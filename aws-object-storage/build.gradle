@@ -6,6 +6,6 @@ dependencies {
 
     api(project(":object-storage"))
 
-    api ("io.micronaut.aws:micronaut-aws-sdk-v2:3.1.0")
+    api ("io.micronaut.aws:micronaut-aws-sdk-v2:3.2.1")
     api ('software.amazon.awssdk:s3')
 }
