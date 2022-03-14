@@ -15,6 +15,6 @@ dependencies {
 
     api(project(":object-storage"))
     implementation platform('com.google.cloud:libraries-bom:24.0.0')
-    api("io.micronaut.gcp:micronaut-gcp-common:4.0.0")
+    api("io.micronaut.gcp:micronaut-gcp-common:4.1.1")
     api("com.google.cloud:google-cloud-storage")
 }
