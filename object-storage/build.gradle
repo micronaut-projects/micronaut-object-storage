@@ -1,0 +1,11 @@
+plugins {
+    id 'io.micronaut.build.internal.objectstorage-module'
+}
+
+dependencies {
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    implementation "io.micronaut:micronaut-inject-java"
+    implementation("io.micronaut:micronaut-runtime")
+
+    testImplementation(project(":object-storage-test"))
+}

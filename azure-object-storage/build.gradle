@@ -1,0 +1,18 @@
+plugins {
+    id 'io.micronaut.build.internal.objectstorage-module'
+}
+
+dependencies {
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    implementation "io.micronaut:micronaut-inject-java"
+    implementation("io.micronaut:micronaut-runtime")
+
+    api(project(":object-storage"))
+    implementation platform('com.azure:azure-sdk-bom:1.0.3')
+    api("com.azure:azure-identity")
+    api("com.azure:azure-storage-blob")
+
+    testAnnotationProcessor "io.micronaut:micronaut-inject-groovy"
+    testImplementation "io.micronaut:micronaut-inject-groovy"
+    testImplementation(project(":object-storage-tck"))
+}

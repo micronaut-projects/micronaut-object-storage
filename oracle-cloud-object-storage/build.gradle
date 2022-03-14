@@ -1,0 +1,10 @@
+plugins {
+    id 'io.micronaut.build.internal.objectstorage-module'
+}
+
+dependencies {
+    api(project(":object-storage"))
+
+    api("io.micronaut.oraclecloud:micronaut-oraclecloud-sdk")
+    api("com.oracle.oci.sdk:oci-java-sdk-objectstorage")
+}

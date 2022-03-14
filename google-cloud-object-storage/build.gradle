@@ -1,0 +1,20 @@
+plugins {
+    id 'io.micronaut.build.internal.objectstorage-module'
+}
+
+dependencies {
+
+    // externalise into plugin
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    annotationProcessor "io.micronaut:micronaut-graal"
+    annotationProcessor "io.micronaut.docs:micronaut-docs-asciidoc-config-props:$micronautDocsVersion"
+
+    compileOnly "io.micronaut:micronaut-inject-java"
+
+    implementation "io.micronaut:micronaut-runtime"
+
+    api(project(":object-storage"))
+    implementation platform('com.google.cloud:libraries-bom:24.0.0')
+    api("io.micronaut.gcp:micronaut-gcp-common:4.0.0")
+    api("com.google.cloud:google-cloud-storage")
+}
