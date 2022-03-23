@@ -17,13 +17,11 @@ package io.micronaut.objectstorage.oraclecloud;
 
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.UploadRequest;
 
 import java.io.InputStream;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 public class OracleCloudObjectStorageEntry implements ObjectStorageEntry {
 

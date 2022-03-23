@@ -13,8 +13,12 @@ import java.util.Optional;
 
 public interface UploadRequest {
 
-    static UploadRequest fromFile(Path path){
+    static UploadRequest fromFile(Path path) {
         return new FileUploadRequest(path);
+    }
+
+    static UploadRequest fromFile(Path path, String key) {
+        return new FileUploadRequest(path, key);
     }
 
     /**
@@ -41,14 +45,11 @@ public interface UploadRequest {
 
     InputStream getInputStream();
 
-    boolean isOverwrite();
-
     class FileUploadRequest implements UploadRequest {
 
         private final String keyName;
         private final String contentType;
-        private final Path file;
-        private final boolean overwrite = false;
+        private final Path path;
 
         public FileUploadRequest(Path localFilePath) {
             this(localFilePath, localFilePath.getFileName().toString(), null, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
@@ -61,11 +62,19 @@ public interface UploadRequest {
         public FileUploadRequest(Path localFilePath, @Nullable String keyName, @Nullable String objectStoragePath, @Nullable String contentType) {
             this.keyName = objectStoragePath != null ? objectStoragePath + "/" + keyName : keyName;
             this.contentType = contentType;
-            this.file = localFilePath;
+            this.path = localFilePath;
         }
 
         public File getFile() {
-            return file.toFile();
+            return path.toFile();
+        }
+
+        public Path getPath() {
+            return path;
+        }
+
+        public String getAbsolutePath(){
+            return path.toAbsolutePath().toString();
         }
 
         @Override
@@ -81,7 +90,7 @@ public interface UploadRequest {
         @Override
         public Optional<Long> getContentSize() {
             try {
-                return Optional.of(Files.size(file));
+                return Optional.of(Files.size(path));
             } catch (IOException e) {
                 return Optional.empty();
             }
@@ -90,16 +99,11 @@ public interface UploadRequest {
         @Override
         public InputStream getInputStream() {
             try {
-                return Files.newInputStream(file);
+                return Files.newInputStream(path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
-        }
-
-        @Override
-        public boolean isOverwrite() {
-            return overwrite;
         }
     }
 }

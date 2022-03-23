@@ -24,7 +24,4 @@ public interface ObjectStorageEntry {
      * @return object content.
      */
     InputStream getInputStream();
-
-
-
 }

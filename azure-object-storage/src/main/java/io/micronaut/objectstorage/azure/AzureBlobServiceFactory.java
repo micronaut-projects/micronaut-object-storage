@@ -41,11 +41,7 @@ import io.micronaut.inject.qualifiers.Qualifiers;
 import jakarta.inject.Singleton;
 
 /**
- * TODO:
- * - blob service builder for given configuration!
- *
  * @author Pavol Gressa
- * @since 2.5
  */
 @Factory
 public class AzureBlobServiceFactory {

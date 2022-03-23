@@ -26,7 +26,6 @@ import jakarta.inject.Singleton;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 @Factory
 public class StorageFactory {

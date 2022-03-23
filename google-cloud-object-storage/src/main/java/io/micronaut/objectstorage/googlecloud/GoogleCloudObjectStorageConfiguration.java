@@ -6,7 +6,6 @@ import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 @EachProperty("micronaut.object-storage.google-cloud")
 public class GoogleCloudObjectStorageConfiguration extends AbstractObjectStorageConfiguration {

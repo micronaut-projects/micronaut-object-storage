@@ -3,16 +3,9 @@ plugins {
 }
 
 dependencies {
-    annotationProcessor "io.micronaut:micronaut-inject-java"
-    implementation "io.micronaut:micronaut-inject-java"
-    implementation("io.micronaut:micronaut-runtime")
-
     api(project(":object-storage"))
-    implementation platform('com.azure:azure-sdk-bom:1.0.3')
-    api("com.azure:azure-identity")
+    implementation platform('io.micronaut.azure:micronaut-azure-bom:3.2.3')
+    api("io.micronaut.azure:micronaut-azure-sdk")
     api("com.azure:azure-storage-blob")
-
-    testAnnotationProcessor "io.micronaut:micronaut-inject-groovy"
-    testImplementation "io.micronaut:micronaut-inject-groovy"
     testImplementation(project(":object-storage-tck"))
 }

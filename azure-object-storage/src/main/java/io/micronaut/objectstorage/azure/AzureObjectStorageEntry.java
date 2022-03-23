@@ -24,7 +24,6 @@ import java.io.OutputStream;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 public class AzureObjectStorageEntry implements ObjectStorageEntry {
 

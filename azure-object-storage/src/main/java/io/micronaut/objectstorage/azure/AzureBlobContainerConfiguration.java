@@ -15,17 +15,13 @@
  */
 package io.micronaut.objectstorage.azure;
 
-import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
-import java.util.Optional;
-
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 @EachProperty(AzureBlobContainerConfiguration.PREFIX)
 public class AzureBlobContainerConfiguration extends AbstractObjectStorageConfiguration {
@@ -44,7 +40,7 @@ public class AzureBlobContainerConfiguration extends AbstractObjectStorageConfig
         return endpoint;
     }
 
-    public void setEndpoint(String endpoint) {
+    public void setEndpoint(@NonNull String endpoint) {
         this.endpoint = endpoint;
     }
 

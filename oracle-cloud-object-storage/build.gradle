@@ -7,4 +7,6 @@ dependencies {
 
     api("io.micronaut.oraclecloud:micronaut-oraclecloud-sdk")
     api("com.oracle.oci.sdk:oci-java-sdk-objectstorage")
+
+    testImplementation(project(":object-storage-tck"))
 }

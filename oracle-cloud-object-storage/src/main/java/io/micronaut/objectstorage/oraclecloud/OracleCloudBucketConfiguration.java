@@ -17,26 +17,27 @@ package io.micronaut.objectstorage.oraclecloud;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 @EachProperty("micronaut.object-storage.oracle-cloud")
 public class OracleCloudBucketConfiguration extends AbstractObjectStorageConfiguration {
 
-    private String namespaceName;
+    private String namespace;
 
-    public OracleCloudBucketConfiguration(@Parameter String bucketName) {
-        super(bucketName);
+    public OracleCloudBucketConfiguration(@Parameter String name) {
+        super(name);
     }
 
-    public String getNamespaceName() {
-        return namespaceName;
+    @NonNull
+    public String getNamespace() {
+        return namespace;
     }
 
-    public void setNamespaceName(String namespaceName) {
-        this.namespaceName = namespaceName;
+    public void setNamespace(@NonNull String namespace) {
+        this.namespace = namespace;
     }
 }

@@ -26,10 +26,13 @@ import io.micronaut.objectstorage.ObjectStorage;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.UploadResponse;
 
 import java.util.Optional;
 
-
+/**
+ * @author Pavol Gressa
+ */
 @EachBean(GoogleCloudObjectStorageConfiguration.class)
 public class GoogleCloudObjectStorage implements ObjectStorage {
 
@@ -44,19 +47,19 @@ public class GoogleCloudObjectStorage implements ObjectStorage {
     }
 
     @Override
-    public void put(UploadRequest uploadRequest) throws ObjectStorageException {
+    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
         BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), uploadRequest.getKey());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null))
             .build();
 
-        storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
-
+        Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
+        return new UploadResponse.Builder().withETag(blob.getEtag()).build();
     }
 
     @Override
-    public Optional<ObjectStorageEntry> get(String objectPath) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), objectPath);
+    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
+        BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), key);
         Blob blob = storage.get(blobId);
 
         GoogleCloudObjectStorageEntry storageEntry = null;
@@ -67,7 +70,8 @@ public class GoogleCloudObjectStorage implements ObjectStorage {
     }
 
     @Override
-    public void delete(String path) throws ObjectStorageException {
-
+    public void delete(String key) throws ObjectStorageException {
+        BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), key);
+        storage.delete(blobId);
     }
 }

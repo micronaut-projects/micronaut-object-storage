@@ -16,16 +16,16 @@
 package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachProperty;
+import io.micronaut.context.annotation.Parameter;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
  */
 @EachProperty("micronaut.object-storage.s3")
 public class AwsS3BucketConfiguration extends AbstractObjectStorageConfiguration {
 
-    public AwsS3BucketConfiguration(String bucketName) {
-        super(bucketName);
+    public AwsS3BucketConfiguration(@Parameter String name) {
+        super(name);
     }
 }

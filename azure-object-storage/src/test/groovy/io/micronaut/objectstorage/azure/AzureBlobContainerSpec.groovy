@@ -1,70 +1,36 @@
 package io.micronaut.objectstorage.azure
 
-import com.azure.core.credential.TokenCredential
-import io.micronaut.context.ApplicationContext
-import io.micronaut.inject.qualifiers.Qualifiers
 import io.micronaut.objectstorage.ObjectStorage
-import io.micronaut.test.annotation.MockBean
+import io.micronaut.objectstorage.ObjectStorageSpecification
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
-import jakarta.inject.Named
-import spock.lang.Specification
-import spock.lang.Unroll
+import spock.lang.Requires
 
+@Requires({
+    System.getenv("AZURE_TEST_STORAGE_CONTAINER_NAME") && System.getenv("AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT") \
+    && System.getenv("AZURE_TEST_CLIENT_ID") && System.getenv("AZURE_TEST_CLIENT_SECRET") \
+  && System.getenv("AZURE_TEST_TENANT_ID")
+})
 @MicronautTest
-class AzureBlobContainerSpec extends Specification implements TestPropertyProvider {
+class AzureBlobContainerSpec extends ObjectStorageSpecification implements TestPropertyProvider {
 
+    @Inject
+    AzureBlobContainer azureBlobContainer
 
+    @Override
     Map<String, String> getProperties() {
         [
-                "micronaut.object-storage.azure-container.container-a.endpoint": "https://container-a.blob.core.windows.net",
-                "micronaut.object-storage.azure-container.container-b.endpoint": "https://container-b.blob.core.windows.net",
-                "micronaut.object-storage.azure-container.container-c.endpoint": "https://container-c.blob.core.windows.net"
+                "azure.credential.client-secret.client-id"                        : System.getenv("AZURE_TEST_CLIENT_ID"),
+                "azure.credential.client-secret.secret"                           : System.getenv("AZURE_TEST_CLIENT_SECRET"),
+                "azure.credential.client-secret.tenant-id"                        : System.getenv("AZURE_TEST_TENANT_ID"),
+                "micronaut.object-storage.azure-container.test-container.name"    : System.getenv("AZURE_TEST_STORAGE_CONTAINER_NAME"),
+                "micronaut.object-storage.azure-container.test-container.endpoint": System.getenv("AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT")
         ]
     }
 
-    @Inject
-    ApplicationContext applicationContext
-
-    @Inject
-    @Named("container-a")
-    ObjectStorage azureBlobContainerA
-
-    @Inject
-    @Named("container-b")
-    ObjectStorage azureBlobContainerB
-
-    @Inject
-    @Named("container-c")
-    ObjectStorage azureBlobContainerC
-
-
-    def "it was properly injected using @Named"() {
-        expect:
-        azureBlobContainerA
-        azureBlobContainerB
-        azureBlobContainerC
+    @Override
+    ObjectStorage getObjectStorage() {
+        return azureBlobContainer
     }
-
-
-        @Unroll
-    def "it can be accessed by name=#name"(String name) {
-        when:
-        def bean = applicationContext.getBean(AzureBlobContainer, Qualifiers.byName(name))
-
-        then:
-        bean
-        bean.configuration.name == name
-        bean.configuration.endpoint == "https://${name}.blob.core.windows.net"
-
-        where:
-        name << ["container-a", "container-b", "container-c"]
-    }
-
-    @MockBean
-    TokenCredential tokenCredential() {
-        return Mock(TokenCredential)
-    }
-
 }

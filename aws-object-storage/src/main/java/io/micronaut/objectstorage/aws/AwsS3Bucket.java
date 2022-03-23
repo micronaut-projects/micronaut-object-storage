@@ -22,16 +22,22 @@ import io.micronaut.objectstorage.ObjectStorage;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.UploadResponse;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.util.Optional;
 
+/**
+ * @author Pavol Gressa
+ */
 @EachBean(AwsS3BucketConfiguration.class)
 public class AwsS3Bucket implements ObjectStorage {
 
@@ -46,7 +52,7 @@ public class AwsS3Bucket implements ObjectStorage {
     }
 
     @Override
-    public void put(UploadRequest uploadRequest) throws ObjectStorageException {
+    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
             .bucket(bucketConfiguration.getName())
             .key(uploadRequest.getKey());
@@ -54,26 +60,28 @@ public class AwsS3Bucket implements ObjectStorage {
         uploadRequest.getContentType().ifPresent(builder::contentType);
         uploadRequest.getContentSize().ifPresent(builder::contentLength);
 
+        PutObjectResponse putObjectResponse = null;
         if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
             UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
-            s3Client.putObject(builder.build(), fileUploadRequest.getFile().toPath());
-
+            putObjectResponse = s3Client.putObject(builder.build(), fileUploadRequest.getFile().toPath());
         } else {
             byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
-            s3Client.putObject(builder.build(), RequestBody.fromBytes(inputBytes));
+            putObjectResponse = s3Client.putObject(builder.build(), RequestBody.fromBytes(inputBytes));
         }
+
+        return new UploadResponse.Builder().withETag(putObjectResponse.eTag()).build();
     }
 
     @Override
-    public Optional<ObjectStorageEntry> get(String objectPath) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
         GetObjectRequest.Builder builder = GetObjectRequest.builder();
         builder.bucket(bucketConfiguration.getName())
-            .key(objectPath);
+            .key(key);
 
         try {
             GetObjectRequest getObjectRequest = builder.build();
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(getObjectRequest);
-            AwsS3ObjectStorageEntry entry = new AwsS3ObjectStorageEntry(objectPath, responseInputStream);
+            AwsS3ObjectStorageEntry entry = new AwsS3ObjectStorageEntry(key, responseInputStream);
             return Optional.of(entry);
         } catch (NoSuchKeyException noSuchKeyException) {
             return Optional.empty();
@@ -81,7 +89,9 @@ public class AwsS3Bucket implements ObjectStorage {
     }
 
     @Override
-    public void delete(String path) throws ObjectStorageException {
-
+    public void delete(String key) throws ObjectStorageException {
+        DeleteObjectRequest.Builder builder = DeleteObjectRequest.builder();
+        builder.bucket(bucketConfiguration.getName()).key(key);
+        s3Client.deleteObject(builder.build());
     }
 }
