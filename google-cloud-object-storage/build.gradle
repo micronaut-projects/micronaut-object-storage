@@ -6,10 +6,10 @@ dependencies {
 
     api(project(":object-storage"))
 
-    implementation platform('io.micronaut.gcp:micronaut-gcp-bom:4.1.1')
+    implementation platform('io.micronaut.gcp:micronaut-gcp-bom:4.2.0')
     api("io.micronaut.gcp:micronaut-gcp-common")
 
-    implementation platform('com.google.cloud:libraries-bom:24.0.0')
+    implementation platform('com.google.cloud:libraries-bom:26.0.0')
     api("com.google.cloud:google-cloud-storage")
 
     testImplementation(project(":object-storage-tck"))

@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api(project(":object-storage"))
-    implementation platform('io.micronaut.azure:micronaut-azure-bom:3.2.3')
+    implementation platform('io.micronaut.azure:micronaut-azure-bom:3.3.0')
     api("io.micronaut.azure:micronaut-azure-sdk")
     api("com.azure:azure-storage-blob")
     testImplementation(project(":object-storage-tck"))
