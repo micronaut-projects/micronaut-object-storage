@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,17 @@ public class AzureBlobContainerConfiguration extends AbstractObjectStorageConfig
         super(name);
     }
 
+    /**
+     * @return the endpoint.
+     */
     @NonNull
     public String getEndpoint() {
         return endpoint;
     }
 
+    /**
+     * @param endpoint the endpoint to set.
+     */
     public void setEndpoint(@NonNull String endpoint) {
         this.endpoint = endpoint;
     }

@@ -8,15 +8,15 @@ If you are interested in contributing to Micronaut and are looking for issues to
 
 ## JDK Setup
 
-Micronaut age currently requires JDK 8.
+Micronaut object-storage currently requires JDK 8.
 
 ## IDE Setup
 
-Micronaut age can be imported into IntelliJ IDEA by opening the `build.gradle` file.
+Micronaut object-storage can be imported into IntelliJ IDEA by opening the `build.gradle` file.
 
 ## Docker Setup
 
-Micronaut age tests currently require Docker to be installed.
+Micronaut object-storage tests currently require Docker to be installed.
 
 ## Running Tests
 

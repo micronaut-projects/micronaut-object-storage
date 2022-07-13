@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,17 @@ public class OracleCloudBucketConfiguration extends AbstractObjectStorageConfigu
         super(name);
     }
 
+    /**
+     * @return the namespace
+     */
     @NonNull
     public String getNamespace() {
         return namespace;
     }
 
+    /**
+     * @param namespace the namespace to set
+     */
     public void setNamespace(@NonNull String namespace) {
         this.namespace = namespace;
     }

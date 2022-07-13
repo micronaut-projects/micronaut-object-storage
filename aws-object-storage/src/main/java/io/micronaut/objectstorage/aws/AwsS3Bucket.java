@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,11 @@ package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.objectstorage.InputStreamMapper;
-import io.micronaut.objectstorage.ObjectStorage;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
-import io.micronaut.objectstorage.UploadRequest;
-import io.micronaut.objectstorage.UploadResponse;
+import io.micronaut.objectstorage.*;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.util.Optional;
 

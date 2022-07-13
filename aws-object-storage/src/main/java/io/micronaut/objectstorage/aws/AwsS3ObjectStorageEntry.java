@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
 
     private final ResponseInputStream<GetObjectResponse> responseResponseInputStream;
     private final String key;
-
 
     AwsS3ObjectStorageEntry(String key, ResponseInputStream<GetObjectResponse> responseResponseInputStream) {
         this.responseResponseInputStream = responseResponseInputStream;
