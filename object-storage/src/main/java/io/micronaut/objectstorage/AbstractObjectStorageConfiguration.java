@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@ public abstract class AbstractObjectStorageConfiguration implements ObjectStorag
         return name;
     }
 
+    /**
+     * @param name the name to set.
+     */
     public void setName(String name) {
         this.name = name;
     }

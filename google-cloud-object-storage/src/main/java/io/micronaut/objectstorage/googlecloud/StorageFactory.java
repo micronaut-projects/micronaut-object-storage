@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,11 @@ import jakarta.inject.Singleton;
 @Factory
 public class StorageFactory {
 
+    /**
+     * @param googleCloudConfiguration The Google Cloud Configuration
+     * @param googleCredentials The Google Credentials
+     * @return The storage instance
+     */
     @RequiresGoogleProjectId
     @Singleton
     @NonNull
@@ -40,12 +45,20 @@ public class StorageFactory {
             .setCredentials(googleCredentials);
     }
 
+    /**
+     * @param builder the builder
+     * @return the {@link Storage}
+     */
     @Singleton
     @NonNull
     public StorageOptions storageOptions(@NonNull StorageOptions.Builder builder) {
         return builder.build();
     }
 
+    /**
+     * @param storageOptions the storage options
+     * @return the {@link Storage}
+     */
     @Singleton
     @NonNull
     public Storage storage(@NonNull StorageOptions storageOptions) {

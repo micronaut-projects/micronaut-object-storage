@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 original authors
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,7 @@ import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.inject.qualifiers.Qualifiers;
-import io.micronaut.objectstorage.ObjectStorage;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
-import io.micronaut.objectstorage.UploadRequest;
-import io.micronaut.objectstorage.UploadResponse;
+import io.micronaut.objectstorage.*;
 import jakarta.inject.Singleton;
 
 import java.util.Optional;
@@ -47,7 +43,6 @@ public class AzureBlobContainer implements ObjectStorage {
 
     private final AzureBlobContainerConfiguration configuration;
     private final BlobContainerClient blobContainerClient;
-
 
     public AzureBlobContainer(@Parameter String name, BlobContainerClient blobContainerClient, BeanContext beanContext) {
         this.blobContainerClient = blobContainerClient;
@@ -94,6 +89,9 @@ public class AzureBlobContainer implements ObjectStorage {
         blobClient.getBlockBlobClient().delete();
     }
 
+    /**
+     * @return the configuration.
+     */
     public AzureBlobContainerConfiguration getConfiguration() {
         return configuration;
     }

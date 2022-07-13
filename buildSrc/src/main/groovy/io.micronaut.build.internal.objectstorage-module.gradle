@@ -1,4 +1,5 @@
 plugins {
+    id 'io.micronaut.build.internal.objectstorage-base'
     id "io.micronaut.build.internal.module"
 }
 
@@ -6,4 +7,10 @@ dependencies {
     annotationProcessor "io.micronaut:micronaut-inject-java"
     implementation "io.micronaut:micronaut-inject-java"
     implementation("io.micronaut:micronaut-runtime")
+}
+
+micronautBuild {
+    binaryCompatibility {
+        enabled = false
+    }
 }

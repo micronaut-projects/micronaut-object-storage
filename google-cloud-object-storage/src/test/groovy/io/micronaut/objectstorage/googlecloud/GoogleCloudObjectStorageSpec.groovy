@@ -1,6 +1,6 @@
 package io.micronaut.objectstorage.googlecloud
 
-import io.micronaut.core.annotation.NonNull
+
 import io.micronaut.objectstorage.ObjectStorage
 import io.micronaut.objectstorage.ObjectStorageSpecification
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
