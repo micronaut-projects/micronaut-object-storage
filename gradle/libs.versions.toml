@@ -20,8 +20,7 @@ micronaut = "3.5.3"
 micronaut-docs = "2.0.0"
 micronaut-test = "3.1.1"
 groovy = "3.0.10"
-spock = "2.1-groovy-3.0"
-micronaut-azure = "3.3.0"
+gcp-libraries = "26.0.0"
 
 # Managed versions appear in the BOM
 # managed-somelib = "1.0"
@@ -33,7 +32,6 @@ micronaut-azure = "3.3.0"
 # Managed dependencies appear in the BOM
 #
 # managed-somelib = { module = "group:artifact", version.ref = "managed-somelib" }
-micronaut-azure-bom = { module = "io.micronaut.azure:micronaut-azure-bom", version.ref = "micronaut-azure" }
 
 #
 # Imported BOMs, also appearing in the generated BOM
@@ -42,8 +40,34 @@ micronaut-azure-bom = { module = "io.micronaut.azure:micronaut-azure-bom", versi
 
 # Other libraries used by the project but non managed
 
-# micronaut-bom = { module = "io.micronaut:micronaut-bom", version.ref = "micronaut" }
-# jdoctor = { module = "me.champeau.jdoctor:jdoctor-core", version.ref="jdoctor" }
+
+# Micronaut
+micronaut-bom = { module = "io.micronaut:micronaut-bom", version.ref = "micronaut" }
+micronaut-inject-groovy = { module = "io.micronaut:micronaut-inject-groovy" }
+micronaut-inject-java = { module = "io.micronaut:micronaut-inject-java" }
+micronaut-runtime = { module = "io.micronaut:micronaut-runtime" }
+
+# Micronaut and cloud implementations
+micronaut-azure-bom = { module = "io.micronaut.azure:micronaut-azure-bom" }
+micronaut-azure-sdk = { module = "io.micronaut.azure:micronaut-azure-sdk" }
+azure-storage-blob = { module = "com.azure:azure-storage-blob" }
+
+micronaut-aws-bom = { module = "io.micronaut.aws:micronaut-aws-bom" }
+micronaut-aws-sdk-v2 = { module = "io.micronaut.aws:micronaut-aws-sdk-v2" }
+amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3" }
+
+micronaut-gcp-bom = { module = "io.micronaut.gcp:micronaut-gcp-bom" }
+micronaut-gcp-common = { module = "io.micronaut.gcp:micronaut-gcp-common" }
+gcp-libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "gcp-libraries" }
+gcp-storage = { module = "com.google.cloud:google-cloud-storage" }
+
+micronaut-oci-bom = { module = "io.micronaut.oraclecloud:micronaut-oraclecloud-bom" }
+micronaut-oci-sdk = { module = "io.micronaut.oraclecloud:micronaut-oraclecloud-sdk" }
+oci-sdk-objectstorage = { module = "com.oracle.oci.sdk:oci-java-sdk-objectstorage" }
+
+# Others
+groovy-test = { module = "org.codehaus.groovy:groovy-test" }
+spock-core = { module = "org.spockframework:spock-core" }
 
 [bundles]
 

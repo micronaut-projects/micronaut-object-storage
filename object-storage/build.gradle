@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    annotationProcessor "io.micronaut:micronaut-inject-java"
-    implementation "io.micronaut:micronaut-inject-java"
-    implementation("io.micronaut:micronaut-runtime")
+    annotationProcessor libs.micronaut.inject.java
+    implementation libs.micronaut.inject.java
+    implementation libs.micronaut.runtime
 }
