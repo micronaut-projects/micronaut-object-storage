@@ -3,10 +3,12 @@ plugins {
 }
 
 dependencies {
-    api(project(":object-storage"))
+    api project(":object-storage")
 
-    api("io.micronaut.oraclecloud:micronaut-oraclecloud-sdk")
-    api("com.oracle.oci.sdk:oci-java-sdk-objectstorage")
+    implementation platform(libs.micronaut.oci.bom)
+    api libs.micronaut.oci.sdk
 
-    testImplementation(project(":object-storage-tck"))
+    api libs.oci.sdk.objectstorage
+
+    testImplementation project(":object-storage-tck")
 }

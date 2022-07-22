@@ -3,13 +3,13 @@ plugins {
 }
 
 dependencies {
-    api(project(":object-storage"))
+    api project(":object-storage")
 
-    implementation platform('io.micronaut.gcp:micronaut-gcp-bom:4.2.0')
-    api("io.micronaut.gcp:micronaut-gcp-common")
+    implementation platform(libs.micronaut.gcp.bom)
+    implementation platform(libs.gcp.libraries.bom)
 
-    implementation platform('com.google.cloud:libraries-bom:26.0.0')
-    api("com.google.cloud:google-cloud-storage")
+    api libs.micronaut.gcp.common
+    api libs.gcp.storage
 
-    testImplementation(project(":object-storage-tck"))
+    testImplementation project(":object-storage-tck")
 }

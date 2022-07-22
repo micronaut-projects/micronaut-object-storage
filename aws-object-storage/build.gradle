@@ -3,8 +3,12 @@ plugins {
 }
 
 dependencies {
-    api(project(":object-storage"))
-    api ("io.micronaut.aws:micronaut-aws-sdk-v2")
-    api ('software.amazon.awssdk:s3')
-    testImplementation(project(":object-storage-tck"))
+    api project(":object-storage")
+
+    implementation platform(libs.micronaut.aws.bom)
+
+    api libs.micronaut.aws.sdk.v2
+    api libs.amazon.awssdk.s3
+
+    testImplementation project(":object-storage-tck")
 }
