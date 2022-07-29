@@ -5,7 +5,7 @@ plugins {
 dependencies {
     api(project(":object-storage"))
 
-    implementation platform('io.micronaut.gcp:micronaut-gcp-bom:4.2.0')
+    implementation platform('io.micronaut.gcp:micronaut-gcp-bom:4.3.0')
     api("io.micronaut.gcp:micronaut-gcp-common")
 
     implementation platform('com.google.cloud:libraries-bom:26.0.0')
