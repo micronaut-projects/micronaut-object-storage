@@ -1,3 +1,3 @@
 plugins {
-    id("groovy-gradle-plugin")
+    `groovy-gradle-plugin`
 }

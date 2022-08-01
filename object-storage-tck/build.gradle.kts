@@ -1,6 +1,6 @@
 plugins {
     groovy
-    id("io.micronaut.build.internal.objectstorage-module")
+    io.micronaut.build.internal.`objectstorage-module`
 }
 
 dependencies {
