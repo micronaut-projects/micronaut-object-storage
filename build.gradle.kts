@@ -1,4 +1,4 @@
 plugins {
-    id("io.micronaut.build.internal.docs")
-    id("io.micronaut.build.internal.quality-reporting")
+    io.micronaut.build.internal.docs
+    io.micronaut.build.internal.`quality-reporting`
 }
