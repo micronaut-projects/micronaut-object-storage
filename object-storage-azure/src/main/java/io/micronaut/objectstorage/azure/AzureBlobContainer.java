@@ -76,7 +76,7 @@ public class AzureBlobContainer implements ObjectStorage {
     public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureObjectStorageEntry storageEntry = null;
-        if (blobClient.exists()) {
+        if (Boolean.TRUE.equals(blobClient.exists())) {
             storageEntry = new AzureObjectStorageEntry(blobClient);
         }
         return Optional.ofNullable(storageEntry);

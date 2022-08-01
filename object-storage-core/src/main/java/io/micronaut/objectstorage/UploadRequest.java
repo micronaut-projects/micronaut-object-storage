@@ -121,9 +121,8 @@ public interface UploadRequest {
             try {
                 return Files.newInputStream(path);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new ObjectStorageException(e);
             }
-            return null;
         }
     }
 }
