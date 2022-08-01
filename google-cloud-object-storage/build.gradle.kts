@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(projects.objectStorage)
+    api(projects.objectStorageCore)
 
     implementation(platform(mn.micronaut.gcp.bom))
     implementation(platform(libs.gcp.libraries.bom))

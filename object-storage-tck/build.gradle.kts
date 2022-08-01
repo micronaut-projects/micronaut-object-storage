@@ -10,7 +10,7 @@ dependencies {
     implementation(mn.micronaut.inject.groovy)
     implementation(mn.micronaut.runtime)
 
-    api(projects.objectStorage)
+    api(projects.objectStorageCore)
 
     implementation(libs.groovy.test)
     implementation(libs.spock.core)

@@ -15,7 +15,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "object-storage-parent"
 
-include("object-storage")
+include("object-storage-core")
 include("object-storage-bom")
 include("object-storage-tck")
 
