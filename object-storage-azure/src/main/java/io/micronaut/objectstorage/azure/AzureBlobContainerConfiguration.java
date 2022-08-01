@@ -20,14 +20,20 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
+import static io.micronaut.objectstorage.azure.AzureBlobContainerConfiguration.PREFIX;
+
 /**
+ * Azure object storage configuration properties.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-@EachProperty(AzureBlobContainerConfiguration.PREFIX)
+@EachProperty(PREFIX)
 public class AzureBlobContainerConfiguration extends AbstractObjectStorageConfiguration {
 
-    public static final String NAME = "azure-container";
-    public static final String PREFIX = AbstractObjectStorageConfiguration.GENERIC_PREFIX + "." + NAME;
+    public static final String NAME = "azure";
+
+    public static final String PREFIX = GENERIC_PREFIX + "." + NAME;
 
     private String endpoint;
 

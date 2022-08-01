@@ -16,14 +16,18 @@
 package io.micronaut.objectstorage;
 
 /**
+ * Base class for all the cloud-specific configurations.
+ *
  * @author Pavol Gressa
- * @since 2.5
+ * @since 1.0
  */
 public abstract class AbstractObjectStorageConfiguration implements ObjectStorageConfiguration {
+
     public static final String GENERIC_PREFIX = "micronaut.object-storage";
+
     private String name;
 
-    public AbstractObjectStorageConfiguration(String name) {
+    protected AbstractObjectStorageConfiguration(String name) {
         this.name = name;
     }
 

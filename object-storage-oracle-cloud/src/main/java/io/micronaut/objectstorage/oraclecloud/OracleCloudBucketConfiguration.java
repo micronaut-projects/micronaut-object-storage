@@ -20,11 +20,20 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
+import static io.micronaut.objectstorage.oraclecloud.OracleCloudBucketConfiguration.PREFIX;
+
 /**
+ * Oracle Cloud object storage configuration properties.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-@EachProperty("micronaut.object-storage.oracle-cloud")
+@EachProperty(PREFIX)
 public class OracleCloudBucketConfiguration extends AbstractObjectStorageConfiguration {
+
+    public static final String NAME = "oracle-cloud";
+
+    public static final String PREFIX = GENERIC_PREFIX + "." + NAME;
 
     private String namespace;
 

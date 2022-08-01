@@ -16,8 +16,10 @@
 package io.micronaut.objectstorage;
 
 /**
+ * Common properties for the object storage configuration.
+ *
  * @author Pavol Gressa
- * @since 2.5
+ * @since 1.0
  */
 public interface ObjectStorageConfiguration {
 
