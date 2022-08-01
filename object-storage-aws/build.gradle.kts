@@ -4,11 +4,10 @@ plugins {
 
 dependencies {
     api(projects.objectStorageCore)
-
-    implementation(platform(mn.micronaut.aws.bom))
-
     api(mn.micronaut.aws.sdk.v2)
     api(libs.amazon.awssdk.s3)
+
+    implementation(platform(mn.micronaut.aws.bom))
 
     testImplementation(projects.objectStorageTck)
 }

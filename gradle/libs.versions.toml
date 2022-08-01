@@ -54,7 +54,6 @@ oci-sdk-objectstorage = { module = "com.oracle.oci.sdk:oci-java-sdk-objectstorag
 
 # Others
 groovy-test = { module = "org.codehaus.groovy:groovy-test" }
-spock-core = { module = "org.spockframework:spock-core" }
 
 [bundles]
 

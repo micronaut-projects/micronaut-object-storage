@@ -4,11 +4,10 @@ plugins {
 
 dependencies {
     api(projects.objectStorageCore)
+    api(mn.micronaut.oraclecloud.sdk)
+    api(libs.oci.sdk.objectstorage)
 
     implementation(platform(mn.micronaut.oraclecloud.bom))
-    api(mn.micronaut.oraclecloud.sdk)
-
-    api(libs.oci.sdk.objectstorage)
 
     testImplementation(projects.objectStorageTck)
 }

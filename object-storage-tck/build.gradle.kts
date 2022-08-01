@@ -1,17 +1,16 @@
 plugins {
     groovy
-    io.micronaut.build.internal.`objectstorage-module`
+    io.micronaut.build.internal.common
 }
 
 dependencies {
-    implementation(platform(mn.micronaut.bom))
-
     annotationProcessor(mn.micronaut.inject.groovy)
-    implementation(mn.micronaut.inject.groovy)
-    implementation(mn.micronaut.runtime)
 
     api(projects.objectStorageCore)
 
+    implementation(platform(mn.micronaut.bom))
+    implementation(mn.micronaut.inject.groovy)
+    implementation(mn.micronaut.runtime)
+    implementation(mn.spock)
     implementation(libs.groovy.test)
-    implementation(libs.spock.core)
 }
