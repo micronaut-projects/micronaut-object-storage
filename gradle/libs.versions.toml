@@ -16,7 +16,7 @@
 # a managed version (a version which alias starts with "managed-"
 
 [versions]
-micronaut = "3.5.3"
+micronaut = "3.5.4"
 micronaut-docs = "2.0.0"
 micronaut-test = "3.1.1"
 groovy = "3.0.10"
@@ -41,28 +41,15 @@ gcp-libraries = "26.0.0"
 # Other libraries used by the project but non managed
 
 
-# Micronaut
-micronaut-bom = { module = "io.micronaut:micronaut-bom", version.ref = "micronaut" }
-micronaut-inject-groovy = { module = "io.micronaut:micronaut-inject-groovy" }
-micronaut-inject-java = { module = "io.micronaut:micronaut-inject-java" }
-micronaut-runtime = { module = "io.micronaut:micronaut-runtime" }
 
-# Micronaut and cloud implementations
-micronaut-azure-bom = { module = "io.micronaut.azure:micronaut-azure-bom" }
-micronaut-azure-sdk = { module = "io.micronaut.azure:micronaut-azure-sdk" }
+# Cloud implementations
 azure-storage-blob = { module = "com.azure:azure-storage-blob" }
 
-micronaut-aws-bom = { module = "io.micronaut.aws:micronaut-aws-bom" }
-micronaut-aws-sdk-v2 = { module = "io.micronaut.aws:micronaut-aws-sdk-v2" }
 amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3" }
 
-micronaut-gcp-bom = { module = "io.micronaut.gcp:micronaut-gcp-bom" }
-micronaut-gcp-common = { module = "io.micronaut.gcp:micronaut-gcp-common" }
 gcp-libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "gcp-libraries" }
 gcp-storage = { module = "com.google.cloud:google-cloud-storage" }
 
-micronaut-oci-bom = { module = "io.micronaut.oraclecloud:micronaut-oraclecloud-bom" }
-micronaut-oci-sdk = { module = "io.micronaut.oraclecloud:micronaut-oraclecloud-sdk" }
 oci-sdk-objectstorage = { module = "com.oracle.oci.sdk:oci-java-sdk-objectstorage" }
 
 # Others
