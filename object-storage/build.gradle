@@ -1,9 +1,0 @@
-plugins {
-    id 'io.micronaut.build.internal.objectstorage-module'
-}
-
-dependencies {
-    annotationProcessor libs.micronaut.inject.java
-    implementation libs.micronaut.inject.java
-    implementation libs.micronaut.runtime
-}
