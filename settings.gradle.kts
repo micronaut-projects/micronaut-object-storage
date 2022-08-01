@@ -19,10 +19,10 @@ include("object-storage-core")
 include("object-storage-bom")
 include("object-storage-tck")
 
-include("azure-object-storage")
-include("google-cloud-object-storage")
-include("aws-object-storage")
-include("oracle-cloud-object-storage")
+include("object-storage-aws")
+include("object-storage-azure")
+include("object-storage-gcp")
+include("object-storage-oracle-cloud")
 
 configure<MicronautBuildSettingsExtension> {
     importMicronautCatalog()
