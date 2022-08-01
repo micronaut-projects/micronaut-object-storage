@@ -21,11 +21,11 @@ class AzureBlobContainerSpec extends ObjectStorageSpecification implements TestP
     @Override
     Map<String, String> getProperties() {
         [
-                "azure.credential.client-secret.client-id"                        : System.getenv("AZURE_TEST_CLIENT_ID"),
-                "azure.credential.client-secret.secret"                           : System.getenv("AZURE_TEST_CLIENT_SECRET"),
-                "azure.credential.client-secret.tenant-id"                        : System.getenv("AZURE_TEST_TENANT_ID"),
-                "micronaut.object-storage.azure-container.test-container.name"    : System.getenv("AZURE_TEST_STORAGE_CONTAINER_NAME"),
-                "micronaut.object-storage.azure-container.test-container.endpoint": System.getenv("AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT")
+                "azure.credential.client-secret.client-id"                              : System.getenv("AZURE_TEST_CLIENT_ID"),
+                "azure.credential.client-secret.secret"                                 : System.getenv("AZURE_TEST_CLIENT_SECRET"),
+                "azure.credential.client-secret.tenant-id"                              : System.getenv("AZURE_TEST_TENANT_ID"),
+                (AzureBlobContainerConfiguration.PREFIX + ".test-container.name")       : System.getenv("AZURE_TEST_STORAGE_CONTAINER_NAME"),
+                (AzureBlobContainerConfiguration.PREFIX + ".test-container.endpoint")   : System.getenv("AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT")
         ]
     }
 

@@ -19,8 +19,8 @@ class GoogleCloudObjectStorageSpec extends ObjectStorageSpecification implements
     @Override
     Map<String, String> getProperties() {
         [
-                "gcp.project-id"                                        : System.getenv("GCLOUD_TEST_PROJECT_ID"),
-                "micronaut.object-storage.google-cloud.test-bucket.name": System.getenv("GCLOUD_TEST_BUCKET_NAME"),
+                "gcp.project-id"                                                    : System.getenv("GCLOUD_TEST_PROJECT_ID"),
+                (GoogleCloudObjectStorageConfiguration.PREFIX + ".test-bucket.name"): System.getenv("GCLOUD_TEST_BUCKET_NAME"),
         ]
     }
 

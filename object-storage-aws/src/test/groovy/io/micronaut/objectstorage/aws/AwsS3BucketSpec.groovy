@@ -19,7 +19,7 @@ class AwsS3BucketSpec extends ObjectStorageSpecification implements TestProperty
 
     @Override
     Map<String, String> getProperties() {
-        return ["micronaut.object-storage.s3.test-bucket.name": System.getenv('AWS_TEST_BUCKET_NAME')]
+        return [AwsS3BucketConfiguration.PREFIX + ".test-bucket.name": System.getenv('AWS_TEST_BUCKET_NAME')]
     }
 
     @Override

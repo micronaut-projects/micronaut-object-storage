@@ -18,8 +18,8 @@ class OracleCloudBucketSpecification extends ObjectStorageSpecification implemen
     @Override
     Map<String, String> getProperties() {
         [
-                "micronaut.object-storage.oracle-cloud.test-bucket.name": System.getenv("ORACLE_CLOUD_TEST_BUCKET_NAME"),
-                "micronaut.object-storage.oracle-cloud.test-bucket.namespace": System.getenv("ORACLE_CLOUD_TEST_NAMESPACE"),
+                (OracleCloudBucketConfiguration.PREFIX + ".test-bucket.name")       : System.getenv("ORACLE_CLOUD_TEST_BUCKET_NAME"),
+                (OracleCloudBucketConfiguration.PREFIX + ".test-bucket.namespace")  : System.getenv("ORACLE_CLOUD_TEST_NAMESPACE"),
         ]
     }
 

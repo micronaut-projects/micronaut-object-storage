@@ -9,7 +9,7 @@ class AzureBlobContainerConfigurationSpec extends Specification {
         given:
         def applicationContext = ApplicationContext.run(
                 [
-                        "micronaut.object-storage.azure-container.test-container.endpoint": "endpoint"
+                        (AzureBlobContainerConfiguration.PREFIX + ".test-container.endpoint"): "endpoint"
                 ])
 
         when:
@@ -28,8 +28,8 @@ class AzureBlobContainerConfigurationSpec extends Specification {
         given:
         def applicationContext = ApplicationContext.run(
                 [
-                        "micronaut.object-storage.azure-container.test-container.name"    : "custom-container-name",
-                        "micronaut.object-storage.azure-container.test-container.endpoint": "endpoint"
+                        (AzureBlobContainerConfiguration.PREFIX + ".test-container.name")    : "custom-container-name",
+                        (AzureBlobContainerConfiguration.PREFIX + ".test-container.endpoint"): "endpoint"
                 ])
 
         when:
