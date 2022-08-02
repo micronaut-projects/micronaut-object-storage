@@ -41,29 +41,26 @@ public interface UploadRequest {
 
     /**
      * Gets the content type of this upload request.
-     *
-     * @return The content type of this upload request.
      */
     Optional<String> getContentType();
 
     /**
-     * Gets the file name with path.
-     *
-     * @return The file name with path on object storage.
+     * Returns the file name with path.
      */
     String getKey();
 
     /**
-     * Returns the size of the part.
-     *
-     * @return The size of this part, in bytes.
+     * Returns the size of the part, in bytes.
      */
     Optional<Long> getContentSize();
 
+    /**
+     * Returns an input stream of the object to be stored.
+     */
     InputStream getInputStream();
 
     /**
-     * File upload request implementation.
+     * Upload request implementation using {@link java.io.File}.
      */
     class FileUploadRequest implements UploadRequest {
 

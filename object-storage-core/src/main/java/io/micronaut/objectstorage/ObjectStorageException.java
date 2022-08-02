@@ -16,8 +16,10 @@
 package io.micronaut.objectstorage;
 
 /**
+ * Represents an error produced when an object storage operation fails.
+ *
  * @author Pavol Gressa
- * @since 2.5
+ * @since 1.0
  */
 public class ObjectStorageException extends RuntimeException {
 

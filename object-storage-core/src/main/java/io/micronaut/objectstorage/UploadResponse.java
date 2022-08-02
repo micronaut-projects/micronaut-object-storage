@@ -16,21 +16,26 @@
 package io.micronaut.objectstorage;
 
 /**
+ * Object storage upload response.
+ *
  * @author Pavol Gressa
- * @since 2.5
+ * @since 1.0
  */
 public interface UploadResponse {
 
+    /**
+     * Returns the entity tag of the object stored (an identifier for a specific version of the object).
+     */
     String getETag();
 
     /**
      * Default implementation of {@link UploadResponse}.
      */
-    class UploadResponseImpl implements UploadResponse {
+    class DefaultUploadResponse implements UploadResponse {
 
         private final String eTag;
 
-        protected UploadResponseImpl(String eTag) {
+        protected DefaultUploadResponse(String eTag) {
             this.eTag = eTag;
         }
 
@@ -53,7 +58,7 @@ public interface UploadResponse {
         }
 
         public UploadResponse build() {
-            return new UploadResponseImpl(eTag);
+            return new DefaultUploadResponse(eTag);
         }
 
     }

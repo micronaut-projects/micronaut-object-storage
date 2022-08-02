@@ -23,7 +23,7 @@ import java.io.InputStream;
 
 /**
  * @author Pavol Gressa
- * @since 2.5
+ * @since 1.0
  */
 @Singleton
 public class DefaultInputStreamMapper implements InputStreamMapper {

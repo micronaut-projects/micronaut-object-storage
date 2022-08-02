@@ -18,32 +18,35 @@ package io.micronaut.objectstorage;
 import java.util.Optional;
 
 /**
+ * Main interface for object storage operations.
+ *
  * @author Pavol Gressa
- * @since 2.5
+ * @since 1.0
  */
 public interface ObjectStorage {
 
     /**
-     * Upload object to object storage.
+     * Uploads an object to the object storage.
      *
      * @param uploadRequest the upload request
      * @return the upload response
-     * @throws ObjectStorageException
+     * @throws ObjectStorageException if there was a failure storing the object
      */
     UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException;
 
     /**
      * Get the object from object storage.
      *
-     * @param key the object path
-     * @return the object or null if object not exists
-     * @throws ObjectStorageException if there was a failure to store object
+     * @param key the object path in the format {@code /foo/bar/file}
+     * @return the object, or empty optional if the object does not exist
+     * @throws ObjectStorageException if there was a failure retrieving the object
      */
     Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException;
 
     /**
-     * Delete the object.
-     * @param key object name in format {@code /foo/bar/file}
+     * Deletes an object from the object storage.
+     *
+     * @param key object path in the format {@code /foo/bar/file}
      */
     void delete(String key) throws ObjectStorageException;
 }
