@@ -27,3 +27,12 @@ include("object-storage-oracle-cloud")
 configure<MicronautBuildSettingsExtension> {
     importMicronautCatalog()
 }
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        }
+    }
+}

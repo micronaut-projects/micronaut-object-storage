@@ -14,3 +14,10 @@ dependencies {
     implementation(mn.spock)
     implementation(libs.groovy.test)
 }
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
+}
