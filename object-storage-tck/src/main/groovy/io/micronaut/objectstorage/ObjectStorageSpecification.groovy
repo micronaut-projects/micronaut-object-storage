@@ -58,6 +58,12 @@ abstract class ObjectStorageSpecification extends Specification {
 
         then:
         noExceptionThrown()
+
+        when: 'get file based on path'
+        objectStorageEntry = getObjectStorage().get(tempFileName)
+
+        then:
+        !objectStorageEntry.isPresent()
     }
 
     abstract ObjectStorage getObjectStorage()

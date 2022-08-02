@@ -10,4 +10,10 @@ dependencies {
     implementation(platform(mn.micronaut.aws.bom))
 
     testImplementation(projects.objectStorageTck)
+    testImplementation(libs.testcontainers.spock)
+    testImplementation(libs.testcontainers.localstack)
+
+    //Required by testcontainers-localstack
+    testImplementation(libs.amazon.awssdk.v1)
+
 }

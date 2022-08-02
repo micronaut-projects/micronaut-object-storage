@@ -39,13 +39,11 @@ gcp-libraries = "26.0.0"
 # boms-somebom = { module = "com.foo:somebom", version.ref = "managed-somebom" }
 
 # Other libraries used by the project but non managed
-
-
-
 # Cloud implementations
 azure-storage-blob = { module = "com.azure:azure-storage-blob" }
 
 amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3" }
+amazon-awssdk-v1 = { module = "com.amazonaws:aws-java-sdk-core" }
 
 gcp-libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "gcp-libraries" }
 gcp-storage = { module = "com.google.cloud:google-cloud-storage" }
@@ -54,6 +52,8 @@ oci-sdk-objectstorage = { module = "com.oracle.oci.sdk:oci-java-sdk-objectstorag
 
 # Others
 groovy-test = { module = "org.codehaus.groovy:groovy-test" }
+testcontainers-spock = { module = "org.testcontainers:spock" }
+testcontainers-localstack = { module = "org.testcontainers:localstack" }
 
 [bundles]
 
