@@ -23,7 +23,7 @@ class AwsS3BucketSpec extends ObjectStorageSpecification implements TestProperty
 
     @Shared
     @AutoCleanup
-    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack"), false)
+    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:1.0.3"))
             .withServices(S3)
 
     @Named("default")
@@ -47,11 +47,7 @@ class AwsS3BucketSpec extends ObjectStorageSpecification implements TestProperty
     }
 
     void setup() {
-        CreateBucketRequest bucketRequest = CreateBucketRequest.builder()
-                .bucket(BUCKET_NAME)
-                .build() as CreateBucketRequest
-
-        s3.createBucket(bucketRequest)
+        s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
     }
 
     @Override
