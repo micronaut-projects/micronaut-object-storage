@@ -11,13 +11,14 @@ import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
+import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3
 
 @MicronautTest
-class AwsS3BucketSpec extends ObjectStorageSpecification implements TestPropertyProvider {
+class AwsS3BucketLocalstackSpec extends ObjectStorageSpecification implements TestPropertyProvider {
 
     private static final String BUCKET_NAME = "test-bucket"
 
@@ -48,6 +49,10 @@ class AwsS3BucketSpec extends ObjectStorageSpecification implements TestProperty
 
     void setup() {
         s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
+    }
+
+    void cleanup() {
+        s3.deleteBucket(DeleteBucketRequest.builder().bucket(BUCKET_NAME).build() as DeleteBucketRequest)
     }
 
     @Override
