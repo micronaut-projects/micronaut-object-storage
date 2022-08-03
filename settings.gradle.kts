@@ -36,11 +36,3 @@ dependencyResolutionManagement {
         }
     }
 }
-
-//TODO remove when https://github.com/micronaut-projects/micronaut-aws/pull/1420 is released
-includeBuild("../micronaut-aws") {
-    dependencySubstitution {
-        substitute(module("io.micronaut.aws:micronaut-aws-bom")).using(project(":aws-bom"))
-        substitute(module("io.micronaut.aws:micronaut-aws-sdk-v2")).using(project(":aws-sdk-v2"))
-    }
-}
