@@ -48,6 +48,7 @@ jobs:
            AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
            AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
            AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+           AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v3.2.0
