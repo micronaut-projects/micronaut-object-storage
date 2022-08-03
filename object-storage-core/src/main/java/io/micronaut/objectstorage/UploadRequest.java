@@ -40,22 +40,22 @@ public interface UploadRequest {
     }
 
     /**
-     * Gets the content type of this upload request.
+     * @return the content type of this upload request.
      */
     Optional<String> getContentType();
 
     /**
-     * Returns the file name with path.
+     * @return the file name with path.
      */
     String getKey();
 
     /**
-     * Returns the size of the part, in bytes.
+     * @return the size of the part, in bytes.
      */
     Optional<Long> getContentSize();
 
     /**
-     * Returns an input stream of the object to be stored.
+     * @return an input stream of the object to be stored.
      */
     InputStream getInputStream();
 

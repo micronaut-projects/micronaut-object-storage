@@ -24,7 +24,7 @@ package io.micronaut.objectstorage;
 public interface UploadResponse {
 
     /**
-     * Returns the entity tag of the object stored (an identifier for a specific version of the object).
+     * @return the entity tag of the object stored (an identifier for a specific version of the object).
      */
     String getETag();
 
