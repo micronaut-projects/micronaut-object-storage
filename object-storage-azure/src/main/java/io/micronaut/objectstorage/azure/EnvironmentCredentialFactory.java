@@ -24,6 +24,7 @@ import jakarta.inject.Singleton;
 
 /**
  * TODO: migrate upstream to micronaut-azure.
+ * https://github.com/micronaut-projects/micronaut-azure/issues/366
  *
  * @author Álvaro Sánchez-Mariscal
  * @since 1.0.0
