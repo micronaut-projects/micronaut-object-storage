@@ -32,6 +32,9 @@ import jakarta.inject.Singleton;
 @BootstrapContextCompatible
 public class EnvironmentCredentialFactory {
 
+    /**
+     * @return the environment credential builder.
+     */
     //TODO create custom condition
     @Requires(property = "azure.client.id")
     @Requires(property = "azure.client.secret")
@@ -42,6 +45,10 @@ public class EnvironmentCredentialFactory {
         return new EnvironmentCredentialBuilder();
     }
 
+    /**
+     * @param builder the environment credential builder.
+     * @return the environment builder.
+     */
     @Requires(bean = EnvironmentCredentialBuilder.class)
     @Singleton
     @BootstrapContextCompatible
