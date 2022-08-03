@@ -26,16 +26,19 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.util.Optional;
 
 /**
+ * AWS implementation of {@link ObjectStorageOperations}.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-@EachBean(AwsS3BucketConfiguration.class)
-public class AwsS3Bucket implements ObjectStorage {
+@EachBean(AwsS3Configuration.class)
+public class AwsS3Operations implements ObjectStorageOperations {
 
     private final S3Client s3Client;
-    private final AwsS3BucketConfiguration bucketConfiguration;
+    private final AwsS3Configuration bucketConfiguration;
     private final InputStreamMapper inputStreamMapper;
 
-    public AwsS3Bucket(@Parameter AwsS3BucketConfiguration bucketConfiguration, S3Client s3Client, InputStreamMapper inputStreamMapper) {
+    public AwsS3Operations(@Parameter AwsS3Configuration bucketConfiguration, S3Client s3Client, InputStreamMapper inputStreamMapper) {
         this.s3Client = s3Client;
         this.bucketConfiguration = bucketConfiguration;
         this.inputStreamMapper = inputStreamMapper;

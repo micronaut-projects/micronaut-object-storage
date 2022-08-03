@@ -1,7 +1,7 @@
 package io.micronaut.objectstorage.aws
 
-import io.micronaut.objectstorage.ObjectStorage
-import io.micronaut.objectstorage.ObjectStorageSpecification
+import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import jakarta.inject.Named
@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 
-abstract class AwsSpec extends ObjectStorageSpecification implements TestPropertyProvider {
+abstract class AwsS3Spec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
 
@@ -20,7 +20,7 @@ abstract class AwsSpec extends ObjectStorageSpecification implements TestPropert
 
     @Named(OBJECT_STORAGE_NAME)
     @Inject
-    AwsS3Bucket awsS3Bucket
+    AwsS3Operations awsS3Bucket
 
     void setup() {
         s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
@@ -31,14 +31,14 @@ abstract class AwsSpec extends ObjectStorageSpecification implements TestPropert
     }
 
     @Override
-    ObjectStorage getObjectStorage() {
+    ObjectStorageOperations getObjectStorage() {
         return awsS3Bucket
     }
 
     @Override
     Map<String, String> getProperties() {
         return [
-                ("${AwsS3BucketConfiguration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString()): BUCKET_NAME
+                ("${AwsS3Configuration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString()): BUCKET_NAME
         ]
     }
 }

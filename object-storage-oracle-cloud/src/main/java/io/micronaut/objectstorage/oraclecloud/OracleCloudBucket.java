@@ -23,10 +23,7 @@ import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
-import io.micronaut.objectstorage.UploadRequest;
-import io.micronaut.objectstorage.UploadResponse;
+import io.micronaut.objectstorage.*;
 
 import java.util.Optional;
 
@@ -34,7 +31,7 @@ import java.util.Optional;
  * @author Pavol Gressa
  */
 @EachBean(OracleCloudBucketConfiguration.class)
-public class OracleCloudBucket implements io.micronaut.objectstorage.ObjectStorage {
+public class OracleCloudBucket implements ObjectStorageOperations {
 
     private final ObjectStorage client;
     private final OracleCloudBucketConfiguration oracleCloudBucketConfiguration;

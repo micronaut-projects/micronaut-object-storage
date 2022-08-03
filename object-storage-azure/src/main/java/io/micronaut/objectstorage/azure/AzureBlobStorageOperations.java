@@ -35,18 +35,21 @@ import jakarta.inject.Singleton;
 import java.util.Optional;
 
 /**
+ * Azure implementation of {@link ObjectStorageOperations}.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
 @EachBean(BlobContainerClient.class)
 @Singleton
-public class AzureBlobContainer implements ObjectStorage {
+public class AzureBlobStorageOperations implements ObjectStorageOperations {
 
-    private final AzureBlobContainerConfiguration configuration;
+    private final AzureBlobStorageConfiguration configuration;
     private final BlobContainerClient blobContainerClient;
 
-    public AzureBlobContainer(@Parameter String name, BlobContainerClient blobContainerClient, BeanContext beanContext) {
+    public AzureBlobStorageOperations(@Parameter String name, BlobContainerClient blobContainerClient, BeanContext beanContext) {
         this.blobContainerClient = blobContainerClient;
-        this.configuration = beanContext.getBean(AzureBlobContainerConfiguration.class, Qualifiers.byName(name));
+        this.configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
     }
 
     @Override
@@ -75,9 +78,9 @@ public class AzureBlobContainer implements ObjectStorage {
     @Override
     public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
-        AzureObjectStorageEntry storageEntry = null;
+        AzureBlobStorageEntry storageEntry = null;
         if (Boolean.TRUE.equals(blobClient.exists())) {
-            storageEntry = new AzureObjectStorageEntry(blobClient);
+            storageEntry = new AzureBlobStorageEntry(blobClient);
         }
         return Optional.ofNullable(storageEntry);
 
@@ -92,7 +95,7 @@ public class AzureBlobContainer implements ObjectStorage {
     /**
      * @return the configuration.
      */
-    public AzureBlobContainerConfiguration getConfiguration() {
+    public AzureBlobStorageConfiguration getConfiguration() {
         return configuration;
     }
 }

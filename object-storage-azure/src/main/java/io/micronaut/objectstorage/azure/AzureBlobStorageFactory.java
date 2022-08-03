@@ -30,10 +30,10 @@ import io.micronaut.inject.qualifiers.Qualifiers;
  * @author Pavol Gressa
  */
 @Factory
-public class AzureBlobServiceFactory {
+public class AzureBlobStorageFactory {
     private final BeanContext beanContext;
 
-    public AzureBlobServiceFactory(BeanContext beanContext) {
+    public AzureBlobStorageFactory(BeanContext beanContext) {
         this.beanContext = beanContext;
     }
 
@@ -42,8 +42,8 @@ public class AzureBlobServiceFactory {
      * @param tokenCredential the token credential
      * @return the {@link BlobServiceClientBuilder}
      */
-    @EachBean(AzureBlobContainerConfiguration.class)
-    public BlobServiceClientBuilder blobServiceClientBuilder(AzureBlobContainerConfiguration configuration, @NonNull TokenCredential tokenCredential) {
+    @EachBean(AzureBlobStorageConfiguration.class)
+    public BlobServiceClientBuilder blobServiceClientBuilder(AzureBlobStorageConfiguration configuration, @NonNull TokenCredential tokenCredential) {
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
             .credential(tokenCredential);
@@ -65,7 +65,7 @@ public class AzureBlobServiceFactory {
      */
     @EachBean(BlobServiceClient.class)
     public BlobContainerClient blobContainerClient(@Parameter String name, @NonNull BlobServiceClient serviceClient) {
-        final AzureBlobContainerConfiguration configuration = beanContext.getBean(AzureBlobContainerConfiguration.class, Qualifiers.byName(name));
+        final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
         return serviceClient.getBlobContainerClient(configuration.getName());
     }
 }

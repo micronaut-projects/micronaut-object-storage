@@ -24,11 +24,11 @@ import java.io.InputStream;
 /**
  * @author Pavol Gressa
  */
-public class AzureObjectStorageEntry implements ObjectStorageEntry {
+public class AzureBlobStorageEntry implements ObjectStorageEntry {
 
     private final BlobClient blobClient;
 
-    public AzureObjectStorageEntry(BlobClient blobClient) {
+    public AzureBlobStorageEntry(BlobClient blobClient) {
         this.blobClient = blobClient;
     }
 

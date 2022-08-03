@@ -3,17 +3,17 @@ package io.micronaut.objectstorage.azure
 import io.micronaut.context.ApplicationContext
 import spock.lang.Specification
 
-class AzureBlobContainerConfigurationSpec extends Specification {
+class AzureBlobStorageConfigurationSpec extends Specification {
 
     def "it configures the configuration to use parameter as name"() {
         given:
         def applicationContext = ApplicationContext.run(
                 [
-                        (AzureBlobContainerConfiguration.PREFIX + ".test-container.endpoint"): "endpoint"
+                        (AzureBlobStorageConfiguration.PREFIX + ".test-container.endpoint"): "endpoint"
                 ])
 
         when:
-        def configuration = applicationContext.getBean(AzureBlobContainerConfiguration)
+        def configuration = applicationContext.getBean(AzureBlobStorageConfiguration)
 
         then:
         configuration
@@ -28,12 +28,12 @@ class AzureBlobContainerConfigurationSpec extends Specification {
         given:
         def applicationContext = ApplicationContext.run(
                 [
-                        (AzureBlobContainerConfiguration.PREFIX + ".test-container.name")    : "custom-container-name",
-                        (AzureBlobContainerConfiguration.PREFIX + ".test-container.endpoint"): "endpoint"
+                        (AzureBlobStorageConfiguration.PREFIX + ".test-container.name")    : "custom-container-name",
+                        (AzureBlobStorageConfiguration.PREFIX + ".test-container.endpoint"): "endpoint"
                 ])
 
         when:
-        def configuration = applicationContext.getBean(AzureBlobContainerConfiguration)
+        def configuration = applicationContext.getBean(AzureBlobStorageConfiguration)
 
         then:
         configuration

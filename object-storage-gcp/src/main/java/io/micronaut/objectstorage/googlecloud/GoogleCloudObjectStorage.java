@@ -29,7 +29,7 @@ import java.util.Optional;
  * @author Pavol Gressa
  */
 @EachBean(GoogleCloudObjectStorageConfiguration.class)
-public class GoogleCloudObjectStorage implements ObjectStorage {
+public class GoogleCloudObjectStorage implements ObjectStorageOperations {
 
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;

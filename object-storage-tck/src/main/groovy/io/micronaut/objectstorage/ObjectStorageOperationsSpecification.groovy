@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 
-abstract class ObjectStorageSpecification extends Specification {
+abstract class ObjectStorageOperationsSpecification extends Specification {
 
     def "it can upload, get and delete object from file"() {
         given:
@@ -66,5 +66,5 @@ abstract class ObjectStorageSpecification extends Specification {
         !objectStorageEntry.isPresent()
     }
 
-    abstract ObjectStorage getObjectStorage()
+    abstract ObjectStorageOperations getObjectStorage()
 }

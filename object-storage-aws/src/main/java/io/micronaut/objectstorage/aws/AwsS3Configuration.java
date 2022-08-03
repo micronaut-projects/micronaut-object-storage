@@ -19,7 +19,7 @@ import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
-import static io.micronaut.objectstorage.aws.AwsS3BucketConfiguration.PREFIX;
+import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
 
 /**
  * AWS object storage configuration properties.
@@ -28,13 +28,13 @@ import static io.micronaut.objectstorage.aws.AwsS3BucketConfiguration.PREFIX;
  * @since 1.0
  */
 @EachProperty(PREFIX)
-public class AwsS3BucketConfiguration extends AbstractObjectStorageConfiguration {
+public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
 
     public static final String NAME = "aws";
 
     public static final String PREFIX = GENERIC_PREFIX + "." + NAME;
 
-    public AwsS3BucketConfiguration(@Parameter String name) {
+    public AwsS3Configuration(@Parameter String name) {
         super(name);
     }
 }

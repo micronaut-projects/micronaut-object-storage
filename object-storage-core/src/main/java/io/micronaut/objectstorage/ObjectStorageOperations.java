@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author Pavol Gressa
  * @since 1.0
  */
-public interface ObjectStorage {
+public interface ObjectStorageOperations {
 
     /**
      * Uploads an object to the object storage.

@@ -20,7 +20,7 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
-import static io.micronaut.objectstorage.azure.AzureBlobContainerConfiguration.PREFIX;
+import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX;
 
 /**
  * Azure object storage configuration properties.
@@ -29,7 +29,7 @@ import static io.micronaut.objectstorage.azure.AzureBlobContainerConfiguration.P
  * @since 1.0
  */
 @EachProperty(PREFIX)
-public class AzureBlobContainerConfiguration extends AbstractObjectStorageConfiguration {
+public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfiguration {
 
     public static final String NAME = "azure";
 
@@ -37,7 +37,7 @@ public class AzureBlobContainerConfiguration extends AbstractObjectStorageConfig
 
     private String endpoint;
 
-    public AzureBlobContainerConfiguration(@Parameter String name) {
+    public AzureBlobStorageConfiguration(@Parameter String name) {
         super(name);
     }
 
