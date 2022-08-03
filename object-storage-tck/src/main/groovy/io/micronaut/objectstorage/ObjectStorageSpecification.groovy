@@ -27,7 +27,7 @@ abstract class ObjectStorageSpecification extends Specification {
         given:
         def tempFilePath = Files.createTempFile("test-file", "txt")
         def tempFileName = tempFilePath.getFileName().toString()
-        Files.writeString(tempFilePath, "micronaut", StandardCharsets.UTF_8);
+        tempFilePath.toFile().text = "micronaut"
 
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromFile(tempFilePath)
