@@ -107,14 +107,14 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></dd>
+<dd><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dd>
 </dl>
 <hr>
 <br>
 <pre>@EachBean(value=<a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudBucketConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudBucketConfiguration.class</a>)
 public class <span class="typeNameLabel">OracleCloudBucket</span>
 extends java.lang.Object
-implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></pre>
+implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></pre>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
 <dd>Pavol Gressa</dd>
@@ -222,11 +222,11 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <h4>put</h4>
 <pre>public&nbsp;<a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;put(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
                    throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#put-io.micronaut.objectstorage.UploadRequest-">ObjectStorage</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">ObjectStorageOperations</a></code></span></div>
 <div class="block">Uploads an object to the object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>uploadRequest</code> - the upload request</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -244,11 +244,11 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <h4>get</h4>
 <pre>public&nbsp;java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;&nbsp;get(java.lang.String&nbsp;key)
                                            throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#get-java.lang.String-">ObjectStorage</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#get-java.lang.String-">ObjectStorageOperations</a></code></span></div>
 <div class="block">Get the object from object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#get-java.lang.String-">get</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#get-java.lang.String-">get</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -266,11 +266,11 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <h4>delete</h4>
 <pre>public&nbsp;void&nbsp;delete(java.lang.String&nbsp;key)
             throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#delete-java.lang.String-">ObjectStorage</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#delete-java.lang.String-">ObjectStorageOperations</a></code></span></div>
 <div class="block">Deletes an object from the object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#delete-java.lang.String-">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#delete-java.lang.String-">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
