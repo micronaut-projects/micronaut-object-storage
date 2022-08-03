@@ -118,7 +118,7 @@ var activeTableTab = "activeTableTab";
 <pre>public static class <span class="typeNameLabel">UploadRequest.FileUploadRequest</span>
 extends java.lang.Object
 implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></pre>
-<div class="block">File upload request implementation.</div>
+<div class="block">Upload request implementation using <code>File</code>.</div>
 </li>
 </ul>
 </div>
@@ -185,15 +185,11 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.Long&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getContentSize--">getContentSize</a></span>()</code>
-<div class="block">Returns the size of the part.</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getContentSize--">getContentSize</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getContentType--">getContentType</a></span>()</code>
-<div class="block">Gets the content type of this upload request.</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getContentType--">getContentType</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.io.File</code></td>
@@ -205,9 +201,7 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getKey--">getKey</a></span>()</code>
-<div class="block">Gets the file name with path.</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getKey--">getKey</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>java.nio.file.Path</code></td>
@@ -318,13 +312,11 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <li class="blockList">
 <h4>getContentType</h4>
 <pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getContentType()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getContentType--">UploadRequest</a></code></span></div>
-<div class="block">Gets the content type of this upload request.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getContentType--">getContentType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The content type of this upload request.</dd>
+<dd>the content type of this upload request.</dd>
 </dl>
 </li>
 </ul>
@@ -335,13 +327,11 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <li class="blockList">
 <h4>getKey</h4>
 <pre>public&nbsp;java.lang.String&nbsp;getKey()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getKey--">UploadRequest</a></code></span></div>
-<div class="block">Gets the file name with path.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getKey--">getKey</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The file name with path on object storage.</dd>
+<dd>the file name with path.</dd>
 </dl>
 </li>
 </ul>
@@ -352,13 +342,11 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <li class="blockList">
 <h4>getContentSize</h4>
 <pre>public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getContentSize()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getContentSize--">UploadRequest</a></code></span></div>
-<div class="block">Returns the size of the part.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getContentSize--">getContentSize</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The size of this part, in bytes.</dd>
+<dd>the size of the part, in bytes.</dd>
 </dl>
 </li>
 </ul>
@@ -372,6 +360,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getInputStream--">getInputStream</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an input stream of the object to be stored.</dd>
 </dl>
 </li>
 </ul>

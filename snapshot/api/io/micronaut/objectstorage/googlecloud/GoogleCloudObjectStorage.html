@@ -159,7 +159,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudObjectStorage.html#delete-java.lang.String-">delete</a></span>(java.lang.String&nbsp;key)</code>
-<div class="block">Delete the object.</div>
+<div class="block">Deletes an object from the object storage.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
@@ -171,7 +171,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudObjectStorage.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
-<div class="block">Upload object to object storage.</div>
+<div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
 </table>
@@ -224,7 +224,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <pre>public&nbsp;<a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;put(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
                    throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#put-io.micronaut.objectstorage.UploadRequest-">ObjectStorage</a></code></span></div>
-<div class="block">Upload object to object storage.</div>
+<div class="block">Uploads an object to the object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></code></dd>
@@ -233,7 +233,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the upload response</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code> - if there was a failure storing the object</dd>
 </dl>
 </li>
 </ul>
@@ -251,11 +251,11 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#get-java.lang.String-">get</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - the object path</dd>
+<dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the object or null if object not exists</dd>
+<dd>the object, or empty optional if the object does not exist</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code> - if there was a failure to store object</dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code> - if there was a failure retrieving the object</dd>
 </dl>
 </li>
 </ul>
@@ -268,12 +268,12 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" t
 <pre>public&nbsp;void&nbsp;delete(java.lang.String&nbsp;key)
             throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#delete-java.lang.String-">ObjectStorage</a></code></span></div>
-<div class="block">Delete the object.</div>
+<div class="block">Deletes an object from the object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html#delete-java.lang.String-">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorage.html" title="interface in io.micronaut.objectstorage">ObjectStorage</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>key</code> - object name in format <code>/foo/bar/file</code></dd>
+<dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code></dd>
 </dl>
