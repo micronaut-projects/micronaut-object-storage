@@ -18,8 +18,8 @@ abstract class AwsS3Spec extends ObjectStorageOperationsSpecification implements
     @Inject
     S3Client s3
 
-    @Named(OBJECT_STORAGE_NAME)
     @Inject
+    @Named(OBJECT_STORAGE_NAME)
     AwsS3Operations awsS3Bucket
 
     void setup() {
