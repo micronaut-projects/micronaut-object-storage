@@ -27,7 +27,15 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.inject.qualifiers.Qualifiers;
 
 /**
+ * <p>Creates beans of the following types:</p>
+ * <ul>
+ *     <li>For each {@link AzureBlobStorageConfiguration}, creates a {@link BlobServiceClientBuilder}.</li>
+ *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceClient}</li>
+ *     <li>For each {@link BlobServiceClient}, creates a {@link BlobContainerClient}</li>
+ * </ul>
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
 @Factory
 public class AzureBlobStorageFactory {
