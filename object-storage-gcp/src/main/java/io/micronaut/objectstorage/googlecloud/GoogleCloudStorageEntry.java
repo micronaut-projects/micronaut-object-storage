@@ -22,13 +22,16 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
+ * An {@link ObjectStorageEntry} implementation for Google Cloud Storage.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-public class GoogleCloudObjectStorageEntry implements ObjectStorageEntry {
+public class GoogleCloudStorageEntry implements ObjectStorageEntry {
 
     private final Blob blob;
 
-    public GoogleCloudObjectStorageEntry(Blob blob) {
+    public GoogleCloudStorageEntry(Blob blob) {
         this.blob = blob;
     }
 

@@ -28,7 +28,7 @@ import jakarta.inject.Singleton;
  * @author Pavol Gressa
  */
 @Factory
-public class StorageFactory {
+public class GoogleCloudStorageFactory {
 
     /**
      * @param googleCloudConfiguration The Google Cloud Configuration

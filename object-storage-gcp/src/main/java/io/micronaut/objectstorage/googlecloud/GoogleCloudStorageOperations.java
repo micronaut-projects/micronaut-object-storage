@@ -26,24 +26,27 @@ import io.micronaut.objectstorage.*;
 import java.util.Optional;
 
 /**
+ * Google Cloud implementation of {@link ObjectStorageOperations}.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-@EachBean(GoogleCloudObjectStorageConfiguration.class)
-public class GoogleCloudObjectStorage implements ObjectStorageOperations {
+@EachBean(GoogleCloudStorageConfiguration.class)
+public class GoogleCloudStorageOperations implements ObjectStorageOperations {
 
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
-    private final GoogleCloudObjectStorageConfiguration googleCloudObjectStorageConfiguration;
+    private final GoogleCloudStorageConfiguration configuration;
 
-    public GoogleCloudObjectStorage(InputStreamMapper inputStreamMapper, Storage storage, GoogleCloudObjectStorageConfiguration googleCloudObjectStorageConfiguration) {
+    public GoogleCloudStorageOperations(InputStreamMapper inputStreamMapper, Storage storage, GoogleCloudStorageConfiguration configuration) {
         this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
-        this.googleCloudObjectStorageConfiguration = googleCloudObjectStorageConfiguration;
+        this.configuration = configuration;
     }
 
     @Override
     public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), uploadRequest.getKey());
+        BlobId blobId = BlobId.of(configuration.getName(), uploadRequest.getKey());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null))
             .build();
@@ -54,19 +57,19 @@ public class GoogleCloudObjectStorage implements ObjectStorageOperations {
 
     @Override
     public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), key);
+        BlobId blobId = BlobId.of(configuration.getName(), key);
         Blob blob = storage.get(blobId);
 
-        GoogleCloudObjectStorageEntry storageEntry = null;
+        GoogleCloudStorageEntry storageEntry = null;
         if (blob != null && blob.exists()) {
-            storageEntry = new GoogleCloudObjectStorageEntry(blob);
+            storageEntry = new GoogleCloudStorageEntry(blob);
         }
         return Optional.ofNullable(storageEntry);
     }
 
     @Override
     public void delete(String key) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(googleCloudObjectStorageConfiguration.getName(), key);
+        BlobId blobId = BlobId.of(configuration.getName(), key);
         storage.delete(blobId);
     }
 }
