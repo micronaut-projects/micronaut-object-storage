@@ -12,7 +12,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 @MicronautTest
 @IgnoreIf({ env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY && env.AWS_REGION })
-class AwsS3OperationsLocalstackSpec extends AwsS3Spec implements TestPropertyProvider {
+class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPropertyProvider {
 
     @Shared
     @AutoCleanup

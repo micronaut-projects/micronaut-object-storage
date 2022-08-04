@@ -6,4 +6,4 @@ import spock.lang.Requires
 
 @MicronautTest
 @Requires({ env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY && env.AWS_REGION })
-class AwsS3OperationsCloudSpec extends AwsS3Spec implements TestPropertyProvider {}
+class AwsS3OperationsCloudSpec extends AbstractAwsS3Spec implements TestPropertyProvider {}
