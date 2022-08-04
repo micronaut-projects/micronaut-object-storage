@@ -13,7 +13,8 @@ dependencies {
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.testcontainers.localstack)
 
-    //Required by testcontainers-localstack
-    testImplementation(libs.amazon.awssdk.v1)
+    testImplementation(libs.amazon.awssdk.v1) {
+        because("it is required by testcontainers-localstack")
+    }
 
 }
