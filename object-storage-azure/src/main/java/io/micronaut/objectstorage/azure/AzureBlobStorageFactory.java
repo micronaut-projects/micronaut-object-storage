@@ -56,13 +56,17 @@ public class AzureBlobStorageFactory {
     @Requires(bean = TokenCredential.class)
     @Requires(missingBeans = StorageSharedKeyCredential.class)
     public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(
-        AzureBlobStorageConfiguration configuration, @NonNull TokenCredential tokenCredential)
-    {
+        AzureBlobStorageConfiguration configuration, @NonNull TokenCredential tokenCredential) {
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
             .credential(tokenCredential);
     }
 
+    /**
+     * @param configuration the configuration
+     * @param sharedKeyCredential the shared key credential
+     * @return the {@link BlobServiceClientBuilder}
+     */
     @EachBean(AzureBlobStorageConfiguration.class)
     @Requires(bean = StorageSharedKeyCredential.class)
     public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(
