@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -110,7 +110,15 @@ var activeTableTab = "activeTableTab";
 <pre>@Factory
 public class <span class="typeNameLabel">AzureBlobStorageFactory</span>
 extends java.lang.Object</pre>
+<div class="block"><p>Creates beans of the following types:</p>
+ <ul>
+     <li>For each <a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure"><code>AzureBlobStorageConfiguration</code></a>, creates a <code>BlobServiceClientBuilder</code>.</li>
+     <li>For each <code>BlobServiceClientBuilder</code>, creates a <code>BlobServiceClient</code></li>
+     <li>For each <code>BlobServiceClient</code>, creates a <code>BlobContainerClient</code></li>
+ </ul></div>
 <dl>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.0</dd>
 <dt><span class="simpleTagLabel">Author:</span></dt>
 <dd>Pavol Gressa</dd>
 </dl>
@@ -160,8 +168,13 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>com.azure.storage.blob.BlobServiceClientBuilder</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html#blobServiceClientBuilder-io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration-com.azure.core.credential.TokenCredential-">blobServiceClientBuilder</a></span>(<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
-                        com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html#blobServiceClientBuilderWithSharedKeyCredential-io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration-com.azure.storage.common.StorageSharedKeyCredential-">blobServiceClientBuilderWithSharedKeyCredential</a></span>(<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
+                                               com.azure.storage.common.StorageSharedKeyCredential&nbsp;sharedKeyCredential)</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>com.azure.storage.blob.BlobServiceClientBuilder</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html#blobServiceClientBuilderWithTokenCredential-io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration-com.azure.core.credential.TokenCredential-">blobServiceClientBuilderWithTokenCredential</a></span>(<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
+                                           com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -202,20 +215,41 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="blobServiceClientBuilder-io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration-com.azure.core.credential.TokenCredential-">
+<a name="blobServiceClientBuilderWithTokenCredential-io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration-com.azure.core.credential.TokenCredential-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>blobServiceClientBuilder</h4>
+<h4>blobServiceClientBuilderWithTokenCredential</h4>
 <pre>@EachBean(value=<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration.class</a>)
-public&nbsp;com.azure.storage.blob.BlobServiceClientBuilder&nbsp;blobServiceClientBuilder(<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
-                                                                                                                                     @NonNull
-                                                                                                                                     com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</pre>
+ @Requires(bean=com.azure.core.credential.TokenCredential.class) @Requires(missingBeans=com.azure.storage.common.StorageSharedKeyCredential.class)
+public&nbsp;com.azure.storage.blob.BlobServiceClientBuilder&nbsp;blobServiceClientBuilderWithTokenCredential(<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
+                                                                                                                                                                                                                                                                                                           @NonNull
+                                                                                                                                                                                                                                                                                                           com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>configuration</code> - the configuration</dd>
 <dd><code>tokenCredential</code> - the token credential</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the <code>BlobServiceClientBuilder</code></dd>
+</dl>
+</li>
+</ul>
+<a name="blobServiceClientBuilderWithSharedKeyCredential-io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration-com.azure.storage.common.StorageSharedKeyCredential-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>blobServiceClientBuilderWithSharedKeyCredential</h4>
+<pre>@EachBean(value=<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration.class</a>)
+ @Requires(bean=com.azure.storage.common.StorageSharedKeyCredential.class)
+public&nbsp;com.azure.storage.blob.BlobServiceClientBuilder&nbsp;blobServiceClientBuilderWithSharedKeyCredential(<a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
+                                                                                                                                                                                                                                       @NonNull
+                                                                                                                                                                                                                                       com.azure.storage.common.StorageSharedKeyCredential&nbsp;sharedKeyCredential)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>configuration</code> - the configuration</dd>
+<dd><code>sharedKeyCredential</code> - the shared key credential</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the <code>BlobServiceClientBuilder</code></dd>
 </dl>
