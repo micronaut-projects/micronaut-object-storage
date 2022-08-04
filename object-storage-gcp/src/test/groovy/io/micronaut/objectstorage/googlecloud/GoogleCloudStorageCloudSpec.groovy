@@ -9,7 +9,7 @@ import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import spock.lang.Requires
 
-@Requires({ env.GCLOUD_TEST_PROJECT_ID && env.GCLOUD_TEST_BUCKET_NAME })
+@Requires({ env.GCLOUD_TEST_PROJECT_ID })
 @MicronautTest
 class GoogleCloudStorageCloudSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
