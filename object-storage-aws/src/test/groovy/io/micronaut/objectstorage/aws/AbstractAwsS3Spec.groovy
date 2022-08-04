@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 
-abstract class AwsS3Spec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
+abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
 
@@ -18,8 +18,8 @@ abstract class AwsS3Spec extends ObjectStorageOperationsSpecification implements
     @Inject
     S3Client s3
 
-    @Named(OBJECT_STORAGE_NAME)
     @Inject
+    @Named(OBJECT_STORAGE_NAME)
     AwsS3Operations awsS3Bucket
 
     void setup() {
