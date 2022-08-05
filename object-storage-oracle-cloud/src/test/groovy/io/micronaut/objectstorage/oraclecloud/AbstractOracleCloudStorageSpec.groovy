@@ -37,26 +37,25 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     void setup() {
+        def builder = CreateBucketDetails.builder()
+                .compartmentId(System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID"))
+                .name(BUCKET_NAME)
         if (System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID")) {
-            CreateBucketDetails details = CreateBucketDetails.builder()
-                    .compartmentId(System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID"))
-                    .name(BUCKET_NAME)
-                    .build()
-            CreateBucketRequest request = CreateBucketRequest.builder()
-                    .namespaceName(configuration.getNamespace())
-                    .createBucketDetails(details)
-                    .build()
-            client.createBucket(request)
+            builder.compartmentId(System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID"))
         }
+        CreateBucketRequest request = CreateBucketRequest.builder()
+                .namespaceName(configuration.getNamespace())
+                .createBucketDetails(builder.build())
+                .build()
+        client.createBucket(request)
+
     }
 
     void cleanup() {
-        if (System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID")) {
-            DeleteBucketRequest request = DeleteBucketRequest.builder()
-                    .namespaceName(configuration.getNamespace())
-                    .bucketName(BUCKET_NAME)
-                    .build()
-            client.deleteBucket(request)
-        }
+        DeleteBucketRequest request = DeleteBucketRequest.builder()
+                .namespaceName(configuration.getNamespace())
+                .bucketName(BUCKET_NAME)
+                .build()
+        client.deleteBucket(request)
     }
 }
