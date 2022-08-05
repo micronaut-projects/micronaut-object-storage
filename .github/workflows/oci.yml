@@ -37,11 +37,6 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0'
-        with:
-          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
       - name: Build with Gradle
         run: |
           ./gradlew :object-storage-oracle-cloud:test --no-daemon --parallel --continue
@@ -51,6 +46,11 @@ jobs:
            GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
            GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
+           OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+           OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+           OCI_REGION: ${{ secrets.OCI_REGION }}
+           OCI_TENANT_ID: ${{ secrets.OCI_TENANT_ID }}
+           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
            ORACLE_CLOUD_TEST_NAMESPACE: ${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}
            ORACLE_CLOUD_TEST_COMPARTMENT_ID: ${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}
       - name: Publish Test Report
