@@ -15,11 +15,7 @@ import spock.lang.AutoCleanup
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-
-@IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID && !jvm.java11 })
+@IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID })
 @MicronautTest
 @Property(name = "spec.name", value = SPEC_NAME)
 class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec {
@@ -49,17 +45,18 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
             "externalUrl": "${fakeGcsExternalUrl}"
         }
         """.trim()
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(modifyExternalUrlRequestUri))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        HttpResponse<Void> response = HttpClient.newBuilder().build()
-                .send(req, HttpResponse.BodyHandlers.discarding())
+        def connection = new URL(modifyExternalUrlRequestUri).openConnection() as HttpURLConnection
+        connection.with {
+            requestMethod = "PUT"
+            doOutput = true
+            setRequestProperty("Content-Type", "application/json")
+            outputStream.withPrintWriter {it.write(json) }
+            def result = inputStream.text
 
-        if (response.statusCode() != 200) {
-            throw new RuntimeException(
-                    "error updating fake-gcs-server with external url, response status code " + response.statusCode() + " != 200");
+            if (responseCode != 200) {
+                throw new RuntimeException(
+                        "error updating fake-gcs-server with external url, response status code " + responseCode + " != 200");
+            }
         }
     }
 
