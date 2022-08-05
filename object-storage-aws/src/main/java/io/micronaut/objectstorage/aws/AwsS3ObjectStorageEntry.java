@@ -22,7 +22,10 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import java.io.InputStream;
 
 /**
+ * An {@link ObjectStorageEntry} implementation for AWS S3.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
 public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
 

@@ -22,7 +22,10 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 import java.io.InputStream;
 
 /**
+ * An {@link ObjectStorageEntry} implementation for Azure Blob Storage.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
 public class AzureBlobStorageEntry implements ObjectStorageEntry {
 
