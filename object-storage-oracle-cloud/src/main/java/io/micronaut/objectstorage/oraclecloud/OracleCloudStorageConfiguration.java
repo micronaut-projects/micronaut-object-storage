@@ -42,7 +42,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @return the namespace
+     * @return the Object Storage namespace used.
      */
     @NonNull
     public String getNamespace() {
@@ -50,7 +50,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @param namespace the namespace to set
+     * @param namespace the Object Storage namespace used.
      */
     public void setNamespace(@NonNull String namespace) {
         this.namespace = namespace;

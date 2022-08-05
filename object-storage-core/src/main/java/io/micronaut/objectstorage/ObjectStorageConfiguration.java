@@ -23,6 +23,9 @@ package io.micronaut.objectstorage;
  */
 public interface ObjectStorageConfiguration {
 
+    /**
+     * @return the name of the object storage. In cloud providers this is often referred to as a bucket.
+     */
     String getName();
 
 }
