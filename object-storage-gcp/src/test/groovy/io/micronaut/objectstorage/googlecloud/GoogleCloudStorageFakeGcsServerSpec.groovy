@@ -19,7 +19,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-@IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID })
+@IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID && !jvm.java11 })
 @MicronautTest
 @Property(name = "spec.name", value = SPEC_NAME)
 class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec {
