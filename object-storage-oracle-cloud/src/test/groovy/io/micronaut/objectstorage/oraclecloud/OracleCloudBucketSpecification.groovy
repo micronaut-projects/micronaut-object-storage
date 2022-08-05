@@ -12,14 +12,14 @@ import spock.lang.Requires
 class OracleCloudBucketSpecification extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     @Inject
-    OracleCloudBucket oracleCloudBucket
+    OracleCloudStorageOperations oracleCloudBucket
 
 
     @Override
     Map<String, String> getProperties() {
         [
-                (OracleCloudBucketConfiguration.PREFIX + ".test-bucket.name")       : System.getenv("ORACLE_CLOUD_TEST_BUCKET_NAME"),
-                (OracleCloudBucketConfiguration.PREFIX + ".test-bucket.namespace")  : System.getenv("ORACLE_CLOUD_TEST_NAMESPACE"),
+                (OracleCloudStorageConfiguration.PREFIX + ".test-bucket.name")     : System.getenv("ORACLE_CLOUD_TEST_BUCKET_NAME"),
+                (OracleCloudStorageConfiguration.PREFIX + ".test-bucket.namespace"): System.getenv("ORACLE_CLOUD_TEST_NAMESPACE"),
         ]
     }
 

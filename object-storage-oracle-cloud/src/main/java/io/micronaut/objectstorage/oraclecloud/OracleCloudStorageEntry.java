@@ -21,14 +21,17 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 import java.io.InputStream;
 
 /**
+ * An {@link ObjectStorageEntry} implementation for Oracle Cloud Storage.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-public class OracleCloudObjectStorageEntry implements ObjectStorageEntry {
+public class OracleCloudStorageEntry implements ObjectStorageEntry {
 
-    private GetObjectResponse objectResponse;
+    private final GetObjectResponse objectResponse;
     private final String key;
 
-    OracleCloudObjectStorageEntry(String key, GetObjectResponse objectResponse) {
+    OracleCloudStorageEntry(String key, GetObjectResponse objectResponse) {
         this.objectResponse = objectResponse;
         this.key = key;
     }
