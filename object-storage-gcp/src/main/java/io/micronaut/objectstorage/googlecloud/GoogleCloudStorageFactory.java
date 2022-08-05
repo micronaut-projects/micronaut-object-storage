@@ -19,6 +19,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import io.micronaut.context.annotation.Factory;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.gcp.GoogleCloudConfiguration;
 import io.micronaut.gcp.condition.RequiresGoogleProjectId;
@@ -49,6 +50,7 @@ public class GoogleCloudStorageFactory {
      * @param builder the builder
      * @return the {@link Storage}
      */
+    @Requires(bean = StorageOptions.Builder.class)
     @Singleton
     @NonNull
     public StorageOptions storageOptions(@NonNull StorageOptions.Builder builder) {
@@ -59,6 +61,7 @@ public class GoogleCloudStorageFactory {
      * @param storageOptions the storage options
      * @return the {@link Storage}
      */
+    @Requires(bean = StorageOptions.class)
     @Singleton
     @NonNull
     public Storage storage(@NonNull StorageOptions storageOptions) {

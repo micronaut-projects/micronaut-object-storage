@@ -11,4 +11,5 @@ dependencies {
     implementation(platform(libs.gcp.libraries.bom))
 
     testImplementation(projects.objectStorageTck)
+    testImplementation(libs.testcontainers.spock)
 }
