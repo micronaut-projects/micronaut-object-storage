@@ -1,16 +1,13 @@
 package io.micronaut.objectstorage.googlecloud
 
 import com.google.cloud.NoCredentials
-import com.google.cloud.storage.BucketInfo
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.StorageOptions
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Primary
-import io.micronaut.objectstorage.ObjectStorageOperations
-import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
+import io.micronaut.context.annotation.Property
+import io.micronaut.context.annotation.Requires
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import io.micronaut.test.support.TestPropertyProvider
-import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
@@ -24,11 +21,11 @@ import java.net.http.HttpResponse
 
 @IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID })
 @MicronautTest
-class GoogleCloudStorageFakeGcsServerSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
+@Property(name = "spec.name", value = SPEC_NAME)
+class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec {
 
-    public static final String BUCKET_NAME = System.currentTimeMillis()
-
-    public static final String OBJECT_STORAGE_NAME = "default"
+    public static final String TEST_PROJECT_ID = "test-project"
+    public static final String SPEC_NAME = "GoogleCloudStorageFakeGcsServerSpec"
 
     @Shared
     @AutoCleanup
@@ -38,7 +35,6 @@ class GoogleCloudStorageFakeGcsServerSpec extends ObjectStorageOperationsSpecifi
                     "/bin/fake-gcs-server",
                     "-scheme", "http"
             ))
-    public static final String TEST_PROJECT_ID = "test-project"
 
     void setupSpec() {
         fakeGcs.start()
@@ -67,33 +63,8 @@ class GoogleCloudStorageFakeGcsServerSpec extends ObjectStorageOperationsSpecifi
         }
     }
 
-    @Inject
-    GoogleCloudStorageOperations cloudObjectStorage
-
-    @Inject
-    Storage storage
-
-    @Override
-    Map<String, String> getProperties() {
-        [
-                "gcp.project-id"                                                                    : TEST_PROJECT_ID,
-                ("${GoogleCloudStorageConfiguration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString()): BUCKET_NAME,
-        ]
-    }
-
-    ObjectStorageOperations getObjectStorage() {
-        return cloudObjectStorage
-    }
-
-    void setup() {
-        storage.create(BucketInfo.newBuilder(BUCKET_NAME).build());
-    }
-
-    void cleanup() {
-        storage.get(BUCKET_NAME).delete()
-    }
-
     @Factory
+    @Requires(property = "spec.name", value = SPEC_NAME)
     static class FakeGcsFactory {
 
         @Singleton
