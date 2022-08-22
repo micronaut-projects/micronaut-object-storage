@@ -9,12 +9,12 @@ import jakarta.inject.Singleton
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
-import spock.lang.Ignore
 import spock.lang.Shared
 
 @MicronautTest
-@Ignore("https://github.com/cameritelabs/oci-emulator/issues/20")
 class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
+
+    boolean supportsEtag = false
 
     @Shared
     @AutoCleanup
