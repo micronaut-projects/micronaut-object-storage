@@ -1,19 +1,19 @@
 package io.micronaut.objectstorage.oraclecloud
 
-import com.oracle.bmc.objectstorage.ObjectStorage
 import com.oracle.bmc.objectstorage.ObjectStorageClient
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
-import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
+import spock.lang.Ignore
 import spock.lang.Shared
 
 @MicronautTest
+@Ignore("https://github.com/cameritelabs/oci-emulator/issues/20")
 class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
 
     @Shared
@@ -21,8 +21,7 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
     GenericContainer ociEmulator = new GenericContainer(DockerImageName.parse("cameritelabs/oci-emulator"))
             .withExposedPorts(12000)
 
-    @Shared
-    String endpoint
+    static String endpoint
 
     @Override
     Map<String, String> getProperties() {
@@ -39,13 +38,13 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
     }
 
     @Singleton
-    class ObjectStorageListener implements BeanCreatedEventListener<ObjectStorageClient.Builder> {
+    static class ObjectStorageListener implements BeanCreatedEventListener<ObjectStorageClient> {
 
         @Override
-        ObjectStorageClient.Builder onCreated(@NonNull BeanCreatedEvent<ObjectStorageClient.Builder> event) {
-            ObjectStorageClient.Builder builder = event.bean
-            builder.endpoint(endpoint)
-            return builder
+        ObjectStorageClient onCreated(@NonNull BeanCreatedEvent<ObjectStorageClient> event) {
+            ObjectStorageClient client = event.bean
+            client.endpoint = endpoint
+            return client
         }
     }
 }
