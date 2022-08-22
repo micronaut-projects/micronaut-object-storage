@@ -1,6 +1,8 @@
 package io.micronaut.objectstorage.oraclecloud
 
 import com.oracle.bmc.objectstorage.ObjectStorageClient
+import io.micronaut.context.annotation.Property
+import io.micronaut.context.annotation.Requires
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
 import io.micronaut.core.annotation.NonNull
@@ -12,7 +14,10 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 
 @MicronautTest
+@Property(name = "spec.name", value = SPEC_NAME)
 class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
+
+    static final String SPEC_NAME = "OracleCloudStorageOciEmulatorSpec"
 
     boolean supportsEtag = false
 
@@ -38,6 +43,7 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
     }
 
     @Singleton
+    @Requires(property = "spec.name", value = SPEC_NAME)
     static class ObjectStorageListener implements BeanCreatedEventListener<ObjectStorageClient> {
 
         @Override
