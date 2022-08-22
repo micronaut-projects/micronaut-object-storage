@@ -1,6 +1,6 @@
 ## Setup
 
-To properly execute full test suite, the Oracle Cloud account is required. Then configure services:
+To properly execute the cloud test suite, an Oracle Cloud account is required. Then configure services:
 
 1. Create the API key [configuration file](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdkconfig.htm#SDK_and_CLI_Configuration_File) under the target tenancy:
 

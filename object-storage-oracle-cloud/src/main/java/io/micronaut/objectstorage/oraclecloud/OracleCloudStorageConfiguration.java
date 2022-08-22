@@ -20,7 +20,7 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
-import static io.micronaut.objectstorage.oraclecloud.OracleCloudBucketConfiguration.PREFIX;
+import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX;
 
 /**
  * Oracle Cloud object storage configuration properties.
@@ -29,7 +29,7 @@ import static io.micronaut.objectstorage.oraclecloud.OracleCloudBucketConfigurat
  * @since 1.0
  */
 @EachProperty(PREFIX)
-public class OracleCloudBucketConfiguration extends AbstractObjectStorageConfiguration {
+public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfiguration {
 
     public static final String NAME = "oracle-cloud";
 
@@ -37,12 +37,12 @@ public class OracleCloudBucketConfiguration extends AbstractObjectStorageConfigu
 
     private String namespace;
 
-    public OracleCloudBucketConfiguration(@Parameter String name) {
+    public OracleCloudStorageConfiguration(@Parameter String name) {
         super(name);
     }
 
     /**
-     * @return the namespace
+     * @return the Object Storage namespace used.
      */
     @NonNull
     public String getNamespace() {
@@ -50,7 +50,7 @@ public class OracleCloudBucketConfiguration extends AbstractObjectStorageConfigu
     }
 
     /**
-     * @param namespace the namespace to set
+     * @param namespace the Object Storage namespace used.
      */
     public void setNamespace(@NonNull String namespace) {
         this.namespace = namespace;

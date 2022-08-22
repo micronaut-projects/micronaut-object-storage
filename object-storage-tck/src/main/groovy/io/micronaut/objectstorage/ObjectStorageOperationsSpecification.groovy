@@ -23,6 +23,8 @@ import java.nio.file.Files
 
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
+    boolean supportsEtag = true
+
     def "it can upload, get and delete object from file"() {
         given:
         def tempFilePath = Files.createTempFile("test-file", "txt")
@@ -35,7 +37,9 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         then:
         uploadResponse
-        uploadResponse.ETag
+        if (supportsEtag) {
+            uploadResponse.ETag
+        }
 
         when: 'get file based on path'
         Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().get(tempFileName)

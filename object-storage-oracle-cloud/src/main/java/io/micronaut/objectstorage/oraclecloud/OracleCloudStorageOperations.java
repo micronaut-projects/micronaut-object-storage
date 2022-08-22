@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage.oraclecloud;
 
+import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
@@ -28,15 +29,18 @@ import io.micronaut.objectstorage.*;
 import java.util.Optional;
 
 /**
+ * Oracle Cloud implementation of {@link ObjectStorageOperations}.
+ *
  * @author Pavol Gressa
+ * @since 1.0
  */
-@EachBean(OracleCloudBucketConfiguration.class)
-public class OracleCloudBucket implements ObjectStorageOperations {
+@EachBean(OracleCloudStorageConfiguration.class)
+public class OracleCloudStorageOperations implements ObjectStorageOperations {
 
     private final ObjectStorage client;
-    private final OracleCloudBucketConfiguration oracleCloudBucketConfiguration;
+    private final OracleCloudStorageConfiguration oracleCloudBucketConfiguration;
 
-    public OracleCloudBucket(@Parameter OracleCloudBucketConfiguration oracleCloudBucketConfiguration, ObjectStorage client) {
+    public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration oracleCloudBucketConfiguration, ObjectStorage client) {
         this.client = client;
         this.oracleCloudBucketConfiguration = oracleCloudBucketConfiguration;
     }
@@ -64,9 +68,13 @@ public class OracleCloudBucket implements ObjectStorageOperations {
             .objectName(key);
 
 
-        GetObjectResponse objectResponse = client.getObject(builder.build());
-        OracleCloudObjectStorageEntry storageEntry = new OracleCloudObjectStorageEntry(key, objectResponse);
-        return Optional.of(storageEntry);
+        try {
+            GetObjectResponse objectResponse = client.getObject(builder.build());
+            OracleCloudStorageEntry storageEntry = new OracleCloudStorageEntry(key, objectResponse);
+            return Optional.of(storageEntry);
+        } catch (BmcException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
