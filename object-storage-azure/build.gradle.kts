@@ -9,7 +9,7 @@ dependencies {
 
     implementation(platform(mn.micronaut.azure.bom)) {
         version {
-            require("3.4.0-SNAPSHOT")
+            require("3.4.0")
         }
     }
 
