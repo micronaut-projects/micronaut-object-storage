@@ -32,7 +32,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         tempFilePath.toFile().text = "micronaut"
 
         when: 'put file to object storage'
-        UploadRequest uploadRequest = UploadRequest.fromFile(tempFilePath)
+        UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
         def uploadResponse = getObjectStorage().put(uploadRequest)
 
         then:

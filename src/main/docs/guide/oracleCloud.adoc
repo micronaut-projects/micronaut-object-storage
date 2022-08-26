@@ -1,0 +1,7 @@
+To use https://aws.amazon.com/s3/[Amazon S3], you need the following dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud[version={version}]
+
+The configuration options available are:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.adoc[]

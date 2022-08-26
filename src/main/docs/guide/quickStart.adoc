@@ -1,1 +1,17 @@
-TODO
+To get started, you need to declare a dependency for the actual cloud provider you are using. See the actual cloud
+provider documentation for more details:
+
+* <<aws, Amazon S3>>.
+* <<azure, Azure Blob Storage>>.
+* <<gcp, Google Cloud Storage>>.
+* <<oracleCloud, Oracle Cloud Infrastructure (OCI) Object Storage>>.
+
+Then, you can inject in your controllers/services/etc. a bean of type api:objectstorage.ObjectStorageOperations[]:
+
+snippet::example.ProfileService[project-base="doc-examples/example", indent="0", tags="beginclass,endclass"]
+
+== Uploading files
+
+snippet::example.ProfileService[project-base="doc-examples/example", indent="0", tags="upload"]
+
+<1>

@@ -31,12 +31,12 @@ import java.util.Optional;
  */
 public interface UploadRequest {
 
-    static UploadRequest fromFile(Path path) {
+    static UploadRequest fromPath(Path path) {
         return new FileUploadRequest(path);
     }
 
-    static UploadRequest fromFile(Path path, String key) {
-        return new FileUploadRequest(path, key);
+    static UploadRequest fromPath(Path path, String objectStoragePath) {
+        return new FileUploadRequest(path, objectStoragePath);
     }
 
     /**
@@ -76,7 +76,7 @@ public interface UploadRequest {
             this(localFilePath, localFilePath.toFile().getName(), objectStoragePath, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
-        public FileUploadRequest(Path localFilePath, @Nullable String keyName, @Nullable String objectStoragePath, @Nullable String contentType) {
+        public FileUploadRequest(Path localFilePath, String keyName, @Nullable String objectStoragePath, @Nullable String contentType) {
             this.keyName = objectStoragePath != null ? objectStoragePath + "/" + keyName : keyName;
             this.contentType = contentType;
             this.path = localFilePath;

@@ -24,6 +24,8 @@ include("object-storage-azure")
 include("object-storage-gcp")
 include("object-storage-oracle-cloud")
 
+include("doc-examples:example-java")
+
 configure<MicronautBuildSettingsExtension> {
     importMicronautCatalog()
 }
