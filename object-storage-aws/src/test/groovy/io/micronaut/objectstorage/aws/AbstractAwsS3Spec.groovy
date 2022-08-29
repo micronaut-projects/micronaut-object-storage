@@ -9,11 +9,12 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 
+import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX
+
 abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
-
-    public static final String OBJECT_STORAGE_NAME = "default"
+    public static final String OBJECT_STORAGE_NAME = 'default'
 
     @Inject
     S3Client s3
@@ -37,8 +38,6 @@ abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification im
 
     @Override
     Map<String, String> getProperties() {
-        return [
-                ("${AwsS3Configuration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString()): BUCKET_NAME
-        ]
+        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.name'): BUCKET_NAME]
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,21 @@ package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.objectstorage.*;
+import io.micronaut.objectstorage.InputStreamMapper;
+import io.micronaut.objectstorage.ObjectStorageEntry;
+import io.micronaut.objectstorage.ObjectStorageException;
+import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.UploadResponse;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.util.Optional;
 
@@ -38,7 +48,9 @@ public class AwsS3Operations implements ObjectStorageOperations {
     private final AwsS3Configuration bucketConfiguration;
     private final InputStreamMapper inputStreamMapper;
 
-    public AwsS3Operations(@Parameter AwsS3Configuration bucketConfiguration, S3Client s3Client, InputStreamMapper inputStreamMapper) {
+    public AwsS3Operations(@Parameter AwsS3Configuration bucketConfiguration,
+                           S3Client s3Client,
+                           InputStreamMapper inputStreamMapper) {
         this.s3Client = s3Client;
         this.bucketConfiguration = bucketConfiguration;
         this.inputStreamMapper = inputStreamMapper;
@@ -53,7 +65,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
         uploadRequest.getContentType().ifPresent(builder::contentType);
         uploadRequest.getContentSize().ifPresent(builder::contentLength);
 
-        PutObjectResponse putObjectResponse = null;
+        PutObjectResponse putObjectResponse;
         if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
             UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
             putObjectResponse = s3Client.putObject(builder.build(), fileUploadRequest.getFile().toPath());
@@ -67,13 +79,11 @@ public class AwsS3Operations implements ObjectStorageOperations {
 
     @Override
     public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
-        GetObjectRequest.Builder builder = GetObjectRequest.builder();
-        builder.bucket(bucketConfiguration.getName())
-            .key(key);
-
         try {
-            GetObjectRequest getObjectRequest = builder.build();
-            ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(getObjectRequest);
+            ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
+                .bucket(bucketConfiguration.getName())
+                .key(key)
+                .build());
             AwsS3ObjectStorageEntry entry = new AwsS3ObjectStorageEntry(key, responseInputStream);
             return Optional.of(entry);
         } catch (NoSuchKeyException noSuchKeyException) {
@@ -83,8 +93,9 @@ public class AwsS3Operations implements ObjectStorageOperations {
 
     @Override
     public void delete(String key) throws ObjectStorageException {
-        DeleteObjectRequest.Builder builder = DeleteObjectRequest.builder();
-        builder.bucket(bucketConfiguration.getName()).key(key);
-        s3Client.deleteObject(builder.build());
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+            .bucket(bucketConfiguration.getName())
+            .key(key)
+            .build());
     }
 }

@@ -15,59 +15,62 @@ import spock.lang.AutoCleanup
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 
+import static io.micronaut.http.HttpHeaders.CONTENT_TYPE
+import static io.micronaut.http.MediaType.APPLICATION_JSON
+
 @IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID })
 @MicronautTest
-@Property(name = "spec.name", value = SPEC_NAME)
+@Property(name = 'spec.name', value = SPEC_NAME)
 class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec {
 
-    public static final String TEST_PROJECT_ID = "test-project"
-    public static final String SPEC_NAME = "GoogleCloudStorageFakeGcsServerSpec"
+    public static final String TEST_PROJECT_ID = 'test-project'
+    public static final String SPEC_NAME = 'GoogleCloudStorageFakeGcsServerSpec'
 
     @Shared
     @AutoCleanup
-    static GenericContainer fakeGcs = new GenericContainer(DockerImageName.parse("fsouza/fake-gcs-server"))
+    static GenericContainer fakeGcs = new GenericContainer(DockerImageName.parse('fsouza/fake-gcs-server'))
             .withExposedPorts(4443)
             .withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint(
-                    "/bin/fake-gcs-server",
-                    "-scheme", "http"
+                    '/bin/fake-gcs-server',
+                    '-scheme', 'http'
             ))
 
     void setupSpec() {
         fakeGcs.start()
-        String fakeGcsExternalUrl = "http://" + fakeGcs.getHost() + ":" + fakeGcs.getFirstMappedPort()
+        String fakeGcsExternalUrl = "http://${fakeGcs.host}:${fakeGcs.firstMappedPort}"
         updateExternalUrlWithContainerUrl(fakeGcsExternalUrl)
     }
 
     static void updateExternalUrlWithContainerUrl(String fakeGcsExternalUrl) throws Exception {
-        String modifyExternalUrlRequestUri = fakeGcsExternalUrl + "/_internal/config"
-        def json = """
+        String modifyExternalUrlRequestUri = fakeGcsExternalUrl + '/_internal/config'
+        String json = """
         {
-            "externalUrl": "${fakeGcsExternalUrl}"
+            "externalUrl": "$fakeGcsExternalUrl"
         }
         """.trim()
         def connection = new URL(modifyExternalUrlRequestUri).openConnection() as HttpURLConnection
         connection.with {
-            requestMethod = "PUT"
+            requestMethod = 'PUT'
             doOutput = true
-            setRequestProperty("Content-Type", "application/json")
+            setRequestProperty(CONTENT_TYPE, APPLICATION_JSON)
             outputStream.withPrintWriter {it.write(json) }
             def result = inputStream.text
 
             if (responseCode != 200) {
                 throw new RuntimeException(
-                        "error updating fake-gcs-server with external url, response status code " + responseCode + " != 200");
+                        "error updating fake-gcs-server with external url, response status code $responseCode != 200");
             }
         }
     }
 
     @Factory
-    @Requires(property = "spec.name", value = SPEC_NAME)
+    @Requires(property = 'spec.name', value = SPEC_NAME)
     static class FakeGcsFactory {
 
         @Singleton
         @Primary
         Storage storage() {
-            String fakeGcsExternalUrl = "http://" + fakeGcs.getHost() + ":" + fakeGcs.getFirstMappedPort()
+            String fakeGcsExternalUrl = "http://${fakeGcs.host}:${fakeGcs.firstMappedPort}"
             StorageOptions.newBuilder()
                     .setHost(fakeGcsExternalUrl)
                     .setProjectId(TEST_PROJECT_ID)
@@ -75,6 +78,5 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
                     .build()
                     .getService()
         }
-
     }
 }

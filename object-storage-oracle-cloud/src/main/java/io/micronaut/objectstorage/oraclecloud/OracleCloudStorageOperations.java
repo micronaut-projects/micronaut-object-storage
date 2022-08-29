@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,11 @@ import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.objectstorage.*;
+import io.micronaut.objectstorage.ObjectStorageEntry;
+import io.micronaut.objectstorage.ObjectStorageException;
+import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.UploadResponse;
 
 import java.util.Optional;
 
@@ -38,35 +42,38 @@ import java.util.Optional;
 public class OracleCloudStorageOperations implements ObjectStorageOperations {
 
     private final ObjectStorage client;
-    private final OracleCloudStorageConfiguration oracleCloudBucketConfiguration;
+    private final OracleCloudStorageConfiguration configuration;
 
-    public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration oracleCloudBucketConfiguration, ObjectStorage client) {
+    public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
+                                        ObjectStorage client) {
         this.client = client;
-        this.oracleCloudBucketConfiguration = oracleCloudBucketConfiguration;
+        this.configuration = configuration;
     }
 
     @Override
     public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
             .objectName(uploadRequest.getKey())
-            .bucketName(oracleCloudBucketConfiguration.getName())
-            .namespaceName(oracleCloudBucketConfiguration.getNamespace())
+            .bucketName(configuration.getName())
+            .namespaceName(configuration.getNamespace())
             .putObjectBody(uploadRequest.getInputStream());
 
         uploadRequest.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
         uploadRequest.getContentType().ifPresent(putObjectRequestBuilder::contentType);
 
         PutObjectResponse putObjectResponse = client.putObject(putObjectRequestBuilder.build());
-        return new UploadResponse.Builder().withETag(putObjectResponse.getETag()).build();
+
+        return new UploadResponse.Builder()
+            .withETag(putObjectResponse.getETag())
+            .build();
     }
 
     @Override
     public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
-            .bucketName(oracleCloudBucketConfiguration.getName())
-            .namespaceName(oracleCloudBucketConfiguration.getNamespace())
+            .bucketName(configuration.getName())
+            .namespaceName(configuration.getNamespace())
             .objectName(key);
-
 
         try {
             GetObjectResponse objectResponse = client.getObject(builder.build());
@@ -79,11 +86,10 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
 
     @Override
     public void delete(String key) throws ObjectStorageException {
-        DeleteObjectRequest.Builder builder = DeleteObjectRequest.builder()
-            .bucketName(oracleCloudBucketConfiguration.getName())
-            .namespaceName(oracleCloudBucketConfiguration.getNamespace())
-            .objectName(key);
-
-        client.deleteObject(builder.build());
+        client.deleteObject(DeleteObjectRequest.builder()
+            .bucketName(configuration.getName())
+            .namespaceName(configuration.getNamespace())
+            .objectName(key)
+            .build());
     }
 }

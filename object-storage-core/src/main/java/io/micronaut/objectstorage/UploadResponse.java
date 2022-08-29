@@ -60,6 +60,5 @@ public interface UploadResponse {
         public UploadResponse build() {
             return new DefaultUploadResponse(eTag);
         }
-
     }
 }

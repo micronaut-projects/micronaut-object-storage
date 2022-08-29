@@ -16,18 +16,17 @@ class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPro
 
     @Shared
     @AutoCleanup
-    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:1.0.3"))
+    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse('localstack/localstack:1.0.3'))
             .withServices(S3)
 
     @Override
     Map<String, String> getProperties() {
         localstack.start()
-        return super.getProperties() + [
-                "aws.accessKeyId": localstack.getAccessKey(),
-                "aws.secretKey": localstack.getSecretKey(),
-                "aws.region": localstack.getRegion(),
-                "aws.s3.endpoint-override": localstack.getEndpointOverride(S3)
-
-        ]
+        super.getProperties() + [
+                'aws.accessKeyId'         : localstack.accessKey,
+                'aws.secretKey'           : localstack.secretKey,
+                'aws.region'              : localstack.region,
+                'aws.s3.endpoint-override': localstack.getEndpointOverride(S3)
+        ] as Map
     }
 }

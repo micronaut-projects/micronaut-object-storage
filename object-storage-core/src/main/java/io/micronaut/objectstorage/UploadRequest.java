@@ -15,7 +15,6 @@
  */
 package io.micronaut.objectstorage;
 
-
 import io.micronaut.core.annotation.Nullable;
 
 import java.io.File;
@@ -69,15 +68,20 @@ public interface UploadRequest {
         private final Path path;
 
         public FileUploadRequest(Path localFilePath) {
-            this(localFilePath, localFilePath.getFileName().toString(), null, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
+            this(localFilePath, localFilePath.getFileName().toString(), null,
+                URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
         public FileUploadRequest(Path localFilePath, String objectStoragePath) {
-            this(localFilePath, localFilePath.toFile().getName(), objectStoragePath, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
+            this(localFilePath, localFilePath.toFile().getName(), objectStoragePath,
+                URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
-        public FileUploadRequest(Path localFilePath, @Nullable String keyName, @Nullable String objectStoragePath, @Nullable String contentType) {
-            this.keyName = objectStoragePath != null ? objectStoragePath + "/" + keyName : keyName;
+        public FileUploadRequest(Path localFilePath,
+                                 @Nullable String keyName,
+                                 @Nullable String objectStoragePath,
+                                 @Nullable String contentType) {
+            this.keyName = objectStoragePath != null ? objectStoragePath + '/' + keyName : keyName;
             this.contentType = contentType;
             this.path = localFilePath;
         }
