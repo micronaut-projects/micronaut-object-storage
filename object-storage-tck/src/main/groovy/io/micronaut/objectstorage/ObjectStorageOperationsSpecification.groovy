@@ -33,7 +33,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
-        def uploadResponse = getObjectStorage().put(uploadRequest)
+        def uploadResponse = getObjectStorage().upload(uploadRequest)
 
         then:
         uploadResponse
@@ -42,7 +42,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         }
 
         when: 'get file based on path'
-        Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().get(tempFileName)
+        Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
 
         then:
         objectStorageEntry.isPresent()
@@ -64,7 +64,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         noExceptionThrown()
 
         when: 'get file based on path'
-        objectStorageEntry = getObjectStorage().get(tempFileName)
+        objectStorageEntry = getObjectStorage().retrieve(tempFileName)
 
         then:
         !objectStorageEntry.isPresent()

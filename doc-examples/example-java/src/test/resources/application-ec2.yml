@@ -1,0 +1,5 @@
+micronaut:
+  object-storage:
+    aws:
+      default:
+        name: profile-pictures

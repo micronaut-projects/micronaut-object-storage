@@ -35,8 +35,8 @@ public interface UploadRequest {
         return new FileUploadRequest(path);
     }
 
-    static UploadRequest fromPath(Path path, String objectStoragePath) {
-        return new FileUploadRequest(path, objectStoragePath);
+    static UploadRequest fromPath(Path path, String prefix) {
+        return new FileUploadRequest(path, prefix);
     }
 
     /**
@@ -72,12 +72,12 @@ public interface UploadRequest {
             this(localFilePath, localFilePath.getFileName().toString(), null, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
-        public FileUploadRequest(Path localFilePath, String objectStoragePath) {
-            this(localFilePath, localFilePath.toFile().getName(), objectStoragePath, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
+        public FileUploadRequest(Path localFilePath, String prefix) {
+            this(localFilePath, localFilePath.toFile().getName(), prefix, URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
-        public FileUploadRequest(Path localFilePath, String keyName, @Nullable String objectStoragePath, @Nullable String contentType) {
-            this.keyName = objectStoragePath != null ? objectStoragePath + "/" + keyName : keyName;
+        public FileUploadRequest(Path localFilePath, String keyName, @Nullable String prefix, @Nullable String contentType) {
+            this.keyName = prefix != null ? prefix + "/" + keyName : keyName;
             this.contentType = contentType;
             this.path = localFilePath;
         }

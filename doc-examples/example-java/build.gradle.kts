@@ -17,4 +17,12 @@ dependencies {
     runtimeOnly(mn.logback)
 
     testAnnotationProcessor(platform(mn.micronaut.bom))
+
+    testImplementation(mn.spock)
+    testImplementation(mn.micronaut.test.spock)
+    testImplementation(libs.testcontainers.spock)
+    testImplementation(libs.testcontainers.localstack)
+    testImplementation(libs.amazon.awssdk.v1) {
+        because("it is required by testcontainers-localstack")
+    }
 }
