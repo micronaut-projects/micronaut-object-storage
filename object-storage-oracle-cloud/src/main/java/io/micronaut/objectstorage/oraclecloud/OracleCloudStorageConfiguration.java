@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
 
     public static final String NAME = "oracle-cloud";
 
-    public static final String PREFIX = GENERIC_PREFIX + "." + NAME;
+    public static final String PREFIX = GENERIC_PREFIX + '.' + NAME;
 
     private String namespace;
 

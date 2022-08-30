@@ -30,7 +30,6 @@ public interface ObjectStorageEntry {
      */
     String getKey();
 
-
     /**
      * The object content.
      *

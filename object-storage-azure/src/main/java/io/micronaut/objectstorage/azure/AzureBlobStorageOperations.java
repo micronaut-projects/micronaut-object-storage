@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,21 @@ import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import com.azure.storage.blob.options.BlobUploadFromFileOptions;
-import com.azure.storage.common.implementation.Constants;
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.inject.qualifiers.Qualifiers;
-import io.micronaut.objectstorage.*;
+import io.micronaut.objectstorage.ObjectStorageEntry;
+import io.micronaut.objectstorage.ObjectStorageException;
+import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.UploadResponse;
 import jakarta.inject.Singleton;
 
 import java.util.Optional;
+
+import static com.azure.storage.common.implementation.Constants.HeaderConstants.ETAG_WILDCARD;
+import static java.lang.Boolean.TRUE;
 
 /**
  * Azure implementation of {@link ObjectStorageOperations}.
@@ -47,7 +53,9 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations {
     private final AzureBlobStorageConfiguration configuration;
     private final BlobContainerClient blobContainerClient;
 
-    public AzureBlobStorageOperations(@Parameter String name, BlobContainerClient blobContainerClient, BeanContext beanContext) {
+    public AzureBlobStorageOperations(@Parameter String name,
+                                      BlobContainerClient blobContainerClient,
+                                      BeanContext beanContext) {
         this.blobContainerClient = blobContainerClient;
         this.configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
     }
@@ -56,18 +64,18 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations {
     public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(uploadRequest.getKey());
 
-        Response<BlockBlobItem> blockBlobItemResponse = null;
+        Response<BlockBlobItem> blockBlobItemResponse;
         if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
             UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
 
-            BlobRequestConditions requestConditions = new BlobRequestConditions().setIfNoneMatch(Constants.HeaderConstants.ETAG_WILDCARD);
+            BlobRequestConditions requestConditions = new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD);
             BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(fileUploadRequest.getAbsolutePath())
                 .setRequestConditions(requestConditions);
             blockBlobItemResponse = blobClient.uploadFromFileWithResponse(options, null, null);
         } else {
             BinaryData data = BinaryData.fromStream(uploadRequest.getInputStream());
             BlobRequestConditions blobRequestConditions = new BlobRequestConditions();
-            blobRequestConditions.setIfNoneMatch(Constants.HeaderConstants.ETAG_WILDCARD);
+            blobRequestConditions.setIfNoneMatch(ETAG_WILDCARD);
             blockBlobItemResponse = blobClient.uploadWithResponse(new BlobParallelUploadOptions(data).setRequestConditions(blobRequestConditions),
                 null, Context.NONE);
         }
@@ -79,7 +87,7 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations {
     public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
-        if (Boolean.TRUE.equals(blobClient.exists())) {
+        if (TRUE.equals(blobClient.exists())) {
             storageEntry = new AzureBlobStorageEntry(blobClient);
         }
         return Optional.ofNullable(storageEntry);

@@ -13,37 +13,39 @@ import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 
+import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
+
 @MicronautTest
-@Property(name = "spec.name", value = SPEC_NAME)
+@Property(name = 'spec.name', value = SPEC_NAME)
 class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
 
-    static final String SPEC_NAME = "OracleCloudStorageOciEmulatorSpec"
+    public static final String SPEC_NAME = 'OracleCloudStorageOciEmulatorSpec'
 
     boolean supportsEtag = false
 
     @Shared
     @AutoCleanup
-    GenericContainer ociEmulator = new GenericContainer(DockerImageName.parse("cameritelabs/oci-emulator"))
+    GenericContainer ociEmulator = new GenericContainer(DockerImageName.parse('cameritelabs/oci-emulator'))
             .withExposedPorts(12000)
 
-    static String endpoint
+    public static String endpoint
 
     @Override
     Map<String, String> getProperties() {
         ociEmulator.start()
-        endpoint = "http://127.0.0.1:${ociEmulator.getMappedPort(12000)}"
+        endpoint = 'http://127.0.0.1:' + ociEmulator.getMappedPort(12000)
         return super.getProperties() + [
-                ("${OracleCloudStorageConfiguration.PREFIX}.${OBJECT_STORAGE_NAME}.namespace".toString()): "testtenancy",
-                "oci.fingerprint": "50:a6:c1:a1:da:71:57:dc:87:ae:90:af:9c:38:99:67",
-                "oci.private-key-file": "file:${new File('src/test/resources/key.pem').absolutePath}",
-                "oci.region": "sa-saopaulo-1",
-                "oci.tenant-id": "ocid1.tenancy.oc1..testtenancy",
-                "oci.user-id": "ocid1.user.oc1..testuser"
+                (PREFIX + '.' + OBJECT_STORAGE_NAME + '.namespace'): 'testtenancy',
+                'oci.fingerprint'                                  : '50:a6:c1:a1:da:71:57:dc:87:ae:90:af:9c:38:99:67',
+                'oci.private-key-file'                             : "file:${new File('src/test/resources/key.pem').absolutePath}",
+                'oci.region'                                       : 'sa-saopaulo-1',
+                'oci.tenant-id'                                    : 'ocid1.tenancy.oc1..testtenancy',
+                'oci.user-id'                                      : 'ocid1.user.oc1..testuser'
         ]
     }
 
     @Singleton
-    @Requires(property = "spec.name", value = SPEC_NAME)
+    @Requires(property = 'spec.name', value = SPEC_NAME)
     static class ObjectStorageListener implements BeanCreatedEventListener<ObjectStorageClient> {
 
         @Override

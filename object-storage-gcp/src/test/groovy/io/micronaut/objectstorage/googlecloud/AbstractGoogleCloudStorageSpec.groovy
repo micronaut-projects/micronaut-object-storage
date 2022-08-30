@@ -7,11 +7,12 @@ import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 
+import static io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.PREFIX
+
 abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
-
-    public static final String OBJECT_STORAGE_NAME = "default"
+    public static final String OBJECT_STORAGE_NAME = 'default'
 
     @Inject
     GoogleCloudStorageOperations cloudObjectStorage
@@ -21,9 +22,7 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
 
     @Override
     Map<String, String> getProperties() {
-        [
-                ("${GoogleCloudStorageConfiguration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString()): BUCKET_NAME,
-        ]
+        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.name'): BUCKET_NAME]
     }
 
     ObjectStorageOperations getObjectStorage() {
@@ -37,5 +36,4 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
     void cleanup() {
         storage.get(BUCKET_NAME).delete()
     }
-
 }

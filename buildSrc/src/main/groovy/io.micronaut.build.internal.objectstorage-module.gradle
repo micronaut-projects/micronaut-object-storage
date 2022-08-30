@@ -1,12 +1,11 @@
 plugins {
-    id 'io.micronaut.build.internal.objectstorage-base'
-    id "io.micronaut.build.internal.module"
+    id 'io.micronaut.build.internal.module'
 }
 
 dependencies {
-    annotationProcessor "io.micronaut:micronaut-inject-java"
-    implementation "io.micronaut:micronaut-inject-java"
-    implementation("io.micronaut:micronaut-runtime")
+    annotationProcessor mn.micronaut.inject.java
+    implementation mn.micronaut.inject.java
+    implementation mn.micronaut.runtime
 }
 
 micronautBuild {
@@ -19,6 +18,6 @@ micronautBuild {
 repositories {
     mavenCentral()
     maven {
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        url = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
     }
 }

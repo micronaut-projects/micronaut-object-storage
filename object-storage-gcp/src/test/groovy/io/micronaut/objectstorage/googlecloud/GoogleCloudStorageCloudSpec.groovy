@@ -9,9 +9,6 @@ class GoogleCloudStorageCloudSpec extends AbstractGoogleCloudStorageSpec {
 
     @Override
     Map<String, String> getProperties() {
-        return super.getProperties() + [
-                "gcp.project-id" : System.getenv("GCLOUD_TEST_PROJECT_ID"),
-        ]
+        super.getProperties() + ['gcp.project-id': System.getenv('GCLOUD_TEST_PROJECT_ID')]
     }
-
 }

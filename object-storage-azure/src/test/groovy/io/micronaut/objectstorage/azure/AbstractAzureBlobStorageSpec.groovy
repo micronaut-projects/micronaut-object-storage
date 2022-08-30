@@ -8,11 +8,12 @@ import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import jakarta.inject.Named
 
-abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider{
+import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
+
+abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String CONTAINER_NAME = System.currentTimeMillis()
-
-    public static final String OBJECT_STORAGE_NAME = "default"
+    public static final String OBJECT_STORAGE_NAME = 'default'
 
     @Inject
     @Named(OBJECT_STORAGE_NAME)
@@ -39,8 +40,6 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
 
     @Override
     Map<String, String> getProperties() {
-        [
-                ("${AzureBlobStorageConfiguration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString())      : CONTAINER_NAME
-        ]
+        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.name'): CONTAINER_NAME]
     }
 }
