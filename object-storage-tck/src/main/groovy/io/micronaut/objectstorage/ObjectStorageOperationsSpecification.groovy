@@ -33,8 +33,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         tempFilePath.toFile().text = 'micronaut'
 
         when: 'put file to object storage'
-        UploadRequest uploadRequest = UploadRequest.fromFile(tempFilePath)
-        UploadResponse uploadResponse = getObjectStorage().put(uploadRequest)
+        UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
+        UploadResponse uploadResponse = getObjectStorage().upload(uploadRequest)
 
         then:
         uploadResponse
@@ -43,7 +43,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         }
 
         when: 'get file based on path'
-        Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().get(tempFileName)
+        Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
 
         then:
         objectStorageEntry.isPresent()
@@ -65,7 +65,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         noExceptionThrown()
 
         when: 'get file based on path'
-        objectStorageEntry = getObjectStorage().get(tempFileName)
+        objectStorageEntry = getObjectStorage().retrieve(tempFileName)
 
         then:
         !objectStorageEntry.isPresent()

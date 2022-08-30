@@ -5,6 +5,10 @@ micronaut-test = '3.1.1'
 groovy = '3.0.10'
 gcp-libraries = '26.1.0'
 
+# Gradle plugins
+micronaut-gradle-plugin = "3.5.1"
+kotlin-gradle-plugin = "1.7.10"
+
 [libraries]
 azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
 
@@ -20,3 +24,8 @@ oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorag
 groovy-test = { module = 'org.codehaus.groovy:groovy-test' }
 testcontainers-spock = { module = 'org.testcontainers:spock' }
 testcontainers-localstack = { module = 'org.testcontainers:localstack' }
+
+# Plugins
+gradle-micronaut = { module = "io.micronaut.gradle:micronaut-gradle-plugin", version.ref = "micronaut-gradle-plugin" }
+gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
+gradle-kotlin-allopen = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin-gradle-plugin" }

@@ -51,7 +51,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
+    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
             .objectName(uploadRequest.getKey())
             .bucketName(configuration.getName())
@@ -69,7 +69,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
             .bucketName(configuration.getName())
             .namespaceName(configuration.getNamespace())

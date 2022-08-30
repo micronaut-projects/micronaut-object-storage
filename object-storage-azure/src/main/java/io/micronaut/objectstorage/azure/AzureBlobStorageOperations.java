@@ -61,7 +61,7 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
+    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(uploadRequest.getKey());
 
         Response<BlockBlobItem> blockBlobItemResponse;
@@ -84,7 +84,7 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
         if (TRUE.equals(blobClient.exists())) {
