@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +30,7 @@ import java.io.InputStream;
 public class DefaultInputStreamMapper implements InputStreamMapper {
 
     @Override
-    public byte[] toByteArray(InputStream inputStream) {
+    public byte[] toByteArray(@NonNull InputStream inputStream) throws ObjectStorageException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             int nRead;
             byte[] data = new byte[4];
