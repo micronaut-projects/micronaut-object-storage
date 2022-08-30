@@ -61,7 +61,7 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
      * The blob container name.
      */
     @Override
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         super.setName(name);
     }
 }

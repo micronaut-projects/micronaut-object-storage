@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.googlecloud;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.PREFIX;
@@ -42,7 +43,7 @@ public class GoogleCloudStorageConfiguration extends AbstractObjectStorageConfig
      * The Cloud Storage bucket name.
      */
     @Override
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         super.setName(name);
     }
 }

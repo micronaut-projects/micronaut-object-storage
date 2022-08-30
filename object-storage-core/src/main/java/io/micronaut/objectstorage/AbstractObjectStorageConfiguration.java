@@ -27,6 +27,7 @@ public abstract class AbstractObjectStorageConfiguration implements ObjectStorag
 
     public static final String GENERIC_PREFIX = "micronaut.object-storage";
 
+    @NonNull
     private String name;
 
     protected AbstractObjectStorageConfiguration(@NonNull String name) {
