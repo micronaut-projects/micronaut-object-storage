@@ -107,7 +107,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../io/micronaut/objectstorage/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage">ObjectStorageConfiguration</a></dd>
+<dd>io.micronaut.core.naming.Named, <a href="../../../io/micronaut/objectstorage/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage">ObjectStorageConfiguration</a></dd>
 </dl>
 <dl>
 <dt>Direct Known Subclasses:</dt>
@@ -238,7 +238,8 @@ implements <a href="../../../io/micronaut/objectstorage/ObjectStorageConfigurati
 <ul class="blockListLast">
 <li class="blockList">
 <h4>AbstractObjectStorageConfiguration</h4>
-<pre>protected&nbsp;AbstractObjectStorageConfiguration(java.lang.String&nbsp;name)</pre>
+<pre>protected&nbsp;AbstractObjectStorageConfiguration(@NonNull
+                                             java.lang.String&nbsp;name)</pre>
 </li>
 </ul>
 </li>
@@ -255,12 +256,11 @@ implements <a href="../../../io/micronaut/objectstorage/ObjectStorageConfigurati
 <ul class="blockList">
 <li class="blockList">
 <h4>getName</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getName()</pre>
+<pre>@NonNull
+public&nbsp;java.lang.String&nbsp;getName()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../io/micronaut/objectstorage/ObjectStorageConfiguration.html#getName--">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage">ObjectStorageConfiguration</a></code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the name of the object storage. In cloud providers this is often referred to as a bucket.</dd>
+<dd><code>getName</code>&nbsp;in interface&nbsp;<code>io.micronaut.core.naming.Named</code></dd>
 </dl>
 </li>
 </ul>
@@ -270,7 +270,8 @@ implements <a href="../../../io/micronaut/objectstorage/ObjectStorageConfigurati
 <ul class="blockListLast">
 <li class="blockList">
 <h4>setName</h4>
-<pre>public&nbsp;void&nbsp;setName(java.lang.String&nbsp;name)</pre>
+<pre>public&nbsp;void&nbsp;setName(@NonNull
+                    java.lang.String&nbsp;name)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>name</code> - the name to set.</dd>
