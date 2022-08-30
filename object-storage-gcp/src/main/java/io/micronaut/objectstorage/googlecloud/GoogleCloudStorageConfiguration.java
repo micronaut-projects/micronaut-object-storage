@@ -37,4 +37,12 @@ public class GoogleCloudStorageConfiguration extends AbstractObjectStorageConfig
     public GoogleCloudStorageConfiguration(@Parameter String bucketName) {
         super(bucketName);
     }
+
+    /**
+     * The Cloud Storage bucket name.
+     */
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
 }

@@ -37,4 +37,14 @@ public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
     public AwsS3Configuration(@Parameter String name) {
         super(name);
     }
+
+    /**
+     * The name of the AWS S3 bucket.
+     *
+     * @param name the name to set.
+     */
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
 }

@@ -1,5 +1,8 @@
+gcp:
+  project-id: my-gcp-project
+
 micronaut:
   object-storage:
-    aws:
+    gcp:
       default:
         name: profile-pictures-bucket

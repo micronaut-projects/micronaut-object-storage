@@ -1,7 +1,18 @@
-To use https://aws.amazon.com/s3/[Amazon S3], you need the following dependency:
+To use https://cloud.google.com/storage[Google Cloud Storage], you need the following dependency:
 
 dependency:io.micronaut.objectstorage:micronaut-object-storage-gcp[version={version}]
 
-The configuration options available are:
+Refer to the https://micronaut-projects.github.io/micronaut-gcp/latest/guide[Micronaut GCP documentation] for more
+information about configuring your GCP project.
+
+The object storage specific configuration options available are:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.adoc[]
+
+For example:
+
+.`src/main/resources/application-gcp.yml`
+[source,yaml]
+----
+include::doc-examples/example-java/src/test/resources/application-gcp.yml[]
+----

@@ -42,7 +42,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @return the Object Storage namespace used.
+     * @return the OCI Object Storage namespace used.
      */
     @NonNull
     public String getNamespace() {
@@ -50,9 +50,17 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @param namespace the Object Storage namespace used.
+     * @param namespace the OCI Object Storage namespace used.
      */
     public void setNamespace(@NonNull String namespace) {
         this.namespace = namespace;
+    }
+
+    /**
+     * The OCI Object Storage bucket name.
+     */
+    @Override
+    public void setName(String name) {
+        super.setName(name);
     }
 }

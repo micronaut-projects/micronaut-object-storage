@@ -50,10 +50,18 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
     }
 
     /**
-     * @param endpoint the endpoint to set.
+     * @param endpoint The blob service endpoint to set, in the format of
+     *                 <code>https://{accountName}.blob.core.windows.net</code> foo
      */
     public void setEndpoint(@NonNull String endpoint) {
         this.endpoint = endpoint;
     }
 
+    /**
+     * The blob container name.
+     */
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
 }

@@ -22,22 +22,23 @@ public class ProfileService {
     }
 //end::beginclass[]
 
-//tag::upload[]
+    //tag::upload[]
     public Optional<String> saveProfilePicture(String userId, Path path) {
         try {
-            UploadRequest request = UploadRequest.fromPath(path, userId);
-            UploadResponse response = objectStorage.upload(request);
+            UploadRequest request = UploadRequest.fromPath(path, userId); // <1>
+            UploadResponse response = objectStorage.upload(request); // <2>
             return Optional.ofNullable(response.getETag());
         } catch (ObjectStorageException e) {
             return Optional.empty();
         }
     }
-//end::upload[]
+    //end::upload[]
 
+    //tag::retrieve[]
     public Optional<Path> retrieveProfilePicture(String userId, String fileName) {
         try {
             String key = userId + "/" + fileName;
-            Optional<InputStream> stream = objectStorage.retrieve(key)
+            Optional<InputStream> stream = objectStorage.retrieve(key) // <1>
                 .map(ObjectStorageEntry::getInputStream);
             if (stream.isPresent()) {
                 Path destination = File.createTempFile(userId, "temp").toPath();
@@ -50,11 +51,15 @@ public class ProfileService {
             return Optional.empty();
         }
     }
+    //end::retrieve[]
 
+    //tag::delete[]
     public void deleteProfilePicture(String userId, String fileName) {
         String key = userId + "/" + fileName;
         objectStorage.delete(key);
     }
+    //end::delete[]
+
 //tag::endclass[]
 }
 //end::endclass[]
