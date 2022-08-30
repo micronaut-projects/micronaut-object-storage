@@ -15,8 +15,10 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,12 +32,18 @@ import java.util.Optional;
  */
 public interface UploadRequest {
 
-    static UploadRequest fromFile(Path path) {
+    static UploadRequest fromPath(@NonNull Path path) {
         return new FileUploadRequest(path);
     }
 
-    static UploadRequest fromFile(Path path, String key) {
-        return new FileUploadRequest(path, key);
+    static UploadRequest fromPath(@NonNull Path path, String prefix) {
+        return new FileUploadRequest(path, prefix);
+    }
+
+    static UploadRequest fromBytes(@NonNull byte[] bytes,
+                                   @NonNull String contentType,
+                                   @NonNull String key) {
+        return new BytesUploadRequest(bytes, contentType, key);
     }
 
     /**
@@ -72,16 +80,16 @@ public interface UploadRequest {
                 URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
-        public FileUploadRequest(Path localFilePath, String objectStoragePath) {
-            this(localFilePath, localFilePath.toFile().getName(), objectStoragePath,
+        public FileUploadRequest(Path localFilePath, String prefix) {
+            this(localFilePath, localFilePath.toFile().getName(), prefix,
                 URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
         public FileUploadRequest(Path localFilePath,
-                                 @Nullable String keyName,
-                                 @Nullable String objectStoragePath,
+                                 String keyName,
+                                 @Nullable String prefix,
                                  @Nullable String contentType) {
-            this.keyName = objectStoragePath != null ? objectStoragePath + '/' + keyName : keyName;
+            this.keyName = prefix != null ? prefix + "/" + keyName : keyName;
             this.contentType = contentType;
             this.path = localFilePath;
         }
@@ -124,6 +132,44 @@ public interface UploadRequest {
             } catch (IOException e) {
                 throw new ObjectStorageException(e);
             }
+        }
+    }
+
+    /**
+     * Upload request implementation using byte array.
+     */
+    class BytesUploadRequest implements UploadRequest {
+
+        private final byte[] bytes;
+        private final String contentType;
+        private final String key;
+
+        public BytesUploadRequest(@NonNull byte[] bytes,
+                                  @NonNull String contentType,
+                                  @NonNull String key) {
+            this.bytes = bytes;
+            this.contentType = contentType;
+            this.key = key;
+        }
+
+        @Override
+        public Optional<String> getContentType() {
+            return Optional.of(contentType);
+        }
+
+        @Override
+        public String getKey() {
+            return key;
+        }
+
+        @Override
+        public Optional<Long> getContentSize() {
+            return Optional.of((long) bytes.length);
+        }
+
+        @Override
+        public InputStream getInputStream() {
+            return new ByteArrayInputStream(bytes);
         }
     }
 }

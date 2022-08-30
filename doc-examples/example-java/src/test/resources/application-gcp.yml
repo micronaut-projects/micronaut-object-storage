@@ -1,0 +1,8 @@
+gcp:
+  project-id: my-gcp-project
+
+micronaut:
+  object-storage:
+    gcp:
+      default:
+        name: profile-pictures-bucket

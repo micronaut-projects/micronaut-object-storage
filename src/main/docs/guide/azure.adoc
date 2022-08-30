@@ -1,0 +1,18 @@
+To use https://azure.microsoft.com/en-gb/services/storage/blobs/[Azure Blob Storage], you need the following dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-azure[version={version}]
+
+Refer to the https://micronaut-projects.github.io/micronaut-azure/latest/guide[Micronaut Azure documentation] for more
+information about authentication options.
+
+The object storage specific configuration options available are:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.adoc[]
+
+For example:
+
+.`src/main/resources/application-azure.yml`
+[source,yaml]
+----
+include::doc-examples/example-java/src/test/resources/application-azure.yml[]
+----

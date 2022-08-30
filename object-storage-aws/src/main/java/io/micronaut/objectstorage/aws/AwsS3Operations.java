@@ -57,7 +57,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
+    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
             .bucket(bucketConfiguration.getName())
             .key(uploadRequest.getKey());
@@ -78,7 +78,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
     }
 
     @Override
-    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketConfiguration.getName())
