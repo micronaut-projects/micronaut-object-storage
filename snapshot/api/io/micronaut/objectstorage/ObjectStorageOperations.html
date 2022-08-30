@@ -137,13 +137,13 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#get-java.lang.String-">get</a></span>(java.lang.String&nbsp;key)</code>
-<div class="block">Get the object from object storage.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></span>(<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.UploadRequest-">upload</a></span>(<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
 <div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
@@ -162,14 +162,14 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="put-io.micronaut.objectstorage.UploadRequest-">
+<a name="upload-io.micronaut.objectstorage.UploadRequest-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>put</h4>
-<pre><a href="../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;put(<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
-            throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<h4>upload</h4>
+<pre><a href="../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;upload(<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
+               throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
 <div class="block">Uploads an object to the object storage.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -181,15 +181,15 @@ var activeTableTab = "activeTableTab";
 </dl>
 </li>
 </ul>
-<a name="get-java.lang.String-">
+<a name="retrieve-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>get</h4>
-<pre>java.util.Optional&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;&nbsp;get(java.lang.String&nbsp;key)
-                                    throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
-<div class="block">Get the object from object storage.</div>
+<h4>retrieve</h4>
+<pre>java.util.Optional&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;&nbsp;retrieve(java.lang.String&nbsp;key)
+                                         throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<div class="block">Gets the object from object storage.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>

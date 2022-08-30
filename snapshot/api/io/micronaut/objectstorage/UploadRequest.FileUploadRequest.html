@@ -156,12 +156,12 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 </tr>
 <tr class="rowColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#FileUploadRequest-java.nio.file.Path-java.lang.String-">FileUploadRequest</a></span>(java.nio.file.Path&nbsp;localFilePath,
-                 java.lang.String&nbsp;objectStoragePath)</code>&nbsp;</td>
+                 java.lang.String&nbsp;prefix)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#FileUploadRequest-java.nio.file.Path-java.lang.String-java.lang.String-java.lang.String-">FileUploadRequest</a></span>(java.nio.file.Path&nbsp;localFilePath,
                  java.lang.String&nbsp;keyName,
-                 java.lang.String&nbsp;objectStoragePath,
+                 java.lang.String&nbsp;prefix,
                  java.lang.String&nbsp;contentType)</code>&nbsp;</td>
 </tr>
 </table>
@@ -220,7 +220,7 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;io.micronaut.objectstorage.<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></h3>
-<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#fromFile-java.nio.file.Path-">fromFile</a>, <a href="../../../io/micronaut/objectstorage/UploadRequest.html#fromFile-java.nio.file.Path-java.lang.String-">fromFile</a></code></li>
+<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#fromPath-java.nio.file.Path-">fromPath</a>, <a href="../../../io/micronaut/objectstorage/UploadRequest.html#fromPath-java.nio.file.Path-java.lang.String-">fromPath</a></code></li>
 </ul>
 </li>
 </ul>
@@ -252,7 +252,7 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <li class="blockList">
 <h4>FileUploadRequest</h4>
 <pre>public&nbsp;FileUploadRequest(java.nio.file.Path&nbsp;localFilePath,
-                         java.lang.String&nbsp;objectStoragePath)</pre>
+                         java.lang.String&nbsp;prefix)</pre>
 </li>
 </ul>
 <a name="FileUploadRequest-java.nio.file.Path-java.lang.String-java.lang.String-java.lang.String-">
@@ -262,10 +262,9 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <li class="blockList">
 <h4>FileUploadRequest</h4>
 <pre>public&nbsp;FileUploadRequest(java.nio.file.Path&nbsp;localFilePath,
-                         @Nullable
                          java.lang.String&nbsp;keyName,
                          @Nullable
-                         java.lang.String&nbsp;objectStoragePath,
+                         java.lang.String&nbsp;prefix,
                          @Nullable
                          java.lang.String&nbsp;contentType)</pre>
 </li>

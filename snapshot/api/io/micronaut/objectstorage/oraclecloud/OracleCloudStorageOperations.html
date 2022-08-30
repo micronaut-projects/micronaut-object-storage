@@ -166,13 +166,13 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#get-java.lang.String-">get</a></span>(java.lang.String&nbsp;key)</code>
-<div class="block">Get the object from object storage.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#upload-io.micronaut.objectstorage.UploadRequest-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
 <div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
@@ -217,19 +217,19 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="put-io.micronaut.objectstorage.UploadRequest-">
+<a name="upload-io.micronaut.objectstorage.UploadRequest-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>put</h4>
-<pre>public&nbsp;<a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;put(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
-                   throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">ObjectStorageOperations</a></code></span></div>
+<h4>upload</h4>
+<pre>public&nbsp;<a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;upload(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
+                      throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.UploadRequest-">ObjectStorageOperations</a></code></span></div>
 <div class="block">Uploads an object to the object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.UploadRequest-">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>uploadRequest</code> - the upload request</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -239,19 +239,19 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 </dl>
 </li>
 </ul>
-<a name="get-java.lang.String-">
+<a name="retrieve-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>get</h4>
-<pre>public&nbsp;java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;&nbsp;get(java.lang.String&nbsp;key)
-                                           throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#get-java.lang.String-">ObjectStorageOperations</a></code></span></div>
-<div class="block">Get the object from object storage.</div>
+<h4>retrieve</h4>
+<pre>public&nbsp;java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;&nbsp;retrieve(java.lang.String&nbsp;key)
+                                                throws <a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve-java.lang.String-">ObjectStorageOperations</a></code></span></div>
+<div class="block">Gets the object from object storage.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#get-java.lang.String-">get</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve-java.lang.String-">retrieve</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
