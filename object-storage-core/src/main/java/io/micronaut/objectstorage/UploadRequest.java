@@ -27,6 +27,7 @@ import java.util.Optional;
 
 /**
  * Object storage upload request.
+ * @since 1.0.0
  */
 public interface UploadRequest {
 
