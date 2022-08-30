@@ -15,6 +15,8 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.NonNull;
+
 import java.io.InputStream;
 
 /**
@@ -28,6 +30,7 @@ public interface ObjectStorageEntry {
      *
      * @return object path or empty string if the object is placed at the root of bucket
      */
+    @NonNull
     String getKey();
 
     /**

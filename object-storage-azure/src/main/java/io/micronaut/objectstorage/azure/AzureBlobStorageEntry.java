@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.azure;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.InputStream;
@@ -36,6 +37,7 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry {
     }
 
     @Override
+    @NonNull
     public String getKey() {
         return blobClient.getBlobName();
     }
