@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import io.micronaut.inject.qualifiers.Qualifiers;
  */
 @Factory
 public class AzureBlobStorageFactory {
+
     private final BeanContext beanContext;
 
     public AzureBlobStorageFactory(BeanContext beanContext) {
@@ -48,29 +49,29 @@ public class AzureBlobStorageFactory {
     }
 
     /**
-     * @param configuration the configuration
+     * @param configuration   the configuration
      * @param tokenCredential the token credential
      * @return the {@link BlobServiceClientBuilder}
      */
     @EachBean(AzureBlobStorageConfiguration.class)
     @Requires(bean = TokenCredential.class)
     @Requires(missingBeans = StorageSharedKeyCredential.class)
-    public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(
-        AzureBlobStorageConfiguration configuration, @NonNull TokenCredential tokenCredential) {
+    public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(AzureBlobStorageConfiguration configuration,
+                                                                                @NonNull TokenCredential tokenCredential) {
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
             .credential(tokenCredential);
     }
 
     /**
-     * @param configuration the configuration
+     * @param configuration       the configuration
      * @param sharedKeyCredential the shared key credential
      * @return the {@link BlobServiceClientBuilder}
      */
     @EachBean(AzureBlobStorageConfiguration.class)
     @Requires(bean = StorageSharedKeyCredential.class)
-    public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(
-        AzureBlobStorageConfiguration configuration, @NonNull StorageSharedKeyCredential sharedKeyCredential) {
+    public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(AzureBlobStorageConfiguration configuration,
+                                                                                    @NonNull StorageSharedKeyCredential sharedKeyCredential) {
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
             .credential(sharedKeyCredential);
@@ -86,12 +87,13 @@ public class AzureBlobStorageFactory {
     }
 
     /**
-     * @param name The configuration
+     * @param name          The configuration
      * @param serviceClient The service client
      * @return The {@link BlobContainerClient}
      */
     @EachBean(BlobServiceClient.class)
-    public BlobContainerClient blobContainerClient(@Parameter String name, @NonNull BlobServiceClient serviceClient) {
+    public BlobContainerClient blobContainerClient(@Parameter String name,
+                                                   @NonNull BlobServiceClient serviceClient) {
         final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
         return serviceClient.getBlobContainerClient(configuration.getName());
     }

@@ -1,5 +1,4 @@
 plugins {
-    io.micronaut.build.internal.`objectstorage-base`
     io.micronaut.build.internal.bom
 }
 

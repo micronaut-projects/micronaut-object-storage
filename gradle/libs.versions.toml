@@ -1,60 +1,22 @@
-#
-# This file is used to declare the list of libraries
-# which are used as dependencies in the project.
-# See https://docs.gradle.org/7.4.2/userguide/platforms.html#sub:central-declaration-of-dependencies
-#
-# For Micronaut, we have 3 kinds of dependencies:
-#   - managed dependencies, which are exposed to consumers via a BOM (or version catalog)
-#   - managed BOMs, which are imported into the BOM that we generate
-#   - all other dependencies, which are implementation details
-#
-# If a library needs to appear in the BOM of the project, then it must be
-# declared with the "managed-" prefix.
-# If a BOM needs to be imported in the BOM of the project, then it must be
-# declared with the "boms-" prefix.
-# Both managed dependencies and BOMs need to have their version declared via
-# a managed version (a version which alias starts with "managed-"
-
 [versions]
-micronaut = "3.7.0-SNAPSHOT"
-micronaut-docs = "2.0.0"
-micronaut-test = "3.1.1"
-groovy = "3.0.10"
-gcp-libraries = "26.1.0"
-
-# Managed versions appear in the BOM
-# managed-somelib = "1.0"
-# managed-somebom = "1.1"
+micronaut = '3.7.0-SNAPSHOT'
+micronaut-docs = '2.0.0'
+micronaut-test = '3.1.1'
+groovy = '3.0.10'
+gcp-libraries = '26.1.0'
 
 [libraries]
+azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
 
-#
-# Managed dependencies appear in the BOM
-#
-# managed-somelib = { module = "group:artifact", version.ref = "managed-somelib" }
+amazon-awssdk-s3 = { module = 'software.amazon.awssdk:s3' }
+amazon-awssdk-v1 = { module = 'com.amazonaws:aws-java-sdk-core' }
 
-#
-# Imported BOMs, also appearing in the generated BOM
-#
-# boms-somebom = { module = "com.foo:somebom", version.ref = "managed-somebom" }
+gcp-libraries-bom = { module = 'com.google.cloud:libraries-bom', version.ref = 'gcp-libraries' }
+gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 
-# Other libraries used by the project but non managed
-# Cloud implementations
-azure-storage-blob = { module = "com.azure:azure-storage-blob" }
-
-amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3" }
-amazon-awssdk-v1 = { module = "com.amazonaws:aws-java-sdk-core" }
-
-gcp-libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "gcp-libraries" }
-gcp-storage = { module = "com.google.cloud:google-cloud-storage" }
-
-oci-sdk-objectstorage = { module = "com.oracle.oci.sdk:oci-java-sdk-objectstorage" }
+oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorage' }
 
 # Others
-groovy-test = { module = "org.codehaus.groovy:groovy-test" }
-testcontainers-spock = { module = "org.testcontainers:spock" }
-testcontainers-localstack = { module = "org.testcontainers:localstack" }
-
-[bundles]
-
-[plugins]
+groovy-test = { module = 'org.codehaus.groovy:groovy-test' }
+testcontainers-spock = { module = 'org.testcontainers:spock' }
+testcontainers-localstack = { module = 'org.testcontainers:localstack' }

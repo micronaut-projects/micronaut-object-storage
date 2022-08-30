@@ -24,5 +24,4 @@ import java.io.InputStream;
 public interface InputStreamMapper {
 
     byte[] toByteArray(InputStream inputStream);
-
 }

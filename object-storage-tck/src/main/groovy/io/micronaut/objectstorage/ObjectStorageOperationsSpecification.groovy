@@ -17,28 +17,29 @@ package io.micronaut.objectstorage
 
 import spock.lang.Specification
 
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 
+import static java.nio.charset.StandardCharsets.UTF_8
 
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
     boolean supportsEtag = true
 
-    def "it can upload, get and delete object from file"() {
+    void 'it can upload, get and delete object from file'() {
         given:
-        def tempFilePath = Files.createTempFile("test-file", "txt")
-        def tempFileName = tempFilePath.getFileName().toString()
-        tempFilePath.toFile().text = "micronaut"
+        Path tempFilePath = Files.createTempFile('test-file', 'txt')
+        String tempFileName = tempFilePath.getFileName().toString()
+        tempFilePath.toFile().text = 'micronaut'
 
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromFile(tempFilePath)
-        def uploadResponse = getObjectStorage().put(uploadRequest)
+        UploadResponse uploadResponse = getObjectStorage().put(uploadRequest)
 
         then:
         uploadResponse
         if (supportsEtag) {
-            uploadResponse.ETag
+            assert uploadResponse.ETag
         }
 
         when: 'get file based on path'
@@ -50,12 +51,12 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         when: 'the file has same content'
         String text = new BufferedReader(
-                new InputStreamReader(objectStorageEntry.get().inputStream, StandardCharsets.UTF_8))
+                new InputStreamReader(objectStorageEntry.get().inputStream, UTF_8))
                 .text
 
         then:
         text
-        text == "micronaut"
+        text == 'micronaut'
 
         when: 'delete the file on object storage'
         getObjectStorage().delete(tempFileName)

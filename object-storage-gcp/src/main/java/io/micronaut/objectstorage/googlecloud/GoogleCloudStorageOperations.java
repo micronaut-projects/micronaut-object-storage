@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import io.micronaut.context.annotation.EachBean;
-import io.micronaut.objectstorage.*;
+import io.micronaut.objectstorage.InputStreamMapper;
+import io.micronaut.objectstorage.ObjectStorageEntry;
+import io.micronaut.objectstorage.ObjectStorageException;
+import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.UploadResponse;
 
 import java.util.Optional;
 
@@ -38,7 +43,9 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     private final Storage storage;
     private final GoogleCloudStorageConfiguration configuration;
 
-    public GoogleCloudStorageOperations(InputStreamMapper inputStreamMapper, Storage storage, GoogleCloudStorageConfiguration configuration) {
+    public GoogleCloudStorageOperations(InputStreamMapper inputStreamMapper,
+                                        Storage storage,
+                                        GoogleCloudStorageConfiguration configuration) {
         this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
         this.configuration = configuration;

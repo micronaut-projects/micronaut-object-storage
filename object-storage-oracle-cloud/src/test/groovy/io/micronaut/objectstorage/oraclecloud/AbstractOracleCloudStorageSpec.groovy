@@ -9,11 +9,12 @@ import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 
+import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
+
 abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
-
-    public static final String OBJECT_STORAGE_NAME = "default"
+    public static final String OBJECT_STORAGE_NAME = 'default'
 
     @Inject
     OracleCloudStorageOperations oracleCloudStorageOperations
@@ -26,9 +27,7 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
 
     @Override
     Map<String, String> getProperties() {
-        [
-                ("${OracleCloudStorageConfiguration.PREFIX}.${OBJECT_STORAGE_NAME}.name".toString()): BUCKET_NAME,
-        ]
+        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.name'): BUCKET_NAME]
     }
 
     @Override
@@ -38,24 +37,22 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
 
     void setup() {
         def builder = CreateBucketDetails.builder()
-                .compartmentId(System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID"))
+                .compartmentId(System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID'))
                 .name(BUCKET_NAME)
-        if (System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID")) {
-            builder.compartmentId(System.getenv("ORACLE_CLOUD_TEST_COMPARTMENT_ID"))
+        if (System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID')) {
+            builder.compartmentId(System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID'))
         }
-        CreateBucketRequest request = CreateBucketRequest.builder()
+        client.createBucket(CreateBucketRequest.builder()
                 .namespaceName(configuration.getNamespace())
                 .createBucketDetails(builder.build())
-                .build()
-        client.createBucket(request)
+                .build())
 
     }
 
     void cleanup() {
-        DeleteBucketRequest request = DeleteBucketRequest.builder()
+        client.deleteBucket(DeleteBucketRequest.builder()
                 .namespaceName(configuration.getNamespace())
                 .bucketName(BUCKET_NAME)
-                .build()
-        client.deleteBucket(request)
+                .build())
     }
 }
