@@ -15,8 +15,10 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,12 +32,18 @@ import java.util.Optional;
  */
 public interface UploadRequest {
 
-    static UploadRequest fromFile(Path path) {
+    static UploadRequest fromFile(@NonNull Path path) {
         return new FileUploadRequest(path);
     }
 
-    static UploadRequest fromFile(Path path, String key) {
+    static UploadRequest fromFile(@NonNull Path path, String key) {
         return new FileUploadRequest(path, key);
+    }
+
+    static UploadRequest fromBytes(@NonNull byte[] bytes,
+                                   @NonNull String contentType,
+                                   @NonNull String key) {
+        return new BytesUploadRequest(bytes, contentType, key);
     }
 
     /**
@@ -124,6 +132,44 @@ public interface UploadRequest {
             } catch (IOException e) {
                 throw new ObjectStorageException(e);
             }
+        }
+    }
+
+    /**
+     * Upload request implementation using byte array.
+     */
+    class BytesUploadRequest implements UploadRequest {
+
+        private final byte[] bytes;
+        private final String contentType;
+        private final String key;
+
+        public BytesUploadRequest(@NonNull byte[] bytes,
+                                  @NonNull String contentType,
+                                  @NonNull String key) {
+            this.bytes = bytes;
+            this.contentType = contentType;
+            this.key = key;
+        }
+
+        @Override
+        public Optional<String> getContentType() {
+            return Optional.of(contentType);
+        }
+
+        @Override
+        public String getKey() {
+            return key;
+        }
+
+        @Override
+        public Optional<Long> getContentSize() {
+            return Optional.of((long) bytes.length);
+        }
+
+        @Override
+        public InputStream getInputStream() {
+            return new ByteArrayInputStream(bytes);
         }
     }
 }
