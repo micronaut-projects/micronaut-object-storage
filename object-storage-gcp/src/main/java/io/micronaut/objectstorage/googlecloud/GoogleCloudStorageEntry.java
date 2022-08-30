@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.googlecloud;
 
 import com.google.cloud.storage.Blob;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.ByteArrayInputStream;
@@ -36,6 +37,7 @@ public class GoogleCloudStorageEntry implements ObjectStorageEntry {
     }
 
     @Override
+    @NonNull
     public String getKey() {
         return blob.getName();
     }
