@@ -17,8 +17,6 @@ package io.micronaut.objectstorage;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -79,9 +77,6 @@ public interface UploadRequest {
      * Upload request implementation using {@link java.io.File}.
      */
     class FileUploadRequest implements UploadRequest {
-
-        private static final Logger LOG = LoggerFactory.getLogger(FileUploadRequest.class);
-
         private final String keyName;
         private final String contentType;
         private final Path path;
@@ -139,9 +134,6 @@ public interface UploadRequest {
             try {
                 return Optional.of(Files.size(path));
             } catch (IOException e) {
-                if (LOG.isErrorEnabled()) {
-                    LOG.error("Error calculating the size of the file.", e);
-                }
                 return Optional.empty();
             }
         }
@@ -152,9 +144,6 @@ public interface UploadRequest {
             try {
                 return Files.newInputStream(path);
             } catch (IOException e) {
-                if (LOG.isErrorEnabled()) {
-                    LOG.error("Error creating an input stream to read from the file.", e);
-                }
                 throw new ObjectStorageException(e);
             }
         }
