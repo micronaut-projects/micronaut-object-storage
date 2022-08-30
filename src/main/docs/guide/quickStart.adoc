@@ -45,15 +45,3 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 == Deleting files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="delete"]
-
-
-
-
-
-
-
-
-
-
-
-

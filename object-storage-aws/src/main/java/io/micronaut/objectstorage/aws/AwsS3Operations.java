@@ -79,10 +79,6 @@ public class AwsS3Operations implements ObjectStorageOperations {
 
     @Override
     public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
-        GetObjectRequest.Builder builder = GetObjectRequest.builder();
-        builder.bucket(bucketConfiguration.getName())
-            .key(key);
-
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketConfiguration.getName())
