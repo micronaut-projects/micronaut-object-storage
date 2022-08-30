@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
@@ -44,7 +45,7 @@ public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
      * @param name the name to set.
      */
     @Override
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         super.setName(name);
     }
 }

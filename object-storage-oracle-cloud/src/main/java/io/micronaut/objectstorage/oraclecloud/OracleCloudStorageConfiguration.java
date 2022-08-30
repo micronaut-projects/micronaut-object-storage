@@ -60,7 +60,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
      * The OCI Object Storage bucket name.
      */
     @Override
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         super.setName(name);
     }
 }
