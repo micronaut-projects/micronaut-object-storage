@@ -1,0 +1,27 @@
+plugins {
+    id 'groovy'
+    id 'io.micronaut.minimal.application'
+    id 'io.micronaut.build.internal.dependency-updates'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("spock2")
+}
+
+dependencies {
+    implementation(projects.objectStorageAws)
+
+    testImplementation(libs.testcontainers.spock)
+    testImplementation(libs.testcontainers.localstack)
+    testImplementation(libs.amazon.awssdk.v1) {
+        because("it is required by testcontainers-localstack")
+    }
+}

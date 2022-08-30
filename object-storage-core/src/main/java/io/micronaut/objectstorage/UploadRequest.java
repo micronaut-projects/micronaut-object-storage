@@ -30,12 +30,12 @@ import java.util.Optional;
  */
 public interface UploadRequest {
 
-    static UploadRequest fromFile(Path path) {
+    static UploadRequest fromPath(Path path) {
         return new FileUploadRequest(path);
     }
 
-    static UploadRequest fromFile(Path path, String key) {
-        return new FileUploadRequest(path, key);
+    static UploadRequest fromPath(Path path, String prefix) {
+        return new FileUploadRequest(path, prefix);
     }
 
     /**
@@ -72,16 +72,16 @@ public interface UploadRequest {
                 URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
-        public FileUploadRequest(Path localFilePath, String objectStoragePath) {
-            this(localFilePath, localFilePath.toFile().getName(), objectStoragePath,
+        public FileUploadRequest(Path localFilePath, String prefix) {
+            this(localFilePath, localFilePath.toFile().getName(), prefix,
                 URLConnection.guessContentTypeFromName(localFilePath.toFile().getName()));
         }
 
         public FileUploadRequest(Path localFilePath,
-                                 @Nullable String keyName,
-                                 @Nullable String objectStoragePath,
+                                 String keyName,
+                                 @Nullable String prefix,
                                  @Nullable String contentType) {
-            this.keyName = objectStoragePath != null ? objectStoragePath + '/' + keyName : keyName;
+            this.keyName = prefix != null ? prefix + "/" + keyName : keyName;
             this.contentType = contentType;
             this.path = localFilePath;
         }

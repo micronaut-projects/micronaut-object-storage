@@ -52,7 +52,7 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
+    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
         BlobId blobId = BlobId.of(configuration.getName(), uploadRequest.getKey());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null))
@@ -63,7 +63,7 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         BlobId blobId = BlobId.of(configuration.getName(), key);
         Blob blob = storage.get(blobId);
 

@@ -1,0 +1,18 @@
+To use https://www.oracle.com/cloud/storage/object-storage/[Oracle Cloud Infrastructure (OCI) Object Storage], you need the following dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud[version={version}]
+
+Refer to the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide[Micronaut Oracle Cloud documentation]
+for more information about authentication options.
+
+The object storage specific configuration options available are:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.adoc[]
+
+For example:
+
+.`src/main/resources/application-oraclecloud.yml`
+[source,yaml]
+----
+include::doc-examples/example-java/src/test/resources/application-oraclecloud.yml[]
+----
