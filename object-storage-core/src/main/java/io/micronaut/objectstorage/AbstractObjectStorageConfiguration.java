@@ -16,7 +16,6 @@
 package io.micronaut.objectstorage;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.naming.Named;
 
 /**
  * Base class for all the cloud-specific configurations.
@@ -24,7 +23,7 @@ import io.micronaut.core.naming.Named;
  * @author Pavol Gressa
  * @since 1.0
  */
-public abstract class AbstractObjectStorageConfiguration implements Named {
+public abstract class AbstractObjectStorageConfiguration implements ObjectStorageConfiguration {
 
     public static final String GENERIC_PREFIX = "micronaut.object-storage";
 
