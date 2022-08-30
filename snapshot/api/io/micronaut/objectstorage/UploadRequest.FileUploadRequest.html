@@ -242,7 +242,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>FileUploadRequest</h4>
-<pre>public&nbsp;FileUploadRequest(java.nio.file.Path&nbsp;localFilePath)</pre>
+<pre>public&nbsp;FileUploadRequest(@NonNull
+                         java.nio.file.Path&nbsp;localFilePath)</pre>
 </li>
 </ul>
 <a name="FileUploadRequest-java.nio.file.Path-java.lang.String-">
@@ -251,7 +252,9 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>FileUploadRequest</h4>
-<pre>public&nbsp;FileUploadRequest(java.nio.file.Path&nbsp;localFilePath,
+<pre>public&nbsp;FileUploadRequest(@NonNull
+                         java.nio.file.Path&nbsp;localFilePath,
+                         @Nullable
                          java.lang.String&nbsp;prefix)</pre>
 </li>
 </ul>
@@ -261,7 +264,9 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockListLast">
 <li class="blockList">
 <h4>FileUploadRequest</h4>
-<pre>public&nbsp;FileUploadRequest(java.nio.file.Path&nbsp;localFilePath,
+<pre>public&nbsp;FileUploadRequest(@NonNull
+                         java.nio.file.Path&nbsp;localFilePath,
+                         @NonNull
                          java.lang.String&nbsp;keyName,
                          @Nullable
                          java.lang.String&nbsp;prefix,
@@ -283,7 +288,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>getFile</h4>
-<pre>public&nbsp;java.io.File&nbsp;getFile()</pre>
+<pre>@NonNull
+public&nbsp;java.io.File&nbsp;getFile()</pre>
 </li>
 </ul>
 <a name="getPath--">
@@ -292,7 +298,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>getPath</h4>
-<pre>public&nbsp;java.nio.file.Path&nbsp;getPath()</pre>
+<pre>@NonNull
+public&nbsp;java.nio.file.Path&nbsp;getPath()</pre>
 </li>
 </ul>
 <a name="getAbsolutePath--">
@@ -301,7 +308,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>getAbsolutePath</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getAbsolutePath()</pre>
+<pre>@NonNull
+public&nbsp;java.lang.String&nbsp;getAbsolutePath()</pre>
 </li>
 </ul>
 <a name="getContentType--">
@@ -310,7 +318,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>getContentType</h4>
-<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getContentType()</pre>
+<pre>@NonNull
+public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getContentType()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getContentType--">getContentType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
@@ -325,7 +334,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>getKey</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getKey()</pre>
+<pre>@NonNull
+public&nbsp;java.lang.String&nbsp;getKey()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getKey--">getKey</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
@@ -340,7 +350,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockList">
 <li class="blockList">
 <h4>getContentSize</h4>
-<pre>public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getContentSize()</pre>
+<pre>@NonNull
+public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getContentSize()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getContentSize--">getContentSize</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
@@ -355,7 +366,8 @@ implements <a href="../../../io/micronaut/objectstorage/UploadRequest.html" titl
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getInputStream</h4>
-<pre>public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
+<pre>@NonNull
+public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/UploadRequest.html#getInputStream--">getInputStream</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a></code></dd>
