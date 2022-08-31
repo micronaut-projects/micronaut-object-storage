@@ -35,8 +35,8 @@ public class GoogleCloudStorageConfiguration extends AbstractObjectStorageConfig
 
     public static final String PREFIX = GENERIC_PREFIX + '.' + NAME;
 
-    public GoogleCloudStorageConfiguration(@Parameter String bucketName) {
-        super(bucketName);
+    public GoogleCloudStorageConfiguration(@Parameter String name) {
+        super(name);
     }
 
     /**
