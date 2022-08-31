@@ -15,6 +15,8 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.NonNull;
+
 /**
  * Base class for all the cloud-specific configurations.
  *
@@ -25,13 +27,15 @@ public abstract class AbstractObjectStorageConfiguration implements ObjectStorag
 
     public static final String GENERIC_PREFIX = "micronaut.object-storage";
 
+    @NonNull
     private String name;
 
-    protected AbstractObjectStorageConfiguration(String name) {
+    protected AbstractObjectStorageConfiguration(@NonNull String name) {
         this.name = name;
     }
 
     @Override
+    @NonNull
     public String getName() {
         return name;
     }
@@ -39,7 +43,7 @@ public abstract class AbstractObjectStorageConfiguration implements ObjectStorag
     /**
      * @param name the name to set.
      */
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 }
