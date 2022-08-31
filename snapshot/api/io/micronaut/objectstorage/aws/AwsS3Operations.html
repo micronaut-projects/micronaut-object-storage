@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -166,12 +166,21 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected software.amazon.awssdk.services.s3.model.PutObjectResponse</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3Operations.html#put-software.amazon.awssdk.services.s3.model.PutObjectRequest-io.micronaut.objectstorage.UploadRequest-">put</a></span>(software.amazon.awssdk.services.s3.model.PutObjectRequest&nbsp;putObjectRequest,
+   <a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>&nbsp;</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>protected software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3Operations.html#putRequest-io.micronaut.objectstorage.UploadRequest-">putRequest</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3Operations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3Operations.html#upload-io.micronaut.objectstorage.UploadRequest-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
 <div class="block">Uploads an object to the object storage.</div>
@@ -266,7 +275,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <a name="delete-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>delete</h4>
 <pre>public&nbsp;void&nbsp;delete(java.lang.String&nbsp;key)
@@ -280,6 +289,43 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="putRequest-io.micronaut.objectstorage.UploadRequest-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>putRequest</h4>
+<pre>@NonNull
+protected&nbsp;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder&nbsp;putRequest(@NonNull
+                                                                                                <a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>uploadRequest</code> - Upload Request</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The PUT Object Request Builder</dd>
+</dl>
+</li>
+</ul>
+<a name="put-software.amazon.awssdk.services.s3.model.PutObjectRequest-io.micronaut.objectstorage.UploadRequest-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>put</h4>
+<pre>@NonNull
+protected&nbsp;software.amazon.awssdk.services.s3.model.PutObjectResponse&nbsp;put(@NonNull
+                                                                                  software.amazon.awssdk.services.s3.model.PutObjectRequest&nbsp;putObjectRequest,
+                                                                                  @NonNull
+                                                                                  <a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>putObjectRequest</code> - The PUT Object Request</dd>
+<dd><code>uploadRequest</code> - the upload request</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The PUT Object Response</dd>
 </dl>
 </li>
 </ul>
