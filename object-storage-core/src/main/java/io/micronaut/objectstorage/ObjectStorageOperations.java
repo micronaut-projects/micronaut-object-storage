@@ -16,14 +16,17 @@
 package io.micronaut.objectstorage;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Main interface for object storage operations.
  *
  * @author Pavol Gressa
  * @since 1.0
+ * @param <UPLOAD_REQUEST_BUILDER> Upload Request Builder
+ * @param <UPLOAD_RESPONSE> Upload Response
  */
-public interface ObjectStorageOperations {
+public interface ObjectStorageOperations<UPLOAD_REQUEST_BUILDER, UPLOAD_RESPONSE> {
 
     /**
      * Uploads an object to the object storage.
@@ -32,7 +35,18 @@ public interface ObjectStorageOperations {
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
-    UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException;
+    UPLOAD_RESPONSE upload(UploadRequest uploadRequest) throws ObjectStorageException;
+
+    /**
+     * Uploads an object to the object storage.
+     *
+     * @param uploadRequest the upload request
+     * @param uploadRequestBuilder Upload request builder consumer
+     * @return the upload response
+     * @throws ObjectStorageException if there was a failure storing the object
+     */
+    UPLOAD_RESPONSE upload(UploadRequest uploadRequest,
+                          Consumer<UPLOAD_REQUEST_BUILDER> uploadRequestBuilder) throws ObjectStorageException;
 
     /**
      * Gets the object from object storage.

@@ -21,6 +21,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import io.micronaut.context.annotation.EachBean;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
@@ -29,6 +30,7 @@ import io.micronaut.objectstorage.UploadRequest;
 import io.micronaut.objectstorage.UploadResponse;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Google Cloud implementation of {@link ObjectStorageOperations}.
@@ -37,7 +39,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @EachBean(GoogleCloudStorageConfiguration.class)
-public class GoogleCloudStorageOperations implements ObjectStorageOperations {
+public class GoogleCloudStorageOperations implements ObjectStorageOperations<BlobInfo.Builder, Blob> {
 
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
@@ -52,14 +54,17 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(configuration.getName(), uploadRequest.getKey());
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-            .setContentType(uploadRequest.getContentType().orElse(null))
-            .build();
+    @NonNull
+    public Blob upload(@NonNull UploadRequest uploadRequest) throws ObjectStorageException {
+        return upload(uploadRequest, createBlogInfoBuilder(uploadRequest).build());
+    }
 
-        Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
-        return new UploadResponse.Builder().withETag(blob.getEtag()).build();
+    @Override
+    @NonNull
+    public Blob upload(@NonNull UploadRequest uploadRequest, @NonNull Consumer<BlobInfo.Builder> uploadRequestBuilder) throws ObjectStorageException {
+        BlobInfo.Builder builder = createBlogInfoBuilder(uploadRequest);
+        uploadRequestBuilder.accept(builder);
+        return upload(uploadRequest, builder.build());
     }
 
     @Override
@@ -78,5 +83,22 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     public void delete(String key) throws ObjectStorageException {
         BlobId blobId = BlobId.of(configuration.getName(), key);
         storage.delete(blobId);
+    }
+
+    /**
+     *
+     * @param uploadRequest Upload Request
+     * @return BlobInfo Builder
+     */
+    @NonNull
+    protected BlobInfo.Builder createBlogInfoBuilder(@NonNull UploadRequest uploadRequest) {
+        BlobId blobId = BlobId.of(configuration.getName(), uploadRequest.getKey());
+        return BlobInfo.newBuilder(blobId)
+            .setContentType(uploadRequest.getContentType().orElse(null));
+    }
+
+    @NonNull
+    private Blob upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) throws ObjectStorageException {
+        return storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
     }
 }

@@ -32,6 +32,7 @@ import io.micronaut.objectstorage.UploadRequest;
 import io.micronaut.objectstorage.UploadResponse;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Oracle Cloud implementation of {@link ObjectStorageOperations}.
@@ -40,7 +41,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @EachBean(OracleCloudStorageConfiguration.class)
-public class OracleCloudStorageOperations implements ObjectStorageOperations {
+public class OracleCloudStorageOperations implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
     private final ObjectStorage client;
     private final OracleCloudStorageConfiguration configuration;
 
@@ -51,11 +52,18 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        PutObjectResponse putObjectResponse = client.putObject(put(uploadRequest).build());
-        return new UploadResponse.Builder()
-            .withETag(putObjectResponse.getETag())
-            .build();
+    @NonNull
+    public PutObjectResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
+        return client.putObject(put(uploadRequest).build());
+    }
+
+    @Override
+    @NonNull
+    public PutObjectResponse upload(@NonNull UploadRequest uploadRequest,
+                                    @NonNull Consumer<PutObjectRequest.Builder> uploadRequestBuilder) throws ObjectStorageException {
+        PutObjectRequest.Builder builder = put(uploadRequest);
+        uploadRequestBuilder.accept(builder);
+        return client.putObject(builder.build());
     }
 
     /**

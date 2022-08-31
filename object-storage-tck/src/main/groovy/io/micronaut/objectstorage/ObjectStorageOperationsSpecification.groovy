@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage
 
+import io.micronaut.core.annotation.NonNull
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -22,7 +23,7 @@ import java.nio.file.Path
 
 import static java.nio.charset.StandardCharsets.UTF_8
 
-abstract class ObjectStorageOperationsSpecification extends Specification {
+abstract class ObjectStorageOperationsSpecification<UPLOAD_RESPONSE> extends Specification {
 
     boolean supportsEtag = true
 
@@ -34,12 +35,11 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
-        UploadResponse uploadResponse = getObjectStorage().upload(uploadRequest)
+        UPLOAD_RESPONSE uploadResponse = getObjectStorage().upload(uploadRequest)
 
         then:
-        uploadResponse
         if (supportsEtag) {
-            assert uploadResponse.ETag
+            assert eTag(uploadResponse)
         }
 
         when: 'get file based on path'
@@ -71,5 +71,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         !objectStorageEntry.isPresent()
     }
 
-    abstract ObjectStorageOperations getObjectStorage()
+    @NonNull
+    abstract String eTag(UPLOAD_RESPONSE uploadResponse);
+
+    abstract ObjectStorageOperations<?, UPLOAD_RESPONSE> getObjectStorage()
 }

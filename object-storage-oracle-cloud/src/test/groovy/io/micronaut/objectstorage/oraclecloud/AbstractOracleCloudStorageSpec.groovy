@@ -4,6 +4,9 @@ import com.oracle.bmc.objectstorage.ObjectStorage
 import com.oracle.bmc.objectstorage.model.CreateBucketDetails
 import com.oracle.bmc.objectstorage.requests.CreateBucketRequest
 import com.oracle.bmc.objectstorage.requests.DeleteBucketRequest
+import com.oracle.bmc.objectstorage.requests.PutObjectRequest
+import com.oracle.bmc.objectstorage.responses.PutObjectResponse
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
@@ -11,7 +14,7 @@ import jakarta.inject.Inject
 
 import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
 
-abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
+abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpecification<PutObjectResponse> implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
@@ -31,8 +34,14 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     @Override
-    ObjectStorageOperations getObjectStorage() {
+    @NonNull
+    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> getObjectStorage() {
         return oracleCloudStorageOperations
+    }
+
+    @Override
+    String eTag(PutObjectResponse putObjectResponse) {
+        putObjectResponse.getETag()
     }
 
     void setup() {

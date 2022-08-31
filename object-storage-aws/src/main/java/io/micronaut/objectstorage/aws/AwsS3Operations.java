@@ -35,6 +35,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -43,7 +44,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @EachBean(AwsS3Configuration.class)
-public class AwsS3Operations implements ObjectStorageOperations {
+public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
 
     private final S3Client s3Client;
     private final AwsS3Configuration bucketConfiguration;
@@ -58,9 +59,18 @@ public class AwsS3Operations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        PutObjectResponse putObjectResponse = put(putRequest(uploadRequest).build(), uploadRequest);
-        return new UploadResponse.Builder().withETag(putObjectResponse.eTag()).build();
+    @NonNull
+    public PutObjectResponse upload(@NonNull UploadRequest uploadRequest) throws ObjectStorageException {
+        return put(putRequest(uploadRequest).build(), uploadRequest);
+    }
+
+    @Override
+    @NonNull
+    public PutObjectResponse upload(@NonNull UploadRequest uploadRequest,
+                                    @NonNull Consumer<PutObjectRequest.Builder> uploadRequestBuilder) throws ObjectStorageException {
+        PutObjectRequest.Builder builder = putRequest(uploadRequest);
+        uploadRequestBuilder.accept(builder);
+        return put(builder.build(), uploadRequest);
     }
 
     @Override
