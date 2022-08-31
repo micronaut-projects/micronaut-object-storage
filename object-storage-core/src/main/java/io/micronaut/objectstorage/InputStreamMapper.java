@@ -31,7 +31,6 @@ public interface InputStreamMapper {
      * Transforms an InputStream into a byte array.
      * @param inputStream Input Stream.
      * @return the byte array
-     * @throws ObjectStorageException if a failure happens when transforming the inputStream to a byte array.
      */
-    byte[] toByteArray(@NonNull InputStream inputStream) throws ObjectStorageException;
+    byte[] toByteArray(@NonNull InputStream inputStream);
 }

@@ -30,7 +30,7 @@ import java.io.InputStream;
 public class DefaultInputStreamMapper implements InputStreamMapper {
 
     @Override
-    public byte[] toByteArray(@NonNull InputStream inputStream) throws ObjectStorageException {
+    public byte[] toByteArray(@NonNull InputStream inputStream) {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             int nRead;
             byte[] data = new byte[4];
