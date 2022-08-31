@@ -15,13 +15,22 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.context.annotation.DefaultImplementation;
+import io.micronaut.core.annotation.NonNull;
+
 import java.io.InputStream;
 
 /**
  * @author Pavol Gressa
  * @since 1.0
  */
+@DefaultImplementation(DefaultInputStreamMapper.class)
 public interface InputStreamMapper {
 
-    byte[] toByteArray(InputStream inputStream);
+    /**
+     * Transforms an InputStream into a byte array.
+     * @param inputStream Input Stream.
+     * @return the byte array
+     */
+    byte[] toByteArray(@NonNull InputStream inputStream);
 }
