@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
@@ -58,22 +59,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
 
     @Override
     public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        PutObjectRequest.Builder builder = PutObjectRequest.builder()
-            .bucket(bucketConfiguration.getName())
-            .key(uploadRequest.getKey());
-
-        uploadRequest.getContentType().ifPresent(builder::contentType);
-        uploadRequest.getContentSize().ifPresent(builder::contentLength);
-
-        PutObjectResponse putObjectResponse;
-        if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
-            UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
-            putObjectResponse = s3Client.putObject(builder.build(), fileUploadRequest.getFile().toPath());
-        } else {
-            byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
-            putObjectResponse = s3Client.putObject(builder.build(), RequestBody.fromBytes(inputBytes));
-        }
-
+        PutObjectResponse putObjectResponse = put(putRequest(uploadRequest).build(), uploadRequest);
         return new UploadResponse.Builder().withETag(putObjectResponse.eTag()).build();
     }
 
@@ -97,5 +83,38 @@ public class AwsS3Operations implements ObjectStorageOperations {
             .bucket(bucketConfiguration.getName())
             .key(key)
             .build());
+    }
+
+    /**
+     *
+     * @param uploadRequest Upload Request
+     * @return The PUT Object Request Builder
+     */
+    @NonNull
+    protected PutObjectRequest.Builder putRequest(@NonNull UploadRequest uploadRequest) {
+        PutObjectRequest.Builder builder = PutObjectRequest.builder()
+            .bucket(bucketConfiguration.getName())
+            .key(uploadRequest.getKey());
+
+        uploadRequest.getContentType().ifPresent(builder::contentType);
+        uploadRequest.getContentSize().ifPresent(builder::contentLength);
+        return builder;
+    }
+
+    /**
+     *
+     * @param putObjectRequest The PUT Object Request
+     * @param uploadRequest the upload request
+     * @return The PUT Object Response
+     */
+    @NonNull
+    protected PutObjectResponse put(@NonNull PutObjectRequest putObjectRequest,
+                                    @NonNull UploadRequest uploadRequest) {
+        if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
+            UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
+            return s3Client.putObject(putObjectRequest, fileUploadRequest.getFile().toPath());
+        }
+        byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
+        return s3Client.putObject(putObjectRequest, RequestBody.fromBytes(inputBytes));
     }
 }
