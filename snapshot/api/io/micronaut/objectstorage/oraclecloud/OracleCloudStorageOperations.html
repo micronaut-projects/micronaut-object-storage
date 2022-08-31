@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -165,12 +165,16 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#put-io.micronaut.objectstorage.UploadRequest-">put</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>&nbsp;</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#upload-io.micronaut.objectstorage.UploadRequest-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
 <div class="block">Uploads an object to the object storage.</div>
@@ -236,6 +240,22 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <dd>the upload response</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code> - if there was a failure storing the object</dd>
+</dl>
+</li>
+</ul>
+<a name="put-io.micronaut.objectstorage.UploadRequest-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>put</h4>
+<pre>protected&nbsp;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder&nbsp;put(@NonNull
+                                                                             <a href="../../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>uploadRequest</code> - Upload Request</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The Put Object Request Builder</dd>
 </dl>
 </li>
 </ul>
