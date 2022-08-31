@@ -41,8 +41,8 @@ import java.util.Optional;
  */
 @EachBean(OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations implements ObjectStorageOperations {
-    private final ObjectStorage client;
     private final OracleCloudStorageConfiguration configuration;
+    private final ObjectStorage client;
 
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client) {
@@ -66,7 +66,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     protected PutObjectRequest.Builder put(@NonNull UploadRequest uploadRequest) {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
             .objectName(uploadRequest.getKey())
-            .bucketName(configuration.getName())
+            .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
             .putObjectBody(uploadRequest.getInputStream());
 
@@ -78,7 +78,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     @Override
     public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
-            .bucketName(configuration.getName())
+            .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
             .objectName(key);
 
@@ -94,7 +94,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     @Override
     public void delete(String key) throws ObjectStorageException {
         client.deleteObject(DeleteObjectRequest.builder()
-            .bucketName(configuration.getName())
+            .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
             .objectName(key)
             .build());

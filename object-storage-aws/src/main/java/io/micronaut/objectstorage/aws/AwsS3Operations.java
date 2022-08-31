@@ -46,14 +46,14 @@ import java.util.Optional;
 public class AwsS3Operations implements ObjectStorageOperations {
 
     private final S3Client s3Client;
-    private final AwsS3Configuration bucketConfiguration;
+    private final AwsS3Configuration configuration;
     private final InputStreamMapper inputStreamMapper;
 
-    public AwsS3Operations(@Parameter AwsS3Configuration bucketConfiguration,
+    public AwsS3Operations(@Parameter AwsS3Configuration configuration,
                            S3Client s3Client,
                            InputStreamMapper inputStreamMapper) {
         this.s3Client = s3Client;
-        this.bucketConfiguration = bucketConfiguration;
+        this.configuration = configuration;
         this.inputStreamMapper = inputStreamMapper;
     }
 
@@ -67,7 +67,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
     public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
-                .bucket(bucketConfiguration.getName())
+                .bucket(configuration.getBucket())
                 .key(key)
                 .build());
             AwsS3ObjectStorageEntry entry = new AwsS3ObjectStorageEntry(key, responseInputStream);
@@ -80,7 +80,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
     @Override
     public void delete(String key) throws ObjectStorageException {
         s3Client.deleteObject(DeleteObjectRequest.builder()
-            .bucket(bucketConfiguration.getName())
+            .bucket(configuration.getBucket())
             .key(key)
             .build());
     }
@@ -93,7 +93,7 @@ public class AwsS3Operations implements ObjectStorageOperations {
     @NonNull
     protected PutObjectRequest.Builder putRequest(@NonNull UploadRequest uploadRequest) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
-            .bucket(bucketConfiguration.getName())
+            .bucket(configuration.getBucket())
             .key(uploadRequest.getKey());
 
         uploadRequest.getContentType().ifPresent(builder::contentType);

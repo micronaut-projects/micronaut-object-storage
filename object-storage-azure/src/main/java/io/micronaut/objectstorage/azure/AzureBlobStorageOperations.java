@@ -24,10 +24,8 @@ import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import com.azure.storage.blob.options.BlobUploadFromFileOptions;
-import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.inject.qualifiers.Qualifiers;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
@@ -50,14 +48,10 @@ import static java.lang.Boolean.TRUE;
 @Singleton
 public class AzureBlobStorageOperations implements ObjectStorageOperations {
 
-    private final AzureBlobStorageConfiguration configuration;
     private final BlobContainerClient blobContainerClient;
 
-    public AzureBlobStorageOperations(@Parameter String name,
-                                      BlobContainerClient blobContainerClient,
-                                      BeanContext beanContext) {
+    public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient) {
         this.blobContainerClient = blobContainerClient;
-        this.configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
     }
 
     @Override
@@ -100,10 +94,4 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations {
         blobClient.getBlockBlobClient().delete();
     }
 
-    /**
-     * @return the configuration.
-     */
-    public AzureBlobStorageConfiguration getConfiguration() {
-        return configuration;
-    }
 }
