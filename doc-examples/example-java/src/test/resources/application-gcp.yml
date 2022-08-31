@@ -5,4 +5,4 @@ micronaut:
   object-storage:
     gcp:
       default:
-        name: profile-pictures-bucket
+        bucket: profile-pictures-bucket

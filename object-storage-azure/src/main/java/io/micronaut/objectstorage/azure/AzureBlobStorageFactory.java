@@ -95,6 +95,6 @@ public class AzureBlobStorageFactory {
     public BlobContainerClient blobContainerClient(@Parameter String name,
                                                    @NonNull BlobServiceClient serviceClient) {
         final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
-        return serviceClient.getBlobContainerClient(configuration.getName());
+        return serviceClient.getBlobContainerClient(configuration.getContainer());
     }
 }

@@ -30,13 +30,14 @@ import java.io.InputStream;
  */
 public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
 
-    private final ResponseInputStream<GetObjectResponse> responseResponseInputStream;
+    private final ResponseInputStream<GetObjectResponse> responseInputStream;
+
     @NonNull
     private final String key;
 
     AwsS3ObjectStorageEntry(@NonNull String key,
-                            ResponseInputStream<GetObjectResponse> responseResponseInputStream) {
-        this.responseResponseInputStream = responseResponseInputStream;
+                            ResponseInputStream<GetObjectResponse> responseInputStream) {
+        this.responseInputStream = responseInputStream;
         this.key = key;
     }
 
@@ -48,6 +49,6 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
 
     @Override
     public InputStream getInputStream() {
-        return responseResponseInputStream;
+        return responseInputStream;
     }
 }

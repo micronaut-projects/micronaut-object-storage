@@ -6,5 +6,5 @@ micronaut:
   object-storage:
     oracle-cloud:
       default:
-        name: profile-pictures-bucket
+        bucket: profile-pictures-bucket
         namespace: MyNamespace

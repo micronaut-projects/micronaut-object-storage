@@ -21,6 +21,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import io.micronaut.context.annotation.EachBean;
+import io.micronaut.context.annotation.Parameter;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
@@ -39,21 +40,21 @@ import java.util.Optional;
 @EachBean(GoogleCloudStorageConfiguration.class)
 public class GoogleCloudStorageOperations implements ObjectStorageOperations {
 
+    private final GoogleCloudStorageConfiguration configuration;
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
-    private final GoogleCloudStorageConfiguration configuration;
 
-    public GoogleCloudStorageOperations(InputStreamMapper inputStreamMapper,
-                                        Storage storage,
-                                        GoogleCloudStorageConfiguration configuration) {
+    public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
+                                        InputStreamMapper inputStreamMapper,
+                                        Storage storage) {
+        this.configuration = configuration;
         this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
-        this.configuration = configuration;
     }
 
     @Override
     public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(configuration.getName(), uploadRequest.getKey());
+        BlobId blobId = BlobId.of(configuration.getBucket(), uploadRequest.getKey());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null))
             .build();
@@ -64,7 +65,7 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
 
     @Override
     public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(configuration.getName(), key);
+        BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
 
         GoogleCloudStorageEntry storageEntry = null;
@@ -76,7 +77,7 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
 
     @Override
     public void delete(String key) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(configuration.getName(), key);
+        BlobId blobId = BlobId.of(configuration.getBucket(), key);
         storage.delete(blobId);
     }
 }

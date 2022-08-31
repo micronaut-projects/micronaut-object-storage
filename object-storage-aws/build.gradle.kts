@@ -8,6 +8,8 @@ dependencies {
     api(libs.amazon.awssdk.s3)
 
     implementation(platform(mn.micronaut.aws.bom))
+    annotationProcessor(mn.micronaut.validation)
+    implementation(mn.micronaut.validation)
 
     testImplementation(projects.objectStorageTck)
     testImplementation(libs.testcontainers.spock)
