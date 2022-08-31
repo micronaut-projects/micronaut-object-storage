@@ -455,7 +455,7 @@ information about credentials and region configuration.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the AWS S3 bucket.</p></td>
 </tr>
@@ -471,7 +471,7 @@ information about credentials and region configuration.</p>
   object-storage:
     aws:
       default:
-        name: profile-pictures-bucket</code></pre>
+        bucket: profile-pictures-bucket</code></pre>
 </div>
 </div>
 
@@ -528,14 +528,14 @@ information about authentication options.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.endpoint</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The blob service endpoint to set, in the format of</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.container</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The blob container name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.endpoint</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The blob service endpoint to set, in the format of <a href="https://{accountName}.blob.core.windows.net" class="bare">https://{accountName}.blob.core.windows.net</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -556,7 +556,7 @@ micronaut:
   object-storage:
     azure:
       default:
-        name: profile-pictures-container
+        container: profile-pictures-container
         endpoint: https://my-account.blob.core.windows.net</code></pre>
 </div>
 </div>
@@ -614,9 +614,9 @@ information about configuring your GCP project.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Cloud Storage bucket name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the Google Cloud Storage bucket.</p></td>
 </tr>
 </tbody>
 </table>
@@ -633,7 +633,7 @@ micronaut:
   object-storage:
     gcp:
       default:
-        name: profile-pictures-bucket</code></pre>
+        bucket: profile-pictures-bucket</code></pre>
 </div>
 </div>
 
@@ -690,14 +690,14 @@ for more information about authentication options.</p>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.bucket</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the AWS S3 bucket.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.namespace</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">the OCI Object Storage namespace used.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.name</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The OCI Object Storage bucket name.</p></td>
 </tr>
 </tbody>
 </table>
@@ -715,7 +715,7 @@ micronaut:
   object-storage:
     oracle-cloud:
       default:
-        name: profile-pictures-bucket
+        bucket: profile-pictures-bucket
         namespace: MyNamespace</code></pre>
 </div>
 </div>

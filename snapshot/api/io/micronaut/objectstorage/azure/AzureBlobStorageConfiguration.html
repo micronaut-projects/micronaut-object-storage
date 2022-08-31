@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -153,13 +153,6 @@ extends <a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageCon
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#PREFIX">PREFIX</a></span></code>&nbsp;</td>
 </tr>
 </table>
-<ul class="blockList">
-<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.objectstorage.AbstractObjectStorageConfiguration">
-<!--   -->
-</a>
-<h3>Fields inherited from class&nbsp;io.micronaut.objectstorage.<a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html" title="class in io.micronaut.objectstorage">AbstractObjectStorageConfiguration</a></h3>
-<code><a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html#GENERIC_PREFIX">GENERIC_PREFIX</a></code></li>
-</ul>
 </li>
 </ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
@@ -193,17 +186,19 @@ extends <a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageCon
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getEndpoint--">getEndpoint</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getContainer--">getContainer</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setEndpoint-java.lang.String-">setEndpoint</a></span>(java.lang.String&nbsp;endpoint)</code>&nbsp;</td>
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getEndpoint--">getEndpoint</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setName-java.lang.String-">setName</a></span>(java.lang.String&nbsp;name)</code>
-<div class="block">The blob container name.</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setContainer-java.lang.String-">setContainer</a></span>(java.lang.String&nbsp;container)</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setEndpoint-java.lang.String-">setEndpoint</a></span>(java.lang.String&nbsp;endpoint)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -286,6 +281,34 @@ extends <a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageCon
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getContainer--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getContainer</h4>
+<pre>@NonNull
+public&nbsp;java.lang.String&nbsp;getContainer()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The blob container name.</dd>
+</dl>
+</li>
+</ul>
+<a name="setContainer-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setContainer</h4>
+<pre>public&nbsp;void&nbsp;setContainer(@NonNull
+                         java.lang.String&nbsp;container)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>container</code> - The blob container name.</dd>
+</dl>
+</li>
+</ul>
 <a name="getEndpoint--">
 <!--   -->
 </a>
@@ -303,32 +326,14 @@ public&nbsp;java.lang.String&nbsp;getEndpoint()</pre>
 <a name="setEndpoint-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>setEndpoint</h4>
 <pre>public&nbsp;void&nbsp;setEndpoint(@NonNull
                         java.lang.String&nbsp;endpoint)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>endpoint</code> - The blob service endpoint to set, in the format of
-                 <code>https://{accountName}.blob.core.windows.net</code></dd>
-</dl>
-</li>
-</ul>
-<a name="setName-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>setName</h4>
-<pre>public&nbsp;void&nbsp;setName(@NonNull
-                    java.lang.String&nbsp;name)</pre>
-<div class="block">The blob container name.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html#setName-java.lang.String-">setName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html" title="class in io.micronaut.objectstorage">AbstractObjectStorageConfiguration</a></code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>name</code> - the name to set.</dd>
+<dd><code>endpoint</code> - The blob service endpoint to set, in the format of https://{accountName}.blob.core.windows.net.</dd>
 </dl>
 </li>
 </ul>

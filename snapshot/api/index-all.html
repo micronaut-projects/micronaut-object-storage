@@ -116,7 +116,7 @@
 <dd>
 <div class="block">Azure implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#AzureBlobStorageOperations-java.lang.String-com.azure.storage.blob.BlobContainerClient-io.micronaut.context.BeanContext-">AzureBlobStorageOperations(String, BlobContainerClient, BeanContext)</a></span> - Constructor for class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#AzureBlobStorageOperations-com.azure.storage.blob.BlobContainerClient-">AzureBlobStorageOperations(BlobContainerClient)</a></span> - Constructor for class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:B">
@@ -188,11 +188,15 @@
 </a>
 <h2 class="title">G</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html#GENERIC_PREFIX">GENERIC_PREFIX</a></span> - Static variable in class io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html" title="class in io.micronaut.objectstorage">AbstractObjectStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html#getAbsolutePath--">getAbsolutePath()</a></span> - Method in class io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/UploadRequest.FileUploadRequest.html" title="class in io.micronaut.objectstorage">UploadRequest.FileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#getConfiguration--">getConfiguration()</a></span> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html#getBucket--">getBucket()</a></span> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#getBucket--">getBucket()</a></span> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#getBucket--">getBucket()</a></span> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getContainer--">getContainer()</a></span> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/UploadRequest.BytesUploadRequest.html#getContentSize--">getContentSize()</a></span> - Method in class io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/UploadRequest.BytesUploadRequest.html" title="class in io.micronaut.objectstorage">UploadRequest.BytesUploadRequest</a></dt>
 <dd>&nbsp;</dd>
@@ -276,7 +280,7 @@
 <dd>
 <div class="block">Google Cloud implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a>.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#GoogleCloudStorageOperations-io.micronaut.objectstorage.InputStreamMapper-com.google.cloud.storage.Storage-io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration-">GoogleCloudStorageOperations(InputStreamMapper, Storage, GoogleCloudStorageConfiguration)</a></span> - Constructor for class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#GoogleCloudStorageOperations-io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration-io.micronaut.objectstorage.InputStreamMapper-com.google.cloud.storage.Storage-">GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, InputStreamMapper, Storage)</a></span> - Constructor for class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:I">
@@ -364,6 +368,8 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#PREFIX">PREFIX</a></span> - Static variable in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/ObjectStorageConfiguration.html#PREFIX">PREFIX</a></span> - Static variable in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage">ObjectStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#PREFIX">PREFIX</a></span> - Static variable in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#put-software.amazon.awssdk.services.s3.model.PutObjectRequest-io.micronaut.objectstorage.UploadRequest-">put(PutObjectRequest, UploadRequest)</a></span> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
@@ -396,26 +402,16 @@
 </a>
 <h2 class="title">S</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html#setBucket-java.lang.String-">setBucket(String)</a></span> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#setBucket-java.lang.String-">setBucket(String)</a></span> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#setBucket-java.lang.String-">setBucket(String)</a></span> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setContainer-java.lang.String-">setContainer(String)</a></span> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setEndpoint-java.lang.String-">setEndpoint(String)</a></span> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html#setName-java.lang.String-">setName(String)</a></span> - Method in class io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/AbstractObjectStorageConfiguration.html" title="class in io.micronaut.objectstorage">AbstractObjectStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html#setName-java.lang.String-">setName(String)</a></span> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a></dt>
-<dd>
-<div class="block">The name of the AWS S3 bucket.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setName-java.lang.String-">setName(String)</a></span> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
-<dd>
-<div class="block">The blob container name.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#setName-java.lang.String-">setName(String)</a></span> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
-<dd>
-<div class="block">The Cloud Storage bucket name.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#setName-java.lang.String-">setName(String)</a></span> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
-<dd>
-<div class="block">The OCI Object Storage bucket name.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#setNamespace-java.lang.String-">setNamespace(String)</a></span> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageFactory.html#storage-com.google.cloud.storage.StorageOptions-">storage(StorageOptions)</a></span> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageFactory.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageFactory</a></dt>
