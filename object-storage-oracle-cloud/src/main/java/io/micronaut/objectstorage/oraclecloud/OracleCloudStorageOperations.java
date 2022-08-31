@@ -24,6 +24,7 @@ import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
@@ -40,7 +41,6 @@ import java.util.Optional;
  */
 @EachBean(OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations implements ObjectStorageOperations {
-
     private final ObjectStorage client;
     private final OracleCloudStorageConfiguration configuration;
 
@@ -52,6 +52,18 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
 
     @Override
     public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
+        PutObjectResponse putObjectResponse = client.putObject(put(uploadRequest).build());
+        return new UploadResponse.Builder()
+            .withETag(putObjectResponse.getETag())
+            .build();
+    }
+
+    /**
+     *
+     * @param uploadRequest Upload Request
+     * @return The Put Object Request Builder
+     */
+    protected PutObjectRequest.Builder put(@NonNull UploadRequest uploadRequest) {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
             .objectName(uploadRequest.getKey())
             .bucketName(configuration.getName())
@@ -60,12 +72,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
 
         uploadRequest.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
         uploadRequest.getContentType().ifPresent(putObjectRequestBuilder::contentType);
-
-        PutObjectResponse putObjectResponse = client.putObject(putObjectRequestBuilder.build());
-
-        return new UploadResponse.Builder()
-            .withETag(putObjectResponse.getETag())
-            .build();
+        return putObjectRequestBuilder;
     }
 
     @Override
