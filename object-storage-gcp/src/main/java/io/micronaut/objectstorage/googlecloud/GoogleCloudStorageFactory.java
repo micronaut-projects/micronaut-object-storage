@@ -27,6 +27,7 @@ import jakarta.inject.Singleton;
 
 /**
  * @author Pavol Gressa
+ * @since 1.0
  */
 @Factory
 public class GoogleCloudStorageFactory {
