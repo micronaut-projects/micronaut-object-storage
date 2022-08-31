@@ -158,7 +158,9 @@ implements <a href="../../../io/micronaut/objectstorage/InputStreamMapper.html" 
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>byte[]</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/DefaultInputStreamMapper.html#toByteArray-java.io.InputStream-">toByteArray</a></span>(java.io.InputStream&nbsp;inputStream)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/DefaultInputStreamMapper.html#toByteArray-java.io.InputStream-">toByteArray</a></span>(java.io.InputStream&nbsp;inputStream)</code>
+<div class="block">Transforms an InputStream into a byte array.</div>
+</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -205,10 +207,17 @@ implements <a href="../../../io/micronaut/objectstorage/InputStreamMapper.html" 
 <ul class="blockListLast">
 <li class="blockList">
 <h4>toByteArray</h4>
-<pre>public&nbsp;byte[]&nbsp;toByteArray(java.io.InputStream&nbsp;inputStream)</pre>
+<pre>public&nbsp;byte[]&nbsp;toByteArray(@NonNull
+                          java.io.InputStream&nbsp;inputStream)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../io/micronaut/objectstorage/InputStreamMapper.html#toByteArray-java.io.InputStream-">InputStreamMapper</a></code></span></div>
+<div class="block">Transforms an InputStream into a byte array.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/InputStreamMapper.html#toByteArray-java.io.InputStream-">toByteArray</a></code>&nbsp;in interface&nbsp;<code><a href="../../../io/micronaut/objectstorage/InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>inputStream</code> - Input Stream.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the byte array</dd>
 </dl>
 </li>
 </ul>
