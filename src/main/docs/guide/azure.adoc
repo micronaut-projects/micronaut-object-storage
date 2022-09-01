@@ -16,3 +16,7 @@ For example:
 ----
 include::doc-examples/example-java/src/test/resources/application-azure.yml[]
 ----
+
+To use it, inject a bean of type `ObjectStorageOperations<RequestConditions, Response<BlockBlobItem>>`.
+
+If you have multiple containers, use the name qualifier in the injection point `@Named("default") ObjectStorageOperations<RequestConditions, Response<BlockBlobItem>>`.

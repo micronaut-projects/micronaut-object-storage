@@ -6,7 +6,9 @@ provider documentation for more details:
 * <<gcp, Google Cloud Storage>>.
 * <<oracleCloud, Oracle Cloud Infrastructure (OCI) Object Storage>>.
 
-Then, you can inject in your controllers/services/etc. a bean of type api:objectstorage.ObjectStorageOperations[]:
+Then, you can inject in your controllers/services/etc. a bean of type api:objectstorage.ObjectStorageOperations[].
+
+The following example uses AWS S3:
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="beginclass,endclass"]
 
@@ -35,6 +37,15 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 
 <1> You can use any of the api:objectstorage.UploadRequest[] static methods to build an upload request.
 <2> The upload operation returns an api:objectstorage.UploadResponse[].
+
+== Uploading files with Customization
+
+You can use the method `upload(UploadRequest, Consumer)` of api:objectstorage.ObjectStorageOperations[] to customize an upload:
+
+[source,java]
+----
+include::object-storage-aws/src/test/groovy/io/micronaut/objectstorage/aws/AwsS3OperationsUploadWithConsumerSpec.groovy[tag="consumer", indent="0"]
+----
 
 == Retrieving files
 

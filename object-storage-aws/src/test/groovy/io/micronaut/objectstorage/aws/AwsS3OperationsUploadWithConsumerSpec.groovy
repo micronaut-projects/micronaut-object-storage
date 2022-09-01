@@ -18,7 +18,8 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import spock.lang.Specification
 
 import java.nio.file.Files
-import java.nio.file.Path;
+import java.nio.file.Path
+import java.util.function.Consumer;
 
 @Property(name = "micronaut.object-storage.aws.default.bucket", value = "profile-pictures-bucket")
 @Property(name = "spec.name", value = "AswsS3OperationsUploadWithConsumerSpec")
@@ -38,10 +39,11 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
 
         when:
-        objectStorage.upload(uploadRequest, { builder ->
-            builder.acl(ObjectCannedACL.PUBLIC_READ)
-        })
-
+//tag::consumer[]
+        objectStorage.upload(uploadRequest, builder -> {
+                builder.acl(ObjectCannedACL.PUBLIC_READ)
+        });
+//end::consumer[]
         then:
         s3ClientReplacement.request
         ObjectCannedACL.PUBLIC_READ == s3ClientReplacement.request.acl()

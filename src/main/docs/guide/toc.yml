@@ -1,7 +1,6 @@
 introduction: Introduction
 releaseHistory: Release History
 quickStart: Quick Start
-
 aws: Amazon S3
 azure: Azure Blob Storage
 gcp: Google Cloud Storage
