@@ -49,6 +49,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     private String namespace;
 
     /**
+     * Constructor.
      *
      * @param name Bean Qualifier name.
      */
