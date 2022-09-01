@@ -23,7 +23,6 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.UploadRequest;
-import io.micronaut.objectstorage.UploadResponse;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -47,14 +46,20 @@ import java.util.function.Consumer;
 public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
 
     private final S3Client s3Client;
-    private final AwsS3Configuration bucketConfiguration;
+    private final AwsS3Configuration configuration;
     private final InputStreamMapper inputStreamMapper;
 
-    public AwsS3Operations(@Parameter AwsS3Configuration bucketConfiguration,
+    /**
+     *
+     * @param configuration AWS S3 Configuration
+     * @param s3Client S3 Client
+     * @param inputStreamMapper InputStream Mapper
+     */
+    public AwsS3Operations(@Parameter AwsS3Configuration configuration,
                            S3Client s3Client,
                            InputStreamMapper inputStreamMapper) {
         this.s3Client = s3Client;
-        this.bucketConfiguration = bucketConfiguration;
+        this.configuration = configuration;
         this.inputStreamMapper = inputStreamMapper;
     }
 
@@ -77,7 +82,7 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
-                .bucket(bucketConfiguration.getName())
+                .bucket(configuration.getBucket())
                 .key(key)
                 .build());
             AwsS3ObjectStorageEntry entry = new AwsS3ObjectStorageEntry(key, responseInputStream);
@@ -90,7 +95,7 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     @Override
     public void delete(String key) throws ObjectStorageException {
         s3Client.deleteObject(DeleteObjectRequest.builder()
-            .bucket(bucketConfiguration.getName())
+            .bucket(configuration.getBucket())
             .key(key)
             .build());
     }
@@ -103,7 +108,7 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     @NonNull
     protected PutObjectRequest.Builder putRequest(@NonNull UploadRequest uploadRequest) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
-            .bucket(bucketConfiguration.getName())
+            .bucket(configuration.getBucket())
             .key(uploadRequest.getKey());
 
         uploadRequest.getContentType().ifPresent(builder::contentType);

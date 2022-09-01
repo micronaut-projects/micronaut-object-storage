@@ -2,6 +2,8 @@ package example;
 
 import io.micronaut.objectstorage.*;
 import jakarta.inject.Singleton;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +17,9 @@ import java.util.Optional;
 @Singleton
 public class ProfileService {
 
-    private final ObjectStorageOperations objectStorage;
+    private final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage;
 
-    public ProfileService(ObjectStorageOperations objectStorage) {
+    public ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage) {
         this.objectStorage = objectStorage;
     }
 //end::beginclass[]
@@ -26,8 +28,8 @@ public class ProfileService {
     public Optional<String> saveProfilePicture(String userId, Path path) {
         try {
             UploadRequest request = UploadRequest.fromPath(path, userId); // <1>
-            UploadResponse response = objectStorage.upload(request); // <2>
-            return Optional.ofNullable(response.getETag());
+            PutObjectResponse response = objectStorage.upload(request); // <2>
+            return Optional.ofNullable(response.eTag());
         } catch (ObjectStorageException e) {
             return Optional.empty();
         }

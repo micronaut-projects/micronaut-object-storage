@@ -25,7 +25,7 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
 
     @Override
     Map<String, String> getProperties() {
-        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.name'): BUCKET_NAME]
+        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.bucket'): BUCKET_NAME]
     }
 
     ObjectStorageOperations<BlobInfo.Builder, Blob> getObjectStorage() {

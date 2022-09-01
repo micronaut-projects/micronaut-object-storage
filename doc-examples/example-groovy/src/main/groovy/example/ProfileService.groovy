@@ -7,6 +7,8 @@ import io.micronaut.objectstorage.UploadRequest
 import io.micronaut.objectstorage.UploadResponse
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -16,16 +18,18 @@ import java.nio.file.StandardCopyOption
 @Singleton
 class ProfileService {
 
-    @Inject
-    ObjectStorageOperations objectStorage
+    final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage
+    ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage) {
+        this.objectStorage = objectStorage
+    }
 //end::beginclass[]
 
     //tag::upload[]
     Optional<String> saveProfilePicture(String userId, Path path) {
         try {
             UploadRequest request = UploadRequest.fromPath(path, userId) // <1>
-            UploadResponse response = objectStorage.upload(request) // <2>
-            Optional.ofNullable(response.getETag())
+            PutObjectResponse response = objectStorage.upload(request) // <2>
+            Optional.ofNullable(response.eTag())
         } catch (ObjectStorageException e) {
             return Optional.empty()
         }

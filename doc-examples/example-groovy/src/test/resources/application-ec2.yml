@@ -2,4 +2,4 @@ micronaut:
   object-storage:
     aws:
       default:
-        name: profile-pictures-bucket
+        bucket: profile-pictures-bucket

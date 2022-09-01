@@ -50,6 +50,6 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
 
     @Override
     Map<String, String> getProperties() {
-        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.name'): CONTAINER_NAME]
+        [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.container'): CONTAINER_NAME]
     }
 }

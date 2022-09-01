@@ -25,8 +25,6 @@ import io.micronaut.core.annotation.NonNull;
  */
 public abstract class AbstractObjectStorageConfiguration implements ObjectStorageConfiguration {
 
-    public static final String GENERIC_PREFIX = "micronaut.object-storage";
-
     @NonNull
     private String name;
 
@@ -34,16 +32,12 @@ public abstract class AbstractObjectStorageConfiguration implements ObjectStorag
         this.name = name;
     }
 
+    /**
+     * @return The name of this object storage configuration.
+     */
     @Override
     @NonNull
     public String getName() {
         return name;
-    }
-
-    /**
-     * @param name the name to set.
-     */
-    public void setName(@NonNull String name) {
-        this.name = name;
     }
 }

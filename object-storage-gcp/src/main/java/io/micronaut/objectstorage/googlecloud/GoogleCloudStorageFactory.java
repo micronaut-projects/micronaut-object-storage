@@ -27,22 +27,23 @@ import jakarta.inject.Singleton;
 
 /**
  * @author Pavol Gressa
+ * @since 1.0
  */
 @Factory
 public class GoogleCloudStorageFactory {
 
     /**
-     * @param googleCloudConfiguration The Google Cloud Configuration
+     * @param configuration The Google Cloud Configuration
      * @param googleCredentials        The Google Credentials
      * @return The storage instance
      */
     @RequiresGoogleProjectId
     @Singleton
     @NonNull
-    public StorageOptions.Builder builder(@NonNull GoogleCloudConfiguration googleCloudConfiguration,
+    public StorageOptions.Builder builder(@NonNull GoogleCloudConfiguration configuration,
                                           @NonNull GoogleCredentials googleCredentials) {
         return StorageOptions.newBuilder()
-            .setProjectId(googleCloudConfiguration.getProjectId())
+            .setProjectId(configuration.getProjectId())
             .setCredentials(googleCredentials);
     }
 
