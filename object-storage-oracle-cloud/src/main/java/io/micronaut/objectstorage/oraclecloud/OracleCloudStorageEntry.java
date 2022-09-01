@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.oraclecloud;
 
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.InputStream;
@@ -37,6 +38,7 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry {
     }
 
     @Override
+    @NonNull
     public String getKey() {
         return key;
     }

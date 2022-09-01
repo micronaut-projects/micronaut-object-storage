@@ -15,17 +15,16 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.naming.Named;
+
 /**
  * Common properties for the object storage configuration.
  *
  * @author Pavol Gressa
  * @since 1.0
  */
-public interface ObjectStorageConfiguration {
+public interface ObjectStorageConfiguration extends Named {
 
-    /**
-     * @return the name of the object storage. In cloud providers this is often referred to as a bucket.
-     */
-    String getName();
+    String PREFIX = "micronaut.object-storage";
 
 }

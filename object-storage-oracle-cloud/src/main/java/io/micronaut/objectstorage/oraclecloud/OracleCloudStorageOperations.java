@@ -24,6 +24,7 @@ import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
@@ -40,9 +41,8 @@ import java.util.Optional;
  */
 @EachBean(OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations implements ObjectStorageOperations {
-
-    private final ObjectStorage client;
     private final OracleCloudStorageConfiguration configuration;
+    private final ObjectStorage client;
 
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client) {
@@ -51,27 +51,34 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException {
-        PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
-            .objectName(uploadRequest.getKey())
-            .bucketName(configuration.getName())
-            .namespaceName(configuration.getNamespace())
-            .putObjectBody(uploadRequest.getInputStream());
-
-        uploadRequest.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
-        uploadRequest.getContentType().ifPresent(putObjectRequestBuilder::contentType);
-
-        PutObjectResponse putObjectResponse = client.putObject(putObjectRequestBuilder.build());
-
+    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
+        PutObjectResponse putObjectResponse = client.putObject(put(uploadRequest).build());
         return new UploadResponse.Builder()
             .withETag(putObjectResponse.getETag())
             .build();
     }
 
+    /**
+     *
+     * @param uploadRequest Upload Request
+     * @return The Put Object Request Builder
+     */
+    protected PutObjectRequest.Builder put(@NonNull UploadRequest uploadRequest) {
+        PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
+            .objectName(uploadRequest.getKey())
+            .bucketName(configuration.getBucket())
+            .namespaceName(configuration.getNamespace())
+            .putObjectBody(uploadRequest.getInputStream());
+
+        uploadRequest.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
+        uploadRequest.getContentType().ifPresent(putObjectRequestBuilder::contentType);
+        return putObjectRequestBuilder;
+    }
+
     @Override
-    public Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
-            .bucketName(configuration.getName())
+            .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
             .objectName(key);
 
@@ -87,7 +94,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations {
     @Override
     public void delete(String key) throws ObjectStorageException {
         client.deleteObject(DeleteObjectRequest.builder()
-            .bucketName(configuration.getName())
+            .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
             .objectName(key)
             .build());

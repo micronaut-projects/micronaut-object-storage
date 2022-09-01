@@ -1,0 +1,13 @@
+azure:
+  credential:
+    client-secret:
+      client-id: <client-id>
+      tenant-id: <tenant-id>
+      secret: <secret>
+
+micronaut:
+  object-storage:
+    azure:
+      default:
+        container: profile-pictures-container
+        endpoint: https://my-account.blob.core.windows.net

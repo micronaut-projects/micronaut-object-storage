@@ -17,7 +17,9 @@ package io.micronaut.objectstorage.googlecloud;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.ObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.PREFIX;
 
@@ -32,9 +34,28 @@ public class GoogleCloudStorageConfiguration extends AbstractObjectStorageConfig
 
     public static final String NAME = "gcp";
 
-    public static final String PREFIX = GENERIC_PREFIX + '.' + NAME;
+    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
 
-    public GoogleCloudStorageConfiguration(@Parameter String bucketName) {
-        super(bucketName);
+    @NonNull
+    private String bucket;
+
+    public GoogleCloudStorageConfiguration(@Parameter String name) {
+        super(name);
     }
+
+    /**
+     * @return The name of the Google Cloud Storage bucket.
+     */
+    @NonNull
+    public String getBucket() {
+        return bucket;
+    }
+
+    /**
+     * @param bucket The name of the Google Cloud Storage bucket.
+     */
+    public void setBucket(@NonNull String bucket) {
+        this.bucket = bucket;
+    }
+
 }

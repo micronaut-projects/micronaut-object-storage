@@ -1,1 +1,8 @@
-TODO
+Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers:
+
+* https://aws.amazon.com/s3/[Amazon S3].
+* https://azure.microsoft.com/en-gb/services/storage/blobs/[Azure Blob Storage].
+* https://cloud.google.com/storage[Google Cloud Storage].
+* https://www.oracle.com/cloud/storage/object-storage/[Oracle Cloud Infrastructure (OCI) Object Storage].
+
+Using this API enables the creation of truly multi-cloud, portable applications.

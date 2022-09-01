@@ -19,6 +19,7 @@ import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.ObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX;
 
@@ -33,8 +34,12 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
 
     public static final String NAME = "oracle-cloud";
 
-    public static final String PREFIX = GENERIC_PREFIX + '.' + NAME;
+    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
 
+    @NonNull
+    private String bucket;
+
+    @NonNull
     private String namespace;
 
     public OracleCloudStorageConfiguration(@Parameter String name) {
@@ -42,7 +47,22 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @return the Object Storage namespace used.
+     * @return The name of the AWS S3 bucket.
+     */
+    @NonNull
+    public String getBucket() {
+        return bucket;
+    }
+
+    /**
+     * @param bucket The name of the AWS S3 bucket.
+     */
+    public void setBucket(@NonNull String bucket) {
+        this.bucket = bucket;
+    }
+
+    /**
+     * @return the OCI Object Storage namespace used.
      */
     @NonNull
     public String getNamespace() {
@@ -50,9 +70,10 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @param namespace the Object Storage namespace used.
+     * @param namespace the OCI Object Storage namespace used.
      */
     public void setNamespace(@NonNull String namespace) {
         this.namespace = namespace;
     }
+
 }

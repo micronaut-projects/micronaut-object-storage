@@ -17,7 +17,12 @@ package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.ObjectStorageConfiguration;
+
+import javax.validation.constraints.Pattern;
 
 import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
 
@@ -28,13 +33,36 @@ import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
  * @since 1.0
  */
 @EachProperty(PREFIX)
+@Introspected
 public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
 
     public static final String NAME = "aws";
 
-    public static final String PREFIX = GENERIC_PREFIX + '.' + NAME;
+    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
+
+    /**
+     * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">Bucket Name Requirements</a>.
+     */
+    @NonNull
+    @Pattern(regexp = "(?!xn--)(?!.*-s3alias)^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$")
+    private String bucket;
 
     public AwsS3Configuration(@Parameter String name) {
         super(name);
+    }
+
+    /**
+     * @return The name of the AWS S3 bucket.
+     */
+    @NonNull
+    public String getBucket() {
+        return bucket;
+    }
+
+    /**
+     * @param bucket The name of the AWS S3 bucket.
+     */
+    public void setBucket(@NonNull String bucket) {
+        this.bucket = bucket;
     }
 }

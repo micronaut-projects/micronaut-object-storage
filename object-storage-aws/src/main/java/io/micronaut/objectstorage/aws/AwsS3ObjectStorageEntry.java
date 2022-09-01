@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage.aws;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -29,22 +30,25 @@ import java.io.InputStream;
  */
 public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
 
-    private final ResponseInputStream<GetObjectResponse> responseResponseInputStream;
+    private final ResponseInputStream<GetObjectResponse> responseInputStream;
+
+    @NonNull
     private final String key;
 
-    AwsS3ObjectStorageEntry(String key,
-                            ResponseInputStream<GetObjectResponse> responseResponseInputStream) {
-        this.responseResponseInputStream = responseResponseInputStream;
+    AwsS3ObjectStorageEntry(@NonNull String key,
+                            ResponseInputStream<GetObjectResponse> responseInputStream) {
+        this.responseInputStream = responseInputStream;
         this.key = key;
     }
 
     @Override
+    @NonNull
     public String getKey() {
         return key;
     }
 
     @Override
     public InputStream getInputStream() {
-        return responseResponseInputStream;
+        return responseInputStream;
     }
 }

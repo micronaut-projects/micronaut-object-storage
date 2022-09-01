@@ -19,6 +19,7 @@ import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.ObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX;
 
@@ -33,12 +34,31 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
 
     public static final String NAME = "azure";
 
-    public static final String PREFIX = GENERIC_PREFIX + '.' + NAME;
+    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
 
+    @NonNull
+    private String container;
+
+    @NonNull
     private String endpoint;
 
     public AzureBlobStorageConfiguration(@Parameter String name) {
         super(name);
+    }
+
+    /**
+     * @return The blob container name.
+     */
+    @NonNull
+    public String getContainer() {
+        return container;
+    }
+
+    /**
+     * @param container The blob container name.
+     */
+    public void setContainer(@NonNull String container) {
+        this.container = container;
     }
 
     /**
@@ -50,9 +70,14 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
     }
 
     /**
-     * @param endpoint the endpoint to set.
+     * @param endpoint The blob service endpoint to set, in the format of https://{accountName}.blob.core.windows.net.
      */
     public void setEndpoint(@NonNull String endpoint) {
         this.endpoint = endpoint;
     }
+
+    /**
+     * @return The blob container name.
+     */
+
 }

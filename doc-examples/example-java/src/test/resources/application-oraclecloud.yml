@@ -1,0 +1,10 @@
+oci:
+  config:
+    profile: DEFAULT
+
+micronaut:
+  object-storage:
+    oracle-cloud:
+      default:
+        bucket: profile-pictures-bucket
+        namespace: MyNamespace

@@ -32,16 +32,16 @@ public interface ObjectStorageOperations {
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
-    UploadResponse put(UploadRequest uploadRequest) throws ObjectStorageException;
+    UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException;
 
     /**
-     * Get the object from object storage.
+     * Gets the object from object storage.
      *
      * @param key the object path in the format {@code /foo/bar/file}
      * @return the object, or empty optional if the object does not exist
      * @throws ObjectStorageException if there was a failure retrieving the object
      */
-    Optional<ObjectStorageEntry> get(String key) throws ObjectStorageException;
+    Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException;
 
     /**
      * Deletes an object from the object storage.

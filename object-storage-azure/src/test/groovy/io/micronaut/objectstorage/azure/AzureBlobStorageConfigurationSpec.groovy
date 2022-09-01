@@ -27,7 +27,7 @@ class AzureBlobStorageConfigurationSpec extends Specification {
         given:
         def applicationContext = ApplicationContext.run(
                 [
-                        (PREFIX + '.test-container.name')    : 'custom-container-name',
+                        (PREFIX + '.test-container.container')    : 'custom-container-name',
                         (PREFIX + '.test-container.endpoint'): 'endpoint'
                 ])
 
@@ -36,7 +36,8 @@ class AzureBlobStorageConfigurationSpec extends Specification {
 
         then:
         configuration
-        configuration.name == 'custom-container-name'
+        configuration.name == 'test-container'
+        configuration.container == 'custom-container-name'
         configuration.endpoint == 'endpoint'
 
         cleanup:
