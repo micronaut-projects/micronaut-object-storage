@@ -44,6 +44,12 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
 
+    /**
+     * Constructor.
+     * @param configuration Google Storage Configuration
+     * @param inputStreamMapper Input Stream Mapper
+     * @param storage Interface for Google Cloud Storage
+     */
     public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
                                         InputStreamMapper inputStreamMapper,
                                         Storage storage) {

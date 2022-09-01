@@ -32,8 +32,14 @@ import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfigura
 @EachProperty(PREFIX)
 public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfiguration {
 
+    /**
+     * Configuration Prefix Suffix.
+     */
     public static final String NAME = "oracle-cloud";
 
+    /**
+     * Configuration Prefix.
+     */
     public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
 
     @NonNull
@@ -42,12 +48,16 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     @NonNull
     private String namespace;
 
+    /**
+     * Constructor.
+     * @param name Bean Qualifier name.
+     */
     public OracleCloudStorageConfiguration(@Parameter String name) {
         super(name);
     }
 
     /**
-     * @return The name of the AWS S3 bucket.
+     * @return The name of the OCI Object Storage bucket.
      */
     @NonNull
     public String getBucket() {
@@ -55,7 +65,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
-     * @param bucket The name of the AWS S3 bucket.
+     * @param bucket The name of the OCI Object Storage bucket.
      */
     public void setBucket(@NonNull String bucket) {
         this.bucket = bucket;
