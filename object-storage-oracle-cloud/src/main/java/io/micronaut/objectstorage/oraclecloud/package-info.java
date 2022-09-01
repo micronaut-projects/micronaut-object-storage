@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /**
+ * Object Storage Classes related to Oracle Cloud Storage.
+ * <a href="https://www.oracle.com/cloud/storage/">Oracle Cloud Storage</a>
  * @author Sergio del Amo
  * @since 1.0.0
  */

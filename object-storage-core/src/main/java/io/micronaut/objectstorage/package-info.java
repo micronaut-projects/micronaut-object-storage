@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /**
+ * Core Object Storage Classes.
  * @author Sergio del Amo
  * @since 1.0.0
  */

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /**
+ * Object Storage Classes realted to GCP Cloud Storage.
+ * <a href="https://cloud.google.com/storage">GCP Cloud Storage</a>
  * @author Sergio del Amo
  * @since 1.0.0
  */

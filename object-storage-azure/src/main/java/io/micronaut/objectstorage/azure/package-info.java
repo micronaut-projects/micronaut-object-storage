@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /**
+ * Object Storage Classes related to Azure Blob Storage.
+ * <a href="https://azure.microsoft.com/en-us/services/storage/blobs/#overview">Azure Blob Storage</a>
  * @author Sergio del Amo
  * @since 1.0.0
  */

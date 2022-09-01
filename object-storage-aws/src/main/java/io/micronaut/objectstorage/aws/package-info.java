@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 /**
+ * Object Storage Classes related to AWS S3.
+ * @see <a href="https://aws.amazon.com/s3/">AWS S3</a>
  * @author Sergio del Amo
  * @since 1.0.0
  */
