@@ -21,6 +21,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import io.micronaut.context.annotation.EachBean;
+import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
@@ -44,9 +45,15 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
     private final Storage storage;
     private final GoogleCloudStorageConfiguration configuration;
 
-    public GoogleCloudStorageOperations(InputStreamMapper inputStreamMapper,
-                                        Storage storage,
-                                        GoogleCloudStorageConfiguration configuration) {
+    /**
+     * Constructor.
+     * @param configuration Google Storage Configuration
+     * @param inputStreamMapper Input Stream Mapper
+     * @param storage Interface for Google Cloud Storage
+     */
+    public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
+                                        InputStreamMapper inputStreamMapper,
+                                        Storage storage) {
         this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
         this.configuration = configuration;
