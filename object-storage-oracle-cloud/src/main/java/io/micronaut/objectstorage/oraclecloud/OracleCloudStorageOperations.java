@@ -41,8 +41,8 @@ import java.util.function.Consumer;
  */
 @EachBean(OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
-    private final ObjectStorage client;
     private final OracleCloudStorageConfiguration configuration;
+    private final ObjectStorage client;
 
     /**
      *
