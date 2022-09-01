@@ -67,7 +67,8 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
 
     @Override
     @NonNull
-    public Blob upload(@NonNull UploadRequest uploadRequest, @NonNull Consumer<BlobInfo.Builder> uploadRequestBuilder) throws ObjectStorageException {
+    public Blob upload(@NonNull UploadRequest uploadRequest,
+                       @NonNull Consumer<BlobInfo.Builder> uploadRequestBuilder) throws ObjectStorageException {
         BlobInfo.Builder builder = createBlogInfoBuilder(uploadRequest);
         uploadRequestBuilder.accept(builder);
         return upload(uploadRequest, builder.build());
