@@ -34,7 +34,7 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 @Property(name = "micronaut.object-storage.gcp.default.bucket", value = "profile-pictures-bucket")
-@Property(name = "spec.name", value = "AswsS3OperationsUploadWithConsumerSpec")
+@Property(name = "spec.name", value = "GoogleCloudStorageOperationsUploadWithConsumerSpec")
 @MicronautTest
 class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
 
@@ -61,7 +61,7 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         [project: "micronaut-object-storage"] == storageReplacement.blobInfo.metadata
     }
 
-    @Requires(property = "spec.name", value = "AswsS3OperationsUploadWithConsumerSpec")
+    @Requires(property = "spec.name", value = "GoogleCloudStorageOperationsUploadWithConsumerSpec")
     @Replaces(Storage)
     @Singleton
     static class StorageReplacement implements Storage {
