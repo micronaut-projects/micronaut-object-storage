@@ -37,7 +37,7 @@ import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
 public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
 
     /**
-     * Prefix ending.
+     * Configuration Prefix ending.
      */
     public static final String NAME = "aws";
 

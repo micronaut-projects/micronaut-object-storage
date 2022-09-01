@@ -44,6 +44,11 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations<Put
     private final ObjectStorage client;
     private final OracleCloudStorageConfiguration configuration;
 
+    /**
+     *
+     * @param configuration Oracle Cloud Storage Configuration
+     * @param client Object Storage Client
+     */
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client) {
         this.client = client;
