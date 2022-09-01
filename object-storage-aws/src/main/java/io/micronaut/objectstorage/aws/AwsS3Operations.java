@@ -49,6 +49,12 @@ public class AwsS3Operations implements ObjectStorageOperations {
     private final AwsS3Configuration configuration;
     private final InputStreamMapper inputStreamMapper;
 
+    /**
+     *
+     * @param configuration AWS S3 Configuration
+     * @param s3Client S3 Client
+     * @param inputStreamMapper InputStream Mapper
+     */
     public AwsS3Operations(@Parameter AwsS3Configuration configuration,
                            S3Client s3Client,
                            InputStreamMapper inputStreamMapper) {

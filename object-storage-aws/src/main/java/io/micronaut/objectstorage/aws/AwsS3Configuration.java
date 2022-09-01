@@ -36,17 +36,28 @@ import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
 @Introspected
 public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
 
+    /**
+     * Configuration Prefix ending.
+     */
     public static final String NAME = "aws";
 
+    /**
+     * Configuration Prefix.
+     */
     public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
 
     /**
+     * Bucket name.
      * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">Bucket Name Requirements</a>.
      */
     @NonNull
     @Pattern(regexp = "(?!xn--)(?!.*-s3alias)^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$")
     private String bucket;
 
+    /**
+     * Constructor.
+     * @param name Bean Qualifier name.
+     */
     public AwsS3Configuration(@Parameter String name) {
         super(name);
     }
