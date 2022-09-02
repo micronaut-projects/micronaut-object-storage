@@ -5,7 +5,7 @@ import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.annotation.Requires
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
-import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Exception
 import spock.lang.Specification
 
 import java.nio.file.Path

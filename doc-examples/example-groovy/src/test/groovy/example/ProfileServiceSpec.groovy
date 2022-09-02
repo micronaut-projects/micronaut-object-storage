@@ -16,7 +16,6 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 @MicronautTest(environments = Environment.AMAZON_EC2)

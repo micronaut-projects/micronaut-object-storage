@@ -4,7 +4,6 @@ import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import spock.lang.Specification
 import spock.lang.Subject
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 @Subject(FileUploadRequest)
