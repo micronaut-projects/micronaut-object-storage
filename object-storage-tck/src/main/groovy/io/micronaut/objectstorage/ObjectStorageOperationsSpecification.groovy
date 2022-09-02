@@ -28,8 +28,6 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
 
     public static final String TEXT = 'micronaut'
 
-    boolean supportsEtag = true
-
     void 'it can upload, get and delete object from file'() {
         given:
         Path path = createTempFile()
@@ -40,9 +38,7 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
         R uploadResponse = getObjectStorage().upload(uploadRequest)
 
         then:
-        if (supportsEtag) {
-            assert eTag(uploadResponse)
-        }
+        eTagIsValid(uploadResponse)
 
         when: 'get file based on path'
         Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
@@ -74,7 +70,7 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
     }
 
     @NonNull
-    abstract String eTag(R uploadResponse);
+    abstract String eTagIsValid(R uploadResponse);
 
     abstract ObjectStorageOperations<?, R> getObjectStorage()
 

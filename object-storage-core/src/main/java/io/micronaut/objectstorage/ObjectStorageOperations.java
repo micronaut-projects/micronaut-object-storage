@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  *
  * @author Pavol Gressa
  * @since 1.0
- * @param <I> Cloud vendor-specific upload request.
+ * @param <I> Cloud vendor-specific upload request class or builder.
  * @param <O> Cloud vendor-specific upload response.
  */
 public interface ObjectStorageOperations<I, O> {
