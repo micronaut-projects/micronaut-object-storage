@@ -1,6 +1,7 @@
 package example
 
 import io.micronaut.context.env.Environment
+import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.aws.AwsS3Operations
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
@@ -15,7 +16,6 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 @MicronautTest(environments = Environment.AMAZON_EC2)
@@ -63,8 +63,7 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
 
     void "it works"() {
         given:
-        Path path = Files.createTempFile("test-file", ".txt")
-        path.toFile().text = "micronaut"
+        Path path = ObjectStorageOperationsSpecification.createTempFile()
         String fileName = path.toFile().name
 
         expect:

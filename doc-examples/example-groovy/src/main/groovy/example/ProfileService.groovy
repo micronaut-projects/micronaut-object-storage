@@ -3,7 +3,7 @@ package example
 import io.micronaut.objectstorage.ObjectStorageEntry
 import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.ObjectStorageOperations
-import io.micronaut.objectstorage.UploadRequest
+import io.micronaut.objectstorage.request.UploadRequest
 import jakarta.inject.Singleton
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse

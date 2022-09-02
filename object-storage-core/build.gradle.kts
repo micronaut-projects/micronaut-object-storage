@@ -4,6 +4,9 @@ plugins {
 
 dependencies {
     annotationProcessor(mn.micronaut.inject.java)
+
     implementation(mn.micronaut.inject.java)
     implementation(mn.micronaut.runtime)
+
+    testImplementation(projects.objectStorageTck)
 }

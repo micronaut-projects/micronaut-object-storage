@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage
 
 import io.micronaut.core.annotation.NonNull
+import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -23,19 +24,20 @@ import java.nio.file.Path
 
 import static java.nio.charset.StandardCharsets.UTF_8
 
-abstract class ObjectStorageOperationsSpecification<UPLOAD_RESPONSE> extends Specification {
+abstract class ObjectStorageOperationsSpecification<R> extends Specification {
+
+    public static final String TEXT = 'micronaut'
 
     boolean supportsEtag = true
 
     void 'it can upload, get and delete object from file'() {
         given:
-        Path tempFilePath = Files.createTempFile('test-file', 'txt')
-        String tempFileName = tempFilePath.getFileName().toString()
-        tempFilePath.toFile().text = 'micronaut'
+        Path path = createTempFile()
+        String tempFileName = path.getFileName().toString()
 
         when: 'put file to object storage'
-        UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
-        UPLOAD_RESPONSE uploadResponse = getObjectStorage().upload(uploadRequest)
+        UploadRequest uploadRequest = UploadRequest.fromPath(path)
+        R uploadResponse = getObjectStorage().upload(uploadRequest)
 
         then:
         if (supportsEtag) {
@@ -56,7 +58,7 @@ abstract class ObjectStorageOperationsSpecification<UPLOAD_RESPONSE> extends Spe
 
         then:
         text
-        text == 'micronaut'
+        text == TEXT
 
         when: 'delete the file on object storage'
         getObjectStorage().delete(tempFileName)
@@ -72,7 +74,13 @@ abstract class ObjectStorageOperationsSpecification<UPLOAD_RESPONSE> extends Spe
     }
 
     @NonNull
-    abstract String eTag(UPLOAD_RESPONSE uploadResponse);
+    abstract String eTag(R uploadResponse);
 
-    abstract ObjectStorageOperations<?, UPLOAD_RESPONSE> getObjectStorage()
+    abstract ObjectStorageOperations<?, R> getObjectStorage()
+
+    static Path createTempFile() {
+        Path path = Files.createTempFile('test-file', '.txt')
+        path.toFile().text = TEXT
+        return path
+    }
 }

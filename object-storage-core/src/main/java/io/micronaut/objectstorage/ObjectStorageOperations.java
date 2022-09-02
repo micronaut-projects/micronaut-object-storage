@@ -15,6 +15,8 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.objectstorage.request.UploadRequest;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -23,10 +25,10 @@ import java.util.function.Consumer;
  *
  * @author Pavol Gressa
  * @since 1.0
- * @param <UPLOAD_REQUEST_BUILDER> Upload Request Builder
- * @param <UPLOAD_RESPONSE> Upload Response
+ * @param <B> Cloud vendor-specific upload request builder.
+ * @param <R> Cloud vendor-specific upload response.
  */
-public interface ObjectStorageOperations<UPLOAD_REQUEST_BUILDER, UPLOAD_RESPONSE> {
+public interface ObjectStorageOperations<B, R> {
 
     /**
      * Uploads an object to the object storage.
@@ -35,7 +37,7 @@ public interface ObjectStorageOperations<UPLOAD_REQUEST_BUILDER, UPLOAD_RESPONSE
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
-    UPLOAD_RESPONSE upload(UploadRequest uploadRequest) throws ObjectStorageException;
+    R upload(UploadRequest uploadRequest) throws ObjectStorageException;
 
     /**
      * Uploads an object to the object storage.
@@ -45,8 +47,7 @@ public interface ObjectStorageOperations<UPLOAD_REQUEST_BUILDER, UPLOAD_RESPONSE
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
-    UPLOAD_RESPONSE upload(UploadRequest uploadRequest,
-                          Consumer<UPLOAD_REQUEST_BUILDER> uploadRequestBuilder) throws ObjectStorageException;
+    R upload(UploadRequest uploadRequest, Consumer<B> uploadRequestBuilder);
 
     /**
      * Gets the object from object storage.
@@ -55,12 +56,12 @@ public interface ObjectStorageOperations<UPLOAD_REQUEST_BUILDER, UPLOAD_RESPONSE
      * @return the object, or empty optional if the object does not exist
      * @throws ObjectStorageException if there was a failure retrieving the object
      */
-    Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException;
+    Optional<ObjectStorageEntry> retrieve(String key);
 
     /**
      * Deletes an object from the object storage.
      *
      * @param key object path in the format {@code /foo/bar/file}
      */
-    void delete(String key) throws ObjectStorageException;
+    void delete(String key);
 }

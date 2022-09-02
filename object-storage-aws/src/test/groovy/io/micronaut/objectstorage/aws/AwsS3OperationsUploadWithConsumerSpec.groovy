@@ -4,12 +4,14 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.annotation.Requires
 import io.micronaut.objectstorage.ObjectStorageOperations
-import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
+import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import software.amazon.awssdk.awscore.exception.AwsServiceException
 import software.amazon.awssdk.core.exception.SdkClientException
+import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
@@ -17,14 +19,14 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import spock.lang.Specification
 
-import java.nio.file.Files
 import java.nio.file.Path
-import java.util.function.Consumer;
 
 @Property(name = "micronaut.object-storage.aws.default.bucket", value = "profile-pictures-bucket")
-@Property(name = "spec.name", value = "AswsS3OperationsUploadWithConsumerSpec")
+@Property(name = "spec.name", value = SPEC_NAME)
 @MicronautTest
 class AwsS3OperationsUploadWithConsumerSpec extends Specification {
+
+    private static final String SPEC_NAME = "AswsS3OperationsUploadWithConsumerSpec"
 
     @Inject
     ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage
@@ -34,9 +36,8 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
 
     void "consumer accept is invoked"() {
         given:
-        Path tempFilePath = Files.createTempFile('test-file', 'txt')
-        tempFilePath.toFile().text = 'micronaut'
-        UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
+        Path path = ObjectStorageOperationsSpecification.createTempFile()
+        UploadRequest uploadRequest = UploadRequest.fromPath(path)
 
         when:
 //tag::consumer[]
@@ -49,15 +50,15 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         ObjectCannedACL.PUBLIC_READ == s3ClientReplacement.request.acl()
     }
 
-    @Requires(property = "spec.name", value = "AswsS3OperationsUploadWithConsumerSpec")
+    @Requires(property = "spec.name", value = SPEC_NAME)
     @Replaces(S3Client)
     @Singleton
     static class S3ClientReplacement implements S3Client {
         PutObjectRequest request
 
         @Override
-        PutObjectResponse putObject(PutObjectRequest putObjectRequest, Path sourcePath) throws AwsServiceException,
-                SdkClientException, S3Exception {
+        PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody)
+                throws AwsServiceException, SdkClientException, S3Exception {
             this.request = putObjectRequest
             null
         }

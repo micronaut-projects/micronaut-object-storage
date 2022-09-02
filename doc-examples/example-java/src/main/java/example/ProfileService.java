@@ -1,6 +1,7 @@
 package example;
 
 import io.micronaut.objectstorage.*;
+import io.micronaut.objectstorage.request.UploadRequest;
 import jakarta.inject.Singleton;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;

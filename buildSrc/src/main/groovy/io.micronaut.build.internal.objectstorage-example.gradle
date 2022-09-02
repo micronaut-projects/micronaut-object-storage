@@ -19,6 +19,7 @@ micronaut {
 dependencies {
     implementation(projects.objectStorageAws)
 
+    testImplementation(projects.objectStorageTck)
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.testcontainers.localstack)
     testImplementation(libs.amazon.awssdk.v1) {
