@@ -15,7 +15,6 @@
  */
 package io.micronaut.objectstorage.azure;
 
-import com.azure.core.http.RequestConditions;
 import com.azure.core.http.rest.Response;
 import com.azure.core.util.BinaryData;
 import com.azure.core.util.Context;
@@ -24,14 +23,13 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
-import com.azure.storage.blob.options.BlobUploadFromFileOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.request.UploadRequest;
 import jakarta.inject.Singleton;
 
 import java.util.Optional;
@@ -48,7 +46,8 @@ import static java.lang.Boolean.TRUE;
  */
 @EachBean(BlobContainerClient.class)
 @Singleton
-public class AzureBlobStorageOperations implements ObjectStorageOperations<RequestConditions, Response<BlockBlobItem>> {
+public class AzureBlobStorageOperations
+    implements ObjectStorageOperations<BlobParallelUploadOptions, Response<BlockBlobItem>> {
 
     private final BlobContainerClient blobContainerClient;
 
@@ -58,54 +57,51 @@ public class AzureBlobStorageOperations implements ObjectStorageOperations<Reque
 
     @Override
     @NonNull
-    public Response<BlockBlobItem> upload(@NonNull UploadRequest uploadRequest) throws ObjectStorageException {
-        BlobRequestConditions requestConditions = uploadBlobRequestConditions();
-        return upload(uploadRequest, requestConditions);
-    }
-
-    @Override
-    public Response<BlockBlobItem> upload(@NonNull UploadRequest uploadRequest,
-                                          @NonNull Consumer<RequestConditions> uploadRequestBuilder) throws ObjectStorageException {
-        BlobRequestConditions requestConditions = uploadBlobRequestConditions();
-        uploadRequestBuilder.accept(requestConditions);
-        return upload(uploadRequest, requestConditions);
+    public Response<BlockBlobItem> upload(@NonNull UploadRequest request) {
+        BlobParallelUploadOptions options = getUploadOptions(request);
+        return doUpload(request, options);
     }
 
     @NonNull
-    private Response<BlockBlobItem> upload(@NonNull UploadRequest uploadRequest,
-                                            BlobRequestConditions requestConditions) {
-        final BlobClient blobClient = blobContainerClient.getBlobClient(uploadRequest.getKey());
-        if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
-            UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
-            BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(fileUploadRequest.getAbsolutePath())
-                .setRequestConditions(requestConditions);
-            return blobClient.uploadFromFileWithResponse(options, null, null);
-        }
+    @Override
+    public Response<BlockBlobItem> upload(@NonNull UploadRequest request,
+                                          @NonNull Consumer<BlobParallelUploadOptions> requestConsumer) {
+        BlobParallelUploadOptions options = getUploadOptions(request);
+        requestConsumer.accept(options);
+        return doUpload(request, options);
+    }
 
-        BinaryData data = BinaryData.fromStream(uploadRequest.getInputStream());
-        return blobClient.uploadWithResponse(new BlobParallelUploadOptions(data).setRequestConditions(requestConditions),
-            null, Context.NONE);
+    private Response<BlockBlobItem> doUpload(@NonNull UploadRequest request,
+                                             @NonNull BlobParallelUploadOptions options) {
+        final BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
+
+        //TODO: make timeout configurable
+        return blobClient.uploadWithResponse(options, null, Context.NONE);
     }
 
     @NonNull
-    private BlobRequestConditions uploadBlobRequestConditions() {
-        return new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD);
-    }
-
     @Override
-    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
         if (TRUE.equals(blobClient.exists())) {
-            storageEntry = new AzureBlobStorageEntry(blobClient);
+            BinaryData data = blobClient.getBlockBlobClient().downloadContent();
+            storageEntry = new AzureBlobStorageEntry(key, data);
         }
         return Optional.ofNullable(storageEntry);
 
     }
 
     @Override
-    public void delete(String key) throws ObjectStorageException {
+    public void delete(@NonNull String key) throws ObjectStorageException {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         blobClient.getBlockBlobClient().delete();
     }
+
+    @NonNull
+    protected BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
+        return new BlobParallelUploadOptions(request.getInputStream())
+            .setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
+    }
+
 }

@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.request.UploadRequest;
 
 import java.util.Optional;
@@ -25,29 +26,31 @@ import java.util.function.Consumer;
  *
  * @author Pavol Gressa
  * @since 1.0
- * @param <B> Cloud vendor-specific upload request builder.
- * @param <R> Cloud vendor-specific upload response.
+ * @param <I> Cloud vendor-specific upload request.
+ * @param <O> Cloud vendor-specific upload response.
  */
-public interface ObjectStorageOperations<B, R> {
+public interface ObjectStorageOperations<I, O> {
 
     /**
      * Uploads an object to the object storage.
      *
-     * @param uploadRequest the upload request
+     * @param request the upload request
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
-    R upload(UploadRequest uploadRequest) throws ObjectStorageException;
+    @NonNull
+    O upload(@NonNull UploadRequest request);
 
     /**
      * Uploads an object to the object storage.
      *
-     * @param uploadRequest the upload request
-     * @param uploadRequestBuilder Upload request builder consumer
+     * @param request the upload request
+     * @param requestConsumer Upload request builder consumer
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
-    R upload(UploadRequest uploadRequest, Consumer<B> uploadRequestBuilder);
+    @NonNull
+    O upload(@NonNull UploadRequest request, @NonNull Consumer<I> requestConsumer);
 
     /**
      * Gets the object from object storage.
@@ -56,12 +59,13 @@ public interface ObjectStorageOperations<B, R> {
      * @return the object, or empty optional if the object does not exist
      * @throws ObjectStorageException if there was a failure retrieving the object
      */
-    Optional<ObjectStorageEntry> retrieve(String key);
+    @NonNull
+    Optional<ObjectStorageEntry> retrieve(@NonNull String key);
 
     /**
      * Deletes an object from the object storage.
      *
      * @param key object path in the format {@code /foo/bar/file}
      */
-    void delete(String key);
+    void delete(@NonNull String key);
 }

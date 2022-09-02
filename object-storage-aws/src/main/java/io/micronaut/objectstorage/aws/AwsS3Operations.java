@@ -68,23 +68,24 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     @Override
     @NonNull
     public PutObjectResponse upload(@NonNull UploadRequest uploadRequest) {
-        PutObjectRequest request = getRequestBuilder(uploadRequest).build();
+        PutObjectRequest objectRequest = getRequestBuilder(uploadRequest).build();
         RequestBody requestBody = getRequestBody(uploadRequest);
-        return s3Client.putObject(request, requestBody);
+        return s3Client.putObject(objectRequest, requestBody);
     }
 
     @Override
     @NonNull
-    public PutObjectResponse upload(@NonNull UploadRequest uploadRequest,
-                                    @NonNull Consumer<PutObjectRequest.Builder> uploadRequestBuilder) {
-        PutObjectRequest.Builder builder = getRequestBuilder(uploadRequest);
-        uploadRequestBuilder.accept(builder);
-        RequestBody requestBody = getRequestBody(uploadRequest);
+    public PutObjectResponse upload(@NonNull UploadRequest request,
+                                    @NonNull Consumer<PutObjectRequest.Builder> requestConsumer) {
+        PutObjectRequest.Builder builder = getRequestBuilder(request);
+        requestConsumer.accept(builder);
+        RequestBody requestBody = getRequestBody(request);
         return s3Client.putObject(builder.build(), requestBody);
     }
 
     @Override
-    public Optional<ObjectStorageEntry> retrieve(String key) {
+    @NonNull
+    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
                 .bucket(configuration.getBucket())
@@ -98,7 +99,7 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     }
 
     @Override
-    public void delete(String key) throws ObjectStorageException {
+    public void delete(@NonNull String key) throws ObjectStorageException {
         s3Client.deleteObject(DeleteObjectRequest.builder()
             .bucket(configuration.getBucket())
             .key(key)
@@ -109,13 +110,13 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
      * Creates an AWS' {@link PutObjectRequest.Builder} from a Micronaut's {@link UploadRequest}
      */
     @NonNull
-    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest uploadRequest) {
+    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
             .bucket(configuration.getBucket())
-            .key(uploadRequest.getKey());
+            .key(request.getKey());
 
-        uploadRequest.getContentType().ifPresent(builder::contentType);
-        uploadRequest.getContentSize().ifPresent(builder::contentLength);
+        request.getContentType().ifPresent(builder::contentType);
+        request.getContentSize().ifPresent(builder::contentLength);
         return builder;
     }
 

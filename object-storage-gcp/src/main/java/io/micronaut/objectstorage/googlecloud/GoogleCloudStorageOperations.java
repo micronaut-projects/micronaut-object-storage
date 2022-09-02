@@ -74,8 +74,9 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
         return upload(uploadRequest, builder.build());
     }
 
+    @NonNull
     @Override
-    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) throws ObjectStorageException {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
 
@@ -87,7 +88,7 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
     }
 
     @Override
-    public void delete(String key) throws ObjectStorageException {
+    public void delete(@NonNull String key) throws ObjectStorageException {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         storage.delete(blobId);
     }

@@ -18,8 +18,8 @@ package io.micronaut.objectstorage.azure;
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
-import io.micronaut.objectstorage.ObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX;
 

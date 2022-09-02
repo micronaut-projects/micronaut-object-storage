@@ -87,8 +87,9 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations<Put
         return putObjectRequestBuilder;
     }
 
+    @NonNull
     @Override
-    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) throws ObjectStorageException {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
             .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
@@ -104,7 +105,7 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations<Put
     }
 
     @Override
-    public void delete(String key) throws ObjectStorageException {
+    public void delete(@NonNull String key) throws ObjectStorageException {
         client.deleteObject(DeleteObjectRequest.builder()
             .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())

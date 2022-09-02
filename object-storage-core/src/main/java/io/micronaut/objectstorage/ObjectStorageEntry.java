@@ -20,8 +20,11 @@ import io.micronaut.core.annotation.NonNull;
 import java.io.InputStream;
 
 /**
+ * Object storage entry.
+ *
  * @author Pavol Gressa
  * @since 1.0
+// * @param <O> Cloud vendor-specific response object.
  */
 public interface ObjectStorageEntry {
 
@@ -39,4 +42,10 @@ public interface ObjectStorageEntry {
      * @return object content.
      */
     InputStream getInputStream();
+//
+//    /**
+//     * Returns the underlying cloud vendor-specific response object
+//     * @return
+//     */
+//    O getNativeEntry();
 }
