@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage;
 
+import io.micronaut.core.annotation.Blocking;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.request.UploadRequest;
 
@@ -38,6 +39,7 @@ public interface ObjectStorageOperations<I, O> {
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
+    @Blocking
     @NonNull
     O upload(@NonNull UploadRequest request);
 
@@ -49,6 +51,7 @@ public interface ObjectStorageOperations<I, O> {
      * @return the upload response
      * @throws ObjectStorageException if there was a failure storing the object
      */
+    @Blocking
     @NonNull
     O upload(@NonNull UploadRequest request, @NonNull Consumer<I> requestConsumer);
 
@@ -59,6 +62,7 @@ public interface ObjectStorageOperations<I, O> {
      * @return the object, or empty optional if the object does not exist
      * @throws ObjectStorageException if there was a failure retrieving the object
      */
+    @Blocking
     @NonNull
     Optional<ObjectStorageEntry> retrieve(@NonNull String key);
 
@@ -67,5 +71,6 @@ public interface ObjectStorageOperations<I, O> {
      *
      * @param key object path in the format {@code /foo/bar/file}
      */
+    @Blocking
     void delete(@NonNull String key);
 }
