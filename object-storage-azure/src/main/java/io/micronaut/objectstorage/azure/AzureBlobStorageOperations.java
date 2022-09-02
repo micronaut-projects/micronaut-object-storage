@@ -27,7 +27,6 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import jakarta.inject.Singleton;
@@ -81,7 +80,7 @@ public class AzureBlobStorageOperations
 
     @NonNull
     @Override
-    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) throws ObjectStorageException {
+    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
         if (TRUE.equals(blobClient.exists())) {
@@ -93,7 +92,7 @@ public class AzureBlobStorageOperations
     }
 
     @Override
-    public void delete(@NonNull String key) throws ObjectStorageException {
+    public void delete(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         blobClient.getBlockBlobClient().delete();
     }

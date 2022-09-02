@@ -20,7 +20,6 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
@@ -99,7 +98,7 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     }
 
     @Override
-    public void delete(@NonNull String key) throws ObjectStorageException {
+    public void delete(@NonNull String key) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
             .bucket(configuration.getBucket())
             .key(key)
