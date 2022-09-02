@@ -64,7 +64,7 @@ public interface ObjectStorageOperations<I, O> {
      */
     @Blocking
     @NonNull
-    Optional<ObjectStorageEntry> retrieve(@NonNull String key);
+    Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key);
 
     /**
      * Deletes an object from the object storage.

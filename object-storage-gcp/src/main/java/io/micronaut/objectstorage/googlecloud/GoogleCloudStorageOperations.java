@@ -75,7 +75,8 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
 
     @Override
     @NonNull
-    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
+    @SuppressWarnings("java:S1854")
+    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
 

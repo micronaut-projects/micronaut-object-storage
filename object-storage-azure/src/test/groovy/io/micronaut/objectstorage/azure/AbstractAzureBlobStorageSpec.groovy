@@ -43,7 +43,7 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
 
     @Override
     @NonNull
-    String eTagIsValid(Response<BlockBlobItem> blockBlobItemResponse) {
+    String assertThatETagIsValid(Response<BlockBlobItem> blockBlobItemResponse) {
         BlockBlobItem value = blockBlobItemResponse.getValue()
         value.getETag()
     }

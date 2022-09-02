@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author Pavol Gressa
  * @since 1.0
  */
-public class GoogleCloudStorageEntry implements ObjectStorageEntry {
+public class GoogleCloudStorageEntry implements ObjectStorageEntry<Blob> {
 
     private final Blob blob;
 
@@ -45,5 +45,10 @@ public class GoogleCloudStorageEntry implements ObjectStorageEntry {
     @Override
     public InputStream getInputStream() {
         return new ByteArrayInputStream(blob.getContent());
+    }
+
+    @Override
+    public Blob getNativeEntry() {
+        return blob;
     }
 }

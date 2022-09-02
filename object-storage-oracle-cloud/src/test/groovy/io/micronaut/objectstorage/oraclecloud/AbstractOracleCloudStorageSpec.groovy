@@ -40,7 +40,7 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     @Override
-    String eTagIsValid(PutObjectResponse putObjectResponse) {
+    String assertThatETagIsValid(PutObjectResponse putObjectResponse) {
         putObjectResponse.getETag()
     }
 

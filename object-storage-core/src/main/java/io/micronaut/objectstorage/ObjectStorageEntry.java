@@ -24,9 +24,9 @@ import java.io.InputStream;
  *
  * @author Pavol Gressa
  * @since 1.0
-// * @param <O> Cloud vendor-specific response object.
+ * @param <O> Cloud vendor-specific response object.
  */
-public interface ObjectStorageEntry {
+public interface ObjectStorageEntry<O> {
 
     /**
      * The object path on object storage. For example {@code /path/to}
@@ -42,10 +42,9 @@ public interface ObjectStorageEntry {
      * @return object content.
      */
     InputStream getInputStream();
-//
-//    /**
-//     * Returns the underlying cloud vendor-specific response object
-//     * @return
-//     */
-//    O getNativeEntry();
+
+    /**
+     * Returns the underlying cloud vendor-specific response object.
+     */
+    O getNativeEntry();
 }

@@ -38,14 +38,15 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
         R uploadResponse = getObjectStorage().upload(uploadRequest)
 
         then:
-        eTagIsValid(uploadResponse)
+        assertThatETagIsValid(uploadResponse)
 
         when: 'get file based on path'
-        Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
+        Optional<ObjectStorageEntry<?>> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
 
         then:
         objectStorageEntry.isPresent()
         objectStorageEntry.get().key == tempFileName
+        objectStorageEntry.get().nativeEntry
 
         when: 'the file has same content'
         String text = new BufferedReader(
@@ -70,7 +71,7 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
     }
 
     @NonNull
-    abstract String eTagIsValid(R uploadResponse);
+    abstract String assertThatETagIsValid(R uploadResponse);
 
     abstract ObjectStorageOperations<?, R> getObjectStorage()
 

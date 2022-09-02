@@ -84,7 +84,8 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
 
     @Override
     @NonNull
-    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
+    @SuppressWarnings("java:S1854")
+    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
                 .bucket(configuration.getBucket())

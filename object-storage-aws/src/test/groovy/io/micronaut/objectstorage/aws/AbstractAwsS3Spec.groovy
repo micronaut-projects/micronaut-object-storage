@@ -41,7 +41,7 @@ abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification<Pu
 
     @Override
     @NonNull
-    String eTagIsValid(PutObjectResponse putObjectResponse) {
+    String assertThatETagIsValid(PutObjectResponse putObjectResponse) {
         putObjectResponse.eTag()
     }
 

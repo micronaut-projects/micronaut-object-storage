@@ -27,7 +27,7 @@ import java.io.InputStream;
  * @author Pavol Gressa
  * @since 1.0
  */
-public class AzureBlobStorageEntry implements ObjectStorageEntry {
+public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
 
     private final String key;
 
@@ -47,5 +47,10 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry {
     @Override
     public InputStream getInputStream() {
         return data.toStream();
+    }
+
+    @Override
+    public BinaryData getNativeEntry() {
+        return data;
     }
 }

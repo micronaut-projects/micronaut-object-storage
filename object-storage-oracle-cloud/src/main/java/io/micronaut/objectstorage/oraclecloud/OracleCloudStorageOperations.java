@@ -73,7 +73,8 @@ public class OracleCloudStorageOperations
 
     @NonNull
     @Override
-    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
+    @SuppressWarnings("java:S1854")
+    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
             .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())

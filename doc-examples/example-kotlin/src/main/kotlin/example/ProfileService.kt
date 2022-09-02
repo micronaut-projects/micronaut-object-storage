@@ -28,7 +28,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<Put
     open fun retrieveProfilePicture(userId: String, fileName: String): Path? {
         val key = "$userId/$fileName"
         val stream = objectStorage.retrieve(key) // <1>
-            .map { obj: ObjectStorageEntry -> obj.inputStream }
+            .map { obj: ObjectStorageEntry<*> -> obj.inputStream }
 
         return if (stream.isPresent) {
             val destination = File.createTempFile(userId, "temp").toPath()

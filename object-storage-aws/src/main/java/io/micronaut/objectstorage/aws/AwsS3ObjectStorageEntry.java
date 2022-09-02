@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author Pavol Gressa
  * @since 1.0
  */
-public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
+public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResponse> {
 
     private final ResponseInputStream<GetObjectResponse> responseInputStream;
 
@@ -50,5 +50,10 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
     @Override
     public InputStream getInputStream() {
         return responseInputStream;
+    }
+
+    @Override
+    public GetObjectResponse getNativeEntry() {
+        return responseInputStream.response();
     }
 }

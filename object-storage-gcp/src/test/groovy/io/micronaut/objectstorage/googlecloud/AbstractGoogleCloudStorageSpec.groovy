@@ -34,7 +34,7 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
 
     @Override
     @NonNull
-    String eTagIsValid(Blob blob) {
+    String assertThatETagIsValid(Blob blob) {
         blob.getEtag()
     }
 

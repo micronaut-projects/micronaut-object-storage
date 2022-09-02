@@ -72,7 +72,8 @@ public class AzureBlobStorageOperations
 
     @Override
     @NonNull
-    public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
+    @SuppressWarnings("java:S1854")
+    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
         if (TRUE.equals(blobClient.exists())) {
