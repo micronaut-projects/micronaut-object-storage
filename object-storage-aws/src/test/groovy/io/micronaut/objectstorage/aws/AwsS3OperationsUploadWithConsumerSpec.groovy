@@ -26,7 +26,7 @@ import java.nio.file.Path
 @MicronautTest
 class AwsS3OperationsUploadWithConsumerSpec extends Specification {
 
-    private static final String SPEC_NAME = "AswsS3OperationsUploadWithConsumerSpec"
+    private static final String SPEC_NAME = "AwsS3OperationsUploadWithConsumerSpec"
 
     @Inject
     ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage
@@ -68,8 +68,6 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
             's3-client-replacement'
         }
         @Override
-        void close() {
-
-        }
+        void close() {}
     }
 }

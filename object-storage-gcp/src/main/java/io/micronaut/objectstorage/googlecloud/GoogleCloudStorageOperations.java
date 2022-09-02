@@ -27,7 +27,7 @@ import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.UploadRequest;
+import io.micronaut.objectstorage.request.UploadRequest;
 
 import java.util.Optional;
 import java.util.function.Consumer;
