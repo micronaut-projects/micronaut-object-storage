@@ -39,7 +39,9 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 @EachBean(OracleCloudStorageConfiguration.class)
-public class OracleCloudStorageOperations implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
+public class OracleCloudStorageOperations
+    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
+
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
 
@@ -69,23 +71,6 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations<Put
         return client.putObject(builder.build());
     }
 
-    /**
-     *
-     * @param request Upload Request
-     * @return The Put Object Request Builder
-     */
-    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
-        PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
-            .objectName(request.getKey())
-            .bucketName(configuration.getBucket())
-            .namespaceName(configuration.getNamespace())
-            .putObjectBody(request.getInputStream());
-
-        request.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
-        request.getContentType().ifPresent(putObjectRequestBuilder::contentType);
-        return putObjectRequestBuilder;
-    }
-
     @NonNull
     @Override
     public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
@@ -110,5 +95,23 @@ public class OracleCloudStorageOperations implements ObjectStorageOperations<Put
             .namespaceName(configuration.getNamespace())
             .objectName(key)
             .build());
+    }
+
+    /**
+     *
+     * @param request Upload Request
+     * @return The Put Object Request Builder
+     */
+    @NonNull
+    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
+        PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
+            .objectName(request.getKey())
+            .bucketName(configuration.getBucket())
+            .namespaceName(configuration.getNamespace())
+            .putObjectBody(request.getInputStream());
+
+        request.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
+        request.getContentType().ifPresent(putObjectRequestBuilder::contentType);
+        return putObjectRequestBuilder;
     }
 }

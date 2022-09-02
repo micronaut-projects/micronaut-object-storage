@@ -61,8 +61,8 @@ public class AzureBlobStorageOperations
         return doUpload(request, options);
     }
 
-    @NonNull
     @Override
+    @NonNull
     public Response<BlockBlobItem> upload(@NonNull UploadRequest request,
                                           @NonNull Consumer<BlobParallelUploadOptions> requestConsumer) {
         BlobParallelUploadOptions options = getUploadOptions(request);
@@ -70,16 +70,8 @@ public class AzureBlobStorageOperations
         return doUpload(request, options);
     }
 
-    private Response<BlockBlobItem> doUpload(@NonNull UploadRequest request,
-                                             @NonNull BlobParallelUploadOptions options) {
-        final BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
-
-        //TODO: make timeout configurable
-        return blobClient.uploadWithResponse(options, null, Context.NONE);
-    }
-
-    @NonNull
     @Override
+    @NonNull
     public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
@@ -101,6 +93,14 @@ public class AzureBlobStorageOperations
     protected BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
         return new BlobParallelUploadOptions(request.getInputStream())
             .setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
+    }
+
+    private Response<BlockBlobItem> doUpload(@NonNull UploadRequest request,
+                                             @NonNull BlobParallelUploadOptions options) {
+        final BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
+
+        //TODO: make timeout configurable
+        return blobClient.uploadWithResponse(options, null, Context.NONE);
     }
 
 }

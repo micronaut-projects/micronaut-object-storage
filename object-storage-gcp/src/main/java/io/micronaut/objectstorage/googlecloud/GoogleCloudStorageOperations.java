@@ -73,8 +73,8 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
         return upload(uploadRequest, builder.build());
     }
 
-    @NonNull
     @Override
+    @NonNull
     public Optional<ObjectStorageEntry> retrieve(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
