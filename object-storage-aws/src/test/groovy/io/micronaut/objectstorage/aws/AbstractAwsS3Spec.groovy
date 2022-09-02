@@ -9,6 +9,7 @@ import jakarta.inject.Named
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 
@@ -35,7 +36,7 @@ abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification<Pu
     }
 
     @Override
-    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> getObjectStorage() {
+    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> getObjectStorage() {
         return awsS3Bucket
     }
 

@@ -35,7 +35,7 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
 
     @Override
     @NonNull
-    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> getObjectStorage() {
+    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, ?> getObjectStorage() {
         return oracleCloudStorageOperations
     }
 

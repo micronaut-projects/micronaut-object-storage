@@ -28,6 +28,7 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -44,7 +45,8 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 @EachBean(AwsS3Configuration.class)
-public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
+public class AwsS3Operations
+    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private final S3Client s3Client;
     private final AwsS3Configuration configuration;
@@ -99,8 +101,9 @@ public class AwsS3Operations implements ObjectStorageOperations<PutObjectRequest
     }
 
     @Override
-    public void delete(@NonNull String key) {
-        s3Client.deleteObject(DeleteObjectRequest.builder()
+    @NonNull
+    public DeleteObjectResponse delete(@NonNull String key) {
+        return s3Client.deleteObject(DeleteObjectRequest.builder()
             .bucket(configuration.getBucket())
             .key(key)
             .build());

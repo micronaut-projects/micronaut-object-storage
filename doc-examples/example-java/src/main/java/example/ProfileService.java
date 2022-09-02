@@ -5,6 +5,7 @@ import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import jakarta.inject.Singleton;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -20,9 +21,9 @@ import java.util.Optional;
 @Singleton
 public class ProfileService {
 
-    private final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage;
+    private final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> objectStorage;
 
-    public ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage) {
+    public ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> objectStorage) {
         this.objectStorage = objectStorage;
     }
 //end::beginclass[]

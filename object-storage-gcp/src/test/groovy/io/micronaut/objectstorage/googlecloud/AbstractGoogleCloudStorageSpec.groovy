@@ -28,7 +28,7 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
         [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.bucket'): BUCKET_NAME]
     }
 
-    ObjectStorageOperations<BlobInfo.Builder, Blob> getObjectStorage() {
+    ObjectStorageOperations<BlobInfo.Builder, Blob, ?> getObjectStorage() {
         return cloudObjectStorage
     }
 

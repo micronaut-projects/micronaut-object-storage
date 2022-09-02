@@ -38,7 +38,8 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 @EachBean(GoogleCloudStorageConfiguration.class)
-public class GoogleCloudStorageOperations implements ObjectStorageOperations<BlobInfo.Builder, Blob> {
+public class GoogleCloudStorageOperations
+    implements ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> {
 
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
@@ -88,9 +89,10 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations<Blo
     }
 
     @Override
-    public void delete(@NonNull String key) {
+    @NonNull
+    public Boolean delete(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
-        storage.delete(blobId);
+        return storage.delete(blobId);
     }
 
     /**

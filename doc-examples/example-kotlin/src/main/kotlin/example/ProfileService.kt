@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption
 
 //tag::beginclass[]
 @Singleton
-open class ProfileService(private val objectStorage: ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse>) {
+open class ProfileService(private val objectStorage: ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, *>) {
 //end::beginclass[]
 
     //tag::upload[]

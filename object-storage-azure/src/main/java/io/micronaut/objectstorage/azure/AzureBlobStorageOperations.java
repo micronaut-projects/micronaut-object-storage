@@ -46,7 +46,7 @@ import static java.lang.Boolean.TRUE;
 @EachBean(BlobContainerClient.class)
 @Singleton
 public class AzureBlobStorageOperations
-    implements ObjectStorageOperations<BlobParallelUploadOptions, Response<BlockBlobItem>> {
+    implements ObjectStorageOperations<BlobParallelUploadOptions, Response<BlockBlobItem>, Response<Void>> {
 
     private final BlobContainerClient blobContainerClient;
 
@@ -85,9 +85,10 @@ public class AzureBlobStorageOperations
     }
 
     @Override
-    public void delete(@NonNull String key) {
+    @NonNull
+    public Response<Void> delete(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
-        blobClient.getBlockBlobClient().delete();
+        return blobClient.getBlockBlobClient().deleteWithResponse(null, null, null, Context.NONE);
     }
 
     @NonNull

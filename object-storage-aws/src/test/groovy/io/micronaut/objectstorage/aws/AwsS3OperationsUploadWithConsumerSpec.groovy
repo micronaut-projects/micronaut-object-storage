@@ -13,6 +13,7 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
@@ -29,7 +30,7 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
     private static final String SPEC_NAME = "AwsS3OperationsUploadWithConsumerSpec"
 
     @Inject
-    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage
+    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> objectStorage
 
     @Inject
     S3ClientReplacement s3ClientReplacement

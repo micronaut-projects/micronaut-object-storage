@@ -73,7 +73,7 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
     @NonNull
     abstract String assertThatETagIsValid(R uploadResponse);
 
-    abstract ObjectStorageOperations<?, R> getObjectStorage()
+    abstract ObjectStorageOperations<?, R, ?> getObjectStorage()
 
     static Path createTempFile() {
         Path path = Files.createTempFile('test-file', '.txt')

@@ -29,8 +29,9 @@ import java.util.function.Consumer;
  * @since 1.0
  * @param <I> Cloud vendor-specific upload request class or builder.
  * @param <O> Cloud vendor-specific upload response.
+ * @param <D> Cloud vendor-specific delete response.
  */
-public interface ObjectStorageOperations<I, O> {
+public interface ObjectStorageOperations<I, O, D> {
 
     /**
      * Uploads an object to the object storage.
@@ -70,7 +71,9 @@ public interface ObjectStorageOperations<I, O> {
      * Deletes an object from the object storage.
      *
      * @param key object path in the format {@code /foo/bar/file}
+     * @return Cloud vendor-specific delete response.
      */
     @Blocking
-    void delete(@NonNull String key);
+    @NonNull
+    D delete(@NonNull String key);
 }

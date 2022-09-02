@@ -24,7 +24,7 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     private static final String SPEC_NAME = "GoogleCloudStorageOperationsUploadWithConsumerSpec"
 
     @Inject
-    ObjectStorageOperations<BlobInfo.Builder, Blob> objectStorage
+    ObjectStorageOperations<BlobInfo.Builder, Blob, ?> objectStorage
 
     @Inject
     StorageReplacement storageReplacement

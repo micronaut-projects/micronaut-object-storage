@@ -37,7 +37,7 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
     }
 
     @Override
-    ObjectStorageOperations<?, Response<BlockBlobItem>> getObjectStorage() {
+    ObjectStorageOperations<?, Response<BlockBlobItem>, ?> getObjectStorage() {
         return azureBlobContainer
     }
 

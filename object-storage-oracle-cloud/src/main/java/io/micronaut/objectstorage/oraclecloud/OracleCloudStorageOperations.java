@@ -20,6 +20,7 @@ import com.oracle.bmc.objectstorage.ObjectStorage;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
+import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
@@ -40,7 +41,7 @@ import java.util.function.Consumer;
  */
 @EachBean(OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations
-    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> {
+    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
@@ -90,8 +91,9 @@ public class OracleCloudStorageOperations
     }
 
     @Override
-    public void delete(@NonNull String key) {
-        client.deleteObject(DeleteObjectRequest.builder()
+    @NonNull
+    public DeleteObjectResponse delete(@NonNull String key) {
+        return client.deleteObject(DeleteObjectRequest.builder()
             .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())
             .objectName(key)

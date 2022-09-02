@@ -16,8 +16,8 @@ import java.nio.file.StandardCopyOption
 @Singleton
 class ProfileService {
 
-    final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage
-    ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse> objectStorage) {
+    final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, ?> objectStorage
+    ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, ?> objectStorage) {
         this.objectStorage = objectStorage
     }
 //end::beginclass[]
