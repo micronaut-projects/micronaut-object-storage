@@ -6,11 +6,15 @@ provider documentation for more details:
 * <<gcp, Google Cloud Storage>>.
 * <<oracleCloud, Oracle Cloud Infrastructure (OCI) Object Storage>>.
 
-Then, you can inject in your controllers/services/etc. a bean of type api:objectstorage.ObjectStorageOperations[].
-
-The following example uses AWS S3:
+Then, you can inject in your controllers/services/etc. a bean of type api:objectstorage.ObjectStorageOperations[], the
+parent interface that allows you to use the API in a generic way for all cloud providers:
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="beginclass,endclass"]
+
+If your application is not multi-cloud, and/or you need cloud-specific details, you can use a concrete implementation.
+For example, for AWS S3:
+
+snippet::example.UploadController[project-base="doc-examples/example", source="main", indent="0", tags="beginclass,endclass"]
 
 If you have multiple object storages configured, it is possible to select which one to work with via
 https://docs.micronaut.io/latest/guide/#qualifiers[bean qualifiers].
@@ -29,30 +33,35 @@ micronaut:
         name: logos-bucket
 ----
 
-You need to use `@Named("pictures")` or `@Named("logos")` to specify which of the object storages you want to use.
+You then need to use `@Named("pictures")` or `@Named("logos")` to specify which of the object storages you want to use.
 
 == Uploading files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="upload"]
 
-<1> You can use any of the api:objectstorage.UploadRequest[] static methods to build an upload request.
-<2> The upload operation returns an api:objectstorage.UploadResponse[].
+<1> You can use any of the api:objectstorage.request.UploadRequest[] static methods to build an upload request.
+<2> The upload operation returns an api:objectstorage.response.UploadResponse[], which wraps the cloud-specific SDK response
+    object.
+<3> The response object contains some common properties for all cloud vendor, and a `getNativeResponse()` method that can
+    be used for accessing the vendor-specific response object.
 
-== Uploading files with Customization
+In case you want to have better control of the upload options used, you can use the method
+`upload(UploadRequest, Consumer)` of api:objectstorage.ObjectStorageOperations[], which will give you access to the
+cloud vendor-specific request class or builder.
 
-You can use the method `upload(UploadRequest, Consumer)` of api:objectstorage.ObjectStorageOperations[] to customize an upload:
+For example, for AWS S3:
 
-[source,java]
-----
-include::object-storage-aws/src/test/groovy/io/micronaut/objectstorage/aws/AwsS3OperationsUploadWithConsumerSpec.groovy[tag="consumer", indent="0"]
-----
+snippet::example.UploadController[project-base="doc-examples/example", source="main", indent="0", tags="consumer"]
 
 == Retrieving files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="retrieve"]
 
 <1> The retrieve operation returns an api:objectstorage.ObjectStorageEntry[], from which you can get an `InputStream`.
+    There is also a `getNativeEntry()` method that gives you access to the cloud vendor-specific response object.
 
 == Deleting files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="delete"]
+
+<1> The delete operation returns the cloud vendor-specific delete response object in case you need it.

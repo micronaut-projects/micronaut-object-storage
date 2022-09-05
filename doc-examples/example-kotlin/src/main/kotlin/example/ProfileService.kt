@@ -18,7 +18,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
     open fun saveProfilePicture(userId: String?, path: Path): String? {
         val request = UploadRequest.fromPath(path, userId) // <1>
         val response = objectStorage.upload(request) // <2>
-        return response.eTag
+        return response.key // <3>
     }
     //end::upload[]
 
@@ -41,7 +41,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
     //tag::delete[]
     open fun deleteProfilePicture(userId: String, fileName: String) {
         val key = "$userId/$fileName"
-        objectStorage.delete(key)
+        objectStorage.delete(key) // <1>
     }
     //end::delete[]
 

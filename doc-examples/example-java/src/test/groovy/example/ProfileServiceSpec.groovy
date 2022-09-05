@@ -73,7 +73,7 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
         def saveResult = service.saveProfilePicture(USER_ID, path)
 
         then:
-        saveResult.present
+        saveResult
 
         when:
         def retrieveResult = service.retrieveProfilePicture(USER_ID, fileName)

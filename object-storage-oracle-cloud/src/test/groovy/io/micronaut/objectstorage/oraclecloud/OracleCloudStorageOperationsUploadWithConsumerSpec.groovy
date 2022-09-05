@@ -37,11 +37,10 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
 
         when:
-//tag::consumer[]
         objectStorage.upload(uploadRequest, builder -> {
                 builder.opcMeta([project: "micronaut-object-storage"])
         });
-//end::consumer[]
+
         then:
         objectStorageReplacement.request
         [project: "micronaut-object-storage"] == objectStorageReplacement.request.opcMeta

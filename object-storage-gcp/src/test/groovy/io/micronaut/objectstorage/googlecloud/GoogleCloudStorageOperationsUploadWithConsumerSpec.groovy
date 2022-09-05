@@ -40,11 +40,10 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
 
         when:
-//tag::consumer[]
         objectStorage.upload(uploadRequest, builder -> {
             builder.metadata = [project: "micronaut-object-storage"]
         });
-//end::consumer[]
+
         then:
         storageReplacement.blobInfo
         [project: "micronaut-object-storage"] == storageReplacement.blobInfo.metadata

@@ -1,7 +1,6 @@
 package example;
 
 import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
@@ -27,14 +26,10 @@ public class ProfileService {
 //end::beginclass[]
 
     //tag::upload[]
-    public Optional<String> saveProfilePicture(String userId, Path path) {
-        try {
-            UploadRequest request = UploadRequest.fromPath(path, userId); // <1>
-            UploadResponse<?> response = objectStorage.upload(request); // <2>
-            return Optional.ofNullable(response.getETag());
-        } catch (ObjectStorageException e) {
-            return Optional.empty();
-        }
+    public String saveProfilePicture(String userId, Path path) {
+        UploadRequest request = UploadRequest.fromPath(path, userId); // <1>
+        UploadResponse<?> response = objectStorage.upload(request); // <2>
+        return response.getKey(); // <3>
     }
     //end::upload[]
 
@@ -51,7 +46,7 @@ public class ProfileService {
             } else {
                 return Optional.empty();
             }
-        } catch (ObjectStorageException | IOException e) {
+        } catch (IOException e) {
             return Optional.empty();
         }
     }
@@ -60,7 +55,7 @@ public class ProfileService {
     //tag::delete[]
     public void deleteProfilePicture(String userId, String fileName) {
         String key = userId + "/" + fileName;
-        objectStorage.delete(key);
+        objectStorage.delete(key); // <1>
     }
     //end::delete[]
 

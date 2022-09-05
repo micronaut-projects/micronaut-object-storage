@@ -17,6 +17,4 @@ For example:
 include::doc-examples/example-java/src/test/resources/application-gcp.yml[]
 ----
 
-To use it, inject a bean of type `ObjectStorageOperations<BlobInfo.Builder, Blob>`.
-
-If you have multiple buckets, use the name qualifier in the injection point `@Named("default") ObjectStorageOperations<BlobInfo.Builder, Blob>`.
+The concrete implementation of `ObjectStorageOperations` is api:objectstorage.googlecloud.GoogleCloudStorageOperations[].

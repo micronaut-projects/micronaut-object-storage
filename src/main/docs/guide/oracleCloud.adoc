@@ -17,7 +17,4 @@ For example:
 include::doc-examples/example-java/src/test/resources/application-oraclecloud.yml[]
 ----
 
-To use it, inject a bean of type `ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse>`.
-
-If you have multiple buckets, use the name qualifier in the injection point `@Named("default") ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse>`.
-
+The concrete implementation of `ObjectStorageOperations` is api:objectstorage.oraclecloud.OracleCloudStorageOperations[]

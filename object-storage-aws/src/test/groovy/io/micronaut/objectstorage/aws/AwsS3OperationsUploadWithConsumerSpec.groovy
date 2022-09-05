@@ -41,11 +41,10 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
 
         when:
-//tag::consumer[]
         objectStorage.upload(uploadRequest, builder -> {
                 builder.acl(ObjectCannedACL.PUBLIC_READ)
         });
-//end::consumer[]
+
         then:
         s3ClientReplacement.request
         ObjectCannedACL.PUBLIC_READ == s3ClientReplacement.request.acl()
