@@ -6,7 +6,7 @@ groovy = '3.0.10'
 gcp-libraries = '26.1.1'
 
 # Gradle plugins
-micronaut-gradle-plugin = "3.5.1"
+micronaut-gradle-plugin = "3.5.3"
 kotlin-gradle-plugin = "1.7.10"
 
 [libraries]
