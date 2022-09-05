@@ -26,7 +26,6 @@ import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
@@ -73,8 +72,8 @@ public class AzureBlobStorageOperations
 
     @Override
     @NonNull
-    @SuppressWarnings("java:S1854")
-    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
+    @SuppressWarnings("unchecked")
+    public Optional<AzureBlobStorageEntry> retrieve(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
         if (TRUE.equals(blobClient.exists())) {
@@ -108,7 +107,7 @@ public class AzureBlobStorageOperations
 
         //TODO: make timeout configurable
         Response<BlockBlobItem> response = blobClient.uploadWithResponse(options, null, Context.NONE);
-        return UploadResponse.of(response.getValue().getETag(), response.getValue());
+        return UploadResponse.of(request.getKey(), response.getValue().getETag(), response.getValue());
     }
 
 }

@@ -25,7 +25,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
     //tag::retrieve[]
     open fun retrieveProfilePicture(userId: String, fileName: String): Path? {
         val key = "$userId/$fileName"
-        val stream = objectStorage.retrieve(key) // <1>
+        val stream = objectStorage.retrieve<ObjectStorageEntry<*>>(key) // <1>
             .map { obj: ObjectStorageEntry<*> -> obj.inputStream }
 
         return if (stream.isPresent) {

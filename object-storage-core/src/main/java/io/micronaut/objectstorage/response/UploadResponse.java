@@ -29,6 +29,11 @@ import io.micronaut.context.annotation.DefaultImplementation;
 public interface UploadResponse<R> {
 
     /**
+     * @return The key under which the object was stored.
+     */
+    String getKey();
+
+    /**
      * @return the entity tag of the object stored (an identifier for a specific version of the object).
      */
     String getETag();
@@ -38,8 +43,8 @@ public interface UploadResponse<R> {
      */
     R getNativeResponse();
 
-    static <R> UploadResponse<R> of(String eTag, R nativeResponse) {
-        return new DefaultUploadResponse<>(eTag, nativeResponse);
+    static <R> UploadResponse<R> of(String key, String eTag, R nativeResponse) {
+        return new DefaultUploadResponse<>(key, eTag, nativeResponse);
     }
 
 }

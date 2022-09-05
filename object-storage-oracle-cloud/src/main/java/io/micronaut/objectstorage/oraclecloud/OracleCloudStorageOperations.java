@@ -26,7 +26,6 @@ import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
@@ -62,7 +61,7 @@ public class OracleCloudStorageOperations
     @NonNull
     public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request) {
         PutObjectResponse response = client.putObject(getRequestBuilder(request).build());
-        return UploadResponse.of(response.getETag(), response);
+        return UploadResponse.of(request.getKey(), response.getETag(), response);
     }
 
     @Override
@@ -72,13 +71,13 @@ public class OracleCloudStorageOperations
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
         PutObjectResponse response = client.putObject(builder.build());
-        return UploadResponse.of(response.getETag(), response);
+        return UploadResponse.of(request.getKey(), response.getETag(), response);
     }
 
     @NonNull
     @Override
-    @SuppressWarnings("java:S1854")
-    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
+    @SuppressWarnings("unchecked")
+    public Optional<OracleCloudStorageEntry> retrieve(@NonNull String key) {
         GetObjectRequest.Builder builder = GetObjectRequest.builder()
             .bucketName(configuration.getBucket())
             .namespaceName(configuration.getNamespace())

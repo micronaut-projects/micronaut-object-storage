@@ -19,7 +19,6 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
-import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
@@ -46,8 +45,8 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 @EachBean(AwsS3Configuration.class)
-public class AwsS3Operations
-    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
+public class AwsS3Operations implements ObjectStorageOperations<
+    PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private final S3Client s3Client;
     private final AwsS3Configuration configuration;
@@ -73,7 +72,7 @@ public class AwsS3Operations
         PutObjectRequest objectRequest = getRequestBuilder(uploadRequest).build();
         RequestBody requestBody = getRequestBody(uploadRequest);
         PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
-        return UploadResponse.of(response.eTag(), response);
+        return UploadResponse.of(uploadRequest.getKey(), response.eTag(), response);
     }
 
     @Override
@@ -84,13 +83,13 @@ public class AwsS3Operations
         requestConsumer.accept(builder);
         RequestBody requestBody = getRequestBody(request);
         PutObjectResponse response = s3Client.putObject(builder.build(), requestBody);
-        return UploadResponse.of(response.eTag(), response);
+        return UploadResponse.of(request.getKey(), response.eTag(), response);
     }
 
     @Override
     @NonNull
-    @SuppressWarnings("java:S1854")
-    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
+    @SuppressWarnings("unchecked")
+    public Optional<AwsS3ObjectStorageEntry> retrieve(@NonNull String key) {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
                 .bucket(configuration.getBucket())

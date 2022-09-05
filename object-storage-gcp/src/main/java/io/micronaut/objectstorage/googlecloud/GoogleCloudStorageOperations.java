@@ -24,7 +24,6 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
-import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
@@ -77,8 +76,8 @@ public class GoogleCloudStorageOperations
 
     @Override
     @NonNull
-    @SuppressWarnings("java:S1854")
-    public Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key) {
+    @SuppressWarnings("unchecked")
+    public Optional<GoogleCloudStorageEntry> retrieve(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
 
@@ -111,6 +110,6 @@ public class GoogleCloudStorageOperations
     @NonNull
     private UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
         Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
-        return UploadResponse.of(blob.getEtag(), blob);
+        return UploadResponse.of(uploadRequest.getKey(), blob.getEtag(), blob);
     }
 }

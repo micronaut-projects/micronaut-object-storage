@@ -27,6 +27,8 @@ public class UploadController {
             builder.acl(ObjectCannedACL.PUBLIC_READ);
         });
 
-        return HttpResponse.created(response.getNativeResponse().eTag());
+        return HttpResponse
+            .created(response.getKey())
+            .header("ETag", response.getNativeResponse().eTag());
     }
 }

@@ -81,6 +81,7 @@ class UploadControllerSpec extends Specification implements TestPropertyProvider
         then:
         response.status() == HttpStatus.CREATED
         response.body.present
+        response.header("ETag")
     }
 
 }

@@ -22,12 +22,19 @@ package io.micronaut.objectstorage.response;
  */
 public class DefaultUploadResponse<R> implements UploadResponse<R> {
 
+    private final String key;
     private final String eTag;
     private final R nativeResponse;
 
-    protected DefaultUploadResponse(String eTag, R nativeResponse) {
+    protected DefaultUploadResponse(String key, String eTag, R nativeResponse) {
+        this.key = key;
         this.eTag = eTag;
         this.nativeResponse = nativeResponse;
+    }
+
+    @Override
+    public String getKey() {
+        return key;
     }
 
     @Override

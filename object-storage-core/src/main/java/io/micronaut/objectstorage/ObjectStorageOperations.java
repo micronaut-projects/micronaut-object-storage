@@ -61,12 +61,13 @@ public interface ObjectStorageOperations<I, O, D> {
      * Gets the object from object storage.
      *
      * @param key the object path in the format {@code /foo/bar/file}
+     * @param <E> an instance of {@link ObjectStorageEntry}.
      * @return the object, or empty optional if the object does not exist
      * @throws ObjectStorageException if there was a failure retrieving the object
      */
     @Blocking
     @NonNull
-    Optional<ObjectStorageEntry<?>> retrieve(@NonNull String key);
+    <E extends ObjectStorageEntry<?>> Optional<E> retrieve(@NonNull String key);
 
     /**
      * Deletes an object from the object storage.
