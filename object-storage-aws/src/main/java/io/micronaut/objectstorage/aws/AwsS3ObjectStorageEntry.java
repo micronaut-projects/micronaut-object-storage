@@ -47,11 +47,13 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResp
         return key;
     }
 
+    @NonNull
     @Override
     public InputStream getInputStream() {
         return responseInputStream;
     }
 
+    @NonNull
     @Override
     public GetObjectResponse getNativeEntry() {
         return responseInputStream.response();

@@ -29,6 +29,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Singleton;
 
 import java.util.Optional;
@@ -46,7 +47,7 @@ import static java.lang.Boolean.TRUE;
 @EachBean(BlobContainerClient.class)
 @Singleton
 public class AzureBlobStorageOperations
-    implements ObjectStorageOperations<BlobParallelUploadOptions, Response<BlockBlobItem>, Response<Void>> {
+    implements ObjectStorageOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> {
 
     private final BlobContainerClient blobContainerClient;
 
@@ -56,14 +57,14 @@ public class AzureBlobStorageOperations
 
     @Override
     @NonNull
-    public Response<BlockBlobItem> upload(@NonNull UploadRequest request) {
+    public UploadResponse<BlockBlobItem> upload(@NonNull UploadRequest request) {
         BlobParallelUploadOptions options = getUploadOptions(request);
         return doUpload(request, options);
     }
 
     @Override
     @NonNull
-    public Response<BlockBlobItem> upload(@NonNull UploadRequest request,
+    public UploadResponse<BlockBlobItem> upload(@NonNull UploadRequest request,
                                           @NonNull Consumer<BlobParallelUploadOptions> requestConsumer) {
         BlobParallelUploadOptions options = getUploadOptions(request);
         requestConsumer.accept(options);
@@ -91,18 +92,23 @@ public class AzureBlobStorageOperations
         return blobClient.getBlockBlobClient().deleteWithResponse(null, null, null, Context.NONE);
     }
 
+    /**
+     * @param request the upload request
+     * @return An Azure's {@link BlobParallelUploadOptions} from a Micronaut's {@link UploadRequest}.
+     */
     @NonNull
     protected BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
         return new BlobParallelUploadOptions(request.getInputStream())
             .setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
     }
 
-    private Response<BlockBlobItem> doUpload(@NonNull UploadRequest request,
+    private UploadResponse<BlockBlobItem> doUpload(@NonNull UploadRequest request,
                                              @NonNull BlobParallelUploadOptions options) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
 
         //TODO: make timeout configurable
-        return blobClient.uploadWithResponse(options, null, Context.NONE);
+        Response<BlockBlobItem> response = blobClient.uploadWithResponse(options, null, Context.NONE);
+        return UploadResponse.of(response.getValue().getETag(), response.getValue());
     }
 
 }

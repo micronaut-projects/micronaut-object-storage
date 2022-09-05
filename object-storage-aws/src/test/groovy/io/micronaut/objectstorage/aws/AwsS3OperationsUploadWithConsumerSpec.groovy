@@ -61,7 +61,7 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody)
                 throws AwsServiceException, SdkClientException, S3Exception {
             this.request = putObjectRequest
-            null
+            return PutObjectResponse.builder().eTag("eTag").build()
         }
 
         @Override

@@ -18,6 +18,7 @@ package io.micronaut.objectstorage;
 import io.micronaut.core.annotation.Blocking;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -42,7 +43,7 @@ public interface ObjectStorageOperations<I, O, D> {
      */
     @Blocking
     @NonNull
-    O upload(@NonNull UploadRequest request);
+    UploadResponse<O> upload(@NonNull UploadRequest request);
 
     /**
      * Uploads an object to the object storage.
@@ -54,7 +55,7 @@ public interface ObjectStorageOperations<I, O, D> {
      */
     @Blocking
     @NonNull
-    O upload(@NonNull UploadRequest request, @NonNull Consumer<I> requestConsumer);
+    UploadResponse<O> upload(@NonNull UploadRequest request, @NonNull Consumer<I> requestConsumer);
 
     /**
      * Gets the object from object storage.

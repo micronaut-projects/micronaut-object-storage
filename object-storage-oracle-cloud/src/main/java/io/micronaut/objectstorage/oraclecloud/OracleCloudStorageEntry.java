@@ -43,11 +43,13 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry<GetObjectResp
         return key;
     }
 
+    @NonNull
     @Override
     public InputStream getInputStream() {
         return objectResponse.getInputStream();
     }
 
+    @NonNull
     @Override
     public GetObjectResponse getNativeEntry() {
         return objectResponse;

@@ -27,6 +27,7 @@ import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -61,13 +62,13 @@ public class GoogleCloudStorageOperations
 
     @Override
     @NonNull
-    public Blob upload(@NonNull UploadRequest uploadRequest) {
+    public UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest) {
         return upload(uploadRequest, createBlogInfoBuilder(uploadRequest).build());
     }
 
     @Override
     @NonNull
-    public Blob upload(@NonNull UploadRequest uploadRequest,
+    public UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest,
                        @NonNull Consumer<BlobInfo.Builder> uploadRequestBuilder) {
         BlobInfo.Builder builder = createBlogInfoBuilder(uploadRequest);
         uploadRequestBuilder.accept(builder);
@@ -108,7 +109,8 @@ public class GoogleCloudStorageOperations
     }
 
     @NonNull
-    private Blob upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
-        return storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
+    private UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
+        Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
+        return UploadResponse.of(blob.getEtag(), blob);
     }
 }

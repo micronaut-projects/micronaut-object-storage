@@ -42,11 +42,13 @@ public class GoogleCloudStorageEntry implements ObjectStorageEntry<Blob> {
         return blob.getName();
     }
 
+    @NonNull
     @Override
     public InputStream getInputStream() {
         return new ByteArrayInputStream(blob.getContent());
     }
 
+    @NonNull
     @Override
     public Blob getNativeEntry() {
         return blob;

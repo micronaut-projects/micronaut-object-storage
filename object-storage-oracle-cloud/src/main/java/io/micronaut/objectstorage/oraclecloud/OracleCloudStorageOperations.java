@@ -29,6 +29,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -59,17 +60,19 @@ public class OracleCloudStorageOperations
 
     @Override
     @NonNull
-    public PutObjectResponse upload(@NonNull UploadRequest request) {
-        return client.putObject(getRequestBuilder(request).build());
+    public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request) {
+        PutObjectResponse response = client.putObject(getRequestBuilder(request).build());
+        return UploadResponse.of(response.getETag(), response);
     }
 
     @Override
     @NonNull
-    public PutObjectResponse upload(@NonNull UploadRequest request,
+    public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request,
                                     @NonNull Consumer<PutObjectRequest.Builder> requestConsumer) {
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
-        return client.putObject(builder.build());
+        PutObjectResponse response = client.putObject(builder.build());
+        return UploadResponse.of(response.getETag(), response);
     }
 
     @NonNull

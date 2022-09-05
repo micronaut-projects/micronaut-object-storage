@@ -4,8 +4,6 @@ import io.micronaut.objectstorage.ObjectStorageEntry
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.request.UploadRequest
 import jakarta.inject.Singleton
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -13,14 +11,14 @@ import java.nio.file.StandardCopyOption
 
 //tag::beginclass[]
 @Singleton
-open class ProfileService(private val objectStorage: ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, *>) {
+open class ProfileService(private val objectStorage: ObjectStorageOperations<*, *, *>) {
 //end::beginclass[]
 
     //tag::upload[]
     open fun saveProfilePicture(userId: String?, path: Path): String? {
         val request = UploadRequest.fromPath(path, userId) // <1>
         val response = objectStorage.upload(request) // <2>
-        return response.eTag()
+        return response.eTag
     }
     //end::upload[]
 

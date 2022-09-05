@@ -4,7 +4,6 @@ import com.azure.core.http.rest.Response
 import com.azure.storage.blob.BlobContainerClient
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.models.BlockBlobItem
-import io.micronaut.core.annotation.NonNull
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
@@ -13,7 +12,7 @@ import jakarta.inject.Named
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
 
-abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpecification<Response<BlockBlobItem>> implements TestPropertyProvider {
+abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String CONTAINER_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
@@ -39,13 +38,6 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
     @Override
     ObjectStorageOperations<?, Response<BlockBlobItem>, ?> getObjectStorage() {
         return azureBlobContainer
-    }
-
-    @Override
-    @NonNull
-    String assertThatETagIsValid(Response<BlockBlobItem> blockBlobItemResponse) {
-        BlockBlobItem value = blockBlobItemResponse.getValue()
-        value.getETag()
     }
 
     @Override

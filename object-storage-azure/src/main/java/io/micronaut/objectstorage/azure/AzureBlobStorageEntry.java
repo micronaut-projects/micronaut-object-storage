@@ -44,11 +44,13 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
         return key;
     }
 
+    @NonNull
     @Override
     public InputStream getInputStream() {
         return data.toStream();
     }
 
+    @NonNull
     @Override
     public BinaryData getNativeEntry() {
         return data;

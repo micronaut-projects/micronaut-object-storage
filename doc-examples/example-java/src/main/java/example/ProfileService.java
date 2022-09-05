@@ -4,10 +4,8 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Singleton;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +19,9 @@ import java.util.Optional;
 @Singleton
 public class ProfileService {
 
-    private final ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> objectStorage;
+    private final ObjectStorageOperations<?, ?, ?> objectStorage;
 
-    public ProfileService(ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> objectStorage) {
+    public ProfileService(ObjectStorageOperations<?, ?, ?> objectStorage) {
         this.objectStorage = objectStorage;
     }
 //end::beginclass[]
@@ -32,8 +30,8 @@ public class ProfileService {
     public Optional<String> saveProfilePicture(String userId, Path path) {
         try {
             UploadRequest request = UploadRequest.fromPath(path, userId); // <1>
-            PutObjectResponse response = objectStorage.upload(request); // <2>
-            return Optional.ofNullable(response.eTag());
+            UploadResponse<?> response = objectStorage.upload(request); // <2>
+            return Optional.ofNullable(response.getETag());
         } catch (ObjectStorageException e) {
             return Optional.empty();
         }

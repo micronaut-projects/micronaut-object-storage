@@ -13,38 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage;
+package io.micronaut.objectstorage.response;
 
-import io.micronaut.core.annotation.NonNull;
-
-import java.io.InputStream;
+import io.micronaut.context.annotation.DefaultImplementation;
 
 /**
- * Object storage entry.
+ * Object storage upload response.
+ *
+ * @param <R> Cloud vendor-specific upload response
  *
  * @author Pavol Gressa
  * @since 1.0
- * @param <O> Cloud vendor-specific response object.
  */
-public interface ObjectStorageEntry<O> {
+@DefaultImplementation(DefaultUploadResponse.class)
+public interface UploadResponse<R> {
 
     /**
-     * The object path on object storage. For example {@code /path/to}
-     *
-     * @return object path or empty string if the object is placed at the root of bucket
+     * @return the entity tag of the object stored (an identifier for a specific version of the object).
      */
-    @NonNull
-    String getKey();
+    String getETag();
 
     /**
-     * @return The object content.
+     * @return Cloud vendor-specific upload response
      */
-    @NonNull
-    InputStream getInputStream();
+    R getNativeResponse();
 
-    /**
-     * @return The underlying cloud vendor-specific response object.
-     */
-    @NonNull
-    O getNativeEntry();
+    static <R> UploadResponse<R> of(String eTag, R nativeResponse) {
+        return new DefaultUploadResponse<>(eTag, nativeResponse);
+    }
+
 }

@@ -12,6 +12,7 @@ import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import spock.lang.Shared
 import spock.lang.Specification
 
 import java.nio.file.Path
@@ -29,8 +30,12 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     @Inject
     StorageReplacement storageReplacement
 
+    @Shared
+    static Blob blobMock
+
     void "consumer accept is invoked"() {
         given:
+        blobMock = Mock(Blob)
         Path path = ObjectStorageOperationsSpecification.createTempFile()
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
 
@@ -45,6 +50,10 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         [project: "micronaut-object-storage"] == storageReplacement.blobInfo.metadata
     }
 
+    static Blob blobMock() {
+        return blobMock
+    }
+
     @Requires(property = "spec.name", value = SPEC_NAME)
     @Replaces(Storage)
     @Singleton
@@ -56,7 +65,7 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         @Override
         Blob create(BlobInfo blobInfo, byte[] content, BlobTargetOption... options) {
             this.blobInfo = blobInfo
-            return null
+            return blobMock()
         }
 
     }

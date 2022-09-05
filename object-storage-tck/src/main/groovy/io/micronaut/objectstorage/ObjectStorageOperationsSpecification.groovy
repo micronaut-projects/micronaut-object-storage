@@ -15,8 +15,8 @@
  */
 package io.micronaut.objectstorage
 
-import io.micronaut.core.annotation.NonNull
 import io.micronaut.objectstorage.request.UploadRequest
+import io.micronaut.objectstorage.response.UploadResponse
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -24,7 +24,7 @@ import java.nio.file.Path
 
 import static java.nio.charset.StandardCharsets.UTF_8
 
-abstract class ObjectStorageOperationsSpecification<R> extends Specification {
+abstract class ObjectStorageOperationsSpecification extends Specification {
 
     public static final String TEXT = 'micronaut'
 
@@ -35,10 +35,10 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
 
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
-        R uploadResponse = getObjectStorage().upload(uploadRequest)
+        UploadResponse response = getObjectStorage().upload(uploadRequest)
 
         then:
-        assertThatETagIsValid(uploadResponse)
+        response.ETag
 
         when: 'get file based on path'
         Optional<ObjectStorageEntry<?>> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
@@ -70,10 +70,7 @@ abstract class ObjectStorageOperationsSpecification<R> extends Specification {
         !objectStorageEntry.isPresent()
     }
 
-    @NonNull
-    abstract String assertThatETagIsValid(R uploadResponse);
-
-    abstract ObjectStorageOperations<?, R, ?> getObjectStorage()
+    abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
 
     static Path createTempFile() {
         Path path = Files.createTempFile('test-file', '.txt')

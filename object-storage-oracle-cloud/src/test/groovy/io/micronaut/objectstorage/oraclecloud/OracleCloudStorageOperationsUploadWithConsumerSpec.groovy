@@ -58,7 +58,7 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         @Override
         PutObjectResponse putObject(PutObjectRequest request) {
             this.request = request
-            return null
+            return PutObjectResponse.builder().eTag("etag").build()
         }
 
     }

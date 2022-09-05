@@ -14,7 +14,7 @@ import jakarta.inject.Inject
 
 import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
 
-abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpecification<PutObjectResponse> implements TestPropertyProvider {
+abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
@@ -37,11 +37,6 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     @NonNull
     ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, ?> getObjectStorage() {
         return oracleCloudStorageOperations
-    }
-
-    @Override
-    String assertThatETagIsValid(PutObjectResponse putObjectResponse) {
-        putObjectResponse.getETag()
     }
 
     void setup() {

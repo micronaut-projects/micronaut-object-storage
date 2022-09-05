@@ -21,6 +21,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
@@ -68,20 +69,22 @@ public class AwsS3Operations
 
     @Override
     @NonNull
-    public PutObjectResponse upload(@NonNull UploadRequest uploadRequest) {
+    public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest uploadRequest) {
         PutObjectRequest objectRequest = getRequestBuilder(uploadRequest).build();
         RequestBody requestBody = getRequestBody(uploadRequest);
-        return s3Client.putObject(objectRequest, requestBody);
+        PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
+        return UploadResponse.of(response.eTag(), response);
     }
 
     @Override
     @NonNull
-    public PutObjectResponse upload(@NonNull UploadRequest request,
+    public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request,
                                     @NonNull Consumer<PutObjectRequest.Builder> requestConsumer) {
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
         RequestBody requestBody = getRequestBody(request);
-        return s3Client.putObject(builder.build(), requestBody);
+        PutObjectResponse response = s3Client.putObject(builder.build(), requestBody);
+        return UploadResponse.of(response.eTag(), response);
     }
 
     @Override
@@ -110,7 +113,8 @@ public class AwsS3Operations
     }
 
     /**
-     * Creates an AWS' {@link PutObjectRequest.Builder} from a Micronaut's {@link UploadRequest}
+     * @param request the upload request
+     * @return An AWS' {@link PutObjectRequest.Builder} from a Micronaut's {@link UploadRequest}.
      */
     @NonNull
     protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
@@ -124,7 +128,8 @@ public class AwsS3Operations
     }
 
     /**
-     * Creates an AWS' {@link RequestBody} from a Micronaut's {@link UploadRequest}
+     * @param uploadRequest the upload request
+     * @return An AWS' {@link RequestBody} from a Micronaut's {@link UploadRequest}.
      */
     @NonNull
     protected RequestBody getRequestBody(@NonNull UploadRequest uploadRequest) {
