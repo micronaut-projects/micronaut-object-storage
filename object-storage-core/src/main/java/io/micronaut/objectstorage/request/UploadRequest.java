@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.request;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.http.multipart.CompletedFileUpload;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -47,6 +48,11 @@ public interface UploadRequest {
                                    @NonNull String key,
                                    @NonNull String contentType) {
         return new BytesUploadRequest(bytes, key, contentType);
+    }
+
+    @NonNull
+    static UploadRequest fromCompletedFileUpload(CompletedFileUpload completedFileUpload) {
+        return new CompletedFileUploadRequest(completedFileUpload);
     }
 
     /**

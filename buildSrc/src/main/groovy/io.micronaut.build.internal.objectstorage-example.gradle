@@ -17,7 +17,12 @@ micronaut {
 }
 
 dependencies {
+    annotationProcessor(mn.micronaut.http.validation)
+
+    implementation(mn.micronaut.http.client)
     implementation(projects.objectStorageAws)
+
+    runtimeOnly(mn.logback)
 
     testImplementation(projects.objectStorageTck)
     testImplementation(libs.testcontainers.spock)
