@@ -32,7 +32,7 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry<GetObjectResp
     private final GetObjectResponse objectResponse;
     private final String key;
 
-    OracleCloudStorageEntry(String key, GetObjectResponse objectResponse) {
+    public OracleCloudStorageEntry(String key, GetObjectResponse objectResponse) {
         this.objectResponse = objectResponse;
         this.key = key;
     }

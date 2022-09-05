@@ -35,7 +35,7 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResp
     @NonNull
     private final String key;
 
-    AwsS3ObjectStorageEntry(@NonNull String key,
+    public AwsS3ObjectStorageEntry(@NonNull String key,
                             ResponseInputStream<GetObjectResponse> responseInputStream) {
         this.responseInputStream = responseInputStream;
         this.key = key;
