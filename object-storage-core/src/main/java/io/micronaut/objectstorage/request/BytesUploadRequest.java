@@ -25,6 +25,9 @@ import java.util.Optional;
 
 /**
  * Upload request implementation using byte array.
+ *
+ * @author Burt Beckwith
+ * @since 1.0
  */
 public class BytesUploadRequest implements UploadRequest {
 

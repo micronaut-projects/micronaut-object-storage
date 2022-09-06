@@ -20,10 +20,12 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageException;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
+import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
@@ -62,14 +64,14 @@ public class GoogleCloudStorageOperations
     @Override
     @NonNull
     public UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest) {
-        return upload(uploadRequest, createBlogInfoBuilder(uploadRequest).build());
+        return upload(uploadRequest, createBlobInfoBuilder(uploadRequest).build());
     }
 
     @Override
     @NonNull
     public UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest,
                        @NonNull Consumer<BlobInfo.Builder> uploadRequestBuilder) {
-        BlobInfo.Builder builder = createBlogInfoBuilder(uploadRequest);
+        BlobInfo.Builder builder = createBlobInfoBuilder(uploadRequest);
         uploadRequestBuilder.accept(builder);
         return upload(uploadRequest, builder.build());
     }
@@ -78,21 +80,30 @@ public class GoogleCloudStorageOperations
     @NonNull
     @SuppressWarnings("unchecked")
     public Optional<GoogleCloudStorageEntry> retrieve(@NonNull String key) {
-        BlobId blobId = BlobId.of(configuration.getBucket(), key);
-        Blob blob = storage.get(blobId);
-
         GoogleCloudStorageEntry storageEntry = null;
-        if (blob != null && blob.exists()) {
-            storageEntry = new GoogleCloudStorageEntry(blob);
+        BlobId blobId = BlobId.of(configuration.getBucket(), key);
+
+        try {
+            Blob blob = storage.get(blobId);
+
+            if (blob != null && blob.exists()) {
+                storageEntry = new GoogleCloudStorageEntry(blob);
+            }
+            return Optional.ofNullable(storageEntry);
+        } catch (StorageException e) {
+            throw new ObjectStorageException("Error when trying to retrieve an object from Google Cloud Storage", e);
         }
-        return Optional.ofNullable(storageEntry);
     }
 
     @Override
     @NonNull
     public Boolean delete(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
-        return storage.delete(blobId);
+        try {
+            return storage.delete(blobId);
+        } catch (StorageException e) {
+            throw new ObjectStorageException("Error when trying to delete an object from Google Cloud Storage", e);
+        }
     }
 
     /**
@@ -101,7 +112,7 @@ public class GoogleCloudStorageOperations
      * @return BlobInfo Builder
      */
     @NonNull
-    protected BlobInfo.Builder createBlogInfoBuilder(@NonNull UploadRequest uploadRequest) {
+    protected BlobInfo.Builder createBlobInfoBuilder(@NonNull UploadRequest uploadRequest) {
         BlobId blobId = BlobId.of(configuration.getBucket(), uploadRequest.getKey());
         return BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null));
@@ -109,7 +120,11 @@ public class GoogleCloudStorageOperations
 
     @NonNull
     private UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
-        Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
-        return UploadResponse.of(uploadRequest.getKey(), blob.getEtag(), blob);
+        try {
+            Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
+            return UploadResponse.of(uploadRequest.getKey(), blob.getEtag(), blob);
+        } catch (StorageException e) {
+            throw new ObjectStorageException("Error when trying to upload an object to Google Cloud Storage", e);
+        }
     }
 }

@@ -26,9 +26,12 @@ import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -42,6 +45,8 @@ import java.util.function.Consumer;
 @EachBean(OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations
     implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OracleCloudStorageOperations.class);
 
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
@@ -60,8 +65,12 @@ public class OracleCloudStorageOperations
     @Override
     @NonNull
     public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request) {
-        PutObjectResponse response = client.putObject(getRequestBuilder(request).build());
-        return UploadResponse.of(request.getKey(), response.getETag(), response);
+        try {
+            PutObjectResponse response = client.putObject(getRequestBuilder(request).build());
+            return UploadResponse.of(request.getKey(), response.getETag(), response);
+        } catch (BmcException e) {
+            throw new ObjectStorageException("Error when trying to upload an object to Oracle Cloud Storage", e);
+        }
     }
 
     @Override
@@ -70,8 +79,12 @@ public class OracleCloudStorageOperations
                                     @NonNull Consumer<PutObjectRequest.Builder> requestConsumer) {
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
-        PutObjectResponse response = client.putObject(builder.build());
-        return UploadResponse.of(request.getKey(), response.getETag(), response);
+        try {
+            PutObjectResponse response = client.putObject(builder.build());
+            return UploadResponse.of(request.getKey(), response.getETag(), response);
+        } catch (BmcException e) {
+            throw new ObjectStorageException("Error when trying to upload an object to Oracle Cloud Storage", e);
+        }
     }
 
     @NonNull
@@ -88,6 +101,9 @@ public class OracleCloudStorageOperations
             OracleCloudStorageEntry storageEntry = new OracleCloudStorageEntry(key, objectResponse);
             return Optional.of(storageEntry);
         } catch (BmcException e) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Error when trying to retrieve an object from Oracle Cloud Storage: {}", e.getMessage(), e);
+            }
             return Optional.empty();
         }
     }
@@ -95,11 +111,15 @@ public class OracleCloudStorageOperations
     @Override
     @NonNull
     public DeleteObjectResponse delete(@NonNull String key) {
-        return client.deleteObject(DeleteObjectRequest.builder()
-            .bucketName(configuration.getBucket())
-            .namespaceName(configuration.getNamespace())
-            .objectName(key)
-            .build());
+        try {
+            return client.deleteObject(DeleteObjectRequest.builder()
+                .bucketName(configuration.getBucket())
+                .namespaceName(configuration.getNamespace())
+                .objectName(key)
+                .build());
+        } catch (BmcException e) {
+            throw new ObjectStorageException("Error when trying to delete an object from Oracle Cloud Storage", e);
+        }
     }
 
     /**
