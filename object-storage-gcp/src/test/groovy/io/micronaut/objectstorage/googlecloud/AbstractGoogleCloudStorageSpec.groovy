@@ -1,5 +1,7 @@
 package io.micronaut.objectstorage.googlecloud
 
+import com.google.cloud.storage.Blob
+import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.BucketInfo
 import com.google.cloud.storage.Storage
 import io.micronaut.objectstorage.ObjectStorageOperations
@@ -25,7 +27,7 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
         [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.bucket'): BUCKET_NAME]
     }
 
-    ObjectStorageOperations getObjectStorage() {
+    ObjectStorageOperations<BlobInfo.Builder, Blob, ?> getObjectStorage() {
         return cloudObjectStorage
     }
 

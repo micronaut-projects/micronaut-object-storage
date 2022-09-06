@@ -21,8 +21,6 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
 
     public static final String SPEC_NAME = 'OracleCloudStorageOciEmulatorSpec'
 
-    boolean supportsEtag = false
-
     @Shared
     @AutoCleanup
     GenericContainer ociEmulator = new GenericContainer(DockerImageName.parse('cameritelabs/oci-emulator'))

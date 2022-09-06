@@ -1,7 +1,9 @@
 package io.micronaut.objectstorage.azure
 
+import com.azure.core.http.rest.Response
 import com.azure.storage.blob.BlobContainerClient
 import com.azure.storage.blob.BlobServiceClient
+import com.azure.storage.blob.models.BlockBlobItem
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
@@ -34,7 +36,7 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
     }
 
     @Override
-    ObjectStorageOperations getObjectStorage() {
+    ObjectStorageOperations<?, Response<BlockBlobItem>, ?> getObjectStorage() {
         return azureBlobContainer
     }
 

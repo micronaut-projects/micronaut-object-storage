@@ -19,15 +19,16 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.UploadRequest;
-import io.micronaut.objectstorage.UploadResponse;
+import io.micronaut.objectstorage.response.UploadResponse;
+import io.micronaut.objectstorage.request.BytesUploadRequest;
+import io.micronaut.objectstorage.request.FileUploadRequest;
+import io.micronaut.objectstorage.request.UploadRequest;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -35,6 +36,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -43,7 +45,8 @@ import java.util.Optional;
  * @since 1.0
  */
 @EachBean(AwsS3Configuration.class)
-public class AwsS3Operations implements ObjectStorageOperations {
+public class AwsS3Operations implements ObjectStorageOperations<
+    PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private final S3Client s3Client;
     private final AwsS3Configuration configuration;
@@ -64,13 +67,29 @@ public class AwsS3Operations implements ObjectStorageOperations {
     }
 
     @Override
-    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        PutObjectResponse putObjectResponse = put(putRequest(uploadRequest).build(), uploadRequest);
-        return new UploadResponse.Builder().withETag(putObjectResponse.eTag()).build();
+    @NonNull
+    public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest uploadRequest) {
+        PutObjectRequest objectRequest = getRequestBuilder(uploadRequest).build();
+        RequestBody requestBody = getRequestBody(uploadRequest);
+        PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
+        return UploadResponse.of(uploadRequest.getKey(), response.eTag(), response);
     }
 
     @Override
-    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
+    @NonNull
+    public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request,
+                                    @NonNull Consumer<PutObjectRequest.Builder> requestConsumer) {
+        PutObjectRequest.Builder builder = getRequestBuilder(request);
+        requestConsumer.accept(builder);
+        RequestBody requestBody = getRequestBody(request);
+        PutObjectResponse response = s3Client.putObject(builder.build(), requestBody);
+        return UploadResponse.of(request.getKey(), response.eTag(), response);
+    }
+
+    @Override
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public Optional<AwsS3ObjectStorageEntry> retrieve(@NonNull String key) {
         try {
             ResponseInputStream<GetObjectResponse> responseInputStream = s3Client.getObject(GetObjectRequest.builder()
                 .bucket(configuration.getBucket())
@@ -84,43 +103,44 @@ public class AwsS3Operations implements ObjectStorageOperations {
     }
 
     @Override
-    public void delete(String key) throws ObjectStorageException {
-        s3Client.deleteObject(DeleteObjectRequest.builder()
+    @NonNull
+    public DeleteObjectResponse delete(@NonNull String key) {
+        return s3Client.deleteObject(DeleteObjectRequest.builder()
             .bucket(configuration.getBucket())
             .key(key)
             .build());
     }
 
     /**
-     *
-     * @param uploadRequest Upload Request
-     * @return The PUT Object Request Builder
+     * @param request the upload request
+     * @return An AWS' {@link PutObjectRequest.Builder} from a Micronaut's {@link UploadRequest}.
      */
     @NonNull
-    protected PutObjectRequest.Builder putRequest(@NonNull UploadRequest uploadRequest) {
+    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
             .bucket(configuration.getBucket())
-            .key(uploadRequest.getKey());
+            .key(request.getKey());
 
-        uploadRequest.getContentType().ifPresent(builder::contentType);
-        uploadRequest.getContentSize().ifPresent(builder::contentLength);
+        request.getContentType().ifPresent(builder::contentType);
+        request.getContentSize().ifPresent(builder::contentLength);
         return builder;
     }
 
     /**
-     *
-     * @param putObjectRequest The PUT Object Request
      * @param uploadRequest the upload request
-     * @return The PUT Object Response
+     * @return An AWS' {@link RequestBody} from a Micronaut's {@link UploadRequest}.
      */
     @NonNull
-    protected PutObjectResponse put(@NonNull PutObjectRequest putObjectRequest,
-                                    @NonNull UploadRequest uploadRequest) {
-        if (uploadRequest instanceof UploadRequest.FileUploadRequest) {
-            UploadRequest.FileUploadRequest fileUploadRequest = (UploadRequest.FileUploadRequest) uploadRequest;
-            return s3Client.putObject(putObjectRequest, fileUploadRequest.getFile().toPath());
+    protected RequestBody getRequestBody(@NonNull UploadRequest uploadRequest) {
+        if (uploadRequest instanceof FileUploadRequest) {
+            FileUploadRequest request = (FileUploadRequest) uploadRequest;
+            return RequestBody.fromFile(request.getFile());
+        } else if (uploadRequest instanceof BytesUploadRequest) {
+            BytesUploadRequest request = (BytesUploadRequest) uploadRequest;
+            return RequestBody.fromBytes(request.getBytes());
+        } else {
+            byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
+            return RequestBody.fromBytes(inputBytes);
         }
-        byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
-        return s3Client.putObject(putObjectRequest, RequestBody.fromBytes(inputBytes));
     }
 }

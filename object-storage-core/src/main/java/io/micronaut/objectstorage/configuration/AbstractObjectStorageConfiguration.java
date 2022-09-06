@@ -13,18 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage;
+package io.micronaut.objectstorage.configuration;
 
-import io.micronaut.core.naming.Named;
+import io.micronaut.core.annotation.NonNull;
 
 /**
- * Common properties for the object storage configuration.
+ * Base class for all the cloud-specific configurations.
  *
  * @author Pavol Gressa
  * @since 1.0
  */
-public interface ObjectStorageConfiguration extends Named {
+public abstract class AbstractObjectStorageConfiguration implements ObjectStorageConfiguration {
 
-    String PREFIX = "micronaut.object-storage";
+    @NonNull
+    private String name;
 
+    protected AbstractObjectStorageConfiguration(@NonNull String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return The name of this object storage configuration.
+     */
+    @Override
+    @NonNull
+    public String getName() {
+        return name;
+    }
 }

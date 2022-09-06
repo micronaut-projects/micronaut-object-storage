@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,46 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.azure;
-
-import com.azure.core.util.BinaryData;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-
-import java.io.InputStream;
+package io.micronaut.objectstorage.response;
 
 /**
- * An {@link ObjectStorageEntry} implementation for Azure Blob Storage.
+ * Default implementation of {@link UploadResponse}.
  *
- * @author Pavol Gressa
- * @since 1.0
+ * @param <R> Cloud vendor-specific upload response
  */
-public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
+public class DefaultUploadResponse<R> implements UploadResponse<R> {
 
     private final String key;
+    private final String eTag;
+    private final R nativeResponse;
 
-    private final BinaryData data;
-
-    public AzureBlobStorageEntry(String key, BinaryData data) {
+    protected DefaultUploadResponse(String key, String eTag, R nativeResponse) {
         this.key = key;
-        this.data = data;
+        this.eTag = eTag;
+        this.nativeResponse = nativeResponse;
     }
 
     @Override
-    @NonNull
     public String getKey() {
         return key;
     }
 
-    @NonNull
     @Override
-    public InputStream getInputStream() {
-        return data.toStream();
+    public String getETag() {
+        return eTag;
     }
 
-    @NonNull
     @Override
-    public BinaryData getNativeEntry() {
-        return data;
+    public R getNativeResponse() {
+        return nativeResponse;
     }
 }

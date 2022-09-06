@@ -28,14 +28,14 @@ import java.io.InputStream;
  * @author Pavol Gressa
  * @since 1.0
  */
-public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
+public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResponse> {
 
     private final ResponseInputStream<GetObjectResponse> responseInputStream;
 
     @NonNull
     private final String key;
 
-    AwsS3ObjectStorageEntry(@NonNull String key,
+    public AwsS3ObjectStorageEntry(@NonNull String key,
                             ResponseInputStream<GetObjectResponse> responseInputStream) {
         this.responseInputStream = responseInputStream;
         this.key = key;
@@ -47,8 +47,15 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry {
         return key;
     }
 
+    @NonNull
     @Override
     public InputStream getInputStream() {
         return responseInputStream;
+    }
+
+    @NonNull
+    @Override
+    public GetObjectResponse getNativeEntry() {
+        return responseInputStream.response();
     }
 }

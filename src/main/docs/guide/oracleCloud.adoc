@@ -16,3 +16,5 @@ For example:
 ----
 include::doc-examples/example-java/src/test/resources/application-oraclecloud.yml[]
 ----
+
+The concrete implementation of `ObjectStorageOperations` is api:objectstorage.oraclecloud.OracleCloudStorageOperations[]

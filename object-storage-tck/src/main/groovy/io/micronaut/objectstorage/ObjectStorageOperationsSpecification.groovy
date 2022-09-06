@@ -15,6 +15,8 @@
  */
 package io.micronaut.objectstorage
 
+import io.micronaut.objectstorage.request.UploadRequest
+import io.micronaut.objectstorage.response.UploadResponse
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -24,30 +26,27 @@ import static java.nio.charset.StandardCharsets.UTF_8
 
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
-    boolean supportsEtag = true
+    public static final String TEXT = 'micronaut'
 
     void 'it can upload, get and delete object from file'() {
         given:
-        Path tempFilePath = Files.createTempFile('test-file', 'txt')
-        String tempFileName = tempFilePath.getFileName().toString()
-        tempFilePath.toFile().text = 'micronaut'
+        Path path = createTempFile()
+        String tempFileName = path.getFileName().toString()
 
         when: 'put file to object storage'
-        UploadRequest uploadRequest = UploadRequest.fromPath(tempFilePath)
-        UploadResponse uploadResponse = getObjectStorage().upload(uploadRequest)
+        UploadRequest uploadRequest = UploadRequest.fromPath(path)
+        UploadResponse response = getObjectStorage().upload(uploadRequest)
 
         then:
-        uploadResponse
-        if (supportsEtag) {
-            assert uploadResponse.ETag
-        }
+        response.ETag
 
         when: 'get file based on path'
-        Optional<ObjectStorageEntry> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
+        Optional<ObjectStorageEntry<?>> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
 
         then:
         objectStorageEntry.isPresent()
         objectStorageEntry.get().key == tempFileName
+        objectStorageEntry.get().nativeEntry
 
         when: 'the file has same content'
         String text = new BufferedReader(
@@ -56,7 +55,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         then:
         text
-        text == 'micronaut'
+        text == TEXT
 
         when: 'delete the file on object storage'
         getObjectStorage().delete(tempFileName)
@@ -71,5 +70,11 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         !objectStorageEntry.isPresent()
     }
 
-    abstract ObjectStorageOperations getObjectStorage()
+    abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
+
+    static Path createTempFile() {
+        Path path = Files.createTempFile('test-file', '.txt')
+        path.toFile().text = TEXT
+        return path
+    }
 }

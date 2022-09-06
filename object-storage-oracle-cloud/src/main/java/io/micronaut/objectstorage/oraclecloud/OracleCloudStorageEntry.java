@@ -27,12 +27,12 @@ import java.io.InputStream;
  * @author Pavol Gressa
  * @since 1.0
  */
-public class OracleCloudStorageEntry implements ObjectStorageEntry {
+public class OracleCloudStorageEntry implements ObjectStorageEntry<GetObjectResponse> {
 
     private final GetObjectResponse objectResponse;
     private final String key;
 
-    OracleCloudStorageEntry(String key, GetObjectResponse objectResponse) {
+    public OracleCloudStorageEntry(String key, GetObjectResponse objectResponse) {
         this.objectResponse = objectResponse;
         this.key = key;
     }
@@ -43,8 +43,15 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry {
         return key;
     }
 
+    @NonNull
     @Override
     public InputStream getInputStream() {
         return objectResponse.getInputStream();
+    }
+
+    @NonNull
+    @Override
+    public GetObjectResponse getNativeEntry() {
+        return objectResponse;
     }
 }

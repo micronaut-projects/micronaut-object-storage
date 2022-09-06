@@ -22,14 +22,14 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
-import io.micronaut.objectstorage.ObjectStorageEntry;
-import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.UploadRequest;
-import io.micronaut.objectstorage.UploadResponse;
+import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Google Cloud implementation of {@link ObjectStorageOperations}.
@@ -38,11 +38,12 @@ import java.util.Optional;
  * @since 1.0
  */
 @EachBean(GoogleCloudStorageConfiguration.class)
-public class GoogleCloudStorageOperations implements ObjectStorageOperations {
+public class GoogleCloudStorageOperations
+    implements ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> {
 
-    private final GoogleCloudStorageConfiguration configuration;
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
+    private final GoogleCloudStorageConfiguration configuration;
 
     /**
      * Constructor.
@@ -53,24 +54,30 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
                                         InputStreamMapper inputStreamMapper,
                                         Storage storage) {
-        this.configuration = configuration;
         this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
+        this.configuration = configuration;
     }
 
     @Override
-    public UploadResponse upload(UploadRequest uploadRequest) throws ObjectStorageException {
-        BlobId blobId = BlobId.of(configuration.getBucket(), uploadRequest.getKey());
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-            .setContentType(uploadRequest.getContentType().orElse(null))
-            .build();
-
-        Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
-        return new UploadResponse.Builder().withETag(blob.getEtag()).build();
+    @NonNull
+    public UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest) {
+        return upload(uploadRequest, createBlogInfoBuilder(uploadRequest).build());
     }
 
     @Override
-    public Optional<ObjectStorageEntry> retrieve(String key) throws ObjectStorageException {
+    @NonNull
+    public UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest,
+                       @NonNull Consumer<BlobInfo.Builder> uploadRequestBuilder) {
+        BlobInfo.Builder builder = createBlogInfoBuilder(uploadRequest);
+        uploadRequestBuilder.accept(builder);
+        return upload(uploadRequest, builder.build());
+    }
+
+    @Override
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public Optional<GoogleCloudStorageEntry> retrieve(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
 
@@ -82,8 +89,27 @@ public class GoogleCloudStorageOperations implements ObjectStorageOperations {
     }
 
     @Override
-    public void delete(String key) throws ObjectStorageException {
+    @NonNull
+    public Boolean delete(@NonNull String key) {
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
-        storage.delete(blobId);
+        return storage.delete(blobId);
+    }
+
+    /**
+     *
+     * @param uploadRequest Upload Request
+     * @return BlobInfo Builder
+     */
+    @NonNull
+    protected BlobInfo.Builder createBlogInfoBuilder(@NonNull UploadRequest uploadRequest) {
+        BlobId blobId = BlobId.of(configuration.getBucket(), uploadRequest.getKey());
+        return BlobInfo.newBuilder(blobId)
+            .setContentType(uploadRequest.getContentType().orElse(null));
+    }
+
+    @NonNull
+    private UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
+        Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
+        return UploadResponse.of(uploadRequest.getKey(), blob.getEtag(), blob);
     }
 }

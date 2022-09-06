@@ -1,6 +1,13 @@
 package example
 
+
 import io.micronaut.context.env.Environment
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.MediaType
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.multipart.MultipartBody
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.aws.AwsS3Operations
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
@@ -11,7 +18,6 @@ import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
-import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
@@ -19,12 +25,10 @@ import spock.lang.Specification
 import java.nio.file.Path
 
 @MicronautTest(environments = Environment.AMAZON_EC2)
-class ProfileServiceSpec extends Specification implements TestPropertyProvider {
+class UploadControllerSpec extends Specification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = "profile-pictures-bucket"
-
     public static final String OBJECT_STORAGE_NAME = "default"
-    public static final String USER_ID = "user123"
 
     @Shared
     @AutoCleanup
@@ -39,7 +43,8 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
     S3Client s3
 
     @Inject
-    ProfileService service
+    @Client('/')
+    HttpClient client
 
     @Override
     Map<String, String> getProperties() {
@@ -57,35 +62,26 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
         s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
     }
 
-    void cleanup() {
-        s3.deleteBucket(DeleteBucketRequest.builder().bucket(BUCKET_NAME).build() as DeleteBucketRequest)
-    }
-
     void "it works"() {
         given:
         Path path = ObjectStorageOperationsSpecification.createTempFile()
-        String fileName = path.toFile().name
+        File file = path.toFile()
+        MultipartBody requestBody = MultipartBody
+                .builder()
+                .addPart("fileUpload", file.name, MediaType.TEXT_PLAIN_TYPE, file)
+                .build()
+        HttpRequest request = HttpRequest
+                .POST("/", requestBody)
+                .contentType(MediaType.MULTIPART_FORM_DATA_TYPE)
 
-        expect:
-        !service.retrieveProfilePicture(USER_ID, fileName)
-
-        when:
-        def saveResult = service.saveProfilePicture(USER_ID, path)
-
-        then:
-        saveResult
-
-        when:
-        def retrieveResult = service.retrieveProfilePicture(USER_ID, fileName)
-
-        then:
-        retrieveResult.toFile().text == "micronaut"
 
         when:
-        service.deleteProfilePicture(USER_ID, fileName)
+        def response = client.toBlocking().exchange(request, String)
 
         then:
-        !service.retrieveProfilePicture(USER_ID, fileName)
+        response.status() == HttpStatus.CREATED
+        response.body.present
+        response.header("ETag")
     }
 
 }

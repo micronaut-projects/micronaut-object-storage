@@ -4,6 +4,9 @@ import com.oracle.bmc.objectstorage.ObjectStorage
 import com.oracle.bmc.objectstorage.model.CreateBucketDetails
 import com.oracle.bmc.objectstorage.requests.CreateBucketRequest
 import com.oracle.bmc.objectstorage.requests.DeleteBucketRequest
+import com.oracle.bmc.objectstorage.requests.PutObjectRequest
+import com.oracle.bmc.objectstorage.responses.PutObjectResponse
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
@@ -31,7 +34,8 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     @Override
-    ObjectStorageOperations getObjectStorage() {
+    @NonNull
+    ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, ?> getObjectStorage() {
         return oracleCloudStorageOperations
     }
 

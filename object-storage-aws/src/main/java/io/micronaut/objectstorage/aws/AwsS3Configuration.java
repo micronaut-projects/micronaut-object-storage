@@ -19,8 +19,8 @@ import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.AbstractObjectStorageConfiguration;
-import io.micronaut.objectstorage.ObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 
 import javax.validation.constraints.Pattern;
 
@@ -55,8 +55,8 @@ public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
     private String bucket;
 
     /**
-     * Constructor.
-     * @param name Bean Qualifier name.
+     *
+     * @param name Bean Qualifier name
      */
     public AwsS3Configuration(@Parameter String name) {
         super(name);
