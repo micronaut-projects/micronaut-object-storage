@@ -193,16 +193,19 @@ provider documentation for more details:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Then, you can inject in your controllers/services/etc. a bean of type <a href="../api/io/micronaut/objectstorage/ObjectStorageOperations.html">ObjectStorageOperations</a>:</p>
+<p>Then, you can inject in your controllers/services/etc. a bean of type <a href="../api/io/micronaut/objectstorage/ObjectStorageOperations.html">ObjectStorageOperations</a>, the
+parent interface that allows you to use the API in a generic way for all cloud providers:</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
 public class ProfileService {
 
-    private final ObjectStorageOperations objectStorage;
+    private static final Logger LOG = LoggerFactory.getLogger(ProfileService.class);
 
-    public ProfileService(ObjectStorageOperations objectStorage) {
+    private final ObjectStorageOperations&lt;?, ?, ?&gt; objectStorage;
+
+    public ProfileService(ObjectStorageOperations&lt;?, ?, ?&gt; objectStorage) {
         this.objectStorage = objectStorage;
     }
 
@@ -214,8 +217,11 @@ public class ProfileService {
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Singleton
 class ProfileService {
 
-    @Inject
-    ObjectStorageOperations objectStorage
+    final ObjectStorageOperations&lt;?, ?, ?&gt; objectStorage
+
+    ProfileService(ObjectStorageOperations&lt;?, ?, ?&gt; objectStorage) {
+        this.objectStorage = objectStorage
+    }
 
 }</code></pre>
 </div>
@@ -223,7 +229,47 @@ class ProfileService {
 <div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
-open class ProfileService(private val objectStorage: ObjectStorageOperations) {
+open class ProfileService(private val objectStorage: ObjectStorageOperations&lt;*, *, *&gt;) {
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If your application is not multi-cloud, and/or you need cloud-specific details, you can use a concrete implementation.
+For example, for AWS S3:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Controller
+public class UploadController {
+
+    private final AwsS3Operations objectStorage;
+
+    public UploadController(AwsS3Operations objectStorage) {
+        this.objectStorage = objectStorage;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Controller
+class UploadController {
+
+    final AwsS3Operations objectStorage
+
+    UploadController(AwsS3Operations objectStorage) {
+        this.objectStorage = objectStorage
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Controller
+open class UploadController(private val objectStorage: AwsS3Operations) {
 
 }</code></pre>
 </div>
@@ -248,43 +294,35 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 </div>
 </div>
 <div class="paragraph">
-<p>You need to use <code>@Named("pictures")</code> or <code>@Named("logos")</code> to specify which of the object storages you want to use.</p>
+<p>You then need to use <code>@Named("pictures")</code> or <code>@Named("logos")</code> to specify which of the object storages you want to use.</p>
 </div>
 <div class="sect1">
 <h2 id="_uploading_files">Uploading files</h2>
 <div class="sectionbody">
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public Optional&lt;String&gt; saveProfilePicture(String userId, Path path) {
-    try {
-        UploadRequest request = UploadRequest.fromPath(path, userId); // <b class="conum">(1)</b>
-        UploadResponse response = objectStorage.upload(request); // <b class="conum">(2)</b>
-        return Optional.ofNullable(response.getETag());
-    } catch (ObjectStorageException e) {
-        return Optional.empty();
-    }
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public String saveProfilePicture(String userId, Path path) {
+    UploadRequest request = UploadRequest.fromPath(path, userId); // <b class="conum">(1)</b>
+    UploadResponse&lt;?&gt; response = objectStorage.upload(request); // <b class="conum">(2)</b>
+    return response.getKey(); // <b class="conum">(3)</b>
 }</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">Optional&lt;String&gt; saveProfilePicture(String userId, Path path) {
-    try {
-        UploadRequest request = UploadRequest.fromPath(path, userId) // <b class="conum">(1)</b>
-        UploadResponse response = objectStorage.upload(request) // <b class="conum">(2)</b>
-        Optional.ofNullable(response.getETag())
-    } catch (ObjectStorageException e) {
-        return Optional.empty()
-    }
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">String saveProfilePicture(String userId, Path path) {
+    UploadRequest request = UploadRequest.fromPath(path, userId) // <b class="conum">(1)</b>
+    UploadResponse response = objectStorage.upload(request) // <b class="conum">(2)</b>
+    response.key // <b class="conum">(3)</b>
 }</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun saveProfilePicture(userId: String?, path: Path?): String? {
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun saveProfilePicture(userId: String, path: Path): String? {
     val request = UploadRequest.fromPath(path, userId) // <b class="conum">(1)</b>
     val response = objectStorage.upload(request) // <b class="conum">(2)</b>
-    return response.eTag
+    return response.key // <b class="conum">(3)</b>
 }</code></pre>
 </div>
 </div>
@@ -292,13 +330,48 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>You can use any of the <a href="../api/io/micronaut/objectstorage/UploadRequest.html">UploadRequest</a> static methods to build an upload request.</td>
+<td>You can use any of the <a href="../api/io/micronaut/objectstorage/request/UploadRequest.html">UploadRequest</a> static methods to build an upload request.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The upload operation returns an <a href="../api/io/micronaut/objectstorage/UploadResponse.html">UploadResponse</a>.</td>
+<td>The upload operation returns an <a href="../api/io/micronaut/objectstorage/response/UploadResponse.html">UploadResponse</a>, which wraps the cloud-specific SDK response
+object.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The response object contains some common properties for all cloud vendor, and a <code>getNativeResponse()</code> method that can
+be used for accessing the vendor-specific response object.</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>In case you want to have better control of the upload options used, you can use the method
+<code>upload(UploadRequest, Consumer)</code> of <a href="../api/io/micronaut/objectstorage/ObjectStorageOperations.html">ObjectStorageOperations</a>, which will give you access to the
+cloud vendor-specific request class or builder.</p>
+</div>
+<div class="paragraph">
+<p>For example, for AWS S3:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">UploadResponse&lt;PutObjectResponse&gt; response = objectStorage.upload(objectStorageUpload, builder -&gt; {
+    builder.acl(ObjectCannedACL.PUBLIC_READ);
+});</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">UploadResponse&lt;PutObjectResponse&gt; response = objectStorage.upload(objectStorageUpload, { builder -&gt;
+    builder.acl(ObjectCannedACL.PUBLIC_READ)
+})</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">val response = objectStorage.upload(objectStorageUpload) { builder: PutObjectRequest.Builder -&gt;
+    builder.acl(ObjectCannedACL.PUBLIC_READ)
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -308,18 +381,20 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public Optional&lt;Path&gt; retrieveProfilePicture(String userId, String fileName) {
+    Path destination = null;
     try {
         String key = userId + "/" + fileName;
         Optional&lt;InputStream&gt; stream = objectStorage.retrieve(key) // <b class="conum">(1)</b>
             .map(ObjectStorageEntry::getInputStream);
         if (stream.isPresent()) {
-            Path destination = File.createTempFile(userId, "temp").toPath();
+            destination = File.createTempFile(userId, "temp").toPath();
             Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING);
             return Optional.of(destination);
         } else {
             return Optional.empty();
         }
-    } catch (ObjectStorageException | IOException e) {
+    } catch (IOException e) {
+        LOG.error("Error while trying to save profile picture to the local file [{}]: {}", destination, e.getMessage());
         return Optional.empty();
     }
 }</code></pre>
@@ -328,18 +403,14 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">Optional&lt;Path&gt; retrieveProfilePicture(String userId, String fileName) {
-    try {
-        String key = "${userId}/${fileName}"
-        Optional&lt;InputStream&gt; stream = objectStorage.retrieve(key) // <b class="conum">(1)</b>
-                .map(ObjectStorageEntry::getInputStream)
-        if (stream.isPresent()) {
-            Path destination = File.createTempFile(userId, "temp").toPath()
-            Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING)
-            return Optional.of(destination)
-        } else {
-            return Optional.empty()
-        }
-    } catch (ObjectStorageException | IOException e) {
+    String key = "${userId}/${fileName}"
+    Optional&lt;InputStream&gt; stream = objectStorage.retrieve(key) // <b class="conum">(1)</b>
+            .map(ObjectStorageEntry::getInputStream)
+    if (stream.isPresent()) {
+        Path destination = File.createTempFile(userId, "temp").toPath()
+        Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING)
+        return Optional.of(destination)
+    } else {
         return Optional.empty()
     }
 }</code></pre>
@@ -349,8 +420,8 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun retrieveProfilePicture(userId: String, fileName: String): Path? {
     val key = "$userId/$fileName"
-    val stream = objectStorage.retrieve(key) // <b class="conum">(1)</b>
-        .map { obj: ObjectStorageEntry -&gt; obj.inputStream }
+    val stream = objectStorage.retrieve&lt;ObjectStorageEntry&lt;*&gt;&gt;(key) // <b class="conum">(1)</b>
+        .map { obj: ObjectStorageEntry&lt;*&gt; -&gt; obj.inputStream }
 
     return if (stream.isPresent) {
         val destination = File.createTempFile(userId, "temp").toPath()
@@ -366,7 +437,8 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The retrieve operation returns an <a href="../api/io/micronaut/objectstorage/ObjectStorageEntry.html">ObjectStorageEntry</a>, from which you can get an <code>InputStream</code>.</td>
+<td>The retrieve operation returns an <a href="../api/io/micronaut/objectstorage/ObjectStorageEntry.html">ObjectStorageEntry</a>, from which you can get an <code>InputStream</code>.
+There is also a <code>getNativeEntry()</code> method that gives you access to the cloud vendor-specific response object.</td>
 </tr>
 </table>
 </div>
@@ -379,7 +451,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public void deleteProfilePicture(String userId, String fileName) {
     String key = userId + "/" + fileName;
-    objectStorage.delete(key);
+    objectStorage.delete(key); // <b class="conum">(1)</b>
 }</code></pre>
 </div>
 </div>
@@ -387,7 +459,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">void deleteProfilePicture(String userId, String fileName) {
     String key = "${userId}/${fileName}"
-    objectStorage.delete(key)
+    objectStorage.delete(key) // <b class="conum">(1)</b>
 }</code></pre>
 </div>
 </div>
@@ -395,9 +467,17 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations) {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun deleteProfilePicture(userId: String, fileName: String) {
     val key = "$userId/$fileName"
-    objectStorage.delete(key)
+    objectStorage.delete(key) // <b class="conum">(1)</b>
 }</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The delete operation returns the cloud vendor-specific delete response object in case you need it.</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -473,6 +553,9 @@ information about credentials and region configuration.</p>
       default:
         bucket: profile-pictures-bucket</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/aws/AwsS3Operations.html">AwsS3Operations</a>.</p>
 </div>
 
 <h1 id="azure"><a class="anchor" href="#azure"></a>5 Azure Blob Storage</h1>
@@ -560,6 +643,9 @@ micronaut:
         endpoint: https://my-account.blob.core.windows.net</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html">AzureBlobStorageOperations</a>.</p>
+</div>
 
 <h1 id="gcp"><a class="anchor" href="#gcp"></a>6 Google Cloud Storage</h1>
 
@@ -635,6 +721,9 @@ micronaut:
       default:
         bucket: profile-pictures-bucket</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html">GoogleCloudStorageOperations</a>.</p>
 </div>
 
 <h1 id="oracleCloud"><a class="anchor" href="#oracleCloud"></a>7 Oracle Cloud Infrastructure (OCI) Object Storage</h1>
@@ -718,6 +807,9 @@ micronaut:
         bucket: profile-pictures-bucket
         namespace: MyNamespace</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html">OracleCloudStorageOperations</a></p>
 </div>
 
 <h1 id="repository"><a class="anchor" href="#repository"></a>8 Repository</h1>

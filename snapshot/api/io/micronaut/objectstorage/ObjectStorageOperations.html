@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?io/micronaut/objectstorage/ObjectStorageOperations.html" target="_top">Frames</a></li>
@@ -91,19 +91,25 @@ var activeTableTab = "activeTableTab";
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
 <div class="subTitle">io.micronaut.objectstorage</div>
-<h2 title="Interface ObjectStorageOperations" class="title">Interface ObjectStorageOperations</h2>
+<h2 title="Interface ObjectStorageOperations" class="title">Interface ObjectStorageOperations&lt;I,O,D&gt;</h2>
 </div>
 <div class="contentContainer">
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>I</code> - Cloud vendor-specific upload request class or builder.</dd>
+<dd><code>O</code> - Cloud vendor-specific upload response.</dd>
+<dd><code>D</code> - Cloud vendor-specific delete response.</dd>
+</dl>
+<dl>
 <dt>All Known Implementing Classes:</dt>
 <dd><a href="../../../io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a>, <a href="../../../io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a>, <a href="../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a>, <a href="../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dd>
 </dl>
 <hr>
 <br>
-<pre>public interface <span class="typeNameLabel">ObjectStorageOperations</span></pre>
+<pre>public interface <span class="typeNameLabel">ObjectStorageOperations&lt;I,O,D&gt;</span></pre>
 <div class="block">Main interface for object storage operations.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -130,20 +136,27 @@ var activeTableTab = "activeTableTab";
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code>void</code></td>
+<td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">D</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#delete-java.lang.String-">delete</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Deletes an object from the object storage.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;</code></td>
+<td class="colFirst"><code>&lt;E extends <a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;?&gt;&gt;<br>java.util.Optional&lt;E&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.UploadRequest-">upload</a></span>(<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)</code>
+<td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">upload</a></span>(<a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code>
+<div class="block">Uploads an object to the object storage.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">upload</a></span>(<a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
+      java.util.function.Consumer&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">I</a>&gt;&nbsp;requestConsumer)</code>
 <div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
@@ -162,18 +175,42 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="upload-io.micronaut.objectstorage.UploadRequest-">
+<a name="upload-io.micronaut.objectstorage.request.UploadRequest-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>upload</h4>
-<pre><a href="../../../io/micronaut/objectstorage/UploadResponse.html" title="interface in io.micronaut.objectstorage">UploadResponse</a>&nbsp;upload(<a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage">UploadRequest</a>&nbsp;uploadRequest)
-               throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<pre>@NonNull
+<a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;&nbsp;upload(@NonNull
+                                  <a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</pre>
 <div class="block">Uploads an object to the object storage.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>uploadRequest</code> - the upload request</dd>
+<dd><code>request</code> - the upload request</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the upload response</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code> - if there was a failure storing the object</dd>
+</dl>
+</li>
+</ul>
+<a name="upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>upload</h4>
+<pre>@NonNull
+<a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;&nbsp;upload(@NonNull
+                                  <a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
+                                  @NonNull
+                                  java.util.function.Consumer&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">I</a>&gt;&nbsp;requestConsumer)</pre>
+<div class="block">Uploads an object to the object storage.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>request</code> - the upload request</dd>
+<dd><code>requestConsumer</code> - Upload request builder consumer</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the upload response</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -187,10 +224,13 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <h4>retrieve</h4>
-<pre>java.util.Optional&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&gt;&nbsp;retrieve(java.lang.String&nbsp;key)
-                                         throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<pre>@NonNull
+&lt;E extends <a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;?&gt;&gt;&nbsp;java.util.Optional&lt;E&gt;&nbsp;retrieve(@NonNull
+                                                                          java.lang.String&nbsp;key)</pre>
 <div class="block">Gets the object from object storage.</div>
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>E</code> - an instance of <a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageEntry</code></a>.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -206,14 +246,15 @@ var activeTableTab = "activeTableTab";
 <ul class="blockListLast">
 <li class="blockList">
 <h4>delete</h4>
-<pre>void&nbsp;delete(java.lang.String&nbsp;key)
-     throws <a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></pre>
+<pre>@NonNull
+<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">D</a>&nbsp;delete(@NonNull
+                  java.lang.String&nbsp;key)</pre>
 <div class="block">Deletes an object from the object storage.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Cloud vendor-specific delete response.</dd>
 </dl>
 </li>
 </ul>
@@ -245,7 +286,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../io/micronaut/objectstorage/UploadRequest.html" title="interface in io.micronaut.objectstorage"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
 <li><a href="../../../index.html?io/micronaut/objectstorage/ObjectStorageOperations.html" target="_top">Frames</a></li>

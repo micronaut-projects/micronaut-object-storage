@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10};
+var methods = {"i0":10,"i1":10,"i2":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -74,13 +74,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -107,13 +107,13 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dd>
+<dd><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</dd>
 </dl>
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">AwsS3ObjectStorageEntry</span>
 extends java.lang.Object
-implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></pre>
+implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</pre>
 <div class="block">An <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageEntry</code></a> implementation for AWS S3.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -127,6 +127,24 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.ht
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#AwsS3ObjectStorageEntry-java.lang.String-software.amazon.awssdk.core.ResponseInputStream-">AwsS3ObjectStorageEntry</a></span>(java.lang.String&nbsp;key,
+                       software.amazon.awssdk.core.ResponseInputStream&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;&nbsp;responseInputStream)</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
 <!-- ========== METHOD SUMMARY =========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.summary">
@@ -141,15 +159,17 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.ht
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.io.InputStream</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#getInputStream--">getInputStream</a></span>()</code>
-<div class="block">The object content.</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#getInputStream--">getInputStream</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#getKey--">getKey</a></span>()</code>
 <div class="block">The object path on object storage.</div>
 </td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>software.amazon.awssdk.services.s3.model.GetObjectResponse</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#getNativeEntry--">getNativeEntry</a></span>()</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -167,6 +187,25 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.ht
 <div class="details">
 <ul class="blockList">
 <li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor.detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="AwsS3ObjectStorageEntry-java.lang.String-software.amazon.awssdk.core.ResponseInputStream-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>AwsS3ObjectStorageEntry</h4>
+<pre>public&nbsp;AwsS3ObjectStorageEntry(@NonNull
+                               java.lang.String&nbsp;key,
+                               software.amazon.awssdk.core.ResponseInputStream&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;&nbsp;responseInputStream)</pre>
+</li>
+</ul>
+</li>
+</ul>
 <!-- ============ METHOD DETAIL ========== -->
 <ul class="blockList">
 <li class="blockList"><a name="method.detail">
@@ -185,7 +224,7 @@ public&nbsp;java.lang.String&nbsp;getKey()</pre>
 <div class="block">The object path on object storage. For example <code>/path/to</code></div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getKey--">getKey</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getKey--">getKey</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>object path or empty string if the object is placed at the root of bucket</dd>
 </dl>
@@ -194,17 +233,32 @@ public&nbsp;java.lang.String&nbsp;getKey()</pre>
 <a name="getInputStream--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getInputStream</h4>
-<pre>public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getInputStream--">ObjectStorageEntry</a></code></span></div>
-<div class="block">The object content.</div>
+<pre>@NonNull
+public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getInputStream--">getInputStream</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getInputStream--">getInputStream</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>object content.</dd>
+<dd>The object content.</dd>
+</dl>
+</li>
+</ul>
+<a name="getNativeEntry--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getNativeEntry</h4>
+<pre>@NonNull
+public&nbsp;software.amazon.awssdk.services.s3.model.GetObjectResponse&nbsp;getNativeEntry()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getNativeEntry--">getNativeEntry</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The underlying cloud vendor-specific response object.</dd>
 </dl>
 </li>
 </ul>
@@ -262,13 +316,13 @@ public&nbsp;java.lang.String&nbsp;getKey()</pre>
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
-<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>

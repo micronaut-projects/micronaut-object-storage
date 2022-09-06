@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6};
+var methods = {"i0":6,"i1":6,"i2":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -47,7 +47,7 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../io/micronaut/objectstorage/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../io/micronaut/objectstorage/InputStreamMapper.html" title="interface in io.micronaut.objectstorage"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -91,19 +91,24 @@ var activeTableTab = "activeTableTab";
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
 <div class="subTitle">io.micronaut.objectstorage</div>
-<h2 title="Interface ObjectStorageEntry" class="title">Interface ObjectStorageEntry</h2>
+<h2 title="Interface ObjectStorageEntry" class="title">Interface ObjectStorageEntry&lt;O&gt;</h2>
 </div>
 <div class="contentContainer">
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>O</code> - Cloud vendor-specific response object.</dd>
+</dl>
+<dl>
 <dt>All Known Implementing Classes:</dt>
 <dd><a href="../../../io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a>, <a href="../../../io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a>, <a href="../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a>, <a href="../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageEntry</a></dd>
 </dl>
 <hr>
 <br>
-<pre>public interface <span class="typeNameLabel">ObjectStorageEntry</span></pre>
+<pre>public interface <span class="typeNameLabel">ObjectStorageEntry&lt;O&gt;</span></pre>
+<div class="block">Object storage entry.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>1.0</dd>
@@ -130,15 +135,17 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.io.InputStream</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getInputStream--">getInputStream</a></span>()</code>
-<div class="block">The object content.</div>
-</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getInputStream--">getInputStream</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getKey--">getKey</a></span>()</code>
 <div class="block">The object path on object storage.</div>
 </td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="type parameter in ObjectStorageEntry">O</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getNativeEntry--">getNativeEntry</a></span>()</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -173,14 +180,28 @@ java.lang.String&nbsp;getKey()</pre>
 <a name="getInputStream--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getInputStream</h4>
-<pre>java.io.InputStream&nbsp;getInputStream()</pre>
-<div class="block">The object content.</div>
+<pre>@NonNull
+java.io.InputStream&nbsp;getInputStream()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>object content.</dd>
+<dd>The object content.</dd>
+</dl>
+</li>
+</ul>
+<a name="getNativeEntry--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getNativeEntry</h4>
+<pre>@NonNull
+<a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="type parameter in ObjectStorageEntry">O</a>&nbsp;getNativeEntry()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The underlying cloud vendor-specific response object.</dd>
 </dl>
 </li>
 </ul>
@@ -211,7 +232,7 @@ java.lang.String&nbsp;getKey()</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../io/micronaut/objectstorage/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../io/micronaut/objectstorage/InputStreamMapper.html" title="interface in io.micronaut.objectstorage"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
