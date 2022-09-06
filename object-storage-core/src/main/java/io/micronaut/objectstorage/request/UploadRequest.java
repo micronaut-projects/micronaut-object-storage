@@ -39,7 +39,7 @@ public interface UploadRequest {
 
     /**
      * @param path the path to the file.
-     * @param prefix the prefix under which the file will be stored (<code>prefix/fileName<code/>).
+     * @param prefix the prefix under which the file will be stored (<code>prefix/fileName</code>).
      * @return An {@link UploadRequest} from the given path and prefix
      */
     @NonNull
