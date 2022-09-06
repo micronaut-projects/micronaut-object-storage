@@ -28,21 +28,41 @@ import java.util.Optional;
  */
 public interface UploadRequest {
 
+    /**
+     * @param path the path to the file.
+     * @return An {@link UploadRequest} from the given path.
+     */
     @NonNull
     static UploadRequest fromPath(@NonNull Path path) {
         return new FileUploadRequest(path);
     }
 
+    /**
+     * @param path the path to the file.
+     * @param prefix the prefix under which the file will be stored (<code>prefix/fileName<code/>).
+     * @return An {@link UploadRequest} from the given path and prefix
+     */
     @NonNull
-    static UploadRequest fromPath(@NonNull Path path, String prefix) {
+    static UploadRequest fromPath(@NonNull Path path, @NonNull String prefix) {
         return new FileUploadRequest(path, prefix);
     }
 
+    /**
+     * @param bytes the source byte array.
+     * @param key the key under which the file will be stored (<code>path/to/file</code>)
+     * @return An {@link UploadRequest} from the given byte array and key
+     */
     @NonNull
     static UploadRequest fromBytes(@NonNull byte[] bytes, @NonNull String key) {
         return new BytesUploadRequest(bytes, key);
     }
 
+    /**
+     * @param bytes the source byte array.
+     * @param key the key under which the file will be stored (<code>path/to/file</code>)
+     * @param contentType the content type of the file to store.
+     * @return An {@link UploadRequest} from the given parameters.
+     */
     @NonNull
     static UploadRequest fromBytes(@NonNull byte[] bytes,
                                    @NonNull String key,
@@ -50,10 +70,26 @@ public interface UploadRequest {
         return new BytesUploadRequest(bytes, key, contentType);
     }
 
+    /**
+     * @param completedFileUpload the {@link CompletedFileUpload}.
+     * @return An {@link UploadRequest} from the given {@link CompletedFileUpload}.
+     */
     @NonNull
-    static UploadRequest fromCompletedFileUpload(CompletedFileUpload completedFileUpload) {
+    static UploadRequest fromCompletedFileUpload(@NonNull CompletedFileUpload completedFileUpload) {
         return new CompletedFileUploadRequest(completedFileUpload);
     }
+
+    /**
+     * @param completedFileUpload the {@link CompletedFileUpload}.
+     * @param key the key under which the file will be stored (<code>path/to/file</code>)
+     * @return An {@link UploadRequest} from the given {@link CompletedFileUpload} and key.
+     */
+    @NonNull
+    static UploadRequest fromCompletedFileUpload(@NonNull CompletedFileUpload completedFileUpload,
+                                                 @NonNull String key) {
+        return new CompletedFileUploadRequest(completedFileUpload, key);
+    }
+
 
     /**
      * @return the content type of this upload request.

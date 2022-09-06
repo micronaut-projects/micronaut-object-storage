@@ -33,9 +33,16 @@ import java.util.Optional;
 public class CompletedFileUploadRequest implements UploadRequest {
 
     private final CompletedFileUpload completedFileUpload;
+    private final String key;
 
     public CompletedFileUploadRequest(CompletedFileUpload completedFileUpload) {
         this.completedFileUpload = completedFileUpload;
+        this.key = completedFileUpload.getName();
+    }
+
+    public CompletedFileUploadRequest(CompletedFileUpload completedFileUpload, String key) {
+        this.completedFileUpload = completedFileUpload;
+        this.key = key;
     }
 
     @NonNull
@@ -48,7 +55,7 @@ public class CompletedFileUploadRequest implements UploadRequest {
     @NonNull
     @Override
     public String getKey() {
-        return completedFileUpload.getName();
+        return key;
     }
 
     @NonNull

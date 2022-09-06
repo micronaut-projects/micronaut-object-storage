@@ -15,26 +15,46 @@ class CompletedFileUploadSpec extends Specification {
 
     void "it can be created from a completed file upload"() {
         given:
-        Path path = ObjectStorageOperationsSpecification.createTempFile()
-        File file = path.toFile()
-        FileUpload fileUpload = new DiskFileUpload(file.name, file.name, "text/plain", "chunked", Charset.defaultCharset(), ObjectStorageOperationsSpecification.TEXT.length())
-        fileUpload.setContent(file)
-        NettyCompletedFileUpload completedFileUpload = new NettyCompletedFileUpload(fileUpload, false)
+        NettyCompletedFileUpload completedFileUpload = createCompletedFileUpload()
 
         when:
         CompletedFileUploadRequest request =
                 UploadRequest.fromCompletedFileUpload(completedFileUpload) as CompletedFileUploadRequest
 
         then:
+        assertThatRequestIsValid(request, completedFileUpload.name)
+    }
+
+    void "it can be created from a completed file upload and key"() {
+        given:
+        NettyCompletedFileUpload completedFileUpload = createCompletedFileUpload()
+        String key = "path/tp=o/file.txt"
+
+        when:
+        CompletedFileUploadRequest request =
+                UploadRequest.fromCompletedFileUpload(completedFileUpload, key) as CompletedFileUploadRequest
+
+        then:
+        assertThatRequestIsValid(request, key)
+
+    }
+
+    private NettyCompletedFileUpload createCompletedFileUpload() {
+        Path path = ObjectStorageOperationsSpecification.createTempFile()
+        File file = path.toFile()
+        FileUpload fileUpload = new DiskFileUpload(file.name, file.name, "text/plain", "chunked", Charset.defaultCharset(), ObjectStorageOperationsSpecification.TEXT.length())
+        fileUpload.setContent(file)
+        return new NettyCompletedFileUpload(fileUpload, false)
+    }
+
+    private void assertThatRequestIsValid(CompletedFileUploadRequest request, String expectedKey) {
         request.with {
-            assert key == file.name
+            assert key == expectedKey
             assert contentSize.present
             assert contentSize.get() == ObjectStorageOperationsSpecification.TEXT.length() as long
             assert contentType.present
             assert contentType.get() == "text/plain"
             assert inputStream.text == ObjectStorageOperationsSpecification.TEXT
         }
-
     }
-
 }

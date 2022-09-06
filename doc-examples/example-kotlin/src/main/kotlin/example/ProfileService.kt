@@ -15,7 +15,7 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
 //end::beginclass[]
 
     //tag::upload[]
-    open fun saveProfilePicture(userId: String?, path: Path): String? {
+    open fun saveProfilePicture(userId: String, path: Path): String? {
         val request = UploadRequest.fromPath(path, userId) // <1>
         val response = objectStorage.upload(request) // <2>
         return response.key // <3>
