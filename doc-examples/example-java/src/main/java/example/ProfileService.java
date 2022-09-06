@@ -5,6 +5,8 @@ import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,8 @@ import java.util.Optional;
 //tag::beginclass[]
 @Singleton
 public class ProfileService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProfileService.class);
 
     private final ObjectStorageOperations<?, ?, ?> objectStorage;
 
@@ -35,18 +39,20 @@ public class ProfileService {
 
     //tag::retrieve[]
     public Optional<Path> retrieveProfilePicture(String userId, String fileName) {
+        Path destination = null;
         try {
             String key = userId + "/" + fileName;
             Optional<InputStream> stream = objectStorage.retrieve(key) // <1>
                 .map(ObjectStorageEntry::getInputStream);
             if (stream.isPresent()) {
-                Path destination = File.createTempFile(userId, "temp").toPath();
+                destination = File.createTempFile(userId, "temp").toPath();
                 Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING);
                 return Optional.of(destination);
             } else {
                 return Optional.empty();
             }
         } catch (IOException e) {
+            LOG.error("Error while trying to save profile picture to the local file [{}]: {}", destination, e.getMessage());
             return Optional.empty();
         }
     }

@@ -17,5 +17,4 @@
     <logger name="io.micronaut.aws" level="DEBUG"/>
     <logger name="software.amazon.awssdk.services.s3" level="DEBUG"/>
     <logger name="org.testcontainers" level="WARN"/>
-    <logger name="io.micronaut.http.client" level="TRACE"/>
 </configuration>

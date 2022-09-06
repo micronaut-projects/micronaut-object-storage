@@ -1,7 +1,6 @@
 package example
 
 import io.micronaut.objectstorage.ObjectStorageEntry
-import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.objectstorage.response.UploadResponse
@@ -32,18 +31,14 @@ class ProfileService {
 
     //tag::retrieve[]
     Optional<Path> retrieveProfilePicture(String userId, String fileName) {
-        try {
-            String key = "${userId}/${fileName}"
-            Optional<InputStream> stream = objectStorage.retrieve(key) // <1>
-                    .map(ObjectStorageEntry::getInputStream)
-            if (stream.isPresent()) {
-                Path destination = File.createTempFile(userId, "temp").toPath()
-                Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING)
-                return Optional.of(destination)
-            } else {
-                return Optional.empty()
-            }
-        } catch (IOException e) {
+        String key = "${userId}/${fileName}"
+        Optional<InputStream> stream = objectStorage.retrieve(key) // <1>
+                .map(ObjectStorageEntry::getInputStream)
+        if (stream.isPresent()) {
+            Path destination = File.createTempFile(userId, "temp").toPath()
+            Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING)
+            return Optional.of(destination)
+        } else {
             return Optional.empty()
         }
     }
