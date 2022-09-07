@@ -21,6 +21,9 @@ dependencies {
 
     implementation(mn.micronaut.http.client)
     implementation(projects.objectStorageAws)
+    implementation(projects.objectStorageAzure)
+    implementation(projects.objectStorageGcp)
+    implementation(projects.objectStorageOracleCloud)
 
     runtimeOnly(mn.logback)
 
