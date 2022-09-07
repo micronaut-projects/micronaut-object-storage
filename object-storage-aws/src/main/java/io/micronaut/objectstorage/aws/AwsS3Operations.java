@@ -124,7 +124,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
                 .key(key)
                 .build());
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to retrieve a file from AWS S3 ", e);
+            throw new ObjectStorageException("Error when trying to delete a file from AWS S3 ", e);
         }
     }
 
