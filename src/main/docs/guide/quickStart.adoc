@@ -28,9 +28,9 @@ micronaut:
   object-storage:
     aws:
       pictures:
-        name: pictures-bucket
+        bucket: pictures-bucket
       logos:
-        name: logos-bucket
+        bucket: logos-bucket
 ----
 
 You then need to use `@Named("pictures")` or `@Named("logos")` to specify which of the object storages you want to use.
