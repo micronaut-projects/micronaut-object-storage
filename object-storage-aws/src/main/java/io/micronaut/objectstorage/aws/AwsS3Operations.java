@@ -19,12 +19,15 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.InputStreamMapper;
+import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -71,8 +74,12 @@ public class AwsS3Operations implements ObjectStorageOperations<
     public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest uploadRequest) {
         PutObjectRequest objectRequest = getRequestBuilder(uploadRequest).build();
         RequestBody requestBody = getRequestBody(uploadRequest);
-        PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
-        return UploadResponse.of(uploadRequest.getKey(), response.eTag(), response);
+        try {
+            PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
+            return UploadResponse.of(uploadRequest.getKey(), response.eTag(), response);
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new ObjectStorageException("Error when trying to upload a file to AWS S3", e);
+        }
     }
 
     @Override
@@ -82,8 +89,12 @@ public class AwsS3Operations implements ObjectStorageOperations<
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
         RequestBody requestBody = getRequestBody(request);
-        PutObjectResponse response = s3Client.putObject(builder.build(), requestBody);
-        return UploadResponse.of(request.getKey(), response.eTag(), response);
+        try {
+            PutObjectResponse response = s3Client.putObject(builder.build(), requestBody);
+            return UploadResponse.of(request.getKey(), response.eTag(), response);
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new ObjectStorageException("Error when trying to upload a file to AWS S3", e);
+        }
     }
 
     @Override
@@ -99,16 +110,22 @@ public class AwsS3Operations implements ObjectStorageOperations<
             return Optional.of(entry);
         } catch (NoSuchKeyException noSuchKeyException) {
             return Optional.empty();
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new ObjectStorageException("Error when trying to retrieve a file from AWS S3", e);
         }
     }
 
     @Override
     @NonNull
     public DeleteObjectResponse delete(@NonNull String key) {
-        return s3Client.deleteObject(DeleteObjectRequest.builder()
-            .bucket(configuration.getBucket())
-            .key(key)
-            .build());
+        try {
+            return s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(configuration.getBucket())
+                .key(key)
+                .build());
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new ObjectStorageException("Error when trying to delete a file from AWS S3 ", e);
+        }
     }
 
     /**

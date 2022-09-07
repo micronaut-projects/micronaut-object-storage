@@ -74,6 +74,7 @@ public interface ObjectStorageOperations<I, O, D> {
      *
      * @param key object path in the format {@code /foo/bar/file}
      * @return Cloud vendor-specific delete response.
+     * @throws ObjectStorageException if there was a failure deleting the object
      */
     @Blocking
     @NonNull

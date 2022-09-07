@@ -26,11 +26,13 @@ import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Singleton;
 
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -77,8 +79,12 @@ public class AzureBlobStorageOperations
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         AzureBlobStorageEntry storageEntry = null;
         if (TRUE.equals(blobClient.exists())) {
-            BinaryData data = blobClient.getBlockBlobClient().downloadContent();
-            storageEntry = new AzureBlobStorageEntry(key, data);
+            try {
+                BinaryData data = blobClient.getBlockBlobClient().downloadContent();
+                storageEntry = new AzureBlobStorageEntry(key, data);
+            } catch (UncheckedIOException e) {
+                throw new ObjectStorageException("Error when trying to retrieve a file from Azure Blob Storage", e);
+            }
         }
         return Optional.ofNullable(storageEntry);
 
