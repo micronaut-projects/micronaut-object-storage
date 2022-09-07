@@ -18,3 +18,13 @@ include::doc-examples/example-java/src/test/resources/application-gcp.yml[]
 ----
 
 The concrete implementation of `ObjectStorageOperations` is api:objectstorage.googlecloud.GoogleCloudStorageOperations[].
+
+== Advanced configuration
+
+For configuration properties other than the specified above, you can add bean to your application that implements
+https://docs.micronaut.io/latest/guide/#events[`BeanCreatedEventListener`]. For example:
+
+[source,java]
+----
+include::doc-examples/example-java/src/main/java/example/gcp/StorageOptionsBuilderCustomizer.java[tags="class"]
+----
