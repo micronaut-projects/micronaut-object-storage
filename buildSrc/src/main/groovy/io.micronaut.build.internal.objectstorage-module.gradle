@@ -8,13 +8,6 @@ dependencies {
     implementation mn.micronaut.runtime
 }
 
-micronautBuild {
-    binaryCompatibility {
-        //TODO remove when initial release is done
-        enabled = false
-    }
-}
-
 repositories {
     mavenCentral()
     maven {
