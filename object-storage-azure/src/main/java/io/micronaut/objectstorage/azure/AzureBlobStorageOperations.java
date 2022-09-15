@@ -20,12 +20,14 @@ import com.azure.core.util.BinaryData;
 import com.azure.core.util.Context;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
@@ -81,7 +83,8 @@ public class AzureBlobStorageOperations
         if (TRUE.equals(blobClient.exists())) {
             try {
                 BinaryData data = blobClient.getBlockBlobClient().downloadContent();
-                storageEntry = new AzureBlobStorageEntry(key, data);
+                BlobProperties blobProperties = blobClient.getProperties();
+                storageEntry = new AzureBlobStorageEntry(key, data, blobProperties);
             } catch (UncheckedIOException e) {
                 throw new ObjectStorageException("Error when trying to retrieve a file from Azure Blob Storage", e);
             }
@@ -103,8 +106,12 @@ public class AzureBlobStorageOperations
      */
     @NonNull
     protected BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
-        return new BlobParallelUploadOptions(request.getInputStream())
+        BlobParallelUploadOptions options = new BlobParallelUploadOptions(request.getInputStream())
             .setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            options.setMetadata(request.getMetadata());
+        }
+        return options;
     }
 
     private UploadResponse<BlockBlobItem> doUpload(@NonNull UploadRequest request,

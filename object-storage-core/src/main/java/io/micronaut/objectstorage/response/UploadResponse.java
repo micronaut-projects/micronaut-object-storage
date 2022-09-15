@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.response;
 
 import io.micronaut.context.annotation.DefaultImplementation;
+import io.micronaut.core.annotation.NonNull;
 
 /**
  * Object storage upload response.
@@ -29,22 +30,29 @@ import io.micronaut.context.annotation.DefaultImplementation;
 public interface UploadResponse<R> {
 
     /**
+     * Creates an instance from the given parameters.
+     */
+    @NonNull
+    static <R> UploadResponse<R> of(@NonNull String key, @NonNull String eTag, @NonNull R nativeResponse) {
+        return new DefaultUploadResponse<>(key, eTag, nativeResponse);
+    }
+
+    /**
      * @return The key under which the object was stored.
      */
+    @NonNull
     String getKey();
 
     /**
      * @return the entity tag of the object stored (an identifier for a specific version of the object).
      */
+    @NonNull
     String getETag();
 
     /**
      * @return Cloud vendor-specific upload response
      */
+    @NonNull
     R getNativeResponse();
-
-    static <R> UploadResponse<R> of(String key, String eTag, R nativeResponse) {
-        return new DefaultUploadResponse<>(key, eTag, nativeResponse);
-    }
 
 }

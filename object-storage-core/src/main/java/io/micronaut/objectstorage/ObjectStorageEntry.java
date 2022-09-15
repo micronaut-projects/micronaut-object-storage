@@ -18,6 +18,8 @@ package io.micronaut.objectstorage;
 import io.micronaut.core.annotation.NonNull;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Object storage entry.
@@ -47,4 +49,13 @@ public interface ObjectStorageEntry<O> {
      */
     @NonNull
     O getNativeEntry();
+
+    /**
+     * @return a map with key-value pairs that were stored along the file. An empty map by default.
+     * @since 1.1.0
+     */
+    @NonNull
+    default Map<String, String> getMetadata() {
+        return Collections.emptyMap();
+    }
 }

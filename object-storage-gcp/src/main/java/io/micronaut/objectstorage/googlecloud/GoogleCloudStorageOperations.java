@@ -24,6 +24,7 @@ import com.google.cloud.storage.StorageException;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
@@ -114,8 +115,12 @@ public class GoogleCloudStorageOperations
     @NonNull
     protected BlobInfo.Builder createBlobInfoBuilder(@NonNull UploadRequest uploadRequest) {
         BlobId blobId = BlobId.of(configuration.getBucket(), uploadRequest.getKey());
-        return BlobInfo.newBuilder(blobId)
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null));
+        if (CollectionUtils.isNotEmpty(uploadRequest.getMetadata())) {
+            builder.setMetadata(uploadRequest.getMetadata());
+        }
+        return builder;
     }
 
     @NonNull

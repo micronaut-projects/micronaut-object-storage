@@ -17,9 +17,12 @@ package io.micronaut.objectstorage.oraclecloud;
 
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * An {@link ObjectStorageEntry} implementation for Oracle Cloud Storage.
@@ -53,5 +56,15 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry<GetObjectResp
     @Override
     public GetObjectResponse getNativeEntry() {
         return objectResponse;
+    }
+
+    @NonNull
+    @Override
+    public Map<String, String> getMetadata() {
+        if (CollectionUtils.isNotEmpty(objectResponse.getOpcMeta())) {
+            return objectResponse.getOpcMeta();
+        } else {
+            return Collections.emptyMap();
+        }
     }
 }

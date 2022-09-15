@@ -53,4 +53,9 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
             return client
         }
     }
+
+    @Override
+    boolean supportsMetadata() {
+        return false
+    }
 }

@@ -26,6 +26,7 @@ import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
@@ -137,6 +138,9 @@ public class OracleCloudStorageOperations
 
         request.getContentSize().ifPresent(putObjectRequestBuilder::contentLength);
         request.getContentType().ifPresent(putObjectRequestBuilder::contentType);
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            putObjectRequestBuilder.opcMeta(request.getMetadata());
+        }
         return putObjectRequestBuilder;
     }
 }

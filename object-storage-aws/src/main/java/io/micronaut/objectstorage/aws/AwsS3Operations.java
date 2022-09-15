@@ -18,6 +18,7 @@ package io.micronaut.objectstorage.aws;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
@@ -140,6 +141,9 @@ public class AwsS3Operations implements ObjectStorageOperations<
 
         request.getContentType().ifPresent(builder::contentType);
         request.getContentSize().ifPresent(builder::contentLength);
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            builder.metadata(request.getMetadata());
+        }
         return builder;
     }
 

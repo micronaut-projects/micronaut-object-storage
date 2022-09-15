@@ -27,6 +27,7 @@ import static java.nio.charset.StandardCharsets.UTF_8
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
     public static final String TEXT = 'micronaut'
+    public static final Map<String, String> METADATA = [project: "micronaut-object-storage"]
 
     void 'it can upload, get and delete object from file'() {
         given:
@@ -35,6 +36,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
+        uploadRequest.metadata = METADATA
         UploadResponse response = getObjectStorage().upload(uploadRequest)
 
         then:
@@ -47,6 +49,9 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         objectStorageEntry.isPresent()
         objectStorageEntry.get().key == tempFileName
         objectStorageEntry.get().nativeEntry
+        if (supportsMetadata()) {
+            assert objectStorageEntry.get().metadata == METADATA
+        }
 
         when: 'the file has same content'
         String text = new BufferedReader(
@@ -71,6 +76,10 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     }
 
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
+
+    boolean supportsMetadata() {
+        true
+    }
 
     static Path createTempFile() {
         Path path = Files.createTempFile('test-file', '.txt')

@@ -25,15 +25,26 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * Upload request implementation using {@link java.io.File}.
  */
 public class FileUploadRequest implements UploadRequest {
+
+    @NonNull
     private final String keyName;
+
+    @Nullable
     private final String contentType;
+
+    @NonNull
     private final Path path;
+
+    @NonNull
+    private Map<String, String> metadata;
 
     public FileUploadRequest(@NonNull Path localFilePath) {
         this(localFilePath, localFilePath.getFileName().toString(), null,
@@ -50,9 +61,17 @@ public class FileUploadRequest implements UploadRequest {
                              @NonNull String keyName,
                              @Nullable String prefix,
                              @Nullable String contentType) {
-        this.keyName = prefix != null ? prefix + "/" + keyName : keyName;
+        this(prefix != null ? prefix + "/" + keyName : keyName, contentType, localFilePath, Collections.emptyMap());
+    }
+
+    public FileUploadRequest(@NonNull String keyName,
+                             @Nullable String contentType,
+                             @NonNull Path path,
+                             @NonNull Map<String, String> metadata) {
+        this.keyName = keyName;
         this.contentType = contentType;
-        this.path = localFilePath;
+        this.path = path;
+        this.metadata = metadata;
     }
 
     /**
@@ -109,5 +128,16 @@ public class FileUploadRequest implements UploadRequest {
         } catch (IOException e) {
             throw new ObjectStorageException(e);
         }
+    }
+
+    @Override
+    @NonNull
+    public Map<String, String> getMetadata() {
+        return this.metadata;
+    }
+
+    @Override
+    public void setMetadata(@NonNull Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 }
