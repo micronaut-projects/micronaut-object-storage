@@ -24,6 +24,7 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link ObjectStorageEntry} implementation for Azure Blob Storage.
@@ -89,10 +90,8 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
     @NonNull
     @Override
     public Map<String, String> getMetadata() {
-        if (blobProperties != null) {
-            return blobProperties.getMetadata();
-        } else {
-            return Collections.emptyMap();
-        }
+        return Optional.ofNullable(blobProperties)
+            .map(BlobProperties::getMetadata)
+            .orElse(Collections.emptyMap());
     }
 }

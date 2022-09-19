@@ -55,7 +55,10 @@ public class BytesUploadRequest implements UploadRequest {
         this(bytes, contentType, key, Collections.emptyMap());
     }
 
-    public BytesUploadRequest(@NonNull byte[] bytes, @Nullable String contentType, @NonNull String key, @NonNull Map<String, String> metadata) {
+    public BytesUploadRequest(@NonNull byte[] bytes,
+                              @Nullable String contentType,
+                              @NonNull String key,
+                              @NonNull Map<String, String> metadata) {
         this.bytes = bytes;
         this.contentType = contentType;
         this.key = key;
