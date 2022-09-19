@@ -32,19 +32,13 @@ import java.util.Optional;
 /**
  * Upload request implementation using {@link java.io.File}.
  */
-public class FileUploadRequest implements UploadRequest {
+public class FileUploadRequest extends AbstractUploadRequest implements UploadRequest {
 
     @NonNull
     private final String keyName;
 
-    @Nullable
-    private String contentType;
-
     @NonNull
     private final Path path;
-
-    @NonNull
-    private Map<String, String> metadata;
 
     public FileUploadRequest(@NonNull Path localFilePath) {
         this(localFilePath, localFilePath.getFileName().toString(), null,
@@ -130,19 +124,4 @@ public class FileUploadRequest implements UploadRequest {
         }
     }
 
-    @Override
-    @NonNull
-    public Map<String, String> getMetadata() {
-        return this.metadata;
-    }
-
-    @Override
-    public void setMetadata(@NonNull Map<String, String> metadata) {
-        this.metadata = metadata;
-    }
-
-    @Override
-    public void setContentType(@NonNull String contentType) {
-        this.contentType = contentType;
-    }
 }

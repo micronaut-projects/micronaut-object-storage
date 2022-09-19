@@ -31,19 +31,13 @@ import java.util.Optional;
  * @author Burt Beckwith
  * @since 1.0
  */
-public class BytesUploadRequest implements UploadRequest {
+public class BytesUploadRequest extends AbstractUploadRequest implements UploadRequest {
 
     @NonNull
     private final byte[] bytes;
 
-    @Nullable
-    private String contentType;
-
     @NonNull
     private final String key;
-
-    @NonNull
-    private Map<String, String> metadata;
 
     public BytesUploadRequest(@NonNull byte[] bytes, @NonNull String key) {
         this(bytes, URLConnection.guessContentTypeFromName(key), key, Collections.emptyMap());
@@ -97,19 +91,4 @@ public class BytesUploadRequest implements UploadRequest {
         return bytes;
     }
 
-    @Override
-    @NonNull
-    public Map<String, String> getMetadata() {
-        return this.metadata;
-    }
-
-    @Override
-    public void setMetadata(@NonNull Map<String, String> metadata) {
-        this.metadata = metadata;
-    }
-
-    @Override
-    public void setContentType(@NonNull String contentType) {
-        this.contentType = contentType;
-    }
 }
