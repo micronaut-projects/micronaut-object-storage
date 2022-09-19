@@ -23,6 +23,7 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link ObjectStorageEntry} implementation for Oracle Cloud Storage.
@@ -66,5 +67,11 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry<GetObjectResp
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    @NonNull
+    @Override
+    public Optional<String> getContentType() {
+        return Optional.ofNullable(objectResponse.getContentType());
     }
 }

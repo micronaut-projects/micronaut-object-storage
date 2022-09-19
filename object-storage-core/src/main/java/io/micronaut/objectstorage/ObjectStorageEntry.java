@@ -20,6 +20,7 @@ import io.micronaut.core.annotation.NonNull;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Object storage entry.
@@ -57,5 +58,14 @@ public interface ObjectStorageEntry<O> {
     @NonNull
     default Map<String, String> getMetadata() {
         return Collections.emptyMap();
+    }
+
+    /**
+     * @return the MIME type of the entry.
+     * @since 1.1.0
+     */
+    @NonNull
+    default Optional<String> getContentType() {
+        return Optional.empty();
     }
 }

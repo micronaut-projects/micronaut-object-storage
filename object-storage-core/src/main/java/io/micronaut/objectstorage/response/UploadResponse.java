@@ -31,6 +31,11 @@ public interface UploadResponse<R> {
 
     /**
      * Creates an instance from the given parameters.
+     *
+     * @param key the key under which the file will be stored.
+     * @param eTag the entity tag of the object stored.
+     * @param nativeResponse upload response object.
+     * @param <R> Cloud vendor-specific upload response
      */
     @NonNull
     static <R> UploadResponse<R> of(@NonNull String key, @NonNull String eTag, @NonNull R nativeResponse) {

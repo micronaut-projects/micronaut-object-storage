@@ -20,6 +20,7 @@ import com.azure.core.util.BinaryData;
 import com.azure.core.util.Context;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobHttpHeaders;
 import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
@@ -110,6 +111,10 @@ public class AzureBlobStorageOperations
             .setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
         if (CollectionUtils.isNotEmpty(request.getMetadata())) {
             options.setMetadata(request.getMetadata());
+        }
+        if (request.getContentType().isPresent()) {
+            BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(request.getContentType().get());
+            options.setHeaders(headers);
         }
         return options;
     }

@@ -133,4 +133,11 @@ public interface UploadRequest {
     default void setMetadata(@NonNull Map<String, String> metadata) {
     }
 
+    /**
+     * @param contentType the content type of this upload request.
+     * @since 1.1.0
+     */
+    default void setContentType(@NonNull String contentType) {
+    }
+
 }

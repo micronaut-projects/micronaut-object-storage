@@ -37,7 +37,7 @@ public class BytesUploadRequest implements UploadRequest {
     private final byte[] bytes;
 
     @Nullable
-    private final String contentType;
+    private String contentType;
 
     @NonNull
     private final String key;
@@ -106,5 +106,10 @@ public class BytesUploadRequest implements UploadRequest {
     @Override
     public void setMetadata(@NonNull Map<String, String> metadata) {
         this.metadata = metadata;
+    }
+
+    @Override
+    public void setContentType(@NonNull String contentType) {
+        this.contentType = contentType;
     }
 }

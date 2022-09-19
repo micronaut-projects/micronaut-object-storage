@@ -28,6 +28,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
     public static final String TEXT = 'micronaut'
     public static final Map<String, String> METADATA = [project: "micronaut-object-storage"]
+    public static final String CONTENT_TYPE = "text/plain"
 
     void 'it can upload, get and delete object from file'() {
         given:
@@ -37,6 +38,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         when: 'put file to object storage'
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
         uploadRequest.metadata = METADATA
+        uploadRequest.contentType = CONTENT_TYPE
         UploadResponse response = getObjectStorage().upload(uploadRequest)
 
         then:
@@ -52,6 +54,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         if (supportsMetadata()) {
             assert objectStorageEntry.get().metadata == METADATA
         }
+        objectStorageEntry.get().contentType == Optional.of(CONTENT_TYPE)
 
         when: 'the file has same content'
         String text = new BufferedReader(

@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link ObjectStorageEntry} implementation for AWS S3.
@@ -65,5 +66,11 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResp
     @Override
     public Map<String, String> getMetadata() {
         return responseInputStream.response().metadata();
+    }
+
+    @NonNull
+    @Override
+    public Optional<String> getContentType() {
+        return Optional.ofNullable(responseInputStream.response().contentType());
     }
 }

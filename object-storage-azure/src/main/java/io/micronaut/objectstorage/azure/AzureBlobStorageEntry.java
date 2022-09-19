@@ -94,4 +94,11 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
             .map(BlobProperties::getMetadata)
             .orElse(Collections.emptyMap());
     }
+
+    @NonNull
+    @Override
+    public Optional<String> getContentType() {
+        return Optional.ofNullable(blobProperties)
+            .map(BlobProperties::getContentType);
+    }
 }
