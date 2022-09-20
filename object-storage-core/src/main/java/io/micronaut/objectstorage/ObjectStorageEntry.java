@@ -99,6 +99,7 @@ public interface ObjectStorageEntry<O> {
             String key = getKey();
             String fileName = key.substring(key.lastIndexOf(File.separator) + 1);
             File file = Files.createTempFile("", fileName).toFile();
+            file.deleteOnExit();
             Files.copy(getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             getInputStream().close();
             MediaType mediaType = MediaType.of(getContentType().orElse(MediaType.ALL));
