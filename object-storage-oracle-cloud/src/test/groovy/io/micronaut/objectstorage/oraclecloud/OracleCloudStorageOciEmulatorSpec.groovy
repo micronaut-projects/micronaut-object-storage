@@ -55,7 +55,12 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
     }
 
     @Override
-    boolean supportsMetadata() {
+    boolean emulatorSupportsMetadata() {
+        return false
+    }
+
+    @Override
+    boolean emulatorSupportsUpdate() {
         return false
     }
 }

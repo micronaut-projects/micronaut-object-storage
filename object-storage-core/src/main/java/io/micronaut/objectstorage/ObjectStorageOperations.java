@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 public interface ObjectStorageOperations<I, O, D> {
 
     /**
-     * Uploads an object to the object storage.
+     * Uploads an object to the object storage. If there is an existing entry, it will be updated.
      *
      * @param request the upload request
      * @return the upload response
@@ -48,7 +48,7 @@ public interface ObjectStorageOperations<I, O, D> {
     UploadResponse<O> upload(@NonNull UploadRequest request);
 
     /**
-     * Uploads an object to the object storage.
+     * Uploads an object to the object storage. If there is an existing entry, it will be updated.
      *
      * @param request the upload request
      * @param requestConsumer Upload request builder consumer

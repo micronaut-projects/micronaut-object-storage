@@ -22,77 +22,103 @@ import spock.lang.Specification
 import java.nio.file.Files
 import java.nio.file.Path
 
-import static java.nio.charset.StandardCharsets.UTF_8
-
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
     public static final String TEXT = 'micronaut'
+    public static final String NEW_TEXT = 'object-storage'
     public static final Map<String, String> METADATA = [project: "micronaut-object-storage"]
     public static final String CONTENT_TYPE = "text/plain"
 
     void 'it can upload, get and delete object from file'() {
-        given:
+        given: 'a temporary file'
         ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
         Path path = createTempFile()
-        String tempFileName = path.getFileName().toString()
+        String key = path.getFileName().toString()
 
-        when: 'create the upload request'
+        when: 'creating the upload request'
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
         uploadRequest.metadata = METADATA
         uploadRequest.contentType = CONTENT_TYPE
 
-        then:
+        then: 'the file does not exist yet'
         !storage.exists(uploadRequest.key)
         !storage.listObjects()
 
-        when: 'put file to object storage'
+        when: 'uploading the file'
         UploadResponse response = storage.upload(uploadRequest)
 
-        then:
+        then: 'the file exists'
         response.ETag
         storage.exists(uploadRequest.key)
         storage.listObjects().size() == 1
         storage.listObjects().first() == uploadRequest.key
 
-        when: 'get file based on path'
-        Optional<ObjectStorageEntry<?>> objectStorageEntry = storage.retrieve(tempFileName)
+        when: 'retrieving the file'
+        Optional<ObjectStorageEntry<?>> objectStorageEntry = storage.retrieve(key)
 
-        then:
+        then: 'the file exists'
         objectStorageEntry.isPresent()
-        objectStorageEntry.get().key == tempFileName
+        objectStorageEntry.get().key == key
         objectStorageEntry.get().nativeEntry
-        if (supportsMetadata()) {
+        if (emulatorSupportsMetadata()) {
             assert objectStorageEntry.get().metadata == METADATA
         }
         objectStorageEntry.get().contentType == Optional.of(CONTENT_TYPE)
 
-        when: 'the file has same content'
-        String text = new BufferedReader(
-                new InputStreamReader(objectStorageEntry.get().inputStream, UTF_8))
-                .text
+        when: 'reading the file content'
+        String text = objectStorageEntry.get().inputStream.text
 
-        then:
+        then: 'the content is the same as the source'
         text
         text == TEXT
 
-        when: 'delete the file on object storage'
-        storage.delete(tempFileName)
+        when: 'updating the file'
+        if (emulatorSupportsUpdate()) {
+            path.toFile().text = NEW_TEXT
+            uploadRequest = UploadRequest.fromPath(path)
+            response = storage.upload(uploadRequest)
+        }
 
-        then:
+        then: 'the file exists'
+        if (emulatorSupportsUpdate()) {
+            assert response.ETag
+            assert storage.exists(uploadRequest.key)
+            assert storage.listObjects().size() == 1
+            assert storage.listObjects().first() == uploadRequest.key
+        }
+
+        when: 'retrieving the file'
+        if (emulatorSupportsUpdate()) {
+            objectStorageEntry = storage.retrieve(key)
+        }
+
+        then: 'the file has the new text'
+        if (emulatorSupportsUpdate()) {
+            assert objectStorageEntry.get().inputStream.text == NEW_TEXT
+        }
+
+        when: 'deleting the file'
+        storage.delete(key)
+
+        then: 'the file does not exist'
         noExceptionThrown()
         !storage.exists(uploadRequest.key)
         !storage.listObjects()
 
-        when: 'get file based on path'
-        objectStorageEntry = storage.retrieve(tempFileName)
+        when: 'retrieving the file'
+        objectStorageEntry = storage.retrieve(key)
 
-        then:
+        then: 'the file does not exist'
         !objectStorageEntry.isPresent()
     }
 
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
 
-    boolean supportsMetadata() {
+    boolean emulatorSupportsMetadata() {
+        true
+    }
+
+    boolean emulatorSupportsUpdate() {
         true
     }
 
