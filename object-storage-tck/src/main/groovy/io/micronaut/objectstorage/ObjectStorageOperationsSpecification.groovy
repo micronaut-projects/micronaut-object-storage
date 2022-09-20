@@ -32,6 +32,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
     void 'it can upload, get and delete object from file'() {
         given:
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
         Path path = createTempFile()
         String tempFileName = path.getFileName().toString()
 
@@ -41,17 +42,20 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         uploadRequest.contentType = CONTENT_TYPE
 
         then:
-        !getObjectStorage().exists(uploadRequest.key)
+        !storage.exists(uploadRequest.key)
+        !storage.listObjects()
 
         when: 'put file to object storage'
-        UploadResponse response = getObjectStorage().upload(uploadRequest)
+        UploadResponse response = storage.upload(uploadRequest)
 
         then:
         response.ETag
-        getObjectStorage().exists(uploadRequest.key)
+        storage.exists(uploadRequest.key)
+        storage.listObjects().size() == 1
+        storage.listObjects().first() == uploadRequest.key
 
         when: 'get file based on path'
-        Optional<ObjectStorageEntry<?>> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
+        Optional<ObjectStorageEntry<?>> objectStorageEntry = storage.retrieve(tempFileName)
 
         then:
         objectStorageEntry.isPresent()
@@ -72,14 +76,15 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         text == TEXT
 
         when: 'delete the file on object storage'
-        getObjectStorage().delete(tempFileName)
+        storage.delete(tempFileName)
 
         then:
         noExceptionThrown()
-        !getObjectStorage().exists(uploadRequest.key)
+        !storage.exists(uploadRequest.key)
+        !storage.listObjects()
 
         when: 'get file based on path'
-        objectStorageEntry = getObjectStorage().retrieve(tempFileName)
+        objectStorageEntry = storage.retrieve(tempFileName)
 
         then:
         !objectStorageEntry.isPresent()

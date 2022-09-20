@@ -17,12 +17,15 @@ package io.micronaut.objectstorage.oraclecloud;
 
 import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
+import com.oracle.bmc.objectstorage.model.ObjectSummary;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.HeadObjectRequest;
+import com.oracle.bmc.objectstorage.requests.ListObjectsRequest;
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
+import com.oracle.bmc.objectstorage.responses.ListObjectsResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
@@ -36,7 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Oracle Cloud implementation of {@link ObjectStorageOperations}.
@@ -136,6 +141,21 @@ public class OracleCloudStorageOperations
         } catch (BmcException e) {
             return false;
         }
+    }
+
+    @NonNull
+    @Override
+    public Set<String> listObjects() {
+        ListObjectsResponse response = client.listObjects(ListObjectsRequest.builder()
+            .bucketName(configuration.getBucket())
+            .namespaceName(configuration.getNamespace())
+            .build());
+
+        return response.getListObjects()
+            .getObjects()
+            .stream()
+            .map(ObjectSummary::getName)
+            .collect(Collectors.toSet());
     }
 
     /**

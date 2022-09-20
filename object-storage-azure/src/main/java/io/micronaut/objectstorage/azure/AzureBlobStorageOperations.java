@@ -21,6 +21,7 @@ import com.azure.core.util.Context;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
@@ -37,7 +38,9 @@ import jakarta.inject.Singleton;
 
 import java.io.UncheckedIOException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.azure.storage.common.implementation.Constants.HeaderConstants.ETAG_WILDCARD;
 import static java.lang.Boolean.TRUE;
@@ -105,6 +108,14 @@ public class AzureBlobStorageOperations
     public boolean exists(@NonNull String key) {
         final BlobClient blobClient = blobContainerClient.getBlobClient(key);
         return blobClient.exists();
+    }
+
+    @NonNull
+    @Override
+    public Set<String> listObjects() {
+        return blobContainerClient.listBlobs().stream()
+            .map(BlobItem::getName)
+            .collect(Collectors.toSet());
     }
 
     /**

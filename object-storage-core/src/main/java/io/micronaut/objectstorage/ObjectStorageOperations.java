@@ -20,7 +20,9 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -87,7 +89,20 @@ public interface ObjectStorageOperations<I, O, D> {
      * @return true if the entry exists, false otherwise.
      * @since 1.1.0
      */
+    @Blocking
     default boolean exists(@NonNull String key) {
         return false;
+    }
+
+    /**
+     * Lists the objects that exist in the object storage.
+     *
+     * @return a list of keys (paths) of the existing objects, if any, or an empty list otherwise.
+     * @since 1.1.0
+     */
+    @Blocking
+    @NonNull
+    default Set<String> listObjects() {
+        return Collections.emptySet();
     }
 }

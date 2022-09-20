@@ -15,7 +15,6 @@
  */
 package io.micronaut.objectstorage.googlecloud;
 
-
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -32,7 +31,10 @@ import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Google Cloud implementation of {@link ObjectStorageOperations}.
@@ -112,6 +114,15 @@ public class GoogleCloudStorageOperations
         BlobId blobId = BlobId.of(configuration.getBucket(), key);
         Blob blob = storage.get(blobId);
         return blobExists(blob);
+    }
+
+    @NonNull
+    @Override
+    public Set<String> listObjects() {
+        Iterable<Blob> blobs = storage.list(configuration.getBucket()).iterateAll();
+        return StreamSupport.stream(blobs.spliterator(), false)
+            .map(BlobInfo::getName)
+            .collect(Collectors.toSet());
     }
 
     /**

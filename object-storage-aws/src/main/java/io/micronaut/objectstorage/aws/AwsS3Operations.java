@@ -36,12 +36,16 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -143,6 +147,15 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } catch (AwsServiceException | SdkClientException e) {
             throw new ObjectStorageException("Error when trying to check the existence  of a file in Amazon S3", e);
         }
+    }
+
+    @NonNull
+    @Override
+    public Set<String> listObjects() {
+        ListObjectsResponse response = s3Client.listObjects(b -> b.bucket(configuration.getBucket()));
+        return response.contents().stream()
+            .map(S3Object::key)
+            .collect(Collectors.toSet());
     }
 
     /**
