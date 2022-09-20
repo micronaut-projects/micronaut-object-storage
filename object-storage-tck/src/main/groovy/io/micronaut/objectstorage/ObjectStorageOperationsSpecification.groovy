@@ -35,14 +35,20 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         Path path = createTempFile()
         String tempFileName = path.getFileName().toString()
 
-        when: 'put file to object storage'
+        when: 'create the upload request'
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
         uploadRequest.metadata = METADATA
         uploadRequest.contentType = CONTENT_TYPE
+
+        then:
+        !getObjectStorage().exists(uploadRequest.key)
+
+        when: 'put file to object storage'
         UploadResponse response = getObjectStorage().upload(uploadRequest)
 
         then:
         response.ETag
+        getObjectStorage().exists(uploadRequest.key)
 
         when: 'get file based on path'
         Optional<ObjectStorageEntry<?>> objectStorageEntry = getObjectStorage().retrieve(tempFileName)
@@ -70,6 +76,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         then:
         noExceptionThrown()
+        !getObjectStorage().exists(uploadRequest.key)
 
         when: 'get file based on path'
         objectStorageEntry = getObjectStorage().retrieve(tempFileName)

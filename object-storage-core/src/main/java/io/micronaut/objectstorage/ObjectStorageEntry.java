@@ -16,13 +16,11 @@
 package io.micronaut.objectstorage;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.naming.NameUtils;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.http.server.types.files.SystemFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

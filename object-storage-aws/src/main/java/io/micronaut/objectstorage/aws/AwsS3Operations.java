@@ -35,6 +35,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
@@ -79,7 +80,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
             PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
             return UploadResponse.of(uploadRequest.getKey(), response.eTag(), response);
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to upload a file to AWS S3", e);
+            throw new ObjectStorageException("Error when trying to upload a file to Amazon S3", e);
         }
     }
 
@@ -112,7 +113,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } catch (NoSuchKeyException noSuchKeyException) {
             return Optional.empty();
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to retrieve a file from AWS S3", e);
+            throw new ObjectStorageException("Error when trying to retrieve a file from Amazon S3", e);
         }
     }
 
@@ -125,7 +126,22 @@ public class AwsS3Operations implements ObjectStorageOperations<
                 .key(key)
                 .build());
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to delete a file from AWS S3 ", e);
+            throw new ObjectStorageException("Error when trying to delete a file from Amazon S3 ", e);
+        }
+    }
+
+    @Override
+    public boolean exists(@NonNull String key) {
+        try {
+            s3Client.headObject(HeadObjectRequest.builder()
+                .bucket(configuration.getBucket())
+                .key(key)
+                .build());
+            return true;
+        } catch (NoSuchKeyException noSuchKeyException) {
+            return false;
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new ObjectStorageException("Error when trying to check the existence  of a file in Amazon S3", e);
         }
     }
 

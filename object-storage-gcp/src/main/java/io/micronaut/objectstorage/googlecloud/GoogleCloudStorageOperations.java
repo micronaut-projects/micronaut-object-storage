@@ -87,7 +87,7 @@ public class GoogleCloudStorageOperations
         try {
             Blob blob = storage.get(blobId);
 
-            if (blob != null && blob.exists()) {
+            if (blobExists(blob)) {
                 storageEntry = new GoogleCloudStorageEntry(blob);
             }
             return Optional.ofNullable(storageEntry);
@@ -105,6 +105,13 @@ public class GoogleCloudStorageOperations
         } catch (StorageException e) {
             throw new ObjectStorageException("Error when trying to delete an object from Google Cloud Storage", e);
         }
+    }
+
+    @Override
+    public boolean exists(@NonNull String key) {
+        BlobId blobId = BlobId.of(configuration.getBucket(), key);
+        Blob blob = storage.get(blobId);
+        return blobExists(blob);
     }
 
     /**
@@ -131,5 +138,9 @@ public class GoogleCloudStorageOperations
         } catch (StorageException e) {
             throw new ObjectStorageException("Error when trying to upload an object to Google Cloud Storage", e);
         }
+    }
+
+    private boolean blobExists(Blob blob) {
+        return blob != null && blob.exists();
     }
 }

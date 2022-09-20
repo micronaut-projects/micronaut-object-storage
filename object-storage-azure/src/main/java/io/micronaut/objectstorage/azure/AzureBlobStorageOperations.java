@@ -101,6 +101,12 @@ public class AzureBlobStorageOperations
         return blobClient.getBlockBlobClient().deleteWithResponse(null, null, null, Context.NONE);
     }
 
+    @Override
+    public boolean exists(@NonNull String key) {
+        final BlobClient blobClient = blobContainerClient.getBlobClient(key);
+        return blobClient.exists();
+    }
+
     /**
      * @param request the upload request
      * @return An Azure's {@link BlobParallelUploadOptions} from a Micronaut's {@link UploadRequest}.

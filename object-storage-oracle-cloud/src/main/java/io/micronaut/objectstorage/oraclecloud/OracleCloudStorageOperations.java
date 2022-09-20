@@ -19,6 +19,7 @@ import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
+import com.oracle.bmc.objectstorage.requests.HeadObjectRequest;
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
@@ -120,6 +121,20 @@ public class OracleCloudStorageOperations
                 .build());
         } catch (BmcException e) {
             throw new ObjectStorageException("Error when trying to delete an object from Oracle Cloud Storage", e);
+        }
+    }
+
+    @Override
+    public boolean exists(@NonNull String key) {
+        try {
+            client.headObject(HeadObjectRequest.builder()
+                .bucketName(configuration.getBucket())
+                .namespaceName(configuration.getNamespace())
+                .objectName(key)
+                .build());
+            return true;
+        } catch (BmcException e) {
+            return false;
         }
     }
 

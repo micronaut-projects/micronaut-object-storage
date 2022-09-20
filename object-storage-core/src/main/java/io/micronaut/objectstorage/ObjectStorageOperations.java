@@ -79,4 +79,15 @@ public interface ObjectStorageOperations<I, O, D> {
     @Blocking
     @NonNull
     D delete(@NonNull String key);
+
+    /**
+     * Checks whether an entry with the given key exists in the object storage.
+     *
+     * @param key object path in the format {@code /foo/bar/file}
+     * @return true if the entry exists, false otherwise.
+     * @since 1.1.0
+     */
+    default boolean exists(@NonNull String key) {
+        return false;
+    }
 }
