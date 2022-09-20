@@ -1,5 +1,6 @@
 package io.micronaut.objectstorage
 
+import io.micronaut.core.annotation.NonNull
 import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
@@ -53,21 +54,25 @@ class ObjectStorageEntrySpec extends Specification {
 
         private File file = createTempFile().toFile()
 
+        @NonNull
         @Override
         String getKey() {
             return file.name
         }
 
+        @NonNull
         @Override
         InputStream getInputStream() {
             return file.newInputStream()
         }
 
+        @NonNull
         @Override
         Object getNativeEntry() {
             return null
         }
 
+        @NonNull
         @Override
         Optional<String> getContentType() {
             return Optional.of(MediaType.TEXT_PLAIN)
