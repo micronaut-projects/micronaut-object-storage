@@ -1,5 +1,7 @@
 package io.micronaut.objectstorage.oraclecloud
 
+import com.oracle.bmc.Region
+import com.oracle.bmc.auth.RegionProvider
 import com.oracle.bmc.objectstorage.ObjectStorage
 import com.oracle.bmc.objectstorage.requests.*
 import com.oracle.bmc.objectstorage.responses.*
@@ -60,5 +62,15 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
             return PutObjectResponse.builder().eTag("etag").build()
         }
 
+    }
+
+    @Requires(property = "spec.name", value = SPEC_NAME)
+    @Singleton
+    static class TestRegionProvider implements RegionProvider {
+
+        @Override
+        Region getRegion() {
+            return Region.EU_MARSEILLE_1
+        }
     }
 }
