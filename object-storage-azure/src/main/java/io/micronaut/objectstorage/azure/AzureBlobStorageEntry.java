@@ -83,6 +83,7 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
      * @return The {@link BlobProperties}.
      * @since 1.1.0
      */
+    @Nullable
     public BlobProperties getBlobProperties() {
         return this.blobProperties;
     }

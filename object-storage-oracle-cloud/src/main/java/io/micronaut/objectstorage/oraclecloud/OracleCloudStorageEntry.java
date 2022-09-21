@@ -63,7 +63,7 @@ public class OracleCloudStorageEntry implements ObjectStorageEntry<GetObjectResp
     @Override
     public Map<String, String> getMetadata() {
         if (CollectionUtils.isNotEmpty(objectResponse.getOpcMeta())) {
-            return objectResponse.getOpcMeta();
+            return Collections.unmodifiableMap(objectResponse.getOpcMeta());
         } else {
             return Collections.emptyMap();
         }

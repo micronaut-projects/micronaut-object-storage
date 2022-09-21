@@ -21,6 +21,7 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -65,7 +66,7 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResp
     @NonNull
     @Override
     public Map<String, String> getMetadata() {
-        return responseInputStream.response().metadata();
+        return Collections.unmodifiableMap(responseInputStream.response().metadata());
     }
 
     @NonNull
