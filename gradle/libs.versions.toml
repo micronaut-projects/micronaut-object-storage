@@ -4,6 +4,7 @@ micronaut-docs = '2.0.0'
 micronaut-test = '3.1.1'
 groovy = '3.0.10'
 gcp-libraries = '26.1.1'
+awaitility = '4.2.0'
 
 # Gradle plugins
 micronaut-gradle-plugin = "3.5.3"
@@ -24,6 +25,7 @@ oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorag
 groovy-test = { module = 'org.codehaus.groovy:groovy-test' }
 testcontainers-spock = { module = 'org.testcontainers:spock' }
 testcontainers-localstack = { module = 'org.testcontainers:localstack' }
+awaitility-groovy = { module = 'org.awaitility:awaitility-groovy', version.ref = 'awaitility'}
 
 # Plugins
 gradle-micronaut = { module = "io.micronaut.gradle:micronaut-gradle-plugin", version.ref = "micronaut-gradle-plugin" }

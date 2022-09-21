@@ -63,4 +63,9 @@ class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
     boolean emulatorSupportsUpdate() {
         return false
     }
+
+    @Override
+    boolean emulatorSupportsCopy() {
+        return false
+    }
 }

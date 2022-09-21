@@ -121,6 +121,15 @@ public class AzureBlobStorageOperations
             .collect(Collectors.toSet());
     }
 
+    @NonNull
+    @Override
+    public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+        final BlobClient sourceBlobClient = blobContainerClient.getBlobClient(sourceKey);
+        final BlobClient destinationBlobClient = blobContainerClient.getBlobClient(destinationKey);
+
+        destinationBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl());
+    }
+
     /**
      * @param request the upload request
      * @return An Azure's {@link BlobParallelUploadOptions} from a Micronaut's {@link UploadRequest}.

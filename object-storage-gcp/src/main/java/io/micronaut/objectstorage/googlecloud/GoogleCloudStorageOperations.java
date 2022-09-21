@@ -94,7 +94,8 @@ public class GoogleCloudStorageOperations
             }
             return Optional.ofNullable(storageEntry);
         } catch (StorageException e) {
-            throw new ObjectStorageException("Error when trying to retrieve an object from Google Cloud Storage", e);
+            String msg = String.format("Error when trying to retrieve an object with key [%s] from Google Cloud Storage", key);
+            throw new ObjectStorageException(msg, e);
         }
     }
 
@@ -105,24 +106,45 @@ public class GoogleCloudStorageOperations
         try {
             return storage.delete(blobId);
         } catch (StorageException e) {
-            throw new ObjectStorageException("Error when trying to delete an object from Google Cloud Storage", e);
+            String msg = String.format("Error when trying to delete an object with key [%s] from Google Cloud Storage", key);
+            throw new ObjectStorageException(msg, e);
         }
     }
 
     @Override
     public boolean exists(@NonNull String key) {
-        BlobId blobId = BlobId.of(configuration.getBucket(), key);
-        Blob blob = storage.get(blobId);
-        return blobExists(blob);
+        try {
+            Blob blob = storage.get(BlobId.of(configuration.getBucket(), key));
+            return blobExists(blob);
+        } catch (StorageException e) {
+            String msg = String.format("Error when checking the existence of an object with key [%s] from Google Cloud Storage", key);
+            throw new ObjectStorageException(msg, e);
+        }
     }
 
     @NonNull
     @Override
     public Set<String> listObjects() {
-        Iterable<Blob> blobs = storage.list(configuration.getBucket()).iterateAll();
-        return StreamSupport.stream(blobs.spliterator(), false)
-            .map(BlobInfo::getName)
-            .collect(Collectors.toSet());
+        String bucket = configuration.getBucket();
+        try {
+            Iterable<Blob> blobs = storage.list(bucket).iterateAll();
+            return StreamSupport.stream(blobs.spliterator(), false)
+                .map(BlobInfo::getName)
+                .collect(Collectors.toSet());
+        } catch (StorageException e) {
+            String msg = String.format("Error when listing the objects of the Google Cloud Storage bucket [%s]", bucket);
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+        try {
+            storage.copy(Storage.CopyRequest.of(configuration.getBucket(), sourceKey, destinationKey));
+        } catch (StorageException e) {
+            String msg = String.format("Error when copying the object with key [%s] to key [%s] in Google Cloud Storage", sourceKey, destinationKey);
+            throw new ObjectStorageException(msg, e);
+        }
     }
 
     /**

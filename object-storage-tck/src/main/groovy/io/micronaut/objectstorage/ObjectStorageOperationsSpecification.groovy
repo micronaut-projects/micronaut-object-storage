@@ -22,6 +22,8 @@ import spock.lang.Specification
 import java.nio.file.Files
 import java.nio.file.Path
 
+import static org.awaitility.Awaitility.await
+
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
     public static final String TEXT = 'micronaut'
@@ -76,6 +78,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         if (emulatorSupportsUpdate()) {
             path.toFile().text = NEW_TEXT
             uploadRequest = UploadRequest.fromPath(path)
+            uploadRequest.metadata = METADATA
+            uploadRequest.contentType = CONTENT_TYPE
             response = storage.upload(uploadRequest)
         }
 
@@ -92,17 +96,45 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
             objectStorageEntry = storage.retrieve(key)
         }
 
-        then: 'the file has the new text'
+        then: 'the file has the new text and correct metadata and content type'
         if (emulatorSupportsUpdate()) {
             assert objectStorageEntry.get().inputStream.text == NEW_TEXT
+            assert objectStorageEntry.get().metadata == METADATA
+            assert objectStorageEntry.get().contentType.get() == CONTENT_TYPE
         }
 
-        when: 'deleting the file'
-        storage.delete(key)
+        when: 'copying the file to a new location'
+        String newKey = "newFile.txt"
+        if (emulatorSupportsCopy()) {
+            storage.copy(key, newKey)
+        }
 
-        then: 'the file does not exist'
+        then: 'the file also exists'
+        if (emulatorSupportsCopy()) {
+            assert storage.exists(key)
+            await().until { storage.exists(newKey) }
+            assert storage.exists(newKey)
+            assert storage.listObjects().size() == 2
+        }
+
+        and: 'it has metadata and content type'
+        if (emulatorSupportsCopy()) {
+            assert storage.retrieve(newKey).get().metadata == METADATA
+            assert storage.retrieve(newKey).get().contentType.get() == CONTENT_TYPE
+        }
+
+        when: 'deleting the files'
+        storage.delete(key)
+        if (emulatorSupportsCopy()) {
+            storage.delete(newKey)
+        }
+
+        then: 'the files do not exist'
         noExceptionThrown()
-        !storage.exists(uploadRequest.key)
+        !storage.exists(key)
+        if (emulatorSupportsCopy()) {
+            assert !storage.exists(newKey)
+        }
         !storage.listObjects()
 
         when: 'retrieving the file'
@@ -119,6 +151,10 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     }
 
     boolean emulatorSupportsUpdate() {
+        true
+    }
+
+    boolean emulatorSupportsCopy() {
         true
     }
 

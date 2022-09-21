@@ -13,6 +13,7 @@ dependencies {
     implementation(mn.micronaut.runtime)
     implementation(mn.spock)
     implementation(libs.groovy.test)
+    implementation(libs.awaitility.groovy)
 }
 
 repositories {

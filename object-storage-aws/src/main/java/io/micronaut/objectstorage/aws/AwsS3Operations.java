@@ -31,17 +31,20 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -84,7 +87,8 @@ public class AwsS3Operations implements ObjectStorageOperations<
             PutObjectResponse response = s3Client.putObject(objectRequest, requestBody);
             return UploadResponse.of(uploadRequest.getKey(), response.eTag(), response);
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to upload a file to Amazon S3", e);
+            String msg = String.format("Error when trying to upload a file with key [%s] to Amazon S3", uploadRequest.getKey());
+            throw new ObjectStorageException(msg, e);
         }
     }
 
@@ -99,7 +103,8 @@ public class AwsS3Operations implements ObjectStorageOperations<
             PutObjectResponse response = s3Client.putObject(builder.build(), requestBody);
             return UploadResponse.of(request.getKey(), response.eTag(), response);
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to upload a file to AWS S3", e);
+            String msg = String.format("Error when trying to upload a file with key [%s] to AWS S3", request.getKey());
+            throw new ObjectStorageException(msg, e);
         }
     }
 
@@ -117,7 +122,8 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } catch (NoSuchKeyException noSuchKeyException) {
             return Optional.empty();
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to retrieve a file from Amazon S3", e);
+            String msg = String.format("Error when trying to retrieve a file with key [%s] from Amazon S3", key);
+            throw new ObjectStorageException(msg, e);
         }
     }
 
@@ -130,7 +136,8 @@ public class AwsS3Operations implements ObjectStorageOperations<
                 .key(key)
                 .build());
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to delete a file from Amazon S3 ", e);
+            String msg = String.format("Error when trying to delete a file with key [%s] from Amazon S3", key);
+            throw new ObjectStorageException(msg, e);
         }
     }
 
@@ -145,17 +152,41 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } catch (NoSuchKeyException noSuchKeyException) {
             return false;
         } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to check the existence  of a file in Amazon S3", e);
+            String msg = String.format("Error when trying to check the existence of a file with key [%s] in Amazon S3", key);
+            throw new ObjectStorageException(msg, e);
         }
     }
 
     @NonNull
     @Override
     public Set<String> listObjects() {
-        ListObjectsResponse response = s3Client.listObjects(b -> b.bucket(configuration.getBucket()));
-        return response.contents().stream()
-            .map(S3Object::key)
-            .collect(Collectors.toSet());
+        String bucket = configuration.getBucket();
+        try {
+            ListObjectsResponse response = s3Client.listObjects(b -> b.bucket(bucket));
+            return response.contents().stream()
+                .map(S3Object::key)
+                .collect(Collectors.toSet());
+        } catch (NoSuchBucketException e) {
+            return Collections.emptySet();
+        } catch (AwsServiceException | SdkClientException e) {
+            String msg = String.format("Error when listing the objects of the bucket [%s] in Amazon S3", bucket);
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+        try {
+            s3Client.copyObject(CopyObjectRequest.builder()
+                .sourceBucket(configuration.getBucket())
+                .destinationBucket(configuration.getBucket())
+                .sourceKey(sourceKey)
+                .destinationKey(destinationKey)
+                .build());
+        } catch (AwsServiceException | SdkClientException e) {
+            String msg = String.format("Error when trying to copy a file from key [%s] to key [%s] in Amazon S3", sourceKey, destinationKey);
+            throw new ObjectStorageException(msg, e);
+        }
     }
 
     /**

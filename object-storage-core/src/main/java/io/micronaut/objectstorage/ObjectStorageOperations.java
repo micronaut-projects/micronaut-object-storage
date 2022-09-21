@@ -105,4 +105,16 @@ public interface ObjectStorageOperations<I, O, D> {
     default Set<String> listObjects() {
         return Collections.emptySet();
     }
+
+    /**
+     * Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+     * same object storage (bucket/container). If the destination exists, it will be overwritten.
+     *
+     * @param sourceKey the key of the source object
+     * @param destinationKey the key of the destination object
+     * @since 1.1.0
+     */
+    @Blocking
+    default void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+    }
 }

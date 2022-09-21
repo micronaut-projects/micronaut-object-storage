@@ -15,9 +15,12 @@
  */
 package io.micronaut.objectstorage.oraclecloud;
 
+import com.oracle.bmc.auth.RegionProvider;
 import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
+import com.oracle.bmc.objectstorage.model.CopyObjectDetails;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
+import com.oracle.bmc.objectstorage.requests.CopyObjectRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.HeadObjectRequest;
@@ -35,9 +38,11 @@ import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -57,16 +62,30 @@ public class OracleCloudStorageOperations
 
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
+    private final RegionProvider regionProvider;
 
     /**
-     *
      * @param configuration Oracle Cloud Storage Configuration
      * @param client Object Storage Client
+     * @deprecated use {@link #OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)}
      */
+    @Deprecated
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client) {
-        this.client = client;
+        this(configuration, client, null);
+    }
+
+    /**
+     * @param configuration Oracle Cloud Storage Configuration
+     * @param client Object Storage Client
+     * @param regionProvider Region provider, to determine the current region
+     */
+    @Inject
+    public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
+                                        ObjectStorage client, RegionProvider regionProvider) {
         this.configuration = configuration;
+        this.client = client;
+        this.regionProvider = regionProvider;
     }
 
     @Override
@@ -146,16 +165,45 @@ public class OracleCloudStorageOperations
     @NonNull
     @Override
     public Set<String> listObjects() {
-        ListObjectsResponse response = client.listObjects(ListObjectsRequest.builder()
-            .bucketName(configuration.getBucket())
-            .namespaceName(configuration.getNamespace())
-            .build());
+        String bucket = configuration.getBucket();
+        try {
+            ListObjectsResponse response = client.listObjects(ListObjectsRequest.builder()
+                .bucketName(bucket)
+                .namespaceName(configuration.getNamespace())
+                .build());
 
-        return response.getListObjects()
-            .getObjects()
-            .stream()
-            .map(ObjectSummary::getName)
-            .collect(Collectors.toSet());
+            return response.getListObjects()
+                .getObjects()
+                .stream()
+                .map(ObjectSummary::getName)
+                .collect(Collectors.toSet());
+        } catch (BmcException e) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Error when listing the objects in the bucket {} from Oracle Cloud Storage: {}", bucket, e.getMessage(), e);
+            }
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+        String bucket = configuration.getBucket();
+        try {
+            client.copyObject(CopyObjectRequest.builder()
+                .bucketName(bucket)
+                .namespaceName(configuration.getNamespace())
+                .copyObjectDetails(CopyObjectDetails.builder()
+                    .sourceObjectName(sourceKey)
+                    .destinationObjectName(destinationKey)
+                    .destinationBucket(bucket)
+                    .destinationNamespace(configuration.getNamespace())
+                    .destinationRegion(regionProvider.getRegion().getRegionId())
+                    .build())
+                .build());
+        } catch (BmcException e) {
+            String msg = String.format("Error when copying a file from the key [%s] to the key [%s] in the Oracle Cloud Storage bucket [%s]", sourceKey, destinationKey, bucket);
+            throw new ObjectStorageException(msg, e);
+        }
     }
 
     /**
