@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -162,28 +162,48 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#copy-java.lang.String-java.lang.String-">copy</a></span>(java.lang.String&nbsp;sourceKey,
+    java.lang.String&nbsp;destinationKey)</code>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+ same object storage (bucket/container).</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected com.google.cloud.storage.BlobInfo.Builder</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#createBlobInfoBuilder-io.micronaut.objectstorage.request.UploadRequest-">createBlobInfoBuilder</a></span>(<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code>&nbsp;</td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.Boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#delete-java.lang.String-">delete</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Deletes an object from the object storage.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#exists-java.lang.String-">exists</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#listObjects--">listObjects</a></span>()</code>
+<div class="block">Lists the objects that exist in the object storage.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.google.cloud.storage.Blob&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code>
 <div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.google.cloud.storage.Blob&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest,
       java.util.function.Consumer&lt;com.google.cloud.storage.BlobInfo.Builder&gt;&nbsp;uploadRequestBuilder)</code>
@@ -249,7 +269,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 public&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.google.cloud.storage.Blob&gt;&nbsp;upload(@NonNull
                                                                      <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">ObjectStorageOperations</a></code></span></div>
-<div class="block">Uploads an object to the object storage.</div>
+<div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder,com.google.cloud.storage.Blob,java.lang.Boolean&gt;</code></dd>
@@ -272,7 +292,7 @@ public&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadRespo
                                                                      @NonNull
                                                                      java.util.function.Consumer&lt;com.google.cloud.storage.BlobInfo.Builder&gt;&nbsp;uploadRequestBuilder)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">ObjectStorageOperations</a></code></span></div>
-<div class="block">Uploads an object to the object storage.</div>
+<div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder,com.google.cloud.storage.Blob,java.lang.Boolean&gt;</code></dd>
@@ -323,6 +343,66 @@ public&nbsp;java.lang.Boolean&nbsp;delete(@NonNull
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Cloud vendor-specific delete response.</dd>
+</dl>
+</li>
+</ul>
+<a name="exists-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>exists</h4>
+<pre>public&nbsp;boolean&nbsp;exists(@NonNull
+                      java.lang.String&nbsp;key)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#exists-java.lang.String-">ObjectStorageOperations</a></code></span></div>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#exists-java.lang.String-">exists</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder,com.google.cloud.storage.Blob,java.lang.Boolean&gt;</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the entry exists, false otherwise.</dd>
+</dl>
+</li>
+</ul>
+<a name="listObjects--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>listObjects</h4>
+<pre>@NonNull
+public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;listObjects()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#listObjects--">ObjectStorageOperations</a></code></span></div>
+<div class="block">Lists the objects that exist in the object storage.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#listObjects--">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder,com.google.cloud.storage.Blob,java.lang.Boolean&gt;</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+</dl>
+</li>
+</ul>
+<a name="copy-java.lang.String-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>copy</h4>
+<pre>public&nbsp;void&nbsp;copy(@NonNull
+                 java.lang.String&nbsp;sourceKey,
+                 @NonNull
+                 java.lang.String&nbsp;destinationKey)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#copy-java.lang.String-java.lang.String-">ObjectStorageOperations</a></code></span></div>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+ same object storage (bucket/container). If the destination exists, it will be overwritten.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#copy-java.lang.String-java.lang.String-">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder,com.google.cloud.storage.Blob,java.lang.Boolean&gt;</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sourceKey</code> - the key of the source object</dd>
+<dd><code>destinationKey</code> - the key of the destination object</dd>
 </dl>
 </li>
 </ul>

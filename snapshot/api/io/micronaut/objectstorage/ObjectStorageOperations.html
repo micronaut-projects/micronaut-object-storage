@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
+var methods = {"i0":18,"i1":6,"i2":18,"i3":18,"i4":6,"i5":6,"i6":6};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],16:["t5","Default Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -130,30 +130,50 @@ var activeTableTab = "activeTableTab";
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t3" class="tableTab"><span><a href="javascript:show(4);">Abstract Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t5" class="tableTab"><span><a href="javascript:show(16);">Default Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>default void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#copy-java.lang.String-java.lang.String-">copy</a></span>(java.lang.String&nbsp;sourceKey,
+    java.lang.String&nbsp;destinationKey)</code>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+ same object storage (bucket/container).</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">D</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#delete-java.lang.String-">delete</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Deletes an object from the object storage.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>default boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#exists-java.lang.String-">exists</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>default java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#listObjects--">listObjects</a></span>()</code>
+<div class="block">Lists the objects that exist in the object storage.</div>
+</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>&lt;E extends <a href="../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;?&gt;&gt;<br>java.util.Optional&lt;E&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">upload</a></span>(<a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code>
 <div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">upload</a></span>(<a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
       java.util.function.Consumer&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">I</a>&gt;&nbsp;requestConsumer)</code>
@@ -184,7 +204,7 @@ var activeTableTab = "activeTableTab";
 <pre>@NonNull
 <a href="../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>&gt;&nbsp;upload(@NonNull
                                   <a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</pre>
-<div class="block">Uploads an object to the object storage.</div>
+<div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>request</code> - the upload request</dd>
@@ -206,7 +226,7 @@ var activeTableTab = "activeTableTab";
                                   <a href="../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
                                   @NonNull
                                   java.util.function.Consumer&lt;<a href="../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">I</a>&gt;&nbsp;requestConsumer)</pre>
-<div class="block">Uploads an object to the object storage.</div>
+<div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>request</code> - the upload request</dd>
@@ -243,7 +263,7 @@ var activeTableTab = "activeTableTab";
 <a name="delete-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>delete</h4>
 <pre>@NonNull
@@ -257,6 +277,63 @@ var activeTableTab = "activeTableTab";
 <dd>Cloud vendor-specific delete response.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></code> - if there was a failure deleting the object</dd>
+</dl>
+</li>
+</ul>
+<a name="exists-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>exists</h4>
+<pre>default&nbsp;boolean&nbsp;exists(@NonNull
+                       java.lang.String&nbsp;key)</pre>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the entry exists, false otherwise.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.0</dd>
+</dl>
+</li>
+</ul>
+<a name="listObjects--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>listObjects</h4>
+<pre>@NonNull
+default&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;listObjects()</pre>
+<div class="block">Lists the objects that exist in the object storage.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.0</dd>
+</dl>
+</li>
+</ul>
+<a name="copy-java.lang.String-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>copy</h4>
+<pre>default&nbsp;void&nbsp;copy(@NonNull
+                  java.lang.String&nbsp;sourceKey,
+                  @NonNull
+                  java.lang.String&nbsp;destinationKey)</pre>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+ same object storage (bucket/container). If the destination exists, it will be overwritten.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sourceKey</code> - the key of the source object</dd>
+<dd><code>destinationKey</code> - the key of the destination object</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.0</dd>
 </dl>
 </li>
 </ul>

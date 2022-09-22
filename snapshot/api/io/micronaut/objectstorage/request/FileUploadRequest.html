@@ -73,7 +73,7 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#fields.inherited.from.class.io.micronaut.objectstorage.request.AbstractUploadRequest">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
@@ -98,7 +98,12 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
+<li><a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">io.micronaut.objectstorage.request.AbstractUploadRequest</a></li>
+<li>
+<ul class="inheritance">
 <li>io.micronaut.objectstorage.request.FileUploadRequest</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -112,7 +117,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre>public class <span class="typeNameLabel">FileUploadRequest</span>
-extends java.lang.Object
+extends <a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a>
 implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></pre>
 <div class="block">Upload request implementation using <code>File</code>.</div>
 </li>
@@ -121,6 +126,21 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field.summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.objectstorage.request.AbstractUploadRequest">
+<!--   -->
+</a>
+<h3>Fields inherited from class&nbsp;io.micronaut.objectstorage.request.<a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></h3>
+<code><a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html#contentType">contentType</a>, <a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html#metadata">metadata</a></code></li>
+</ul>
+</li>
+</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -144,6 +164,12 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
                  java.lang.String&nbsp;keyName,
                  java.lang.String&nbsp;prefix,
                  java.lang.String&nbsp;contentType)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/FileUploadRequest.html#FileUploadRequest-java.lang.String-java.lang.String-java.nio.file.Path-java.util.Map-">FileUploadRequest</a></span>(java.lang.String&nbsp;keyName,
+                 java.lang.String&nbsp;contentType,
+                 java.nio.file.Path&nbsp;path,
+                 java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -190,6 +216,13 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 </tr>
 </table>
 <ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.objectstorage.request.AbstractUploadRequest">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;io.micronaut.objectstorage.request.<a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></h3>
+<code><a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html#getMetadata--">getMetadata</a>, <a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html#setContentType-java.lang.String-">setContentType</a>, <a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html#setMetadata-java.util.Map-">setMetadata</a></code></li>
+</ul>
+<ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
 <!--   -->
 </a>
@@ -201,7 +234,7 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;io.micronaut.objectstorage.request.<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></h3>
-<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-">fromPath</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-java.lang.String-">fromPath</a></code></li>
+<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-">fromPath</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-java.lang.String-">fromPath</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#getMetadata--">getMetadata</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#setContentType-java.lang.String-">setContentType</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#setMetadata-java.util.Map-">setMetadata</a></code></li>
 </ul>
 </li>
 </ul>
@@ -242,7 +275,7 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <a name="FileUploadRequest-java.nio.file.Path-java.lang.String-java.lang.String-java.lang.String-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>FileUploadRequest</h4>
 <pre>public&nbsp;FileUploadRequest(@NonNull
@@ -253,6 +286,22 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
                          java.lang.String&nbsp;prefix,
                          @Nullable
                          java.lang.String&nbsp;contentType)</pre>
+</li>
+</ul>
+<a name="FileUploadRequest-java.lang.String-java.lang.String-java.nio.file.Path-java.util.Map-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>FileUploadRequest</h4>
+<pre>public&nbsp;FileUploadRequest(@NonNull
+                         java.lang.String&nbsp;keyName,
+                         @Nullable
+                         java.lang.String&nbsp;contentType,
+                         @NonNull
+                         java.nio.file.Path&nbsp;path,
+                         @NonNull
+                         java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</pre>
 </li>
 </ul>
 </li>
@@ -422,7 +471,7 @@ public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#fields.inherited.from.class.io.micronaut.objectstorage.request.AbstractUploadRequest">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>

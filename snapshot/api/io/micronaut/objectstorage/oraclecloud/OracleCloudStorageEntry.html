@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -158,16 +158,24 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.ht
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getContentType--">getContentType</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getInputStream--">getInputStream</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getKey--">getKey</a></span>()</code>
 <div class="block">The object path on object storage.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getMetadata--">getMetadata</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>com.oracle.bmc.objectstorage.responses.GetObjectResponse</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getNativeEntry--">getNativeEntry</a></span>()</code>&nbsp;</td>
 </tr>
@@ -178,6 +186,13 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.ht
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
 <code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.objectstorage.ObjectStorageEntry">
+<!--   -->
+</a>
+<h3>Methods inherited from interface&nbsp;io.micronaut.objectstorage.<a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></h3>
+<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#toStreamedFile--">toStreamedFile</a>, <a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#toSystemFile--">toSystemFile</a></code></li>
 </ul>
 </li>
 </ul>
@@ -248,7 +263,7 @@ public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
 <a name="getNativeEntry--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getNativeEntry</h4>
 <pre>@NonNull
@@ -258,6 +273,38 @@ public&nbsp;com.oracle.bmc.objectstorage.responses.GetObjectResponse&nbsp;getNat
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getNativeEntry--">getNativeEntry</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;com.oracle.bmc.objectstorage.responses.GetObjectResponse&gt;</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The underlying cloud vendor-specific response object.</dd>
+</dl>
+</li>
+</ul>
+<a name="getMetadata--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMetadata</h4>
+<pre>@NonNull
+public&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getMetadata()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getMetadata--">getMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;com.oracle.bmc.objectstorage.responses.GetObjectResponse&gt;</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a map with key-value pairs that were stored along the file. An empty map by default.</dd>
+</dl>
+</li>
+</ul>
+<a name="getContentType--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getContentType</h4>
+<pre>@NonNull
+public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getContentType()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html#getContentType--">getContentType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;com.oracle.bmc.objectstorage.responses.GetObjectResponse&gt;</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the MIME type of the entry.</dd>
 </dl>
 </li>
 </ul>

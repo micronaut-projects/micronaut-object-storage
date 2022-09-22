@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":17,"i1":17,"i2":17,"i3":17,"i4":17,"i5":17,"i6":6,"i7":6,"i8":6,"i9":6};
+var methods = {"i0":17,"i1":17,"i2":17,"i3":17,"i4":17,"i5":17,"i6":6,"i7":6,"i8":6,"i9":6,"i10":18,"i11":18,"i12":18};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],16:["t5","Default Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -99,7 +99,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><a href="../../../../io/micronaut/objectstorage/request/BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a>, <a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a>, <a href="../../../../io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dd>
+<dd><a href="../../../../io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a>, <a href="../../../../io/micronaut/objectstorage/request/BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a>, <a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a>, <a href="../../../../io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dd>
 </dl>
 <hr>
 <br>
@@ -171,6 +171,18 @@ var activeTableTab = "activeTableTab";
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#getKey--">getKey</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i10" class="altColor">
+<td class="colFirst"><code>default java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#getMetadata--">getMetadata</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i11" class="rowColor">
+<td class="colFirst"><code>default void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#setContentType-java.lang.String-">setContentType</a></span>(java.lang.String&nbsp;contentType)</code>&nbsp;</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code>default void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#setMetadata-java.util.Map-">setMetadata</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -349,7 +361,7 @@ java.util.Optional&lt;java.lang.Long&gt;&nbsp;getContentSize()</pre>
 <a name="getInputStream--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getInputStream</h4>
 <pre>@NonNull
@@ -357,6 +369,54 @@ java.io.InputStream&nbsp;getInputStream()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>an input stream of the object to be stored.</dd>
+</dl>
+</li>
+</ul>
+<a name="getMetadata--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMetadata</h4>
+<pre>@NonNull
+default&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getMetadata()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a map with key-value pairs to be stored along the file. An empty map by default.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.0</dd>
+</dl>
+</li>
+</ul>
+<a name="setMetadata-java.util.Map-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setMetadata</h4>
+<pre>default&nbsp;void&nbsp;setMetadata(@NonNull
+                         java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>metadata</code> - a map with key-value pairs to be stored along the file.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.0</dd>
+</dl>
+</li>
+</ul>
+<a name="setContentType-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>setContentType</h4>
+<pre>default&nbsp;void&nbsp;setContentType(@NonNull
+                            java.lang.String&nbsp;contentType)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>contentType</code> - the content type of this upload request.</dd>
+<dt><span class="simpleTagLabel">Since:</span></dt>
+<dd>1.1.0</dd>
 </dl>
 </li>
 </ul>

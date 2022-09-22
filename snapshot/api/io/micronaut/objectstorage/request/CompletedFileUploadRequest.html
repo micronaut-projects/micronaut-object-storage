@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -145,6 +145,11 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#CompletedFileUploadRequest-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-">CompletedFileUploadRequest</a></span>(io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload,
                           java.lang.String&nbsp;key)</code>&nbsp;</td>
 </tr>
+<tr class="altColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#CompletedFileUploadRequest-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-java.util.Map-">CompletedFileUploadRequest</a></span>(io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload,
+                          java.lang.String&nbsp;key,
+                          java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</code>&nbsp;</td>
+</tr>
 </table>
 </li>
 </ul>
@@ -176,6 +181,14 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getKey--">getKey</a></span>()</code>&nbsp;</td>
 </tr>
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getMetadata--">getMetadata</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#setMetadata-java.util.Map-">setMetadata</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</code>&nbsp;</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -189,7 +202,7 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;io.micronaut.objectstorage.request.<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></h3>
-<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-">fromPath</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-java.lang.String-">fromPath</a></code></li>
+<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromBytes-byte:A-java.lang.String-java.lang.String-">fromBytes</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromCompletedFileUpload-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-">fromCompletedFileUpload</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-">fromPath</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#fromPath-java.nio.file.Path-java.lang.String-">fromPath</a>, <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#setContentType-java.lang.String-">setContentType</a></code></li>
 </ul>
 </li>
 </ul>
@@ -211,17 +224,34 @@ implements <a href="../../../../io/micronaut/objectstorage/request/UploadRequest
 <ul class="blockList">
 <li class="blockList">
 <h4>CompletedFileUploadRequest</h4>
-<pre>public&nbsp;CompletedFileUploadRequest(io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload)</pre>
+<pre>public&nbsp;CompletedFileUploadRequest(@NonNull
+                                  io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload)</pre>
 </li>
 </ul>
 <a name="CompletedFileUploadRequest-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-">
 <!--   -->
 </a>
+<ul class="blockList">
+<li class="blockList">
+<h4>CompletedFileUploadRequest</h4>
+<pre>public&nbsp;CompletedFileUploadRequest(@NonNull
+                                  io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload,
+                                  @NonNull
+                                  java.lang.String&nbsp;key)</pre>
+</li>
+</ul>
+<a name="CompletedFileUploadRequest-io.micronaut.http.multipart.CompletedFileUpload-java.lang.String-java.util.Map-">
+<!--   -->
+</a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>CompletedFileUploadRequest</h4>
-<pre>public&nbsp;CompletedFileUploadRequest(io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload,
-                                  java.lang.String&nbsp;key)</pre>
+<pre>public&nbsp;CompletedFileUploadRequest(@NonNull
+                                  io.micronaut.http.multipart.CompletedFileUpload&nbsp;completedFileUpload,
+                                  @NonNull
+                                  java.lang.String&nbsp;key,
+                                  @NonNull
+                                  java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</pre>
 </li>
 </ul>
 </li>
@@ -283,7 +313,7 @@ public&nbsp;java.util.Optional&lt;java.lang.Long&gt;&nbsp;getContentSize()</pre>
 <a name="getInputStream--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getInputStream</h4>
 <pre>@NonNull
@@ -293,6 +323,38 @@ public&nbsp;java.io.InputStream&nbsp;getInputStream()</pre>
 <dd><code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#getInputStream--">getInputStream</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>an input stream of the object to be stored.</dd>
+</dl>
+</li>
+</ul>
+<a name="getMetadata--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMetadata</h4>
+<pre>@NonNull
+public&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getMetadata()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#getMetadata--">getMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a map with key-value pairs to be stored along the file. An empty map by default.</dd>
+</dl>
+</li>
+</ul>
+<a name="setMetadata-java.util.Map-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>setMetadata</h4>
+<pre>public&nbsp;void&nbsp;setMetadata(@NonNull
+                        java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;metadata)</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html#setMetadata-java.util.Map-">setMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>metadata</code> - a map with key-value pairs to be stored along the file.</dd>
 </dl>
 </li>
 </ul>

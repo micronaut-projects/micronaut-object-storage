@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -141,7 +141,16 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#OracleCloudStorageOperations-io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration-com.oracle.bmc.objectstorage.ObjectStorage-">OracleCloudStorageOperations</a></span>(<a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a>&nbsp;configuration,
-                            com.oracle.bmc.objectstorage.ObjectStorage&nbsp;client)</code>&nbsp;</td>
+                            com.oracle.bmc.objectstorage.ObjectStorage&nbsp;client)</code>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
+<div class="block"><span class="deprecationComment">use <a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#OracleCloudStorageOperations-io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration-com.oracle.bmc.objectstorage.ObjectStorage-com.oracle.bmc.auth.RegionProvider-"><code>OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)</code></a></span></div>
+</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#OracleCloudStorageOperations-io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration-com.oracle.bmc.objectstorage.ObjectStorage-com.oracle.bmc.auth.RegionProvider-">OracleCloudStorageOperations</a></span>(<a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a>&nbsp;configuration,
+                            com.oracle.bmc.objectstorage.ObjectStorage&nbsp;client,
+                            com.oracle.bmc.auth.RegionProvider&nbsp;regionProvider)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -159,28 +168,48 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#copy-java.lang.String-java.lang.String-">copy</a></span>(java.lang.String&nbsp;sourceKey,
+    java.lang.String&nbsp;destinationKey)</code>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+ same object storage (bucket/container).</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>com.oracle.bmc.objectstorage.responses.DeleteObjectResponse</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#delete-java.lang.String-">delete</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Deletes an object from the object storage.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#exists-java.lang.String-">exists</a></span>(java.lang.String&nbsp;key)</code>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#getRequestBuilder-io.micronaut.objectstorage.request.UploadRequest-">getRequestBuilder</a></span>(<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code>&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>java.util.Set&lt;java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#listObjects--">listObjects</a></span>()</code>
+<div class="block">Lists the objects that exist in the object storage.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>java.util.Optional&lt;<a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageEntry</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#retrieve-java.lang.String-">retrieve</a></span>(java.lang.String&nbsp;key)</code>
 <div class="block">Gets the object from object storage.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.oracle.bmc.objectstorage.responses.PutObjectResponse&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code>
 <div class="block">Uploads an object to the object storage.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.oracle.bmc.objectstorage.responses.PutObjectResponse&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">upload</a></span>(<a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
       java.util.function.Consumer&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder&gt;&nbsp;requestConsumer)</code>
@@ -212,16 +241,37 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 <a name="OracleCloudStorageOperations-io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration-com.oracle.bmc.objectstorage.ObjectStorage-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>OracleCloudStorageOperations</h4>
-<pre>public&nbsp;OracleCloudStorageOperations(@Parameter
-                                    <a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a>&nbsp;configuration,
-                                    com.oracle.bmc.objectstorage.ObjectStorage&nbsp;client)</pre>
+<pre>@Deprecated
+public&nbsp;OracleCloudStorageOperations(@Parameter
+                                                <a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a>&nbsp;configuration,
+                                                com.oracle.bmc.objectstorage.ObjectStorage&nbsp;client)</pre>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">use <a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#OracleCloudStorageOperations-io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration-com.oracle.bmc.objectstorage.ObjectStorage-com.oracle.bmc.auth.RegionProvider-"><code>OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)</code></a></span></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>configuration</code> - Oracle Cloud Storage Configuration</dd>
 <dd><code>client</code> - Object Storage Client</dd>
+</dl>
+</li>
+</ul>
+<a name="OracleCloudStorageOperations-io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration-com.oracle.bmc.objectstorage.ObjectStorage-com.oracle.bmc.auth.RegionProvider-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>OracleCloudStorageOperations</h4>
+<pre>@Inject
+public&nbsp;OracleCloudStorageOperations(@Parameter
+                                            <a href="../../../../io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a>&nbsp;configuration,
+                                            com.oracle.bmc.objectstorage.ObjectStorage&nbsp;client,
+                                            com.oracle.bmc.auth.RegionProvider&nbsp;regionProvider)</pre>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>configuration</code> - Oracle Cloud Storage Configuration</dd>
+<dd><code>client</code> - Object Storage Client</dd>
+<dd><code>regionProvider</code> - Region provider, to determine the current region</dd>
 </dl>
 </li>
 </ul>
@@ -243,7 +293,7 @@ implements <a href="../../../../io/micronaut/objectstorage/ObjectStorageOperatio
 public&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.oracle.bmc.objectstorage.responses.PutObjectResponse&gt;&nbsp;upload(@NonNull
                                                                                                 <a href="../../../../io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">ObjectStorageOperations</a></code></span></div>
-<div class="block">Uploads an object to the object storage.</div>
+<div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder,com.oracle.bmc.objectstorage.responses.PutObjectResponse,com.oracle.bmc.objectstorage.responses.DeleteObjectResponse&gt;</code></dd>
@@ -266,7 +316,7 @@ public&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadRespo
                                                                                                 @NonNull
                                                                                                 java.util.function.Consumer&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder&gt;&nbsp;requestConsumer)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">ObjectStorageOperations</a></code></span></div>
-<div class="block">Uploads an object to the object storage.</div>
+<div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#upload-io.micronaut.objectstorage.request.UploadRequest-java.util.function.Consumer-">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder,com.oracle.bmc.objectstorage.responses.PutObjectResponse,com.oracle.bmc.objectstorage.responses.DeleteObjectResponse&gt;</code></dd>
@@ -317,6 +367,66 @@ public&nbsp;com.oracle.bmc.objectstorage.responses.DeleteObjectResponse&nbsp;del
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Cloud vendor-specific delete response.</dd>
+</dl>
+</li>
+</ul>
+<a name="exists-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>exists</h4>
+<pre>public&nbsp;boolean&nbsp;exists(@NonNull
+                      java.lang.String&nbsp;key)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#exists-java.lang.String-">ObjectStorageOperations</a></code></span></div>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#exists-java.lang.String-">exists</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder,com.oracle.bmc.objectstorage.responses.PutObjectResponse,com.oracle.bmc.objectstorage.responses.DeleteObjectResponse&gt;</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true if the entry exists, false otherwise.</dd>
+</dl>
+</li>
+</ul>
+<a name="listObjects--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>listObjects</h4>
+<pre>@NonNull
+public&nbsp;java.util.Set&lt;java.lang.String&gt;&nbsp;listObjects()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#listObjects--">ObjectStorageOperations</a></code></span></div>
+<div class="block">Lists the objects that exist in the object storage.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#listObjects--">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder,com.oracle.bmc.objectstorage.responses.PutObjectResponse,com.oracle.bmc.objectstorage.responses.DeleteObjectResponse&gt;</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+</dl>
+</li>
+</ul>
+<a name="copy-java.lang.String-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>copy</h4>
+<pre>public&nbsp;void&nbsp;copy(@NonNull
+                 java.lang.String&nbsp;sourceKey,
+                 @NonNull
+                 java.lang.String&nbsp;destinationKey)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#copy-java.lang.String-java.lang.String-">ObjectStorageOperations</a></code></span></div>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+ same object storage (bucket/container). If the destination exists, it will be overwritten.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html#copy-java.lang.String-java.lang.String-">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.oracle.bmc.objectstorage.requests.PutObjectRequest.Builder,com.oracle.bmc.objectstorage.responses.PutObjectResponse,com.oracle.bmc.objectstorage.responses.DeleteObjectResponse&gt;</code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>sourceKey</code> - the key of the source object</dd>
+<dd><code>destinationKey</code> - the key of the destination object</dd>
 </dl>
 </li>
 </ul>

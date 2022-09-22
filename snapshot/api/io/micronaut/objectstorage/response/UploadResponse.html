@@ -150,7 +150,9 @@ public interface <span class="typeNameLabel">UploadResponse&lt;R&gt;</span></pre
 <td class="colFirst"><code>static &lt;R&gt;&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;R&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html#of-java.lang.String-java.lang.String-R-">of</a></span>(java.lang.String&nbsp;key,
   java.lang.String&nbsp;eTag,
-  R&nbsp;nativeResponse)</code>&nbsp;</td>
+  R&nbsp;nativeResponse)</code>
+<div class="block">Creates an instance from the given parameters.</div>
+</td>
 </tr>
 </table>
 </li>
@@ -167,13 +169,42 @@ public interface <span class="typeNameLabel">UploadResponse&lt;R&gt;</span></pre
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="of-java.lang.String-java.lang.String-java.lang.Object-">
+<!--   -->
+</a><a name="of-java.lang.String-java.lang.String-R-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>of</h4>
+<pre>@NonNull
+static&nbsp;&lt;R&gt;&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;R&gt;&nbsp;of(@NonNull
+                                         java.lang.String&nbsp;key,
+                                         @NonNull
+                                         java.lang.String&nbsp;eTag,
+                                         @NonNull
+                                         R&nbsp;nativeResponse)</pre>
+<div class="block">Creates an instance from the given parameters.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>R</code> - Cloud vendor-specific upload response</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>key</code> - the key under which the file will be stored.</dd>
+<dd><code>eTag</code> - the entity tag of the object stored.</dd>
+<dd><code>nativeResponse</code> - upload response object.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>an upload response instance.</dd>
+</dl>
+</li>
+</ul>
 <a name="getKey--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getKey</h4>
-<pre>java.lang.String&nbsp;getKey()</pre>
+<pre>@NonNull
+java.lang.String&nbsp;getKey()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The key under which the object was stored.</dd>
@@ -186,7 +217,8 @@ public interface <span class="typeNameLabel">UploadResponse&lt;R&gt;</span></pre
 <ul class="blockList">
 <li class="blockList">
 <h4>getETag</h4>
-<pre>java.lang.String&nbsp;getETag()</pre>
+<pre>@NonNull
+java.lang.String&nbsp;getETag()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>the entity tag of the object stored (an identifier for a specific version of the object).</dd>
@@ -196,27 +228,15 @@ public interface <span class="typeNameLabel">UploadResponse&lt;R&gt;</span></pre
 <a name="getNativeResponse--">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>getNativeResponse</h4>
-<pre><a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="type parameter in UploadResponse">R</a>&nbsp;getNativeResponse()</pre>
+<pre>@NonNull
+<a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="type parameter in UploadResponse">R</a>&nbsp;getNativeResponse()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Cloud vendor-specific upload response</dd>
 </dl>
-</li>
-</ul>
-<a name="of-java.lang.String-java.lang.String-java.lang.Object-">
-<!--   -->
-</a><a name="of-java.lang.String-java.lang.String-R-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>of</h4>
-<pre>static&nbsp;&lt;R&gt;&nbsp;<a href="../../../../io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;R&gt;&nbsp;of(java.lang.String&nbsp;key,
-                                java.lang.String&nbsp;eTag,
-                                R&nbsp;nativeResponse)</pre>
 </li>
 </ul>
 </li>
