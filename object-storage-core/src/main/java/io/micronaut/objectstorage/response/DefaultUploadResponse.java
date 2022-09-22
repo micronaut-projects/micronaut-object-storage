@@ -15,6 +15,8 @@
  */
 package io.micronaut.objectstorage.response;
 
+import io.micronaut.core.annotation.NonNull;
+
 /**
  * Default implementation of {@link UploadResponse}.
  *
@@ -32,16 +34,19 @@ public class DefaultUploadResponse<R> implements UploadResponse<R> {
         this.nativeResponse = nativeResponse;
     }
 
+    @NonNull
     @Override
     public String getKey() {
         return key;
     }
 
+    @NonNull
     @Override
     public String getETag() {
         return eTag;
     }
 
+    @NonNull
     @Override
     public R getNativeResponse() {
         return nativeResponse;

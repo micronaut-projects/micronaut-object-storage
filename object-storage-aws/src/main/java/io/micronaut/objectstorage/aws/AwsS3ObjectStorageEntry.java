@@ -21,6 +21,9 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link ObjectStorageEntry} implementation for AWS S3.
@@ -30,13 +33,14 @@ import java.io.InputStream;
  */
 public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResponse> {
 
-    private final ResponseInputStream<GetObjectResponse> responseInputStream;
-
     @NonNull
     private final String key;
 
+    @NonNull
+    private final ResponseInputStream<GetObjectResponse> responseInputStream;
+
     public AwsS3ObjectStorageEntry(@NonNull String key,
-                            ResponseInputStream<GetObjectResponse> responseInputStream) {
+                                   @NonNull ResponseInputStream<GetObjectResponse> responseInputStream) {
         this.responseInputStream = responseInputStream;
         this.key = key;
     }
@@ -57,5 +61,17 @@ public class AwsS3ObjectStorageEntry implements ObjectStorageEntry<GetObjectResp
     @Override
     public GetObjectResponse getNativeEntry() {
         return responseInputStream.response();
+    }
+
+    @NonNull
+    @Override
+    public Map<String, String> getMetadata() {
+        return Collections.unmodifiableMap(responseInputStream.response().metadata());
+    }
+
+    @NonNull
+    @Override
+    public Optional<String> getContentType() {
+        return Optional.ofNullable(responseInputStream.response().contentType());
     }
 }

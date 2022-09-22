@@ -21,6 +21,8 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link ObjectStorageEntry} implementation for Google Cloud Storage.
@@ -52,5 +54,17 @@ public class GoogleCloudStorageEntry implements ObjectStorageEntry<Blob> {
     @Override
     public Blob getNativeEntry() {
         return blob;
+    }
+
+    @NonNull
+    @Override
+    public Map<String, String> getMetadata() {
+        return blob.getMetadata();
+    }
+
+    @NonNull
+    @Override
+    public Optional<String> getContentType() {
+        return Optional.ofNullable(blob.getContentType());
     }
 }

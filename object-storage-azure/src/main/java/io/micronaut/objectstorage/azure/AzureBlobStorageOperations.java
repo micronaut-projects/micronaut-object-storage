@@ -20,21 +20,30 @@ import com.azure.core.util.BinaryData;
 import com.azure.core.util.Context;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.BlobHttpHeaders;
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobProperties;
 import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
+import com.azure.storage.blob.options.BlockBlobSimpleUploadOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Singleton;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.azure.storage.common.implementation.Constants.HeaderConstants.ETAG_WILDCARD;
 import static java.lang.Boolean.TRUE;
@@ -81,7 +90,8 @@ public class AzureBlobStorageOperations
         if (TRUE.equals(blobClient.exists())) {
             try {
                 BinaryData data = blobClient.getBlockBlobClient().downloadContent();
-                storageEntry = new AzureBlobStorageEntry(key, data);
+                BlobProperties blobProperties = blobClient.getProperties();
+                storageEntry = new AzureBlobStorageEntry(key, data, blobProperties);
             } catch (UncheckedIOException e) {
                 throw new ObjectStorageException("Error when trying to retrieve a file from Azure Blob Storage", e);
             }
@@ -97,23 +107,73 @@ public class AzureBlobStorageOperations
         return blobClient.getBlockBlobClient().deleteWithResponse(null, null, null, Context.NONE);
     }
 
+    @Override
+    public boolean exists(@NonNull String key) {
+        final BlobClient blobClient = blobContainerClient.getBlobClient(key);
+        return blobClient.exists();
+    }
+
+    @NonNull
+    @Override
+    public Set<String> listObjects() {
+        return blobContainerClient.listBlobs().stream()
+            .map(BlobItem::getName)
+            .collect(Collectors.toSet());
+    }
+
+    @NonNull
+    @Override
+    public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+        final BlobClient sourceBlobClient = blobContainerClient.getBlobClient(sourceKey);
+        final BlobClient destinationBlobClient = blobContainerClient.getBlobClient(destinationKey);
+
+        destinationBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl());
+    }
+
     /**
      * @param request the upload request
      * @return An Azure's {@link BlobParallelUploadOptions} from a Micronaut's {@link UploadRequest}.
      */
     @NonNull
     protected BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
-        return new BlobParallelUploadOptions(request.getInputStream())
+        BlobParallelUploadOptions options = new BlobParallelUploadOptions(request.getInputStream())
             .setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            options.setMetadata(request.getMetadata());
+        }
+        if (request.getContentType().isPresent()) {
+            BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(request.getContentType().get());
+            options.setHeaders(headers);
+        }
+        return options;
     }
 
     private UploadResponse<BlockBlobItem> doUpload(@NonNull UploadRequest request,
                                              @NonNull BlobParallelUploadOptions options) {
-        final BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
+        final BlobClient client = blobContainerClient.getBlobClient(request.getKey());
+        BlockBlobItem item;
+        if (request.getContentSize().isPresent()) {
+            long length = request.getContentSize().get();
+            BlockBlobSimpleUploadOptions simpleUploadOptions = toBlockBlobSimpleUploadOptions(options, request.getInputStream(), length);
+            item = client
+                .getBlockBlobClient()
+                .uploadWithResponse(simpleUploadOptions, null, Context.NONE)
+                .getValue();
+        } else {
+            client.deleteIfExists();
+            item = client.uploadWithResponse(options, null, Context.NONE).getValue();
+        }
 
         //TODO: make timeout configurable
-        Response<BlockBlobItem> response = blobClient.uploadWithResponse(options, null, Context.NONE);
-        return UploadResponse.of(request.getKey(), response.getValue().getETag(), response.getValue());
+        return UploadResponse.of(request.getKey(), item.getETag(), item);
+    }
+
+    private BlockBlobSimpleUploadOptions toBlockBlobSimpleUploadOptions(@NonNull BlobParallelUploadOptions options, @NonNull InputStream inputStream, @NonNull long length) {
+        BlockBlobSimpleUploadOptions simpleUploadOptions =
+            new BlockBlobSimpleUploadOptions(new BufferedInputStream(inputStream), length);
+        simpleUploadOptions.setMetadata(options.getMetadata());
+        simpleUploadOptions.setHeaders(options.getHeaders());
+        return simpleUploadOptions;
     }
 
 }

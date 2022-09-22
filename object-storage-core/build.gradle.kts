@@ -9,6 +9,7 @@ dependencies {
 
     implementation(mn.micronaut.inject.java)
     implementation(mn.micronaut.runtime)
+    implementation(mn.micronaut.http.server)
 
     testImplementation(projects.objectStorageTck)
     testImplementation(mn.micronaut.http.server.netty)

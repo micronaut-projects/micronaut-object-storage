@@ -16,8 +16,18 @@
 package io.micronaut.objectstorage;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.server.types.files.StreamedFile;
+import io.micronaut.http.server.types.files.SystemFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Object storage entry.
@@ -47,4 +57,55 @@ public interface ObjectStorageEntry<O> {
      */
     @NonNull
     O getNativeEntry();
+
+    /**
+     * @return a map with key-value pairs that were stored along the file. An empty map by default.
+     * @since 1.1.0
+     */
+    @NonNull
+    default Map<String, String> getMetadata() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * @return the MIME type of the entry.
+     * @since 1.1.0
+     */
+    @NonNull
+    default Optional<String> getContentType() {
+        return Optional.empty();
+    }
+
+    /**
+     * @return a {@link StreamedFile} from this entry.
+     * @since 1.1.0
+     */
+    @NonNull
+    default StreamedFile toStreamedFile() {
+        MediaType mediaType = MediaType.of(getContentType().orElse(MediaType.ALL));
+        String key = getKey();
+        String fileName = key.substring(key.lastIndexOf(File.separator) + 1);
+        return new StreamedFile(getInputStream(), mediaType).attach(fileName);
+    }
+
+    /**
+     * @return a {@link SystemFile} from this entry. Note that calling this method will consume the
+     * {@link #getInputStream()}, which will be closed.
+     * @since 1.1.0
+     */
+    @NonNull
+    default SystemFile toSystemFile() {
+        try {
+            String key = getKey();
+            String fileName = key.substring(key.lastIndexOf(File.separator) + 1);
+            File file = Files.createTempFile("", fileName).toFile();
+            file.deleteOnExit();
+            Files.copy(getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            getInputStream().close();
+            MediaType mediaType = MediaType.of(getContentType().orElse(MediaType.ALL));
+            return new SystemFile(file, mediaType).attach(fileName);
+        } catch (IOException e) {
+            throw new ObjectStorageException(e);
+        }
+    }
 }

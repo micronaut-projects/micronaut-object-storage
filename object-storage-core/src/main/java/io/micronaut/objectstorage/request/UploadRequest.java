@@ -20,6 +20,8 @@ import io.micronaut.http.multipart.CompletedFileUpload;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -114,5 +116,28 @@ public interface UploadRequest {
      */
     @NonNull
     InputStream getInputStream();
+
+    /**
+     * @return a map with key-value pairs to be stored along the file. An empty map by default.
+     * @since 1.1.0
+     */
+    @NonNull
+    default Map<String, String> getMetadata() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * @param metadata a map with key-value pairs to be stored along the file.
+     * @since 1.1.0
+     */
+    default void setMetadata(@NonNull Map<String, String> metadata) {
+    }
+
+    /**
+     * @param contentType the content type of this upload request.
+     * @since 1.1.0
+     */
+    default void setContentType(@NonNull String contentType) {
+    }
 
 }

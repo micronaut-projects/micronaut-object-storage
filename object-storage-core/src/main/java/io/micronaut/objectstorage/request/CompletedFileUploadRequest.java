@@ -22,6 +22,8 @@ import io.micronaut.objectstorage.ObjectStorageException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,17 +34,26 @@ import java.util.Optional;
  */
 public class CompletedFileUploadRequest implements UploadRequest {
 
+    @NonNull
     private final CompletedFileUpload completedFileUpload;
+    @NonNull
     private final String key;
 
-    public CompletedFileUploadRequest(CompletedFileUpload completedFileUpload) {
-        this.completedFileUpload = completedFileUpload;
-        this.key = completedFileUpload.getName();
+    @NonNull
+    private Map<String, String> metadata;
+
+    public CompletedFileUploadRequest(@NonNull CompletedFileUpload completedFileUpload) {
+        this(completedFileUpload, completedFileUpload.getName(), Collections.emptyMap());
     }
 
-    public CompletedFileUploadRequest(CompletedFileUpload completedFileUpload, String key) {
+    public CompletedFileUploadRequest(@NonNull CompletedFileUpload completedFileUpload, @NonNull String key) {
+        this(completedFileUpload, key, Collections.emptyMap());
+    }
+
+    public CompletedFileUploadRequest(@NonNull CompletedFileUpload completedFileUpload, @NonNull String key, @NonNull Map<String, String> metadata) {
         this.completedFileUpload = completedFileUpload;
         this.key = key;
+        this.metadata = metadata;
     }
 
     @NonNull
@@ -72,5 +83,16 @@ public class CompletedFileUploadRequest implements UploadRequest {
         } catch (IOException e) {
             throw new ObjectStorageException(e);
         }
+    }
+
+    @Override
+    @NonNull
+    public Map<String, String> getMetadata() {
+        return this.metadata;
+    }
+
+    @Override
+    public void setMetadata(@NonNull Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 }

@@ -16,10 +16,15 @@
 package io.micronaut.objectstorage.azure;
 
 import com.azure.core.util.BinaryData;
+import com.azure.storage.blob.models.BlobProperties;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * An {@link ObjectStorageEntry} implementation for Azure Blob Storage.
@@ -29,13 +34,31 @@ import java.io.InputStream;
  */
 public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
 
+    @NonNull
     private final String key;
 
+    @NonNull
     private final BinaryData data;
 
-    public AzureBlobStorageEntry(String key, BinaryData data) {
+    @Nullable
+    private BlobProperties blobProperties;
+
+    /**
+     * @param key the key
+     * @param data the binary data
+     * @deprecated Use {@link #AzureBlobStorageEntry(String, BinaryData, BlobProperties)}
+     */
+    @Deprecated
+    public AzureBlobStorageEntry(@NonNull String key, @NonNull BinaryData data) {
         this.key = key;
         this.data = data;
+    }
+
+    public AzureBlobStorageEntry(@NonNull String key, @NonNull BinaryData data,
+                                 @Nullable BlobProperties blobProperties) {
+        this.key = key;
+        this.data = data;
+        this.blobProperties = blobProperties;
     }
 
     @Override
@@ -54,5 +77,29 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
     @Override
     public BinaryData getNativeEntry() {
         return data;
+    }
+
+    /**
+     * @return The {@link BlobProperties}.
+     * @since 1.1.0
+     */
+    @Nullable
+    public BlobProperties getBlobProperties() {
+        return this.blobProperties;
+    }
+
+    @NonNull
+    @Override
+    public Map<String, String> getMetadata() {
+        return Optional.ofNullable(blobProperties)
+            .map(BlobProperties::getMetadata)
+            .orElse(Collections.emptyMap());
+    }
+
+    @NonNull
+    @Override
+    public Optional<String> getContentType() {
+        return Optional.ofNullable(blobProperties)
+            .map(BlobProperties::getContentType);
     }
 }

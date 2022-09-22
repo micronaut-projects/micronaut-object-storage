@@ -21,6 +21,8 @@ import io.micronaut.core.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,29 +31,32 @@ import java.util.Optional;
  * @author Burt Beckwith
  * @since 1.0
  */
-public class BytesUploadRequest implements UploadRequest {
+public class BytesUploadRequest extends AbstractUploadRequest implements UploadRequest {
 
     @NonNull
     private final byte[] bytes;
-
-    @Nullable
-    private String contentType;
 
     @NonNull
     private final String key;
 
     public BytesUploadRequest(@NonNull byte[] bytes, @NonNull String key) {
-        this.bytes = bytes;
-        this.key = key;
-        this.contentType = URLConnection.guessContentTypeFromName(key);
+        this(bytes, URLConnection.guessContentTypeFromName(key), key, Collections.emptyMap());
     }
 
     public BytesUploadRequest(@NonNull byte[] bytes,
                               @NonNull String key,
                               @NonNull String contentType) {
+        this(bytes, contentType, key, Collections.emptyMap());
+    }
+
+    public BytesUploadRequest(@NonNull byte[] bytes,
+                              @Nullable String contentType,
+                              @NonNull String key,
+                              @NonNull Map<String, String> metadata) {
         this.bytes = bytes;
-        this.key = key;
         this.contentType = contentType;
+        this.key = key;
+        this.metadata = metadata;
     }
 
     @Override
@@ -85,4 +90,5 @@ public class BytesUploadRequest implements UploadRequest {
     public byte[] getBytes() {
         return bytes;
     }
+
 }

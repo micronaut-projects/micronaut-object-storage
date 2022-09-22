@@ -20,7 +20,9 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -35,7 +37,7 @@ import java.util.function.Consumer;
 public interface ObjectStorageOperations<I, O, D> {
 
     /**
-     * Uploads an object to the object storage.
+     * Uploads an object to the object storage. If there is an existing entry, it will be updated.
      *
      * @param request the upload request
      * @return the upload response
@@ -46,7 +48,7 @@ public interface ObjectStorageOperations<I, O, D> {
     UploadResponse<O> upload(@NonNull UploadRequest request);
 
     /**
-     * Uploads an object to the object storage.
+     * Uploads an object to the object storage. If there is an existing entry, it will be updated.
      *
      * @param request the upload request
      * @param requestConsumer Upload request builder consumer
@@ -79,4 +81,40 @@ public interface ObjectStorageOperations<I, O, D> {
     @Blocking
     @NonNull
     D delete(@NonNull String key);
+
+    /**
+     * Checks whether an entry with the given key exists in the object storage.
+     *
+     * @param key object path in the format {@code /foo/bar/file}
+     * @return true if the entry exists, false otherwise.
+     * @since 1.1.0
+     */
+    @Blocking
+    default boolean exists(@NonNull String key) {
+        return false;
+    }
+
+    /**
+     * Lists the objects that exist in the object storage.
+     *
+     * @return a list of keys (paths) of the existing objects, if any, or an empty list otherwise.
+     * @since 1.1.0
+     */
+    @Blocking
+    @NonNull
+    default Set<String> listObjects() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+     * same object storage (bucket/container). If the destination exists, it will be overwritten.
+     *
+     * @param sourceKey the key of the source object
+     * @param destinationKey the key of the destination object
+     * @since 1.1.0
+     */
+    @Blocking
+    default void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+    }
 }
