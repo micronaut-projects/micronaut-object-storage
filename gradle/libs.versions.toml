@@ -8,7 +8,7 @@ awaitility = '4.2.0'
 
 # Gradle plugins
 micronaut-gradle-plugin = "3.6.2"
-kotlin-gradle-plugin = "1.7.20"
+kotlin-gradle-plugin = "1.7.21"
 
 [libraries]
 azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
