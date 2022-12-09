@@ -1,8 +1,8 @@
 [versions]
-micronaut = '3.7.0'
 micronaut-docs = '2.0.0'
 micronaut-test = '3.1.1'
 groovy = '3.0.10'
+micronaut = '4.0.0-SNAPSHOT'
 gcp-libraries = '26.1.5'
 awaitility = '4.2.0'
 
