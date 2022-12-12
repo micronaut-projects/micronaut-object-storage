@@ -7,7 +7,7 @@ gcp-libraries = '26.1.5'
 awaitility = '4.2.0'
 
 # Gradle plugins
-micronaut-gradle-plugin = "3.6.5"
+micronaut-gradle-plugin = "3.6.6"
 kotlin-gradle-plugin = "1.7.22"
 
 [libraries]
