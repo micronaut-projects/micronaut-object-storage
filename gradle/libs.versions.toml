@@ -4,6 +4,7 @@ micronaut-docs = "2.0.0"
 micronaut-test = '4.0.0-SNAPSHOT'
 micronaut-aws = '3.9.3'
 micronaut-azure = '4.0.0-SNAPSHOT'
+micronaut-gcp = '5.0.0-SNAPSHOT'
 
 groovy = '4.0.4'
 spock = '2.2-groovy-4.0'
@@ -26,6 +27,7 @@ micronaut-azure = { module = 'io.micronaut.azure:micronaut-azure-bom', version.r
 azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
 
 # GCP
+micronaut-gcp = { module = 'io.micronaut.gcp:micronaut-gcp-bom', version.ref = 'micronaut-gcp' }
 gcp-libraries-bom = { module = 'com.google.cloud:libraries-bom', version.ref = 'gcp-libraries' }
 gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 
