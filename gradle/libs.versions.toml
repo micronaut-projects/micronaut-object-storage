@@ -3,6 +3,7 @@ micronaut = '4.0.0-SNAPSHOT'
 micronaut-docs = "2.0.0"
 micronaut-test = '4.0.0-SNAPSHOT'
 micronaut-aws = '3.9.3'
+micronaut-azure = '4.0.0-SNAPSHOT'
 
 groovy = '4.0.4'
 spock = '2.2-groovy-4.0'
@@ -15,15 +16,20 @@ micronaut-gradle-plugin = '3.6.5'
 kotlin-gradle-plugin = '1.7.21'
 
 [libraries]
-azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
-
+# AWS
 micronaut-aws = { module = 'io.micronaut.aws:micronaut-aws-bom', version.ref = 'micronaut-aws' }
 amazon-awssdk-s3 = { module = 'software.amazon.awssdk:s3' }
 amazon-awssdk-v1 = { module = 'com.amazonaws:aws-java-sdk-core' }
 
+# Azure
+micronaut-azure = { module = 'io.micronaut.azure:micronaut-azure-bom', version.ref = 'micronaut-azure' }
+azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
+
+# GCP
 gcp-libraries-bom = { module = 'com.google.cloud:libraries-bom', version.ref = 'gcp-libraries' }
 gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 
+# Oracle Cloud
 oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorage' }
 
 # Others

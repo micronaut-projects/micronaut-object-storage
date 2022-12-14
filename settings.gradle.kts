@@ -20,7 +20,7 @@ include("object-storage-bom")
 include("object-storage-tck")
 
 include("object-storage-aws")
-//include("object-storage-azure")
+include("object-storage-azure")
 //include("object-storage-gcp")
 //include("object-storage-oracle-cloud")
 //
@@ -32,4 +32,5 @@ configure<MicronautBuildSettingsExtension> {
     addSnapshotRepository()
     importMicronautCatalog()
     importMicronautCatalog("micronaut-aws")
+    importMicronautCatalog("micronaut-azure")
 }
