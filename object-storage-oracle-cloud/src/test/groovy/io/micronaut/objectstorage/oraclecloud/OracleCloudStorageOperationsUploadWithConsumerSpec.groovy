@@ -14,6 +14,7 @@ import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -22,6 +23,7 @@ import java.nio.file.Path
 @Property(name = "micronaut.object-storage.oracle-cloud.default.bucket", value = "profile-pictures-bucket")
 @Property(name = "spec.name", value = SPEC_NAME)
 @MicronautTest
+@Ignore("Blocked by https://github.com/micronaut-projects/micronaut-oracle-cloud/pull/411")
 class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
 
     private static final String SPEC_NAME = "OracleCloudStorageOperationsUploadWithConsumerSpec"

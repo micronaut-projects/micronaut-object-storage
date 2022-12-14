@@ -11,9 +11,11 @@ import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+import spock.lang.Ignore
 
 import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
 
+@Ignore(inherited = true, value = "Blocked by https://github.com/micronaut-projects/micronaut-oracle-cloud/pull/411")
 abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     public static final String BUCKET_NAME = System.currentTimeMillis()

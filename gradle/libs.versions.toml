@@ -5,6 +5,7 @@ micronaut-test = '4.0.0-SNAPSHOT'
 micronaut-aws = '3.9.3'
 micronaut-azure = '4.0.0-SNAPSHOT'
 micronaut-gcp = '5.0.0-SNAPSHOT'
+micronaut-oracle-cloud = '2.3.1'
 
 groovy = '4.0.4'
 spock = '2.2-groovy-4.0'
@@ -32,6 +33,7 @@ gcp-libraries-bom = { module = 'com.google.cloud:libraries-bom', version.ref = '
 gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 
 # Oracle Cloud
+micronaut-oracle-cloud = { module = 'io.micronaut.oraclecloud:micronaut-oraclecloud-bom', version.ref = 'micronaut-oracle-cloud' }
 oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorage' }
 
 # Others
