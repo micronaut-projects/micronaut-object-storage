@@ -1,3 +1,3 @@
 plugins {
-    io.micronaut.build.internal.`objectstorage-example`
+    "io.micronaut.build.internal.objectstorage-example"
 }

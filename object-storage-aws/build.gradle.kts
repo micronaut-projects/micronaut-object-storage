@@ -4,10 +4,10 @@ plugins {
 
 dependencies {
     api(projects.objectStorageCore)
-    api(mn.micronaut.aws.sdk.v2)
+    api(mnAws.micronaut.aws.sdk.v2)
     api(libs.amazon.awssdk.s3)
 
-    implementation(platform(mn.micronaut.aws.bom))
+    implementation(platform(mnAws.micronaut.aws.bom))
     annotationProcessor(mn.micronaut.validation)
     implementation(mn.micronaut.validation)
 

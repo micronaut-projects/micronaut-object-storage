@@ -8,12 +8,18 @@ dependencies {
 
     api(projects.objectStorageCore)
 
-    implementation(platform(mn.micronaut.bom))
     implementation(mn.micronaut.inject.groovy)
     implementation(mn.micronaut.runtime)
-    implementation(mn.spock)
-    implementation(libs.groovy.test)
+    implementation(mnTest.micronaut.test.spock)
     implementation(libs.awaitility.groovy)
+}
+
+dependencies {
+    modules {
+        module("org.codehaus.groovy:groovy") {
+            replacedBy("org.apache.groovy:groovy", "google-collections is now part of Guava")
+        }
+    }
 }
 
 repositories {
