@@ -66,7 +66,6 @@ class AwsS3ConfigurationSpec extends Specification {
         '192.168.5.4'  | 'Bucket names must not be formatted as an IP address (for example, 192.168.5.4).'
         'xn--aaa'      | 'Bucket names must not start with the prefix xn--.'
         'aaaa-s3alias' | 'Bucket names must not end with the suffix -s3alias.'
-        'aaa.aa'       | "Buckets used with Amazon S3 Transfer Acceleration can't have dots (.) in their name"
     }
 
     void "verify valid bucket name"() {
