@@ -3,7 +3,7 @@ micronaut = '3.7.0'
 micronaut-docs = '2.0.0'
 micronaut-test = '3.1.1'
 groovy = '3.0.10'
-gcp-libraries = '26.2.0'
+gcp-libraries = '26.4.0'
 awaitility = '4.2.0'
 
 # Gradle plugins
