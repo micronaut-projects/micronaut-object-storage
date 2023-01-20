@@ -10,7 +10,6 @@ micronaut-oracle-cloud = '3.0.0-SNAPSHOT'
 groovy = '4.0.7'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.1.5'
-awaitility = '4.2.0'
 testcontainers = '1.17.6'
 
 # Gradle plugins
@@ -35,6 +34,7 @@ gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 # Oracle Cloud
 micronaut-oracle-cloud = { module = 'io.micronaut.oraclecloud:micronaut-oraclecloud-bom', version.ref = 'micronaut-oracle-cloud' }
 oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorage' }
+oci-sdk-httpclient-jersey3 = { module = 'com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3' }
 
 # Others
 groovy = { module = 'org.apache.groovy:groovy', version.ref = 'groovy' }
@@ -45,8 +45,6 @@ testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version
 # Which then makes importing the Testcontainers BOM pointless
 testcontainers-spock = { module = 'org.testcontainers:spock', version.ref = 'testcontainers' }
 testcontainers-localstack = { module = 'org.testcontainers:localstack', version.ref = 'testcontainers' }
-
-awaitility-groovy = { module = 'org.awaitility:awaitility-groovy', version.ref = 'awaitility'}
 
 # Plugins
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }

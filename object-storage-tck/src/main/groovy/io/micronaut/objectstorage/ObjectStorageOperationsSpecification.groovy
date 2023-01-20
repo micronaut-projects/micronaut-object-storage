@@ -18,11 +18,10 @@ package io.micronaut.objectstorage
 import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.objectstorage.response.UploadResponse
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
 import java.nio.file.Files
 import java.nio.file.Path
-
-import static org.awaitility.Awaitility.await
 
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
@@ -36,6 +35,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
         Path path = createTempFile()
         String key = path.getFileName().toString()
+        PollingConditions conditions = new PollingConditions(timeout: 30)
 
         when: 'creating the upload request'
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
@@ -112,7 +112,9 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         then: 'the file also exists'
         if (emulatorSupportsCopy()) {
             assert storage.exists(key)
-            await().until { storage.exists(newKey) }
+            conditions.eventually {
+                storage.exists(newKey)
+            }
             assert storage.exists(newKey)
             assert storage.listObjects().size() == 2
         }

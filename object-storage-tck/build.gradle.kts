@@ -11,7 +11,6 @@ dependencies {
     implementation(mn.micronaut.inject.groovy)
     implementation(mn.micronaut.runtime)
     implementation(mnTest.micronaut.test.spock)
-    implementation(libs.awaitility.groovy)
 }
 
 dependencies {
