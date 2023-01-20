@@ -51,7 +51,7 @@ public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
      * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html">Bucket Name Requirements</a>.
      */
     @NonNull
-    @Pattern(regexp = "(?!xn--)(?!.*-s3alias)^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$")
+    @Pattern(regexp = "(?!(^((2(5[0-5]|[0-4][0-9])|[01]?[0-9]{1,2})\\.){3}(2(5[0-5]|[0-4][0-9])|[01]?[0-9]{1,2})$|^xn--|.+-s3alias$|.*\\.\\.))^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$")
     private String bucket;
 
     /**

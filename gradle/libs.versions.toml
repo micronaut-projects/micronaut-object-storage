@@ -9,12 +9,12 @@ micronaut-oracle-cloud = '3.0.0-SNAPSHOT'
 
 groovy = '4.0.7'
 spock = '2.3-groovy-4.0'
-gcp-libraries = '26.1.5'
+gcp-libraries = '26.4.0'
 testcontainers = '1.17.6'
 
 # Gradle plugins
-micronaut-gradle-plugin = '3.6.5'
-kotlin-gradle-plugin = '1.7.21'
+micronaut-gradle-plugin = "3.7.0"
+kotlin-gradle-plugin = "1.8.0"
 
 [libraries]
 # AWS
