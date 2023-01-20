@@ -2,13 +2,13 @@
 micronaut = '4.0.0-SNAPSHOT'
 micronaut-docs = "2.0.0"
 micronaut-test = '4.0.0-SNAPSHOT'
-micronaut-aws = '3.9.3'
+micronaut-aws = '4.0.0-SNAPSHOT'
 micronaut-azure = '4.0.0-SNAPSHOT'
 micronaut-gcp = '5.0.0-SNAPSHOT'
-micronaut-oracle-cloud = '2.3.1'
+micronaut-oracle-cloud = '3.0.0-SNAPSHOT'
 
-groovy = '4.0.4'
-spock = '2.2-groovy-4.0'
+groovy = '4.0.7'
+spock = '2.3-groovy-4.0'
 gcp-libraries = '26.1.5'
 awaitility = '4.2.0'
 testcontainers = '1.17.6'
