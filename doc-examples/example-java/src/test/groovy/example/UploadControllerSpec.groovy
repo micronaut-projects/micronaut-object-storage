@@ -1,6 +1,5 @@
 package example
 
-import io.micronaut.context.annotation.Property
 import io.micronaut.context.env.Environment
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
@@ -17,7 +16,6 @@ import jakarta.inject.Named
 import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
@@ -49,17 +47,14 @@ class UploadControllerSpec extends Specification implements TestPropertyProvider
     @Override
     Map<String, String> getProperties() {
         localstack.start()
+        localstack.execInContainer("awslocal", "s3api", "create-bucket", "--bucket", BUCKET_NAME)
         return [
                 "aws.accessKeyId": localstack.getAccessKey(),
                 "aws.secretKey": localstack.getSecretKey(),
                 "aws.region": localstack.getRegion(),
-                "aws.s3.endpoint-override": localstack.getEndpointOverride(LocalStackContainer.Service.S3)
+                "aws.services.s3.endpoint-override": localstack.getEndpointOverride(LocalStackContainer.Service.S3)
 
         ]
-    }
-
-    void setup() {
-        s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
     }
 
     void "it works"() {

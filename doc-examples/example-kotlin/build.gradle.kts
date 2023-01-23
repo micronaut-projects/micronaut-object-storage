@@ -1,6 +1,6 @@
 plugins {
-    "org.jetbrains.kotlin.jvm"
-    "org.jetbrains.kotlin.kapt"
-    "org.jetbrains.kotlin.plugin.allopen"
-    "io.micronaut.build.internal.objectstorage-example"
+    id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.kotlin.kapt")
+    id("org.jetbrains.kotlin.plugin.allopen")
+    id("io.micronaut.build.internal.objectstorage-example")
 }

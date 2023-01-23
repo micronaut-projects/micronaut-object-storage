@@ -1,43 +1,31 @@
 package example.oraclecloud;
 
-import com.oracle.bmc.http.ClientConfigurator;
+import com.oracle.bmc.ClientConfiguration;
 import com.oracle.bmc.objectstorage.ObjectStorageClient;
 import io.micronaut.context.event.BeanCreatedEvent;
 import io.micronaut.context.event.BeanCreatedEventListener;
 import io.micronaut.core.annotation.NonNull;
 import jakarta.inject.Singleton;
-import org.apache.http.client.config.RequestConfig;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 
 //tag::class[]
-//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ApacheConnectorPropertiesExample.java
+//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
 @Singleton
 public class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventListener<ObjectStorageClient.Builder> {
 
+    public static final int CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000;
+    public static final int READ_TIMEOUT_IN_MILLISECONDS = 35000;
+
     @Override
     public ObjectStorageClient.Builder onCreated(@NonNull BeanCreatedEvent<ObjectStorageClient.Builder> event) {
-        ClientConfigurator additionalClientConfigurator =
-            new ClientConfigurator() {
-                @Override
-                public void customizeBuilder(ClientBuilder clientBuilder) {
-                    RequestConfig config =
-                        RequestConfig.custom()
-                            .setConnectTimeout(60_000)
-                            .build();
-                    clientBuilder.property(ApacheClientProperties.REQUEST_CONFIG, config);
-                }
+        ClientConfiguration clientConfiguration =
+            ClientConfiguration.builder()
+                .connectionTimeoutMillis(CONNECTION_TIMEOUT_IN_MILLISECONDS)
+                .readTimeoutMillis(READ_TIMEOUT_IN_MILLISECONDS)
+                .build();
 
-                @Override
-                public void customizeClient(Client client) {
-                    // no op
-                }
-            };
 
         return event.getBean()
-            .additionalClientConfigurator(additionalClientConfigurator);
+            .configuration(clientConfiguration);
     }
 }
 //end::class[]

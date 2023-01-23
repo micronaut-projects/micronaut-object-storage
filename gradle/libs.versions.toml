@@ -11,6 +11,7 @@ groovy = '4.0.7'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.4.0'
 testcontainers = '1.17.6'
+bytebuddy = '1.12.22'
 
 # Gradle plugins
 micronaut-gradle-plugin = "3.7.0"
@@ -45,6 +46,7 @@ testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version
 # Which then makes importing the Testcontainers BOM pointless
 testcontainers-spock = { module = 'org.testcontainers:spock', version.ref = 'testcontainers' }
 testcontainers-localstack = { module = 'org.testcontainers:localstack', version.ref = 'testcontainers' }
+bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 
 # Plugins
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }
