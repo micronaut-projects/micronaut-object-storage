@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <title>Micronaut Object Storage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
     <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
@@ -537,7 +538,7 @@ information about credentials and region configuration.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the AWS S3 bucket.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -635,12 +636,12 @@ information about authentication options.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.container</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The blob container name.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.endpoint</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The blob service endpoint to set, in the format of <a href="https://{accountName}.blob.core.windows.net" class="bare">https://{accountName}.blob.core.windows.net</a>.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -746,7 +747,7 @@ information about configuring your GCP project.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the Google Cloud Storage bucket.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -847,12 +848,12 @@ for more information about authentication options.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the OCI Object Storage bucket.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.namespace</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">the OCI Object Storage namespace used.</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -886,31 +887,24 @@ micronaut:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ApacheConnectorPropertiesExample.java
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
 @Singleton
 public class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventListener&lt;ObjectStorageClient.Builder&gt; {
 
+    public static final int CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000;
+    public static final int READ_TIMEOUT_IN_MILLISECONDS = 35000;
+
     @Override
     public ObjectStorageClient.Builder onCreated(@NonNull BeanCreatedEvent&lt;ObjectStorageClient.Builder&gt; event) {
-        ClientConfigurator additionalClientConfigurator =
-            new ClientConfigurator() {
-                @Override
-                public void customizeBuilder(ClientBuilder clientBuilder) {
-                    RequestConfig config =
-                        RequestConfig.custom()
-                            .setConnectTimeout(60_000)
-                            .build();
-                    clientBuilder.property(ApacheClientProperties.REQUEST_CONFIG, config);
-                }
+        ClientConfiguration clientConfiguration =
+            ClientConfiguration.builder()
+                .connectionTimeoutMillis(CONNECTION_TIMEOUT_IN_MILLISECONDS)
+                .readTimeoutMillis(READ_TIMEOUT_IN_MILLISECONDS)
+                .build();
 
-                @Override
-                public void customizeClient(Client client) {
-                    // no op
-                }
-            };
 
         return event.getBean()
-            .additionalClientConfigurator(additionalClientConfigurator);
+            .configuration(clientConfiguration);
     }
 }</code></pre>
 </div>
