@@ -25,12 +25,21 @@ dependencies {
     implementation(projects.objectStorageGcp)
     implementation(projects.objectStorageOracleCloud)
 
-    runtimeOnly(mn.logback)
+    runtimeOnly(mn.logback.classic)
+    runtimeOnly(mn.snakeyaml)
+
 
     testImplementation(projects.objectStorageTck)
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.testcontainers.localstack)
     testImplementation(libs.amazon.awssdk.v1) {
         because("it is required by testcontainers-localstack")
+    }
+    testRuntimeOnly(libs.bytebuddy)
+
+    modules {
+        module("org.codehaus.groovy:groovy") {
+            replacedBy("org.apache.groovy:groovy", "google-collections is now part of Guava")
+        }
     }
 }

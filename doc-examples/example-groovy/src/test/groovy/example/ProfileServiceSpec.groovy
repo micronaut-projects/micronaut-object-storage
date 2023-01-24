@@ -10,8 +10,6 @@ import jakarta.inject.Named
 import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest
-import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
@@ -28,7 +26,7 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
 
     @Shared
     @AutoCleanup
-    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:1.0.3"))
+    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:1.3.1"))
             .withServices(LocalStackContainer.Service.S3)
 
     @Inject
@@ -44,21 +42,14 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
     @Override
     Map<String, String> getProperties() {
         localstack.start()
+        localstack.execInContainer("awslocal", "s3api", "create-bucket", "--bucket", BUCKET_NAME)
         return [
                 "aws.accessKeyId": localstack.getAccessKey(),
                 "aws.secretKey": localstack.getSecretKey(),
                 "aws.region": localstack.getRegion(),
-                "aws.s3.endpoint-override": localstack.getEndpointOverride(LocalStackContainer.Service.S3)
+                "aws.services.s3.endpoint-override": localstack.getEndpointOverride(LocalStackContainer.Service.S3)
 
         ]
-    }
-
-    void setup() {
-        s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
-    }
-
-    void cleanup() {
-        s3.deleteBucket(DeleteBucketRequest.builder().bucket(BUCKET_NAME).build() as DeleteBucketRequest)
     }
 
     void "it works"() {

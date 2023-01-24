@@ -1,33 +1,54 @@
 [versions]
-micronaut = '3.7.0'
-micronaut-docs = '2.0.0'
-micronaut-test = '3.1.1'
-groovy = '3.0.10'
+micronaut = '4.0.0-SNAPSHOT'
+micronaut-docs = "2.0.0"
+micronaut-test = '4.0.0-SNAPSHOT'
+micronaut-aws = '4.0.0-SNAPSHOT'
+micronaut-azure = '4.0.0-SNAPSHOT'
+micronaut-gcp = '5.0.0-SNAPSHOT'
+micronaut-oracle-cloud = '3.0.0-SNAPSHOT'
+
+groovy = '4.0.7'
+spock = '2.3-groovy-4.0'
 gcp-libraries = '26.4.0'
-awaitility = '4.2.0'
+testcontainers = '1.17.6'
+bytebuddy = '1.12.22'
 
 # Gradle plugins
 micronaut-gradle-plugin = "3.7.0"
 kotlin-gradle-plugin = "1.8.0"
 
 [libraries]
-azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
-
+# AWS
+micronaut-aws = { module = 'io.micronaut.aws:micronaut-aws-bom', version.ref = 'micronaut-aws' }
 amazon-awssdk-s3 = { module = 'software.amazon.awssdk:s3' }
 amazon-awssdk-v1 = { module = 'com.amazonaws:aws-java-sdk-core' }
 
+# Azure
+micronaut-azure = { module = 'io.micronaut.azure:micronaut-azure-bom', version.ref = 'micronaut-azure' }
+azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
+
+# GCP
+micronaut-gcp = { module = 'io.micronaut.gcp:micronaut-gcp-bom', version.ref = 'micronaut-gcp' }
 gcp-libraries-bom = { module = 'com.google.cloud:libraries-bom', version.ref = 'gcp-libraries' }
 gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 
+# Oracle Cloud
+micronaut-oracle-cloud = { module = 'io.micronaut.oraclecloud:micronaut-oraclecloud-bom', version.ref = 'micronaut-oracle-cloud' }
 oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorage' }
+oci-sdk-httpclient-jersey3 = { module = 'com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3' }
 
 # Others
-groovy-test = { module = 'org.codehaus.groovy:groovy-test' }
-testcontainers-spock = { module = 'org.testcontainers:spock' }
-testcontainers-localstack = { module = 'org.testcontainers:localstack' }
-awaitility-groovy = { module = 'org.awaitility:awaitility-groovy', version.ref = 'awaitility'}
+groovy = { module = 'org.apache.groovy:groovy', version.ref = 'groovy' }
+
+testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version.ref = 'testcontainers' }
+
+# These 2 need the version.ref, otherwise it fails with :object-storage-aws:test: Could not find org.testcontainers:spock:.
+# Which then makes importing the Testcontainers BOM pointless
+testcontainers-spock = { module = 'org.testcontainers:spock', version.ref = 'testcontainers' }
+testcontainers-localstack = { module = 'org.testcontainers:localstack', version.ref = 'testcontainers' }
+bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 
 # Plugins
-gradle-micronaut = { module = "io.micronaut.gradle:micronaut-gradle-plugin", version.ref = "micronaut-gradle-plugin" }
-gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
-gradle-kotlin-allopen = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin-gradle-plugin" }
+gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }
+gradle-kotlin = { module = 'org.jetbrains.kotlin:kotlin-gradle-plugin', version.ref = 'kotlin-gradle-plugin' }
+gradle-kotlin-allopen = { module = 'org.jetbrains.kotlin:kotlin-allopen', version.ref = 'kotlin-gradle-plugin' }

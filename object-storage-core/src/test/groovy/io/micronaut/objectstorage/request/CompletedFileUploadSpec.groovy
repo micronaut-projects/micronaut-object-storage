@@ -1,14 +1,19 @@
 package io.micronaut.objectstorage.request
 
+import io.micronaut.http.server.HttpServerConfiguration
+import io.micronaut.http.server.netty.MicronautHttpData
 import io.micronaut.http.server.netty.multipart.NettyCompletedFileUpload
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
-import io.netty.handler.codec.http.multipart.DiskFileUpload
+import io.netty.buffer.Unpooled
 import io.netty.handler.codec.http.multipart.FileUpload
 import spock.lang.Specification
 import spock.lang.Subject
 
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+
+import static io.micronaut.objectstorage.ObjectStorageOperationsSpecification.TEXT
 
 @Subject(CompletedFileUploadRequest)
 class CompletedFileUploadSpec extends Specification {
@@ -40,10 +45,10 @@ class CompletedFileUploadSpec extends Specification {
     }
 
     private NettyCompletedFileUpload createCompletedFileUpload() {
-        Path path = ObjectStorageOperationsSpecification.createTempFile()
-        File file = path.toFile()
-        FileUpload fileUpload = new DiskFileUpload(file.name, file.name, "text/plain", "chunked", Charset.defaultCharset(), ObjectStorageOperationsSpecification.TEXT.length())
-        fileUpload.setContent(file)
+        HttpServerConfiguration.MultipartConfiguration cfg = new HttpServerConfiguration.MultipartConfiguration()
+        cfg.mixed = true
+        FileUpload fileUpload = new MicronautHttpData.Factory(cfg, StandardCharsets.UTF_8).createFileUpload(null, "test-file.txt", "test-file.txt", "text/plain", "chunked", Charset.defaultCharset(), TEXT.length())
+        fileUpload.addContent(Unpooled.wrappedBuffer(TEXT.bytes), true)
         return new NettyCompletedFileUpload(fileUpload, false)
     }
 
@@ -51,10 +56,10 @@ class CompletedFileUploadSpec extends Specification {
         request.with {
             assert key == expectedKey
             assert contentSize.present
-            assert contentSize.get() == ObjectStorageOperationsSpecification.TEXT.length() as long
+            assert contentSize.get() == TEXT.length() as long
             assert contentType.present
             assert contentType.get() == "text/plain"
-            assert inputStream.text == ObjectStorageOperationsSpecification.TEXT
+            assert inputStream.text == TEXT
         }
     }
 }

@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "5.4.0"
+    id("io.micronaut.build.shared.settings") version "6.2.0"
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -29,14 +29,10 @@ include("doc-examples:example-groovy")
 include("doc-examples:example-kotlin")
 
 configure<MicronautBuildSettingsExtension> {
+    addSnapshotRepository()
     importMicronautCatalog()
-}
-
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-        maven {
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        }
-    }
+    importMicronautCatalog("micronaut-aws")
+    importMicronautCatalog("micronaut-azure")
+    importMicronautCatalog("micronaut-gcp")
+    importMicronautCatalog("micronaut-oracle-cloud")
 }

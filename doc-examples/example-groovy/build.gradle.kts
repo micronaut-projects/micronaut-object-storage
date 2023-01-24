@@ -1,4 +1,4 @@
 plugins {
-    groovy
-    io.micronaut.build.internal.`objectstorage-example`
+    id("groovy")
+    id("io.micronaut.build.internal.objectstorage-example")
 }

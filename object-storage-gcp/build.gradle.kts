@@ -4,12 +4,12 @@ plugins {
 
 dependencies {
     api(projects.objectStorageCore)
-    api(mn.micronaut.gcp.common)
+    api(mnGcp.micronaut.gcp.common)
 
     api(platform(libs.gcp.libraries.bom))
     api(libs.gcp.storage)
 
-    implementation(platform(mn.micronaut.gcp.bom))
+    implementation(platform(mnGcp.micronaut.gcp.bom))
 
     testImplementation(projects.objectStorageTck)
     testImplementation(libs.testcontainers.spock)
