@@ -13,6 +13,7 @@ on:
       - master
       - '[1-9]+.[0-9]+.x'
     paths:
+      - 'gradle/**'
       - 'object-storage-gcp/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
