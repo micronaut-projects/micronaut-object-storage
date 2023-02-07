@@ -9,10 +9,9 @@ The object storage specific configuration options available are:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.adoc[]
 
-For example:
+For example, for the `application-azure` configuration file
 
-.`src/main/resources/application-azure.yml`
-[source,yaml]
+[configuration]
 ----
 include::doc-examples/example-java/src/test/resources/application-azure.yml[]
 ----

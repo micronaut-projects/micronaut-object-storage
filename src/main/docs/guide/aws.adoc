@@ -9,10 +9,9 @@ The object storage specific configuration options available are:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.aws.AwsS3Configuration.adoc[]
 
-For example:
+For example, for the `application-ec2` configuration file
 
-.`src/main/resources/application-ec2.yml`
-[source,yaml]
+[configuration]
 ----
 include::doc-examples/example-java/src/test/resources/application-ec2.yml[]
 ----

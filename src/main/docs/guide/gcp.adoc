@@ -9,10 +9,9 @@ The object storage specific configuration options available are:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.adoc[]
 
-For example:
+For example, for the `application-gcp` configuration file
 
-.`src/main/resources/application-gcp.yml`
-[source,yaml]
+[configuration]
 ----
 include::doc-examples/example-java/src/test/resources/application-gcp.yml[]
 ----
