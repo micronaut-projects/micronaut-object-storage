@@ -3,7 +3,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <title>Micronaut Object Storage</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
     <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
@@ -119,7 +118,7 @@
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/introduction.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/introduction.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -151,7 +150,7 @@
 <h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>2 Release History</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/releaseHistory.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/releaseHistory.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -167,7 +166,7 @@
 <h1 id="quickStart"><a class="anchor" href="#quickStart"></a>3 Quick Start</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/quickStart.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/quickStart.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -280,10 +279,17 @@ open class UploadController(private val objectStorage: AwsS3Operations) {
 <a href="https://docs.micronaut.io/latest/guide/#qualifiers">bean qualifiers</a>.</p>
 </div>
 <div class="paragraph">
-<p>For example, given the following configuration:</p>
+<p>For example, given the following <code>application-ec2</code> configuration file:</p>
 </div>
-<div class="listingblock">
-<div class="title"><code>src/main/resources/application-ec2.yml</code></div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.object-storage.aws.pictures.bucket=pictures-bucket
+micronaut.object-storage.aws.logos.bucket=logos-bucket</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   object-storage:
@@ -292,6 +298,71 @@ open class UploadController(private val objectStorage: AwsS3Operations) {
         bucket: pictures-bucket
       logos:
         bucket: logos-bucket</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.object-storage]
+    [micronaut.object-storage.aws]
+      [micronaut.object-storage.aws.pictures]
+        bucket="pictures-bucket"
+      [micronaut.object-storage.aws.logos]
+        bucket="logos-bucket"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  objectStorage {
+    aws {
+      pictures {
+        bucket = "pictures-bucket"
+      }
+      logos {
+        bucket = "logos-bucket"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    object-storage {
+      aws {
+        pictures {
+          bucket = "pictures-bucket"
+        }
+        logos {
+          bucket = "logos-bucket"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "object-storage": {
+      "aws": {
+        "pictures": {
+          "bucket": "pictures-bucket"
+        },
+        "logos": {
+          "bucket": "logos-bucket"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -486,7 +557,7 @@ There is also a <code>getNativeEntry()</code> method that gives you access to th
 <h1 id="aws"><a class="anchor" href="#aws"></a>4 Amazon S3</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/aws.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/aws.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -499,7 +570,7 @@ There is also a <code>getNativeEntry()</code> method that gives you access to th
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-aws:4.0.0-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-aws:1.1.1-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -507,7 +578,7 @@ There is also a <code>getNativeEntry()</code> method that gives you access to th
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-aws&lt;/artifactId&gt;
-    &lt;version&gt;4.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.1.1-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
@@ -538,21 +609,81 @@ information about credentials and region configuration.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the AWS S3 bucket.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For example:</p>
+<p>For example, for the <code>application-ec2</code> configuration file</p>
 </div>
-<div class="listingblock">
-<div class="title"><code>src/main/resources/application-ec2.yml</code></div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.object-storage.aws.default.bucket=profile-pictures-bucket</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   object-storage:
     aws:
       default:
         bucket: profile-pictures-bucket</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.object-storage]
+    [micronaut.object-storage.aws]
+      [micronaut.object-storage.aws.default]
+        bucket="profile-pictures-bucket"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  objectStorage {
+    aws {
+      'default' {
+        bucket = "profile-pictures-bucket"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    object-storage {
+      aws {
+        default {
+          bucket = "profile-pictures-bucket"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "object-storage": {
+      "aws": {
+        "default": {
+          "bucket": "profile-pictures-bucket"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -584,7 +715,7 @@ public class S3ClientBuilderCustomizer implements BeanCreatedEventListener&lt;S3
 <h1 id="azure"><a class="anchor" href="#azure"></a>5 Azure Blob Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/azure.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/azure.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -597,7 +728,7 @@ public class S3ClientBuilderCustomizer implements BeanCreatedEventListener&lt;S3
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-azure:4.0.0-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-azure:1.1.1-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -605,7 +736,7 @@ public class S3ClientBuilderCustomizer implements BeanCreatedEventListener&lt;S3
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-azure&lt;/artifactId&gt;
-    &lt;version&gt;4.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.1.1-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
@@ -636,20 +767,30 @@ information about authentication options.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.container</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The blob container name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.endpoint</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The blob service endpoint to set, in the format of <a href="https://{accountName}.blob.core.windows.net" class="bare">https://{accountName}.blob.core.windows.net</a>.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For example:</p>
+<p>For example, for the <code>application-azure</code> configuration file</p>
 </div>
-<div class="listingblock">
-<div class="title"><code>src/main/resources/application-azure.yml</code></div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">azure.credential.client-secret.client-id=&lt;client-id&gt;
+azure.credential.client-secret.tenant-id=&lt;tenant-id&gt;
+azure.credential.client-secret.secret=&lt;secret&gt;
+micronaut.object-storage.azure.default.container=profile-pictures-container
+micronaut.object-storage.azure.default.endpoint=https://my-account.blob.core.windows.net</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">azure:
   credential:
@@ -664,6 +805,97 @@ micronaut:
       default:
         container: profile-pictures-container
         endpoint: https://my-account.blob.core.windows.net</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[azure]
+  [azure.credential]
+    [azure.credential.client-secret]
+      client-id="&lt;client-id&gt;"
+      tenant-id="&lt;tenant-id&gt;"
+      secret="&lt;secret&gt;"
+[micronaut]
+  [micronaut.object-storage]
+    [micronaut.object-storage.azure]
+      [micronaut.object-storage.azure.default]
+        container="profile-pictures-container"
+        endpoint="https://my-account.blob.core.windows.net"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">azure {
+  credential {
+    clientSecret {
+      clientId = "&lt;client-id&gt;"
+      tenantId = "&lt;tenant-id&gt;"
+      secret = "&lt;secret&gt;"
+    }
+  }
+}
+micronaut {
+  objectStorage {
+    azure {
+      'default' {
+        container = "profile-pictures-container"
+        endpoint = "https://my-account.blob.core.windows.net"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  azure {
+    credential {
+      client-secret {
+        client-id = "&lt;client-id&gt;"
+        tenant-id = "&lt;tenant-id&gt;"
+        secret = "&lt;secret&gt;"
+      }
+    }
+  }
+  micronaut {
+    object-storage {
+      azure {
+        default {
+          container = "profile-pictures-container"
+          endpoint = "https://my-account.blob.core.windows.net"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "azure": {
+    "credential": {
+      "client-secret": {
+        "client-id": "&lt;client-id&gt;",
+        "tenant-id": "&lt;tenant-id&gt;",
+        "secret": "&lt;secret&gt;"
+      }
+    }
+  },
+  "micronaut": {
+    "object-storage": {
+      "azure": {
+        "default": {
+          "container": "profile-pictures-container",
+          "endpoint": "https://my-account.blob.core.windows.net"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -695,7 +927,7 @@ public class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListe
 <h1 id="gcp"><a class="anchor" href="#gcp"></a>6 Google Cloud Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/gcp.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/gcp.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -708,7 +940,7 @@ public class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListe
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-gcp:4.0.0-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-gcp:1.1.1-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -716,7 +948,7 @@ public class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListe
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-gcp&lt;/artifactId&gt;
-    &lt;version&gt;4.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.1.1-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
@@ -747,15 +979,22 @@ information about configuring your GCP project.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the Google Cloud Storage bucket.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For example:</p>
+<p>For example, for the <code>application-gcp</code> configuration file</p>
 </div>
-<div class="listingblock">
-<div class="title"><code>src/main/resources/application-gcp.yml</code></div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">gcp.project-id=my-gcp-project
+micronaut.object-storage.gcp.default.bucket=profile-pictures-bucket</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">gcp:
   project-id: my-gcp-project
@@ -765,6 +1004,71 @@ micronaut:
     gcp:
       default:
         bucket: profile-pictures-bucket</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[gcp]
+  project-id="my-gcp-project"
+[micronaut]
+  [micronaut.object-storage]
+    [micronaut.object-storage.gcp]
+      [micronaut.object-storage.gcp.default]
+        bucket="profile-pictures-bucket"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">gcp {
+  projectId = "my-gcp-project"
+}
+micronaut {
+  objectStorage {
+    gcp {
+      'default' {
+        bucket = "profile-pictures-bucket"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  gcp {
+    project-id = "my-gcp-project"
+  }
+  micronaut {
+    object-storage {
+      gcp {
+        default {
+          bucket = "profile-pictures-bucket"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "gcp": {
+    "project-id": "my-gcp-project"
+  },
+  "micronaut": {
+    "object-storage": {
+      "gcp": {
+        "default": {
+          "bucket": "profile-pictures-bucket"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -796,7 +1100,7 @@ public class StorageOptionsBuilderCustomizer implements BeanCreatedEventListener
 <h1 id="oracleCloud"><a class="anchor" href="#oracleCloud"></a>7 Oracle Cloud Infrastructure (OCI) Object Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/oracleCloud.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/oracleCloud.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -809,7 +1113,7 @@ public class StorageOptionsBuilderCustomizer implements BeanCreatedEventListener
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud:4.0.0-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud:1.1.1-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -817,7 +1121,7 @@ public class StorageOptionsBuilderCustomizer implements BeanCreatedEventListener
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-oracle-cloud&lt;/artifactId&gt;
-    &lt;version&gt;4.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.1.1-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
@@ -848,20 +1152,28 @@ for more information about authentication options.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the OCI Object Storage bucket.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.namespace</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">the OCI Object Storage namespace used.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For example:</p>
+<p>For example, for the <code>application-oraclecloud</code> configuration file,</p>
 </div>
-<div class="listingblock">
-<div class="title"><code>src/main/resources/application-oraclecloud.yml</code></div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">oci.config.profile=DEFAULT
+micronaut.object-storage.oracle-cloud.default.bucket=profile-pictures-bucket
+micronaut.object-storage.oracle-cloud.default.namespace=MyNamespace</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">oci:
   config:
@@ -873,6 +1185,82 @@ micronaut:
       default:
         bucket: profile-pictures-bucket
         namespace: MyNamespace</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[oci]
+  [oci.config]
+    profile="DEFAULT"
+[micronaut]
+  [micronaut.object-storage]
+    [micronaut.object-storage.oracle-cloud]
+      [micronaut.object-storage.oracle-cloud.default]
+        bucket="profile-pictures-bucket"
+        namespace="MyNamespace"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">oci {
+  config {
+    profile = "DEFAULT"
+  }
+}
+micronaut {
+  objectStorage {
+    oracleCloud {
+      'default' {
+        bucket = "profile-pictures-bucket"
+        namespace = "MyNamespace"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  oci {
+    config {
+      profile = "DEFAULT"
+    }
+  }
+  micronaut {
+    object-storage {
+      oracle-cloud {
+        default {
+          bucket = "profile-pictures-bucket"
+          namespace = "MyNamespace"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "oci": {
+    "config": {
+      "profile": "DEFAULT"
+    }
+  },
+  "micronaut": {
+    "object-storage": {
+      "oracle-cloud": {
+        "default": {
+          "bucket": "profile-pictures-bucket",
+          "namespace": "MyNamespace"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
@@ -887,24 +1275,31 @@ micronaut:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ApacheConnectorPropertiesExample.java
 @Singleton
 public class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventListener&lt;ObjectStorageClient.Builder&gt; {
 
-    public static final int CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000;
-    public static final int READ_TIMEOUT_IN_MILLISECONDS = 35000;
-
     @Override
     public ObjectStorageClient.Builder onCreated(@NonNull BeanCreatedEvent&lt;ObjectStorageClient.Builder&gt; event) {
-        ClientConfiguration clientConfiguration =
-            ClientConfiguration.builder()
-                .connectionTimeoutMillis(CONNECTION_TIMEOUT_IN_MILLISECONDS)
-                .readTimeoutMillis(READ_TIMEOUT_IN_MILLISECONDS)
-                .build();
+        ClientConfigurator additionalClientConfigurator =
+            new ClientConfigurator() {
+                @Override
+                public void customizeBuilder(ClientBuilder clientBuilder) {
+                    RequestConfig config =
+                        RequestConfig.custom()
+                            .setConnectTimeout(60_000)
+                            .build();
+                    clientBuilder.property(ApacheClientProperties.REQUEST_CONFIG, config);
+                }
 
+                @Override
+                public void customizeClient(Client client) {
+                    // no op
+                }
+            };
 
         return event.getBean()
-            .configuration(clientConfiguration);
+            .additionalClientConfigurator(additionalClientConfigurator);
     }
 }</code></pre>
 </div>
@@ -915,7 +1310,7 @@ public class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventLis
 <h1 id="repository"><a class="anchor" href="#repository"></a>8 Repository</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/repository.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/1.1.x/src/main/docs/guide/repository.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
