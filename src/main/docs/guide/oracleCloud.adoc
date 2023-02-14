@@ -9,10 +9,9 @@ The object storage specific configuration options available are:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.adoc[]
 
-For example:
+For example, for the `application-oraclecloud` configuration file,
 
-.`src/main/resources/application-oraclecloud.yml`
-[source,yaml]
+[configuration]
 ----
 include::doc-examples/example-java/src/test/resources/application-oraclecloud.yml[]
 ----
