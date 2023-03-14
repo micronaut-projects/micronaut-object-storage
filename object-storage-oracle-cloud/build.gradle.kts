@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(projects.objectStorageCore)
+    api(projects.micronautObjectStorageCore)
     api(mnOraclecloud.micronaut.oraclecloud.sdk) {
         exclude(group = "org.codehaus.groovy", module = "groovy")
     }
@@ -11,6 +11,6 @@ dependencies {
 
     implementation(platform(mnOraclecloud.micronaut.oraclecloud.bom))
 
-    testImplementation(projects.objectStorageTck)
+    testImplementation(projects.micronautObjectStorageTck)
     testImplementation(libs.testcontainers.spock)
 }

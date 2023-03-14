@@ -3,15 +3,15 @@ plugins {
 }
 
 dependencies {
-    api(projects.objectStorageCore)
+    api(projects.micronautObjectStorageCore)
     api(mnAws.micronaut.aws.sdk.v2)
     api(libs.amazon.awssdk.s3)
 
     implementation(platform(mnAws.micronaut.aws.bom))
-    annotationProcessor(mn.micronaut.validation)
-    implementation(mn.micronaut.validation)
+    annotationProcessor(mnValidation.micronaut.validation.processor)
+    implementation(mnValidation.micronaut.validation)
 
-    testImplementation(projects.objectStorageTck)
+    testImplementation(projects.micronautObjectStorageTck)
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.testcontainers.localstack)
 

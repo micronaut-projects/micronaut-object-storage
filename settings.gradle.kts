@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "6.2.2"
+    id("io.micronaut.build.shared.settings") version "6.3.5"
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -30,9 +30,11 @@ include("doc-examples:example-kotlin")
 
 configure<MicronautBuildSettingsExtension> {
     addSnapshotRepository()
+    useStandardizedProjectNames.set(true)
     importMicronautCatalog()
     importMicronautCatalog("micronaut-aws")
     importMicronautCatalog("micronaut-azure")
     importMicronautCatalog("micronaut-gcp")
     importMicronautCatalog("micronaut-oracle-cloud")
+    importMicronautCatalog("micronaut-validation")
 }

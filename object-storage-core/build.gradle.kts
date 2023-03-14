@@ -11,6 +11,6 @@ dependencies {
     implementation(mn.micronaut.runtime)
     implementation(mn.micronaut.http.server)
 
-    testImplementation(projects.objectStorageTck)
+    testImplementation(projects.micronautObjectStorageTck)
     testImplementation(mn.micronaut.http.server.netty)
 }

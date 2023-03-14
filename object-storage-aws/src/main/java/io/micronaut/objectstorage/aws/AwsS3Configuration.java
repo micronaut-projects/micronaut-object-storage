@@ -22,7 +22,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Pattern;
 
 import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
 
