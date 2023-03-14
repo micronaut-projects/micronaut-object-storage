@@ -1,4 +1,4 @@
-//import org.sonarqube.gradle.SonarQubeExtension
+import org.sonarqube.gradle.SonarExtension
 
 plugins {
     io.micronaut.build.internal.docs
@@ -12,10 +12,10 @@ repositories {
     }
 }
 
-//if (System.getenv("SONAR_TOKEN") != null) {
-//    configure<SonarQubeExtension> {
-//        properties {
-//            property("sonar.exclusions", "**/example/**")
-//        }
-//    }
-//}
+if (System.getenv("SONAR_TOKEN") != null) {
+    configure<SonarExtension> {
+        properties {
+            property("sonar.exclusions", "**/example/**")
+        }
+    }
+}
