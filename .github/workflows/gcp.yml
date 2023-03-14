@@ -54,7 +54,7 @@ jobs:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
       - name: Build with Gradle
         run: |
-          ./gradlew :object-storage-gcp:test --no-daemon --parallel --continue
+          ./gradlew :micronaut-object-storage-gcp:test --no-daemon --parallel --continue
         env:
            TESTCONTAINERS_RYUK_DISABLED: true
            GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
