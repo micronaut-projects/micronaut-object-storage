@@ -14,7 +14,7 @@ testcontainers = '1.17.6'
 bytebuddy = '1.14.0'
 
 # Gradle plugins
-micronaut-gradle-plugin = "3.7.2"
+micronaut-gradle-plugin = "3.7.6"
 kotlin-gradle-plugin = "1.8.10"
 
 [libraries]
