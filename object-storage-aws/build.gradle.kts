@@ -11,6 +11,7 @@ dependencies {
     annotationProcessor(mnValidation.micronaut.validation.processor)
     implementation(mnValidation.micronaut.validation)
 
+    testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.testcontainers.localstack)

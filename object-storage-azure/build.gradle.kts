@@ -9,6 +9,7 @@ dependencies {
 
     implementation(platform(mnAzure.micronaut.azure.bom))
 
+    testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(libs.testcontainers.spock)
 }
