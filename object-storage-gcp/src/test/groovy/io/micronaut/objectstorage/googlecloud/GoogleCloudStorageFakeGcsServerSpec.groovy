@@ -7,7 +7,6 @@ import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Primary
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
-import io.micronaut.core.io.socket.SocketUtils
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Singleton
 import org.testcontainers.containers.GenericContainer
@@ -22,9 +21,6 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
 
     public static final String TEST_PROJECT_ID = 'test-project'
     public static final String SPEC_NAME = 'GoogleCloudStorageFakeGcsServerSpec'
-
-    @Shared
-    static int port = SocketUtils.findAvailableTcpPort()
 
     @Shared
     @AutoCleanup
