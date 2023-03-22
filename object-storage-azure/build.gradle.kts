@@ -3,12 +3,13 @@ plugins {
 }
 
 dependencies {
-    api(projects.objectStorageCore)
+    api(projects.micronautObjectStorageCore)
     api(mnAzure.micronaut.azure.sdk)
     api(libs.azure.storage.blob)
 
     implementation(platform(mnAzure.micronaut.azure.bom))
 
-    testImplementation(projects.objectStorageTck)
+    testImplementation(mnValidation.micronaut.validation.processor)
+    testImplementation(projects.micronautObjectStorageTck)
     testImplementation(libs.testcontainers.spock)
 }

@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ['8', '11', '17']
+        java: ['17']
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -54,7 +54,7 @@ jobs:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
       - name: Build with Gradle
         run: |
-          ./gradlew :object-storage-gcp:test --no-daemon --parallel --continue
+          ./gradlew :micronaut-object-storage-gcp:test --no-daemon --parallel --continue
         env:
            TESTCONTAINERS_RYUK_DISABLED: true
            GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
