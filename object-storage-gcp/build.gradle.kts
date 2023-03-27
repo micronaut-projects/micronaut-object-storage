@@ -11,6 +11,7 @@ dependencies {
 
     implementation(platform(mnGcp.micronaut.gcp.bom))
 
+    testImplementation(mnValidation.micronaut.validation)
     testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(libs.testcontainers.spock)

@@ -5,6 +5,8 @@ plugins {
 }
 
 micronaut {
+    // There's no M1 platform release yet
+    version("4.0.0-SNAPSHOT")
     runtime("netty")
     testRuntime("spock2")
 }
@@ -23,6 +25,7 @@ dependencies {
 
 
     testImplementation(projects.micronautObjectStorageTck)
+    testImplementation(mnValidation.micronaut.validation)
     testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.testcontainers.localstack)
