@@ -8,7 +8,7 @@ micronaut-gcp = '5.0.0-SNAPSHOT'
 micronaut-oracle-cloud = '3.0.0-M1'
 micronaut-validation = "4.0.0-M2"
 
-groovy = '4.0.10'
+groovy = '4.0.11'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.8.0'
 testcontainers = '1.17.6'
