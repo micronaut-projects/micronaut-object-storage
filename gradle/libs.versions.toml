@@ -16,7 +16,7 @@ bytebuddy = '1.14.0'
 
 # Gradle plugins
 micronaut-gradle-plugin = "4.0.0-SNAPSHOT"
-kotlin-gradle-plugin = "1.8.10"
+kotlin-gradle-plugin = "1.8.20"
 
 [libraries]
 # AWS
