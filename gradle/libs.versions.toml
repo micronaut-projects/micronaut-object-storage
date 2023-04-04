@@ -1,14 +1,14 @@
 [versions]
-micronaut = '4.0.0-SNAPSHOT'
+micronaut = '4.0.0-M1'
 micronaut-docs = "2.0.0"
-micronaut-test = '4.0.0-SNAPSHOT'
-micronaut-aws = '4.0.0-SNAPSHOT'
-micronaut-azure = '5.0.0-SNAPSHOT'
-micronaut-gcp = '5.0.0-SNAPSHOT'
-micronaut-oracle-cloud = '3.0.0-SNAPSHOT'
-micronaut-validation = "4.0.0-SNAPSHOT"
+micronaut-test = '4.0.0-M1'
+micronaut-aws = '4.0.0-M1'
+micronaut-azure = '5.0.0-M1'
+micronaut-gcp = '5.0.0-M1'
+micronaut-oracle-cloud = '3.0.0-M1'
+micronaut-validation = "4.0.0-M2"
 
-groovy = '4.0.10'
+groovy = '4.0.11'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.8.0'
 testcontainers = '1.17.6'
