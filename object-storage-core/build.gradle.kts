@@ -7,8 +7,8 @@ dependencies {
 
     compileOnly(mn.micronaut.http)
 
-    implementation(mn.micronaut.inject.java)
-    implementation(mn.micronaut.runtime)
+    implementation(mn.micronaut.inject)
+    implementation(mn.micronaut.context)
     implementation(mn.micronaut.http.server)
 
     testImplementation(projects.micronautObjectStorageTck)

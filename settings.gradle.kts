@@ -29,10 +29,10 @@ include("doc-examples:example-groovy")
 include("doc-examples:example-kotlin")
 
 configure<MicronautBuildSettingsExtension> {
-    addSnapshotRepository()
     useStandardizedProjectNames.set(true)
     importMicronautCatalog()
     importMicronautCatalog("micronaut-aws")
+    importMicronautCatalog("micronaut-logging")
     importMicronautCatalog("micronaut-azure")
     importMicronautCatalog("micronaut-gcp")
     importMicronautCatalog("micronaut-oracle-cloud")
