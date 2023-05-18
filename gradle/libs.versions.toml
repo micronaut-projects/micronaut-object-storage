@@ -1,12 +1,14 @@
 [versions]
-micronaut = '4.0.0-M2'
+micronaut = '4.0.0-M3'
+micronaut-platform = '4.0.0-M2'
 micronaut-docs = "2.0.0"
 micronaut-test = '4.0.0-M2'
 micronaut-aws = '4.0.0-M2'
 micronaut-azure = '5.0.0-M2'
 micronaut-gcp = '5.0.0-M3'
-micronaut-oracle-cloud = '3.0.0-M1'
-micronaut-validation = "4.0.0-M5"
+micronaut-oracle-cloud = '3.0.0-M3'
+micronaut-validation = "4.0.0-M7"
+micronaut-logging = "1.0.0-M1"
 
 groovy = '4.0.11'
 spock = '2.3-groovy-4.0'
@@ -15,7 +17,7 @@ testcontainers = '1.18.0'
 bytebuddy = '1.14.4'
 
 # Gradle plugins
-micronaut-gradle-plugin = "4.0.0-M1"
+micronaut-gradle-plugin = "4.0.0-M3"
 kotlin-gradle-plugin = "1.8.21"
 
 [libraries]
@@ -35,12 +37,11 @@ gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 
 # Oracle Cloud
 micronaut-oracle-cloud = { module = 'io.micronaut.oraclecloud:micronaut-oraclecloud-bom', version.ref = 'micronaut-oracle-cloud' }
-oci-sdk-objectstorage = { module = 'com.oracle.oci.sdk:oci-java-sdk-objectstorage' }
-oci-sdk-httpclient-jersey3 = { module = 'com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3' }
 
 # Others
 #groovy = { module = 'org.apache.groovy:groovy', version.ref = 'groovy' }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
+micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 
 testcontainers-bom = { module = 'org.testcontainers:testcontainers-bom', version.ref = 'testcontainers' }
 

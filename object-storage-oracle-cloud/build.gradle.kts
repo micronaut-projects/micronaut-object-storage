@@ -7,7 +7,7 @@ dependencies {
     api(mnOraclecloud.micronaut.oraclecloud.sdk) {
         exclude(group = "org.codehaus.groovy", module = "groovy")
     }
-    api(libs.oci.sdk.objectstorage)
+    api(mnOraclecloud.micronaut.oraclecloud.bmc.objectstorage)
 
     implementation(platform(mnOraclecloud.micronaut.oraclecloud.bom))
 

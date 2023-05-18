@@ -6,7 +6,8 @@ plugins {
 
 micronaut {
     // There's no M1 platform release yet
-    version("4.0.0-SNAPSHOT")
+    version libs.versions.micronaut.platform.get()
+    coreVersion.set(libs.versions.micronaut.asProvider().get())
     runtime("netty")
     testRuntime("spock2")
 }
@@ -20,7 +21,7 @@ dependencies {
     implementation(projects.micronautObjectStorageGcp)
     implementation(projects.micronautObjectStorageOracleCloud)
 
-    runtimeOnly(mn.logback.classic)
+    runtimeOnly(mnLogging.logback.classic)
     runtimeOnly(mn.snakeyaml)
 
 

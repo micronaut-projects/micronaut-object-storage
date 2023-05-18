@@ -7,16 +7,14 @@ dependencies {
     annotationProcessor(mn.micronaut.inject.groovy)
 
     api(projects.micronautObjectStorageCore)
+    api(mn.micronaut.http)
 
     testImplementation(mnValidation.micronaut.validation.processor)
     implementation(mn.micronaut.inject.groovy)
-    implementation(mn.micronaut.runtime)
+    implementation(mn.micronaut.context)
     implementation(mnTest.micronaut.test.spock)
 }
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-    }
 }
