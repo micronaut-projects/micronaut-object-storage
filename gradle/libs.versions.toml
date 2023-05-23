@@ -21,6 +21,9 @@ micronaut-gradle-plugin = "4.0.0-M3"
 kotlin-gradle-plugin = "1.8.21"
 
 [libraries]
+# Core
+micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
+
 # AWS
 micronaut-aws = { module = 'io.micronaut.aws:micronaut-aws-bom', version.ref = 'micronaut-aws' }
 amazon-awssdk-s3 = { module = 'software.amazon.awssdk:s3' }
