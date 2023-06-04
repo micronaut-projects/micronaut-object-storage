@@ -1,16 +1,16 @@
 [versions]
-micronaut = '4.0.0-M6'
-micronaut-platform = '4.0.0-M2'
+micronaut = "4.0.0-M6"
+micronaut-platform = "4.0.0-M2"
 micronaut-docs = "2.0.0"
-micronaut-test = '4.0.0-M2'
-micronaut-aws = '4.0.0-M3'
-micronaut-azure = '5.0.0-M2'
-micronaut-gcp = '5.0.0-M4'
-micronaut-oracle-cloud = '3.0.0-M8'
+micronaut-test = "4.0.0-M6"
+micronaut-aws = "4.0.0-M6"
+micronaut-azure = "5.0.0-M4"
+micronaut-gcp = "5.0.0-M6"
+micronaut-oracle-cloud = "3.0.0-M8"
 micronaut-validation = "4.0.0-M9"
 micronaut-logging = "1.0.0-M3"
 
-groovy = '4.0.11'
+groovy = '4.0.12'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.15.0'
 testcontainers = '1.18.1'
