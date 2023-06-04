@@ -7,7 +7,7 @@ micronaut-aws = '4.0.0-M3'
 micronaut-azure = '5.0.0-M2'
 micronaut-gcp = '5.0.0-M4'
 micronaut-oracle-cloud = '3.0.0-M7'
-micronaut-validation = "4.0.0-M7"
+micronaut-validation = "4.0.0-M9"
 micronaut-logging = "1.0.0-M2"
 
 groovy = '4.0.11'
