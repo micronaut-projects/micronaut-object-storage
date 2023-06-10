@@ -113,13 +113,13 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.cloud.storage.StorageOptions.Builder</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#builder(io.micronaut.gcp.GoogleCloudConfiguration,com.google.auth.oauth2.GoogleCredentials)" class="member-name-link">builder</a><wbr>(io.micronaut.gcp.GoogleCloudConfiguration&nbsp;configuration,
- com.google.auth.oauth2.GoogleCredentials&nbsp;googleCredentials)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#builder(io.micronaut.gcp.GoogleCloudConfiguration,com.google.auth.oauth2.GoogleCredentials)" class="member-name-link">builder</a><wbr>(@NonNull io.micronaut.gcp.GoogleCloudConfiguration&nbsp;configuration,
+ @NonNull com.google.auth.oauth2.GoogleCredentials&nbsp;googleCredentials)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.cloud.storage.Storage</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#storage(com.google.cloud.storage.StorageOptions)" class="member-name-link">storage</a><wbr>(com.google.cloud.storage.StorageOptions&nbsp;storageOptions)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull com.google.cloud.storage.Storage</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#storage(com.google.cloud.storage.StorageOptions)" class="member-name-link">storage</a><wbr>(@NonNull com.google.cloud.storage.StorageOptions&nbsp;storageOptions)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.cloud.storage.StorageOptions</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull com.google.cloud.storage.StorageOptions</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#storageOptions(com.google.cloud.storage.StorageOptions.Builder)" class="member-name-link">storageOptions</a><wbr>(com.google.cloud.storage.StorageOptions.Builder&nbsp;builder)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
@@ -160,9 +160,9 @@ loadScripts(document, 'script');</script>
 @Singleton
 @NonNull
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.cloud.storage.StorageOptions.Builder</span>&nbsp;<span class="element-name">builder</span><wbr><span class="parameters">(@NonNull
- io.micronaut.gcp.GoogleCloudConfiguration&nbsp;configuration,
+ @NonNull io.micronaut.gcp.GoogleCloudConfiguration&nbsp;configuration,
  @NonNull
- com.google.auth.oauth2.GoogleCredentials&nbsp;googleCredentials)</span></div>
+ @NonNull com.google.auth.oauth2.GoogleCredentials&nbsp;googleCredentials)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>configuration</code> - The Google Cloud Configuration</dd>
@@ -178,7 +178,7 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@Requires(bean=com.google.cloud.storage.StorageOptions.Builder.class)
 @Singleton
 @NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.cloud.storage.StorageOptions</span>&nbsp;<span class="element-name">storageOptions</span><wbr><span class="parameters">(@NonNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull com.google.cloud.storage.StorageOptions</span>&nbsp;<span class="element-name">storageOptions</span><wbr><span class="parameters">(@NonNull
  com.google.cloud.storage.StorageOptions.Builder&nbsp;builder)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -194,8 +194,8 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@Requires(bean=com.google.cloud.storage.StorageOptions.class)
 @Singleton
 @NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.cloud.storage.Storage</span>&nbsp;<span class="element-name">storage</span><wbr><span class="parameters">(@NonNull
- com.google.cloud.storage.StorageOptions&nbsp;storageOptions)</span></div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull com.google.cloud.storage.Storage</span>&nbsp;<span class="element-name">storage</span><wbr><span class="parameters">(@NonNull
+ @NonNull com.google.cloud.storage.StorageOptions&nbsp;storageOptions)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>storageOptions</code> - the storage options</dd>

@@ -120,18 +120,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.azure.storage.blob.BlobContainerClient</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#blobContainerClient(java.lang.String,com.azure.storage.blob.BlobServiceClient)" class="member-name-link">blobContainerClient</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- com.azure.storage.blob.BlobServiceClient&nbsp;serviceClient)</code></div>
+ @NonNull com.azure.storage.blob.BlobServiceClient&nbsp;serviceClient)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.azure.storage.blob.BlobServiceClient</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#blobServiceClient(com.azure.storage.blob.BlobServiceClientBuilder)" class="member-name-link">blobServiceClient</a><wbr>(com.azure.storage.blob.BlobServiceClientBuilder&nbsp;builder)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#blobServiceClient(com.azure.storage.blob.BlobServiceClientBuilder)" class="member-name-link">blobServiceClient</a><wbr>(@NonNull com.azure.storage.blob.BlobServiceClientBuilder&nbsp;builder)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.azure.storage.blob.BlobServiceClientBuilder</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#blobServiceClientBuilderWithSharedKeyCredential(io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration,com.azure.storage.common.StorageSharedKeyCredential)" class="member-name-link">blobServiceClientBuilderWithSharedKeyCredential</a><wbr>(<a href="AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
- com.azure.storage.common.StorageSharedKeyCredential&nbsp;sharedKeyCredential)</code></div>
+ @NonNull com.azure.storage.common.StorageSharedKeyCredential&nbsp;sharedKeyCredential)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.azure.storage.blob.BlobServiceClientBuilder</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#blobServiceClientBuilderWithTokenCredential(io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration,com.azure.core.credential.TokenCredential)" class="member-name-link">blobServiceClientBuilderWithTokenCredential</a><wbr>(<a href="AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
- com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</code></div>
+ @NonNull com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -171,7 +171,7 @@ loadScripts(document, 'script');</script>
 @Requires(bean=com.azure.core.credential.TokenCredential.class) @Requires(missingBeans=com.azure.storage.common.StorageSharedKeyCredential.class)
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.azure.storage.blob.BlobServiceClientBuilder</span>&nbsp;<span class="element-name">blobServiceClientBuilderWithTokenCredential</span><wbr><span class="parameters">(<a href="AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
  @NonNull
- com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</span></div>
+ @NonNull com.azure.core.credential.TokenCredential&nbsp;tokenCredential)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>configuration</code> - the configuration</dd>
@@ -188,7 +188,7 @@ loadScripts(document, 'script');</script>
 @Requires(bean=com.azure.storage.common.StorageSharedKeyCredential.class)
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.azure.storage.blob.BlobServiceClientBuilder</span>&nbsp;<span class="element-name">blobServiceClientBuilderWithSharedKeyCredential</span><wbr><span class="parameters">(<a href="AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a>&nbsp;configuration,
  @NonNull
- com.azure.storage.common.StorageSharedKeyCredential&nbsp;sharedKeyCredential)</span></div>
+ @NonNull com.azure.storage.common.StorageSharedKeyCredential&nbsp;sharedKeyCredential)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>configuration</code> - the configuration</dd>
@@ -203,7 +203,7 @@ loadScripts(document, 'script');</script>
 <h3>blobServiceClient</h3>
 <div class="member-signature"><span class="annotations">@EachBean(com.azure.storage.blob.BlobServiceClientBuilder.class)
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.azure.storage.blob.BlobServiceClient</span>&nbsp;<span class="element-name">blobServiceClient</span><wbr><span class="parameters">(@NonNull
- com.azure.storage.blob.BlobServiceClientBuilder&nbsp;builder)</span></div>
+ @NonNull com.azure.storage.blob.BlobServiceClientBuilder&nbsp;builder)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>builder</code> - the builder</dd>
@@ -219,7 +219,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">com.azure.storage.blob.BlobContainerClient</span>&nbsp;<span class="element-name">blobContainerClient</span><wbr><span class="parameters">(@Parameter
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  @NonNull
- com.azure.storage.blob.BlobServiceClient&nbsp;serviceClient)</span></div>
+ @NonNull com.azure.storage.blob.BlobServiceClient&nbsp;serviceClient)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>name</code> - The configuration</dd>
