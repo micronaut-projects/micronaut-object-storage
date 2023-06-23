@@ -23,6 +23,7 @@ include("object-storage-aws")
 include("object-storage-azure")
 include("object-storage-gcp")
 include("object-storage-oracle-cloud")
+include("object-storage-local")
 
 include("doc-examples:example-java")
 include("doc-examples:example-groovy")
