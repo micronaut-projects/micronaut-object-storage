@@ -9,3 +9,10 @@ dependencies {
     testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
 }
+
+micronautBuild {
+    // New module
+    binaryCompatibility {
+        enabled.set(false)
+    }
+}
