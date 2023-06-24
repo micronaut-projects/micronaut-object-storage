@@ -58,6 +58,8 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
+     * The name of the OCI Object Storage bucket.
+     *
      * @return The name of the OCI Object Storage bucket.
      */
     @NonNull
@@ -73,6 +75,8 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
+     * The OCI Object Storage namespace used.
+     *
      * @return the OCI Object Storage namespace used.
      */
     @NonNull

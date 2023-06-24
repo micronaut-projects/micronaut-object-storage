@@ -1,6 +1,6 @@
 To use https://azure.microsoft.com/en-gb/services/storage/blobs/[Azure Blob Storage], you need the following dependency:
 
-dependency:io.micronaut.objectstorage:micronaut-object-storage-azure[version={version}]
+dependency:io.micronaut.objectstorage:micronaut-object-storage-azure[]
 
 Refer to the https://micronaut-projects.github.io/micronaut-azure/latest/guide[Micronaut Azure documentation] for more
 information about authentication options.

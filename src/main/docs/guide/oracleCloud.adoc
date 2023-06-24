@@ -1,6 +1,6 @@
 To use https://www.oracle.com/cloud/storage/object-storage/[Oracle Cloud Infrastructure (OCI) Object Storage], you need the following dependency:
 
-dependency:io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud[version={version}]
+dependency:io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud[]
 
 Refer to the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide[Micronaut Oracle Cloud documentation]
 for more information about authentication options.

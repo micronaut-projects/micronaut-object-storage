@@ -48,6 +48,8 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
     }
 
     /**
+     * The path of the local storage.
+     *
      * @return The path of the local storage.
      */
     @NonNull

@@ -1,0 +1,17 @@
+To use the local storage implementation (useful for tests), you need the following dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-local[scope=test]
+
+By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.local.LocalStorageConfiguration.adoc[]
+
+For example:
+
+.`src/main/resources/application-test.yml`
+[source,yaml]
+----
+include::doc-examples/example-java/src/test/resources/application-testing.yml[]
+----
+
+The concrete implementation of `ObjectStorageOperations` is api:objectstorage.local.LocalStorageOperations[].

@@ -1,6 +1,6 @@
 To use https://aws.amazon.com/s3/[Amazon S3], you need the following dependency:
 
-dependency:io.micronaut.objectstorage:micronaut-object-storage-aws[version={version}]
+dependency:io.micronaut.objectstorage:micronaut-object-storage-aws[]
 
 Refer to the https://micronaut-projects.github.io/micronaut-aws/latest/guide[Micronaut AWS documentation] for more
 information about credentials and region configuration.

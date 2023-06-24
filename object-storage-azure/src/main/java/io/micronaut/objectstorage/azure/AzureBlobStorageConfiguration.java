@@ -47,6 +47,8 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
     }
 
     /**
+     * The blob container name.
+     *
      * @return The blob container name.
      */
     @NonNull
@@ -62,6 +64,8 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
     }
 
     /**
+     * The blob service endpoint, in the format of https://{accountName}.blob.core.windows.net.
+     *
      * @return the endpoint.
      */
     @NonNull
