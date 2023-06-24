@@ -9,14 +9,22 @@ import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An implementation of {@link ObjectStorageOperations} that uses the local file system. Useful for
@@ -26,12 +34,23 @@ import java.util.function.Consumer;
  * @since 2.0.0
  */
 @EachBean(LocalStorageConfiguration.class)
-public class LocalStorageOperations implements ObjectStorageOperations<LocalStorageOperations.LocalStorageFile, LocalStorageOperations.LocalStorageFile, LocalStorageOperations.LocalStorageFile> {
+public class LocalStorageOperations implements ObjectStorageOperations<
+    LocalStorageOperations.LocalStorageFile,
+    LocalStorageOperations.LocalStorageFile,
+    LocalStorageOperations.LocalStorageFile> {
+
+    public static final String METADATA_DIRECTORY = ".metadata";
 
     private final LocalStorageConfiguration configuration;
+    private final Path metadataPath;
 
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
         this.configuration = configuration;
+        this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
+        boolean metadataDirectoryCreated = metadataPath.toFile().mkdirs();
+        if (!metadataDirectoryCreated) {
+            throw new ObjectStorageException("Error creating metadata directory: " + metadataPath);
+        }
     }
 
     @Override
@@ -44,43 +63,135 @@ public class LocalStorageOperations implements ObjectStorageOperations<LocalStor
     @NonNull
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request,
                                                    @NonNull Consumer<LocalStorageFile> requestConsumer) {
-        File destination = new File(configuration.getPath().toFile(), request.getKey());
-        try (OutputStream out = new FileOutputStream(destination)) {
-            request.getInputStream().transferTo(out);
-            LocalStorageFile file = new LocalStorageFile(destination.toPath());
-            return UploadResponse.of(request.getKey(), "eTag", file);
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error copying file to: " + destination, e);
-        }
+        Path file = storeFile(request);
+        storeMetadata(request);
+        LocalStorageFile localFile = new LocalStorageFile(file);
+        requestConsumer.accept(localFile);
+        return UploadResponse.of(request.getKey(), UUID.randomUUID().toString(), localFile);
     }
 
     @Override
     @NonNull
     @SuppressWarnings("unchecked")
-        public Optional<LocalStorageEntry> retrieve(@NonNull String key) {
-        return Optional.empty();
+    public Optional<LocalStorageEntry> retrieve(@NonNull String key) {
+        Optional<Path> file = retrieveFile(key);
+        return file.map(path -> new LocalStorageEntry(key, path, retrieveMetadata(key)));
     }
 
     @Override
     @NonNull
     public LocalStorageFile delete(@NonNull String key) {
-        return null;
+        Optional<Path> file = retrieveFile(key);
+        deleteFile(key);
+        deleteMetadata(key);
+        return new LocalStorageFile(file.orElse(null));
     }
 
     @Override
     public boolean exists(@NonNull String key) {
-        return ObjectStorageOperations.super.exists(key);
+        return retrieveFile(key).isPresent();
     }
 
     @Override
     @NonNull
     public Set<String> listObjects() {
-        return ObjectStorageOperations.super.listObjects();
+        try (Stream<Path> stream = Files.list(configuration.getPath())) {
+            return stream
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .filter(string -> !string.equals(METADATA_DIRECTORY))
+                .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new ObjectStorageException("Error listing objects", e);
+        }
     }
 
     @Override
     public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
-        ObjectStorageOperations.super.copy(sourceKey, destinationKey);
+        retrieveFile(sourceKey).ifPresent(source -> {
+            try (InputStream in = Files.newInputStream(source)) {
+                storeFile(destinationKey, in);
+                storeMetadata(destinationKey, retrieveMetadata(sourceKey));
+            } catch (IOException e) {
+                throw new ObjectStorageException("Error copying file: " + source, e);
+            }
+        });
+    }
+
+    private Optional<Path> retrieveFile(String key) {
+        Path file = Paths.get(configuration.getPath().toString(), key);
+        if (Files.exists(file)) {
+            return Optional.of(file);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Map<String, String> retrieveMetadata(String key) {
+        Properties metadataProperties = new Properties();
+        Path metadata = Paths.get(metadataPath.toString(), key);
+        if (Files.exists(metadata)) {
+            try (InputStream metadataIn = Files.newInputStream(metadata)) {
+                metadataProperties.load(metadataIn);
+            } catch (IOException e) {
+                //no op
+            }
+        }
+        Map<String, String> result = new HashMap<>(metadataProperties.size());
+        for (final String name: metadataProperties.stringPropertyNames()) {
+            result.put(name, metadataProperties.getProperty(name));
+        }
+        return result;
+    }
+
+    private void deleteFile(String key) {
+        retrieveFile(key).ifPresent(path -> {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                throw new ObjectStorageException("Error deleting file: " + path, e);
+            }
+        });
+    }
+
+    private void deleteMetadata(String key) {
+        Path metadata = Paths.get(metadataPath.toString(), key);
+        if (Files.exists(metadata)) {
+            try {
+                Files.delete(metadata);
+            } catch (IOException e) {
+                //no op
+            }
+        }
+    }
+
+    private Path storeFile(UploadRequest request) {
+        return storeFile(request.getKey(), request.getInputStream());
+    }
+
+    private Path storeFile(String key, InputStream inputStream) {
+        File file = new File(configuration.getPath().toFile(), key);
+        try (OutputStream fileOut = new FileOutputStream(file)) {
+            inputStream.transferTo(fileOut);
+            return file.toPath();
+        } catch (IOException e) {
+            throw new ObjectStorageException("Error copying file to: " + file, e);
+        }
+    }
+
+    private void storeMetadata(UploadRequest request) {
+        storeMetadata(request.getKey(), request.getMetadata());
+    }
+
+    private void storeMetadata(String key, Map<String, String> metadata) {
+        Properties metadataProperties = new Properties();
+        metadataProperties.putAll(metadata);
+        Path metadataFilePath = Paths.get(metadataPath.toString(), key);
+        try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
+            metadataProperties.store(metadataOut, "Metadata for file: " + key);
+        } catch (IOException e) {
+            //no op
+        }
     }
 
     record LocalStorageFile(Path path) { }
