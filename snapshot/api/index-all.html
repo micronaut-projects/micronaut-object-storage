@@ -157,6 +157,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
 <dd>
 <div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
@@ -185,6 +187,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
 <dd>
 <div class="block">Deletes an object from the object storage.</div>
@@ -199,6 +203,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
 <dd>
@@ -241,15 +247,23 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#getBlobProperties()" class="member-name-link">getBlobProperties()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html#getBucket()" class="member-name-link">getBucket()</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The name of the AWS S3 bucket.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#getBucket()" class="member-name-link">getBucket()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The name of the Google Cloud Storage bucket.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#getBucket()" class="member-name-link">getBucket()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The name of the OCI Object Storage bucket.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/request/BytesUploadRequest.html#getBytes()" class="member-name-link">getBytes()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getContainer()" class="member-name-link">getContainer()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The blob container name.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/request/BytesUploadRequest.html#getContentSize()" class="member-name-link">getContentSize()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getContentSize()" class="member-name-link">getContentSize()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></dt>
@@ -264,6 +278,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#getContentType()" class="member-name-link">getContentType()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageEntry</a></dt>
@@ -277,7 +293,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/request/UploadRequest.html#getContentType()" class="member-name-link">getContentType()</a> - Method in interface io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getEndpoint()" class="member-name-link">getEndpoint()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The blob service endpoint, in the format of https://{accountName}.blob.core.windows.net.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/response/DefaultUploadResponse.html#getETag()" class="member-name-link">getETag()</a> - Method in class io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/DefaultUploadResponse.html" title="class in io.micronaut.objectstorage.response">DefaultUploadResponse</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/response/UploadResponse.html#getETag()" class="member-name-link">getETag()</a> - Method in interface io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a></dt>
@@ -289,6 +307,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#getInputStream()" class="member-name-link">getInputStream()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html#getInputStream()" class="member-name-link">getInputStream()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html#getInputStream()" class="member-name-link">getInputStream()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#getInputStream()" class="member-name-link">getInputStream()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
@@ -307,6 +327,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#getKey()" class="member-name-link">getKey()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>
@@ -332,6 +354,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageEntry</a></dt>
@@ -345,12 +369,16 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/configuration/AbstractObjectStorageConfiguration.html#getName()" class="member-name-link">getName()</a> - Method in class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/AbstractObjectStorageConfiguration.html" title="class in io.micronaut.objectstorage.configuration">AbstractObjectStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#getNamespace()" class="member-name-link">getNamespace()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The OCI Object Storage namespace used.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#getNativeEntry()" class="member-name-link">getNativeEntry()</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#getNativeEntry()" class="member-name-link">getNativeEntry()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html#getNativeEntry()" class="member-name-link">getNativeEntry()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html#getNativeEntry()" class="member-name-link">getNativeEntry()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#getNativeEntry()" class="member-name-link">getNativeEntry()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
@@ -360,6 +388,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/response/UploadResponse.html#getNativeResponse()" class="member-name-link">getNativeResponse()</a> - Method in interface io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html#getPath()" class="member-name-link">getPath()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a></dt>
+<dd>
+<div class="block">The path of the local storage.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/request/FileUploadRequest.html#getPath()" class="member-name-link">getPath()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#getRequestBody(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">getRequestBody(UploadRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
@@ -417,6 +449,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Object Storage Classes realted to GCP Cloud Storage.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/local/package-summary.html">io.micronaut.objectstorage.local</a> - package io.micronaut.objectstorage.local</dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/package-summary.html">io.micronaut.objectstorage.oraclecloud</a> - package io.micronaut.objectstorage.oraclecloud</dt>
 <dd>
 <div class="block">Object Storage Classes related to Oracle Cloud Storage.</div>
@@ -434,16 +468,38 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
 <dd>
 <div class="block">Lists the objects that exist in the object storage.</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html" class="type-name-link" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a> - Class in <a href="io/micronaut/objectstorage/local/package-summary.html">io.micronaut.objectstorage.local</a></dt>
+<dd>
+<div class="block">Configuration class for local storage.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html#%3Cinit%3E(java.lang.String)" class="member-name-link">LocalStorageConfiguration(String)</a> - Constructor for class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" class="type-name-link" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a> - Class in <a href="io/micronaut/objectstorage/local/package-summary.html">io.micronaut.objectstorage.local</a></dt>
+<dd>
+<div class="block">An <a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageEntry</code></a> implementation for local storage.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageEntry.html#%3Cinit%3E(java.lang.String,java.nio.file.Path,java.util.Map)" class="member-name-link">LocalStorageEntry(String, Path, Map&lt;String, String&gt;)</a> - Constructor for class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a> - Class in <a href="io/micronaut/objectstorage/local/package-summary.html">io.micronaut.objectstorage.local</a></dt>
+<dd>
+<div class="block">An implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a> that uses the local file system.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration)" class="member-name-link">LocalStorageOperations(LocalStorageConfiguration)</a> - Constructor for class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:M">M</h2>
 <dl class="index">
 <dt><a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html#metadata" class="member-name-link">metadata</a> - Variable in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#METADATA_DIRECTORY" class="member-name-link">METADATA_DIRECTORY</a> - Static variable in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:N">N</h2>
@@ -455,6 +511,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#NAME" class="member-name-link">NAME</a> - Static variable in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#NAME" class="member-name-link">NAME</a> - Static variable in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html#NAME" class="member-name-link">NAME</a> - Static variable in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#NAME" class="member-name-link">NAME</a> - Static variable in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
 <dd>
@@ -528,6 +586,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html#PREFIX" class="member-name-link">PREFIX</a> - Static variable in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html#PREFIX" class="member-name-link">PREFIX</a> - Static variable in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#PREFIX" class="member-name-link">PREFIX</a> - Static variable in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
 <dd>
 <div class="block">Configuration Prefix.</div>
@@ -540,6 +600,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
 <dd>
@@ -572,6 +634,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html#setNamespace(java.lang.String)" class="member-name-link">setNamespace(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html#setPath(java.nio.file.Path)" class="member-name-link">setPath(Path)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageFactory.html#storage(com.google.cloud.storage.StorageOptions)" class="member-name-link">storage(StorageOptions)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageFactory.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageFactory</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageFactory.html#storageOptions(com.google.cloud.storage.StorageOptions.Builder)" class="member-name-link">storageOptions(StorageOptions.Builder)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageFactory.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageFactory</a></dt>
@@ -598,6 +662,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
 <dd>
 <div class="block">Uploads an object to the object storage.</div>
@@ -614,6 +680,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Uploads an object to the object storage.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer&lt;LocalStorageOperations.LocalStorageFile&gt;)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer&lt;PutObjectRequest.Builder&gt;)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/UploadRequest.html" class="type-name-link" title="interface in io.micronaut.objectstorage.request">UploadRequest</a> - Interface in <a href="io/micronaut/objectstorage/request/package-summary.html">io.micronaut.objectstorage.request</a></dt>
