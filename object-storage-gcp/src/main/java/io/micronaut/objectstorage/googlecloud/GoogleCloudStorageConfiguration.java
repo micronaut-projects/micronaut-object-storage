@@ -44,6 +44,8 @@ public class GoogleCloudStorageConfiguration extends AbstractObjectStorageConfig
     }
 
     /**
+     * The name of the Google Cloud Storage bucket.
+     *
      * @return The name of the Google Cloud Storage bucket.
      */
     @NonNull

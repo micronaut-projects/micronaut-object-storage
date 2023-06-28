@@ -13,7 +13,4 @@
     </root>
 
     <logger name="io.micronaut.objectstorage" level="DEBUG"/>
-    <logger name="io.micronaut.aws" level="DEBUG"/>
-    <logger name="software.amazon.awssdk.services.s3" level="DEBUG"/>
-    <logger name="org.testcontainers" level="WARN"/>
 </configuration>

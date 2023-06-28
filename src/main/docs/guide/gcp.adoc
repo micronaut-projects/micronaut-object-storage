@@ -1,6 +1,6 @@
 To use https://cloud.google.com/storage[Google Cloud Storage], you need the following dependency:
 
-dependency:io.micronaut.objectstorage:micronaut-object-storage-gcp[version={version}]
+dependency:io.micronaut.objectstorage:micronaut-object-storage-gcp[]
 
 Refer to the https://micronaut-projects.github.io/micronaut-gcp/latest/guide[Micronaut GCP documentation] for more
 information about configuring your GCP project.
@@ -12,7 +12,7 @@ include::{includedir}configurationProperties/io.micronaut.objectstorage.googlecl
 For example:
 
 .`src/main/resources/application-gcp.yml`
-[source,yaml]
+[configuration]
 ----
 include::doc-examples/example-java/src/test/resources/application-gcp.yml[]
 ----

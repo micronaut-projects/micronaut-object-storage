@@ -1,0 +1,5 @@
+micronaut:
+  object-storage:
+    local:
+      default:
+        path: /tmp/my-object-storage

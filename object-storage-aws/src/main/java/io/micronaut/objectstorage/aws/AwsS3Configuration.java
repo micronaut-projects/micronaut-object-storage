@@ -63,6 +63,8 @@ public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
     }
 
     /**
+     * The name of the AWS S3 bucket.
+     *
      * @return The name of the AWS S3 bucket.
      */
     @NonNull

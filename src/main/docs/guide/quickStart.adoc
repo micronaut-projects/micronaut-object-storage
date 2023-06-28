@@ -22,7 +22,7 @@ https://docs.micronaut.io/latest/guide/#qualifiers[bean qualifiers].
 For example, given the following configuration:
 
 .`src/main/resources/application-ec2.yml`
-[source,yaml]
+[configuration]
 ----
 micronaut:
   object-storage:
