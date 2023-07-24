@@ -91,4 +91,12 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
         this.namespace = namespace;
     }
 
+    /**
+     * Whether to enable or disable this object storage.
+     * @since 2.0.2
+     */
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 }

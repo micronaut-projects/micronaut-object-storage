@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Object Storage Classes related to Azure Blob Storage.
- * <a href="https://azure.microsoft.com/en-us/services/storage/blobs/#overview">Azure Blob Storage</a>
- * @author Sergio del Amo
- * @since 1.0.0
- */
-@Configuration
-@Requires(property = AzureBlobStorageConfiguration.PREFIX + ".enabled", notEquals = StringUtils.FALSE)
-package io.micronaut.objectstorage.azure;
+package io.micronaut.objectstorage.configuration;
 
-import io.micronaut.context.annotation.Configuration;
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.core.util.StringUtils;
+import io.micronaut.core.util.Toggleable;
+
+/**
+ * Common properties for an Object Storage module.
+ *
+ * @author Álvaro Sánchez-Mariscal
+ * @since 2.0.2
+ */
+public interface ObjectStorageModuleConfiguration extends Toggleable {
+
+    boolean DEFAULT_ENABLED = true;
+
+}

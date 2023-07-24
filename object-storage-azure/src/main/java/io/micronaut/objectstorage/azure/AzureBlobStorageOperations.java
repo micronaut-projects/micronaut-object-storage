@@ -29,13 +29,13 @@ import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import com.azure.storage.blob.options.BlockBlobSimpleUploadOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
-import jakarta.inject.Singleton;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -55,7 +55,8 @@ import static java.lang.Boolean.TRUE;
  * @since 1.0
  */
 @EachBean(BlobContainerClient.class)
-@Singleton
+@Requires(condition = AzureBlobStorageEnabledCondition.class)
+@Requires(beans = BlobContainerClient.class)
 public class AzureBlobStorageOperations
     implements ObjectStorageOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> {
 

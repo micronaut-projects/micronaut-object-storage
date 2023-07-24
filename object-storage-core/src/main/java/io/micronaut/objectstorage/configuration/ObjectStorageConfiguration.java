@@ -23,7 +23,7 @@ import io.micronaut.core.naming.Named;
  * @author Pavol Gressa
  * @since 1.0
  */
-public interface ObjectStorageConfiguration extends Named {
+public interface ObjectStorageConfiguration extends Named, ObjectStorageModuleConfiguration {
 
     String PREFIX = "micronaut.object-storage";
 

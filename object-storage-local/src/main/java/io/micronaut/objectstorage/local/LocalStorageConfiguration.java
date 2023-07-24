@@ -70,4 +70,13 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
     public void setPath(@NonNull Path path) {
         this.path = path;
     }
+
+    /**
+     * Whether to enable or disable this object storage.
+     * @since 2.0.2
+     */
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 }

@@ -78,4 +78,13 @@ public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
     public void setBucket(@NonNull String bucket) {
         this.bucket = bucket;
     }
+
+    /**
+     * Whether to enable or disable this object storage.
+     * @since 2.0.2
+     */
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 }
