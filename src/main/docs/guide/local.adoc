@@ -13,6 +13,8 @@ micronaut:
         enabled: true
 ----
 
+NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
+api:objectstorage.ObjectStorageOperations[].
 
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 

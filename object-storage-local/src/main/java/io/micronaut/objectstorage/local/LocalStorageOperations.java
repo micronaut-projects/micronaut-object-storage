@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Primary;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageException;
@@ -53,6 +54,7 @@ import java.util.stream.Stream;
 @EachBean(LocalStorageConfiguration.class)
 @Requires(condition = ToggeableCondition.class)
 @Requires(beans = LocalStorageConfiguration.class)
+@Primary
 public class LocalStorageOperations implements ObjectStorageOperations<
     LocalStorageOperations.LocalStorageFile,
     LocalStorageOperations.LocalStorageFile,
