@@ -34,7 +34,6 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 

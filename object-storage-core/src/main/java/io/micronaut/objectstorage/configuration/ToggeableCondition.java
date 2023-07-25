@@ -25,7 +25,6 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.Toggleable;
 import io.micronaut.inject.QualifiedBeanType;
 import io.micronaut.inject.qualifiers.Qualifiers;
-
 import java.util.Optional;
 
 /**
@@ -36,7 +35,6 @@ import java.util.Optional;
  */
 @Internal
 public class ToggeableCondition implements Condition {
-
     private static final String DEFAULT_QUALIFIER = "default";
 
     @Override
@@ -55,7 +53,6 @@ public class ToggeableCondition implements Condition {
         return false;
     }
 
-
     /**
      * Check whether a specific condition is met.
      *
@@ -63,7 +60,7 @@ public class ToggeableCondition implements Condition {
      * @param configurationClass A {@link Toggleable} configuration class.
      * @return True if has been met
      */
-    public static boolean matches(ConditionContext context, Class<? extends Toggleable> configurationClass) {
+    public static boolean matches(@NonNull ConditionContext<?> context, @NonNull Class<? extends Toggleable> configurationClass) {
         if (context.getBeanResolutionContext() == null) {
             return true;
         }
