@@ -68,14 +68,10 @@ public class ToggeableCondition implements Condition {
             return true;
         }
         Qualifier qualifier = getCurrentQualifier(context);
-        if (context.getBeanContext().containsBean(configurationClass, qualifier)) {
-            Object bean = context.getBean(configurationClass, qualifier);
-            if (bean instanceof Toggleable configuration) {
-                return configuration.isEnabled();
-            }
-        }
-        return false;
-
+        Optional<Toggleable> toggleableOptional = context.findBean(configurationClass, qualifier)
+            .filter(Toggleable.class::isInstance)
+            .map(Toggleable.class::cast);
+        return toggleableOptional.map(Toggleable::isEnabled).orElse(false);
     }
 
     @NonNull
