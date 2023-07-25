@@ -59,7 +59,10 @@ loadScripts(document, 'script');</script>
 <h1 title="Package io.micronaut.objectstorage.googlecloud" class="title">Package io.micronaut.objectstorage.googlecloud</h1>
 </div>
 <hr>
-<div class="package-signature">package <span class="element-name">io.micronaut.objectstorage.googlecloud</span></div>
+<div class="package-signature"><span class="annotations">@Configuration
+@Requires(property="micronaut.object-storage.gcp.enabled",
+          notEquals="false")
+</span>package <span class="element-name">io.micronaut.objectstorage.googlecloud</span></div>
 <section class="package-description" id="package-description">
 <div class="block">Object Storage Classes realted to GCP Cloud Storage.
  <a href="https://cloud.google.com/storage">GCP Cloud Storage</a></div>
@@ -101,8 +104,12 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color class-summary class-summary-tab2"><a href="GoogleCloudStorageFactory.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageFactory</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab2">&nbsp;</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="GoogleCloudStorageModuleConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageModuleConfiguration</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Google Cloud Storage module configuration.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Google Cloud implementation of <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a>.</div>
 </div>
 </div>

@@ -81,6 +81,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@EachBean(<a href="AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration.class</a>)
+@Requires(condition=<a href="../configuration/ObjectStorageEnabledCondition.html" title="class in io.micronaut.objectstorage.configuration">ObjectStorageEnabledCondition.class</a>) @Requires(beans=<a href="AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration.class</a>)
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">AwsS3Operations</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder,<wbr>software.amazon.awssdk.services.s3.model.PutObjectResponse,<wbr>software.amazon.awssdk.services.s3.model.DeleteObjectResponse&gt;</span></div>

@@ -59,7 +59,10 @@ loadScripts(document, 'script');</script>
 <h1 title="Package io.micronaut.objectstorage.azure" class="title">Package io.micronaut.objectstorage.azure</h1>
 </div>
 <hr>
-<div class="package-signature">package <span class="element-name">io.micronaut.objectstorage.azure</span></div>
+<div class="package-signature"><span class="annotations">@Configuration
+@Requires(property="micronaut.object-storage.azure.enabled",
+          notEquals="false")
+</span>package <span class="element-name">io.micronaut.objectstorage.azure</span></div>
 <section class="package-description" id="package-description">
 <div class="block">Object Storage Classes related to Azure Blob Storage.
  <a href="https://azure.microsoft.com/en-us/services/storage/blobs/#overview">Azure Blob Storage</a></div>
@@ -95,13 +98,21 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Azure object storage configuration properties.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a></div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageEnabledCondition.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEnabledCondition</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Condition to check whether an  Azure object storage should be enabled.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageEntry.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEntry</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">An <a href="../ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageEntry</code></a> implementation for Azure Blob Storage.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageFactory.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageFactory</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageFactory.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageFactory</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Creates beans of the following types:</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageModuleConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageModuleConfiguration</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="block">Azure Object Storage module configuration.</div>
 </div>
 <div class="col-first odd-row-color class-summary class-summary-tab2"><a href="AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab2">
