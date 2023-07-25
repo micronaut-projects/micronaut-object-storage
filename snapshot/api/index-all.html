@@ -320,8 +320,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/UploadRequest.html#getContentType()" class="member-name-link">getContentType()</a> - Method in interface io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html#getCurrentQualifier(io.micronaut.context.condition.ConditionContext)" class="member-name-link">getCurrentQualifier(ConditionContext&lt;?&gt;)</a> - Static method in class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html" title="class in io.micronaut.objectstorage.configuration">ObjectStorageEnabledCondition</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#getEndpoint()" class="member-name-link">getEndpoint()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
 <dd>
 <div class="block">The blob service endpoint, in the format of https://{accountName}.blob.core.windows.net.</div>
@@ -581,9 +579,13 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:M">M</h2>
 <dl class="index">
+<dt><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html#matches(io.micronaut.context.condition.ConditionContext,java.lang.Class)" class="member-name-link">matches(ConditionContext&lt;?&gt;, Class&lt;? extends Toggleable&gt;)</a> - Static method in class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a></dt>
+<dd>
+<div class="block">Check whether a specific condition is met.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEnabledCondition.html#matches(io.micronaut.context.condition.ConditionContext)" class="member-name-link">matches(ConditionContext)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageEnabledCondition.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageEnabledCondition</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html#matches(io.micronaut.context.condition.ConditionContext)" class="member-name-link">matches(ConditionContext)</a> - Method in class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html" title="class in io.micronaut.objectstorage.configuration">ObjectStorageEnabledCondition</a></dt>
+<dt><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html#matches(io.micronaut.context.condition.ConditionContext)" class="member-name-link">matches(ConditionContext)</a> - Method in class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html#metadata" class="member-name-link">metadata</a> - Variable in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></dt>
 <dd>&nbsp;</dd>
@@ -615,12 +617,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Common properties for the object storage configuration.</div>
 </dd>
-<dt><a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html" class="type-name-link" title="class in io.micronaut.objectstorage.configuration">ObjectStorageEnabledCondition</a> - Class in <a href="io/micronaut/objectstorage/configuration/package-summary.html">io.micronaut.objectstorage.configuration</a></dt>
-<dd>
-<div class="block">Condition to check whether an object storage should be enabled.</div>
-</dd>
-<dt><a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html#%3Cinit%3E()" class="member-name-link">ObjectStorageEnabledCondition()</a> - Constructor for class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ObjectStorageEnabledCondition.html" title="class in io.micronaut.objectstorage.configuration">ObjectStorageEnabledCondition</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html" class="type-name-link" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="type parameter in ObjectStorageEntry">O</a>&gt; - Interface in <a href="io/micronaut/objectstorage/package-summary.html">io.micronaut.objectstorage</a></dt>
 <dd>
 <div class="block">Object storage entry.</div>
@@ -757,6 +753,12 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Transforms an InputStream into a byte array.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" class="type-name-link" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a> - Class in <a href="io/micronaut/objectstorage/configuration/package-summary.html">io.micronaut.objectstorage.configuration</a></dt>
+<dd>
+<div class="block">Condition to check whether a bean should be enabled based on <code>Toggleable</code> configuration.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html#%3Cinit%3E()" class="member-name-link">ToggeableCondition()</a> - Constructor for class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#toStreamedFile()" class="member-name-link">toStreamedFile()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#toSystemFile()" class="member-name-link">toSystemFile()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
