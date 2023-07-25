@@ -18,6 +18,7 @@ package io.micronaut.objectstorage.azure;
 import io.micronaut.context.Qualifier;
 import io.micronaut.context.condition.Condition;
 import io.micronaut.context.condition.ConditionContext;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
 
 /**
@@ -30,6 +31,7 @@ import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
  * @author Álvaro Sánchez-Mariscal
  * @since 2.0.2
  */
+@Internal
 public class AzureBlobStorageEnabledCondition implements Condition {
 
     @Override

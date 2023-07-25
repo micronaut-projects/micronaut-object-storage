@@ -21,6 +21,7 @@ import io.micronaut.context.condition.Condition;
 import io.micronaut.context.condition.ConditionContext;
 import io.micronaut.core.annotation.AnnotationMetadataProvider;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.inject.QualifiedBeanType;
 import io.micronaut.inject.qualifiers.Qualifiers;
 
@@ -34,6 +35,8 @@ import java.util.Optional;
  */
 @Internal
 public class ObjectStorageEnabledCondition implements Condition {
+
+    private static final String DEFAULT_QUALIFIER = "default";
 
     @Override
     public boolean matches(ConditionContext context) {
@@ -53,7 +56,8 @@ public class ObjectStorageEnabledCondition implements Condition {
         return false;
     }
 
-    public static Qualifier<?> getCurrentQualifier(ConditionContext<?> context) {
+    @NonNull
+    public static Qualifier<?> getCurrentQualifier(@NonNull ConditionContext<?> context) {
         if (context.getBeanResolutionContext() != null) {
             Qualifier<?> qualifier = context.getBeanResolutionContext().getCurrentQualifier();
             if (qualifier == null) {
@@ -63,6 +67,6 @@ public class ObjectStorageEnabledCondition implements Condition {
                 return qualifier;
             }
         }
-        return Qualifiers.byName("default");
+        return Qualifiers.byName(DEFAULT_QUALIFIER);
     }
 }
