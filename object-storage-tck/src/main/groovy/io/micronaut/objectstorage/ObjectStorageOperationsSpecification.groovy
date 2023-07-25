@@ -30,15 +30,15 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     public static final Map<String, String> METADATA = [project: "micronaut-object-storage"]
     public static final String CONTENT_TYPE = "text/plain"
 
-    void 'it can upload, get and delete object from file'() {
+    void 'it can upload, get and delete object from file'(TestFile testFile) {
         given: 'a temporary file'
         ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
-        Path path = createTempFile()
-        String key = path.getFileName().toString()
+        Path path = testFile.path
+        String key = testFile.uploadRequest.key
         PollingConditions conditions = new PollingConditions(timeout: 30)
 
         when: 'creating the upload request'
-        UploadRequest uploadRequest = UploadRequest.fromPath(path)
+        UploadRequest uploadRequest = testFile.uploadRequest
         uploadRequest.metadata = METADATA
         uploadRequest.contentType = CONTENT_TYPE
 
@@ -77,7 +77,12 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         when: 'updating the file'
         if (emulatorSupportsUpdate()) {
             path.toFile().text = NEW_TEXT
-            uploadRequest = UploadRequest.fromPath(path)
+            if (key.contains(File.separator)) {
+                String dirKey = key.substring(0, key.lastIndexOf(File.separator))
+                uploadRequest = UploadRequest.fromPath(path, dirKey)
+            } else {
+                uploadRequest = UploadRequest.fromPath(path)
+            }
             uploadRequest.metadata = METADATA
             uploadRequest.contentType = CONTENT_TYPE
             response = storage.upload(uploadRequest)
@@ -144,6 +149,13 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         then: 'the file does not exist'
         !objectStorageEntry.isPresent()
+
+        where:
+        testFile << [
+                createTestFile(),
+                createTestFile('dir'),
+                createTestFile('dir/subdir')
+        ]
     }
 
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
@@ -164,5 +176,21 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         Path path = Files.createTempFile('test-file', '.txt')
         path.toFile().text = TEXT
         return path
+    }
+
+    static TestFile createTestFile(String dir = null) {
+        Path path = createTempFile()
+        UploadRequest uploadRequest
+        if (dir) {
+            uploadRequest = UploadRequest.fromPath(path, dir)
+        } else {
+            uploadRequest = UploadRequest.fromPath(path)
+        }
+        return new TestFile(path: path, uploadRequest: uploadRequest)
+    }
+
+    static class TestFile {
+        Path path
+        UploadRequest uploadRequest
     }
 }

@@ -114,12 +114,12 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @Override
     @NonNull
     public Set<String> listObjects() {
-        try (Stream<Path> stream = Files.list(configuration.getPath())) {
+        try (Stream<Path> stream = Files.find(configuration.getPath(), Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile())) {
             return stream
-                .map(Path::getFileName)
-                .map(Path::toString)
-                .filter(string -> !string.equals(METADATA_DIRECTORY))
-                .collect(Collectors.toSet());
+            .map(p -> configuration.getPath().relativize(p))
+            .map(Path::toString)
+            .filter(s -> !s.startsWith(METADATA_DIRECTORY))
+            .collect(Collectors.toSet());
         } catch (IOException e) {
             throw new ObjectStorageException("Error listing objects", e);
         }
@@ -190,6 +190,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private Path storeFile(String key, InputStream inputStream) {
         File file = new File(configuration.getPath().toFile(), key);
+        file.getParentFile().mkdirs();
         try (OutputStream fileOut = new FileOutputStream(file)) {
             inputStream.transferTo(fileOut);
             return file.toPath();
@@ -206,6 +207,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         Properties metadataProperties = new Properties();
         metadataProperties.putAll(metadata);
         Path metadataFilePath = Paths.get(metadataPath.toString(), key);
+        metadataFilePath.getParent().toFile().mkdirs();
         try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
             metadataProperties.store(metadataOut, "Metadata for file: " + key);
         } catch (IOException e) {
