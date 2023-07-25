@@ -55,8 +55,8 @@ import static java.lang.Boolean.TRUE;
  * @since 1.0
  */
 @EachBean(BlobContainerClient.class)
-@Requires(condition = AzureBlobStorageEnabledCondition.class)
 @Requires(beans = BlobContainerClient.class)
+@Requires(condition = AzureBlobStorageEnabledCondition.class)
 public class AzureBlobStorageOperations
     implements ObjectStorageOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> {
 

@@ -21,7 +21,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
+import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
@@ -51,7 +51,7 @@ import java.util.stream.Stream;
  * @since 2.0.0
  */
 @EachBean(LocalStorageConfiguration.class)
-@Requires(condition = ObjectStorageEnabledCondition.class)
+@Requires(condition = ToggeableCondition.class)
 @Requires(beans = LocalStorageConfiguration.class)
 public class LocalStorageOperations implements ObjectStorageOperations<
     LocalStorageOperations.LocalStorageFile,

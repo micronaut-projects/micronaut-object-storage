@@ -15,16 +15,15 @@
  */
 package io.micronaut.objectstorage.azure;
 
-import io.micronaut.context.Qualifier;
 import io.micronaut.context.condition.Condition;
 import io.micronaut.context.condition.ConditionContext;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
+import io.micronaut.objectstorage.configuration.ToggeableCondition;
 
 /**
  * Condition to check whether an  Azure object storage should be enabled.
  *
- * {@link ObjectStorageEnabledCondition} can't be used in this module since
+ * {@link ToggeableCondition} can't be used in this module since
  * {@link AzureBlobStorageOperations} has an <code>@EachBean</code> over
  * {@link com.azure.storage.blob.BlobContainerClient}, and not {@link AzureBlobStorageConfiguration}.
  *
@@ -33,19 +32,8 @@ import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
  */
 @Internal
 public class AzureBlobStorageEnabledCondition implements Condition {
-
     @Override
     public boolean matches(ConditionContext context) {
-        if (context.getBeanResolutionContext() == null) {
-            return true;
-        } else {
-            Qualifier qualifier = ObjectStorageEnabledCondition.getCurrentQualifier(context);
-            if (context.getBeanContext().containsBean(AzureBlobStorageConfiguration.class, qualifier)) {
-                AzureBlobStorageConfiguration configuration = context.getBean(AzureBlobStorageConfiguration.class, qualifier);
-                return configuration.isEnabled();
-            }
-        }
-        return false;
+        return ToggeableCondition.matches(context, AzureBlobStorageConfiguration.class);
     }
-
 }
