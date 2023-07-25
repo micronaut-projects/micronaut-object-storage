@@ -11,12 +11,14 @@ import jakarta.inject.Singleton
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
+import spock.lang.Ignore
 import spock.lang.Shared
 
 import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
 
 @MicronautTest
 @Property(name = 'spec.name', value = SPEC_NAME)
+@Ignore("Emulator is unreliable. To re-evaluate in the future, but low priority since actual cloud tests are run in CI")
 class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
 
     public static final String SPEC_NAME = 'OracleCloudStorageOciEmulatorSpec'

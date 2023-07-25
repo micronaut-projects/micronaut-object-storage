@@ -32,10 +32,12 @@ import com.oracle.bmc.objectstorage.responses.ListObjectsResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Inject;
@@ -55,6 +57,8 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @EachBean(OracleCloudStorageConfiguration.class)
+@Requires(condition = ObjectStorageEnabledCondition.class)
+@Requires(beans = OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations
     implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 

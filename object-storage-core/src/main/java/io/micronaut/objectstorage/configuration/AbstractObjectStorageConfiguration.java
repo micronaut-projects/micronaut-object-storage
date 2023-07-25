@@ -23,10 +23,10 @@ import io.micronaut.core.annotation.NonNull;
  * @author Pavol Gressa
  * @since 1.0
  */
-public abstract class AbstractObjectStorageConfiguration implements ObjectStorageConfiguration {
+public abstract class AbstractObjectStorageConfiguration extends AbstractObjectStorageModuleConfiguration implements ObjectStorageConfiguration {
 
     @NonNull
-    private String name;
+    protected final String name;
 
     protected AbstractObjectStorageConfiguration(@NonNull String name) {
         this.name = name;

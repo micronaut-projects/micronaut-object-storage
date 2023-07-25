@@ -1,0 +1,7 @@
+[
+  {
+  "type": "io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration",
+  "member": "Field name",
+  "reason": "Private field made final"
+  }
+]

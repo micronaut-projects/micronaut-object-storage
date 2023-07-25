@@ -19,4 +19,10 @@
  * @author Sergio del Amo
  * @since 1.0.0
  */
+@Configuration
+@Requires(property = GoogleCloudStorageConfiguration.PREFIX + ".enabled", notEquals = StringUtils.FALSE)
 package io.micronaut.objectstorage.googlecloud;
+
+import io.micronaut.context.annotation.Configuration;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.core.util.StringUtils;

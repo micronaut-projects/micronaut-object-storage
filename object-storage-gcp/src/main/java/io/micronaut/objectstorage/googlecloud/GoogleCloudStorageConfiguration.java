@@ -60,4 +60,12 @@ public class GoogleCloudStorageConfiguration extends AbstractObjectStorageConfig
         this.bucket = bucket;
     }
 
+    /**
+     * Whether to enable or disable this object storage.
+     * @since 2.0.2
+     */
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 }

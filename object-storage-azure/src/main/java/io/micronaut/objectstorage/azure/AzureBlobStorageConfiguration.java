@@ -81,7 +81,11 @@ public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfigur
     }
 
     /**
-     * @return The blob container name.
+     * Whether to enable or disable this object storage.
+     * @since 2.0.2
      */
-
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 }
