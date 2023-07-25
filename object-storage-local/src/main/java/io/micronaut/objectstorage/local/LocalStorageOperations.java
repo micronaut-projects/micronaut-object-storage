@@ -66,7 +66,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
         this.configuration = configuration;
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
-        boolean metadataDirectoryCreated = metadataPath.toFile().mkdirs();
+        boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
             throw new ObjectStorageException("Error creating metadata directory: " + metadataPath);
         }
@@ -190,7 +190,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private Path storeFile(String key, InputStream inputStream) {
         File file = new File(configuration.getPath().toFile(), key);
-        file.getParentFile().mkdirs();
+        mkdirs(file.getParentFile().toPath());
         try (OutputStream fileOut = new FileOutputStream(file)) {
             inputStream.transferTo(fileOut);
             return file.toPath();
@@ -207,11 +207,20 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         Properties metadataProperties = new Properties();
         metadataProperties.putAll(metadata);
         Path metadataFilePath = Paths.get(metadataPath.toString(), key);
-        metadataFilePath.getParent().toFile().mkdirs();
+        mkdirs(metadataFilePath.getParent());
         try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
             metadataProperties.store(metadataOut, "Metadata for file: " + key);
         } catch (IOException e) {
             //no op
+        }
+    }
+
+    private boolean mkdirs(Path path) {
+        try {
+            Files.createDirectories(path);
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 

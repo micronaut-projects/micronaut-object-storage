@@ -77,8 +77,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         when: 'updating the file'
         if (emulatorSupportsUpdate()) {
             path.toFile().text = NEW_TEXT
-            if (key.contains(File.separator)) {
-                String dirKey = key.substring(0, key.lastIndexOf(File.separator))
+            if (key.contains('/')) {
+                String dirKey = key.substring(0, key.lastIndexOf('/'))
                 uploadRequest = UploadRequest.fromPath(path, dirKey)
             } else {
                 uploadRequest = UploadRequest.fromPath(path)
@@ -154,7 +154,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         testFile << [
                 createTestFile(),
                 createTestFile('dir'),
-                createTestFile('dir/subdir')
+                createTestFile('dir/subdir'),
         ]
     }
 
