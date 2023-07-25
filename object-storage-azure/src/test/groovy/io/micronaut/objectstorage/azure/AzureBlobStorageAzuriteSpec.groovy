@@ -15,7 +15,7 @@ class AzureBlobStorageAzuriteSpec extends AbstractAzureBlobStorageSpec {
 
     @Shared
     @AutoCleanup
-    GenericContainer azuriteContainer = new GenericContainer(DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.23.0'))
+    GenericContainer azuriteContainer = new GenericContainer(DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.25.0'))
             .withExposedPorts(10000)
 
     @Override

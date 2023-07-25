@@ -66,7 +66,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
         this.configuration = configuration;
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
-        boolean metadataDirectoryCreated = metadataPath.toFile().mkdirs();
+        boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
             throw new ObjectStorageException("Error creating metadata directory: " + metadataPath);
         }
@@ -114,12 +114,12 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @Override
     @NonNull
     public Set<String> listObjects() {
-        try (Stream<Path> stream = Files.list(configuration.getPath())) {
+        try (Stream<Path> stream = Files.find(configuration.getPath(), Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile())) {
             return stream
-                .map(Path::getFileName)
-                .map(Path::toString)
-                .filter(string -> !string.equals(METADATA_DIRECTORY))
-                .collect(Collectors.toSet());
+            .map(p -> configuration.getPath().relativize(p))
+            .map(Path::toString)
+            .filter(s -> !s.startsWith(METADATA_DIRECTORY))
+            .collect(Collectors.toSet());
         } catch (IOException e) {
             throw new ObjectStorageException("Error listing objects", e);
         }
@@ -190,6 +190,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private Path storeFile(String key, InputStream inputStream) {
         File file = new File(configuration.getPath().toFile(), key);
+        mkdirs(file.getParentFile().toPath());
         try (OutputStream fileOut = new FileOutputStream(file)) {
             inputStream.transferTo(fileOut);
             return file.toPath();
@@ -206,10 +207,20 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         Properties metadataProperties = new Properties();
         metadataProperties.putAll(metadata);
         Path metadataFilePath = Paths.get(metadataPath.toString(), key);
+        mkdirs(metadataFilePath.getParent());
         try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
             metadataProperties.store(metadataOut, "Metadata for file: " + key);
         } catch (IOException e) {
             //no op
+        }
+    }
+
+    private boolean mkdirs(Path path) {
+        try {
+            Files.createDirectories(path);
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 
