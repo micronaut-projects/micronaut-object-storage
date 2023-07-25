@@ -28,7 +28,7 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
+import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
@@ -45,7 +45,7 @@ import java.util.stream.StreamSupport;
  * @since 1.0
  */
 @EachBean(GoogleCloudStorageConfiguration.class)
-@Requires(condition = ObjectStorageEnabledCondition.class)
+@Requires(condition = ToggeableCondition.class)
 @Requires(beans = GoogleCloudStorageConfiguration.class)
 public class GoogleCloudStorageOperations
     implements ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> {

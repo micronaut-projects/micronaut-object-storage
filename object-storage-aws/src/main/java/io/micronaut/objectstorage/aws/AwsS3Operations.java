@@ -23,7 +23,7 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
-import io.micronaut.objectstorage.configuration.ObjectStorageEnabledCondition;
+import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @EachBean(AwsS3Configuration.class)
-@Requires(condition = ObjectStorageEnabledCondition.class)
+@Requires(condition = ToggeableCondition.class)
 @Requires(beans = AwsS3Configuration.class)
 public class AwsS3Operations implements ObjectStorageOperations<
     PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {

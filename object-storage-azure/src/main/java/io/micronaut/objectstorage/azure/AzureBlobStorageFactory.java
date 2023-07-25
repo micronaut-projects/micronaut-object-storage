@@ -25,6 +25,7 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.exceptions.DisabledBeanException;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.inject.qualifiers.Qualifiers;
 
@@ -58,6 +59,9 @@ public class AzureBlobStorageFactory {
     @Requires(missingBeans = StorageSharedKeyCredential.class)
     public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(AzureBlobStorageConfiguration configuration,
                                                                                 @NonNull TokenCredential tokenCredential) {
+        if (!configuration.isEnabled()) {
+            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
+        }
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
             .credential(tokenCredential);
@@ -72,6 +76,9 @@ public class AzureBlobStorageFactory {
     @Requires(bean = StorageSharedKeyCredential.class)
     public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(AzureBlobStorageConfiguration configuration,
                                                                                     @NonNull StorageSharedKeyCredential sharedKeyCredential) {
+        if (!configuration.isEnabled()) {
+            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
+        }
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
             .credential(sharedKeyCredential);

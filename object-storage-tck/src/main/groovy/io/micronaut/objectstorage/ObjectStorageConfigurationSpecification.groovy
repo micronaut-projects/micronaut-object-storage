@@ -45,12 +45,7 @@ abstract class ObjectStorageConfigurationSpecification<O extends ObjectStorageOp
 
         expect:
         !ctx.containsBean(getObjectStorage(), Qualifiers.byName("default"))
-
-        when:
-        def bean = ctx.containsBean(getObjectStorage(), Qualifiers.byName("other"))
-
-        then:
-        bean
+        ctx.containsBean(getObjectStorage(), Qualifiers.byName("other"))
 
         cleanup:
         ctx.close()
