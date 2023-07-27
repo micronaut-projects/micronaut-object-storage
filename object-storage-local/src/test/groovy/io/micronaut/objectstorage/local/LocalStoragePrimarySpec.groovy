@@ -38,6 +38,7 @@ class LocalStoragePrimarySpec extends Specification {
         operations instanceof LocalStorageOperations
     }
 
+    @Requires(property = "spec.name", value = SPEC_NAME)
     @MockBean(S3Client)
     S3Client s3Client() {
         return Mock(S3Client)
