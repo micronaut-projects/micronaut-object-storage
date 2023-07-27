@@ -1,0 +1,9 @@
+io.micronaut.objectstorage
+io.micronaut.objectstorage.aws
+io.micronaut.objectstorage.azure
+io.micronaut.objectstorage.configuration
+io.micronaut.objectstorage.googlecloud
+io.micronaut.objectstorage.local
+io.micronaut.objectstorage.oraclecloud
+io.micronaut.objectstorage.request
+io.micronaut.objectstorage.response
