@@ -64,24 +64,26 @@ public class ToggeableCondition implements Condition {
         if (context.getBeanResolutionContext() == null) {
             return true;
         }
-        Qualifier qualifier = getCurrentQualifier(context);
-        Optional<Toggleable> toggleableOptional = context.findBean(configurationClass, qualifier)
-            .filter(Toggleable.class::isInstance)
-            .map(Toggleable.class::cast);
-        return toggleableOptional.map(Toggleable::isEnabled).orElse(false);
+        Optional<Qualifier> qualifier = getCurrentQualifier(context);
+        if (qualifier.isPresent()) {
+            Optional<Toggleable> toggleableOptional = context.findBean(configurationClass, qualifier.get())
+                .filter(Toggleable.class::isInstance)
+                .map(Toggleable.class::cast);
+            return toggleableOptional.map(Toggleable::isEnabled).orElse(false);
+        } else {
+            return true;
+        }
     }
 
     @NonNull
-    private static Qualifier<?> getCurrentQualifier(@NonNull ConditionContext<?> context) {
+    private static Optional<Qualifier> getCurrentQualifier(@NonNull ConditionContext<?> context) {
         if (context.getBeanResolutionContext() != null) {
             Qualifier<?> qualifier = context.getBeanResolutionContext().getCurrentQualifier();
             if (qualifier == null) {
                 qualifier = ((QualifiedBeanType<?>) context.getComponent()).getDeclaredQualifier();
             }
-            if (qualifier != null) {
-                return qualifier;
-            }
+            return Optional.ofNullable(qualifier);
         }
-        return Qualifiers.byName(DEFAULT_QUALIFIER);
+        return Optional.of(Qualifiers.byName(DEFAULT_QUALIFIER));
     }
 }
