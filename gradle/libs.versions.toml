@@ -1,28 +1,29 @@
 [versions]
-micronaut = "4.0.2"
-micronaut-platform = "4.0.0-RC1"
+micronaut = "4.1.6"
+micronaut-platform = "4.1.2"
 micronaut-docs = "2.0.0"
-micronaut-test = "4.0.0"
+micronaut-test = "4.0.2"
 micronaut-aws = "4.0.4"
 micronaut-azure = "5.0.1"
 micronaut-gcp = "5.0.4"
-micronaut-oracle-cloud = "3.0.3"
-micronaut-validation = "4.0.1"
+micronaut-oracle-cloud = "3.0.5"
+micronaut-validation = "4.0.3"
 micronaut-logging = "1.0.0"
 
-groovy = '4.0.13'
+groovy = '4.0.15'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.18.0'
 testcontainers = '1.18.3'
 bytebuddy = '1.14.5'
 
 # Gradle plugins
-micronaut-gradle-plugin = "4.0.1"
+micronaut-gradle-plugin = "4.0.4"
 kotlin-gradle-plugin = "1.8.22"
 
 [libraries]
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
+micronaut-platform = { module = 'io.micronaut.platform:micronaut-platform', version.ref = 'micronaut-platform' }
 
 # AWS
 micronaut-aws = { module = 'io.micronaut.aws:micronaut-aws-bom', version.ref = 'micronaut-aws' }
