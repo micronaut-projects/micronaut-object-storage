@@ -22,8 +22,6 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAzureBlobStorageSpec.class);
     public static final String CONTAINER_NAME = System.currentTimeMillis()
 
-    @Shared
-    boolean containerCreated;
     public static final String OBJECT_STORAGE_NAME = 'default'
 
     @Inject
@@ -34,14 +32,12 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
     @Inject
     BlobContainerClient blobContainerClient
 
+    @Shared
     @Inject
     BlobServiceClient blobServiceClient
 
-    void setup() {
-        if (!containerCreated) {
-            blobServiceClient.createBlobContainer(CONTAINER_NAME)
-            containerCreated = true
-        }
+    void setupSpec() {
+        blobServiceClient.createBlobContainer(CONTAINER_NAME)
     }
 
     void cleanupSpec() {
