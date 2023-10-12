@@ -11,5 +11,5 @@ export AWS_REGION=...
 
 Run the tests:
 ```shell
-./gradlew :object-storage-aws:test
+./gradlew :micronaut-object-storage-aws:test
 ```
