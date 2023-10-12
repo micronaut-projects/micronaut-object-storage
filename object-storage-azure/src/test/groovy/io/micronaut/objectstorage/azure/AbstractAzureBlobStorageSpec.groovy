@@ -18,6 +18,7 @@ import spock.lang.Shared
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
 
 abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAzureBlobStorageSpec.class);
     public static final String CONTAINER_NAME = System.currentTimeMillis()
 
@@ -46,12 +47,12 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
     void cleanupSpec() {
         try {
             if (blobContainerClient.exists()) {
-                blobContainerClient.delete();
-                LOG.trace("Delete completed");
+                blobContainerClient.delete()
+                LOG.trace("Delete completed")
             }
         } catch (BlobStorageException error) {
             if (error.getErrorCode() == BlobErrorCode.CONTAINER_NOT_FOUND) {
-                LOG.error("Delete failed. Container was not found");
+                LOG.error("Delete failed. Container was not found")
             }
             LOG.error("Delete failed with error code: {} status code: {} and service message: {}", error.getErrorCode(), error.getStatusCode(), error.getServiceMessage())
         }
@@ -59,7 +60,7 @@ abstract class AbstractAzureBlobStorageSpec extends ObjectStorageOperationsSpeci
 
     @Override
     ObjectStorageOperations<?, Response<BlockBlobItem>, ?> getObjectStorage() {
-        return azureBlobContainer
+        azureBlobContainer
     }
 
     @Override
