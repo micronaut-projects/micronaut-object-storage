@@ -12,7 +12,7 @@ micronaut-logging = "1.0.0"
 
 groovy = '4.0.15'
 spock = '2.3-groovy-4.0'
-gcp-libraries = '26.18.0'
+gcp-libraries = '26.24.0'
 testcontainers = '1.18.3'
 bytebuddy = '1.14.9'
 
