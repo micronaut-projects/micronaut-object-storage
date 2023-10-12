@@ -17,11 +17,9 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
     public static final String BUCKET_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
 
+    @Shared
     @Inject
     GoogleCloudStorageOperations cloudObjectStorage
-
-    @Shared
-    boolean bucketCreated
 
     @Shared
     @Inject
@@ -36,12 +34,8 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
         return cloudObjectStorage
     }
 
-    void setup() {
-        if (!bucketCreated) {
-            storage.create(BucketInfo.newBuilder(BUCKET_NAME).build())
-            bucketCreated = true
-        }
-
+    void setupSpec() {
+        storage.create(BucketInfo.newBuilder(BUCKET_NAME).build())
     }
 
     void cleanupSpec() {
