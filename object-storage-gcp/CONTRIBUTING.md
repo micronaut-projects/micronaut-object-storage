@@ -19,5 +19,5 @@ export GCLOUD_TEST_PROJECT_ID=<project_id>
 
 4. Run the tests:
 ```shell
-./gradlew :object-storage-gcp:test
+./gradlew :micronaut-object-storage-gcp:test
 ```

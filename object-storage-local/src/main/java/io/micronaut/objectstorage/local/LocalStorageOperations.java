@@ -26,14 +26,12 @@ import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -140,7 +138,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private Optional<Path> retrieveFile(String key) {
-        Path file = Paths.get(configuration.getPath().toString(), key);
+        Path file = resolveSafe(configuration.getPath(), key);
         if (Files.exists(file)) {
             return Optional.of(file);
         } else {
@@ -150,7 +148,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private Map<String, String> retrieveMetadata(String key) {
         Properties metadataProperties = new Properties();
-        Path metadata = Paths.get(metadataPath.toString(), key);
+        Path metadata = resolveSafe(metadataPath, key).normalize();
         if (Files.exists(metadata)) {
             try (InputStream metadataIn = Files.newInputStream(metadata)) {
                 metadataProperties.load(metadataIn);
@@ -176,7 +174,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void deleteMetadata(String key) {
-        Path metadata = Paths.get(metadataPath.toString(), key);
+        Path metadata = resolveSafe(metadataPath, key);
         if (Files.exists(metadata)) {
             try {
                 Files.delete(metadata);
@@ -191,11 +189,11 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private Path storeFile(String key, InputStream inputStream) {
-        File file = new File(configuration.getPath().toFile(), key);
-        mkdirs(file.getParentFile().toPath());
-        try (OutputStream fileOut = new FileOutputStream(file)) {
+        Path file = resolveSafe(configuration.getPath(), key);
+        mkdirs(file.getParent());
+        try (OutputStream fileOut = Files.newOutputStream(file)) {
             inputStream.transferTo(fileOut);
-            return file.toPath();
+            return file;
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
         }
@@ -208,7 +206,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private void storeMetadata(String key, Map<String, String> metadata) {
         Properties metadataProperties = new Properties();
         metadataProperties.putAll(metadata);
-        Path metadataFilePath = Paths.get(metadataPath.toString(), key);
+        Path metadataFilePath = resolveSafe(metadataPath, key);
         mkdirs(metadataFilePath.getParent());
         try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
             metadataProperties.store(metadataOut, "Metadata for file: " + key);
@@ -224,6 +222,14 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         } catch (IOException e) {
             return false;
         }
+    }
+
+    private static Path resolveSafe(Path parent, String key) {
+        Path file = parent.resolve(key).normalize();
+        if (!file.startsWith(parent)) {
+            throw new IllegalArgumentException("Path lies outside the configured bucket");
+        }
+        return file;
     }
 
     record LocalStorageFile(Path path) { }
