@@ -8,6 +8,7 @@ import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+import spock.lang.Shared
 
 import static io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.PREFIX
 
@@ -16,9 +17,11 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
     public static final String BUCKET_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
 
+    @Shared
     @Inject
     GoogleCloudStorageOperations cloudObjectStorage
 
+    @Shared
     @Inject
     Storage storage
 
@@ -31,11 +34,11 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
         return cloudObjectStorage
     }
 
-    void setup() {
-        storage.create(BucketInfo.newBuilder(BUCKET_NAME).build());
+    void setupSpec() {
+        storage.create(BucketInfo.newBuilder(BUCKET_NAME).build())
     }
 
-    void cleanup() {
+    void cleanupSpec() {
         storage.get(BUCKET_NAME).delete()
     }
 }
