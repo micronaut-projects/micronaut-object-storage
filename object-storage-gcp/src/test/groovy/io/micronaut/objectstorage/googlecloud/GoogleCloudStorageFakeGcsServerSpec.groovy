@@ -31,7 +31,6 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
                     "-scheme", "http"
             ))
 
-
     @Factory
     @Requires(property = 'spec.name', value = SPEC_NAME)
     static class FakeGcsFactory {
@@ -39,7 +38,7 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
         @Singleton
         @Primary
         Storage storage() {
-            if (!fakeGcs.isRunning()) {
+            if (!fakeGcs.running) {
                 fakeGcs.start()
             }
             String fakeGcsExternalUrl = "http://${fakeGcs.host}:${fakeGcs.firstMappedPort}"
