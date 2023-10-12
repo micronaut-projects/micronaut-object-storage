@@ -3,16 +3,16 @@ micronaut = "4.1.8"
 micronaut-platform = "4.1.2"
 micronaut-docs = "2.0.0"
 micronaut-test = "4.0.2"
-micronaut-aws = "4.0.4"
+micronaut-aws = "4.0.5"
 micronaut-azure = "5.0.1"
 micronaut-gcp = "5.0.4"
 micronaut-oracle-cloud = "3.0.5"
 micronaut-validation = "4.0.3"
-micronaut-logging = "1.0.0"
+micronaut-logging = "1.1.2"
 
 groovy = '4.0.15'
 spock = '2.3-groovy-4.0'
-gcp-libraries = '26.18.0'
+gcp-libraries = '26.24.0'
 testcontainers = '1.19.1'
 bytebuddy = '1.14.9'
 
