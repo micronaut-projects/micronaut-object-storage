@@ -6,14 +6,14 @@ micronaut-test = "4.0.2"
 micronaut-aws = "4.0.5"
 micronaut-azure = "5.0.1"
 micronaut-gcp = "5.1.0"
-micronaut-oracle-cloud = "3.0.5"
+micronaut-oracle-cloud = "3.0.6"
 micronaut-validation = "4.0.3"
 micronaut-logging = "1.1.2"
 
 groovy = '4.0.15'
 spock = '2.3-groovy-4.0'
 gcp-libraries = '26.24.0'
-testcontainers = '1.18.3'
+testcontainers = '1.19.1'
 bytebuddy = '1.14.9'
 
 # Gradle plugins
