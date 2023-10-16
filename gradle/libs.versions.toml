@@ -19,6 +19,7 @@ bytebuddy = '1.14.9'
 # Gradle plugins
 micronaut-gradle-plugin = "4.1.1"
 kotlin-gradle-plugin = "1.9.10"
+kotlin-gradle-ksp-plugin = "1.9.10-1.0.13"
 
 [libraries]
 # Core
@@ -58,4 +59,4 @@ bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 # Plugins
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }
 gradle-kotlin = { module = 'org.jetbrains.kotlin:kotlin-gradle-plugin', version.ref = 'kotlin-gradle-plugin' }
-gradle-kotlin-allopen = { module = 'org.jetbrains.kotlin:kotlin-allopen', version.ref = 'kotlin-gradle-plugin' }
+gradle-kotlin-ksp = { module = 'com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin', version.ref = 'kotlin-gradle-ksp-plugin' }
