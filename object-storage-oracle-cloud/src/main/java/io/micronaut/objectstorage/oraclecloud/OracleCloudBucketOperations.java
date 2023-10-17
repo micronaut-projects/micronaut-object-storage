@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@EachBean(OracleCloudBucketOperations.class)
+@EachBean(OracleCloudNamespaceConfiguration.class)
 @Requires(condition = ToggeableCondition.class)
 @Requires(beans = OracleCloudBucketOperations.class)
 final class OracleCloudBucketOperations

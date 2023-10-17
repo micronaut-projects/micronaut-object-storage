@@ -11,7 +11,7 @@ public class OracleCloudNamespaceConfiguration implements Toggleable {
     /**
      * Configuration Prefix.
      */
-    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + ".oracle-cloud-dynamic"; // todo: tbd
+    public static final String PREFIX = OracleCloudStorageConfiguration.PREFIX + ".bucket-operations";
 
     private boolean enabled = true;
 
