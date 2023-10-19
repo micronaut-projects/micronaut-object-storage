@@ -5,7 +5,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.objectstorage/micronaut-object-storage-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.objectstorage%22%20AND%20a:%22micronaut-object-storage-core%22)
 [![Build Status](https://github.com/micronaut-projects/micronaut-object-storage/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-object-storage/actions)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=micronaut-projects_micronaut-object-storage&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=micronaut-projects_micronaut-object-storage)
-[![Revved up by Gradle Enterprise](https://img.shields.io/badge/Revved%20up%20by-Gradle%20Enterprise-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
+[![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
 
 Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers.
 
