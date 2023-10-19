@@ -8,6 +8,24 @@ import java.util.Set;
 
 public interface BucketOperations<I, O, D> {
     /**
+     * Create a new bucket with the given name.
+     *
+     * @param name The name of the new bucket
+     */
+    @Blocking
+    @NonNull
+    void createBucket(String name);
+
+    /**
+     * Delete a new bucket with the given name.
+     *
+     * @param name The name of the bucket
+     */
+    @Blocking
+    @NonNull
+    void deleteBucket(String name);
+
+    /**
      * List the available buckets. This operation may be blocking.
      *
      * @return The available buckets

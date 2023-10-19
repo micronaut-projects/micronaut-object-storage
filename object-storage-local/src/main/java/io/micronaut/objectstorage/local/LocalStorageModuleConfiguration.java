@@ -16,7 +16,10 @@
 package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageModuleConfiguration;
+
+import java.nio.file.Path;
 
 /**
  * Local Storage module configuration.
@@ -26,6 +29,10 @@ import io.micronaut.objectstorage.configuration.AbstractObjectStorageModuleConfi
  */
 @ConfigurationProperties(LocalStorageConfiguration.PREFIX)
 public class LocalStorageModuleConfiguration extends AbstractObjectStorageModuleConfiguration {
+
+    /*
+    micronaut.object-storage.local.enabled = true
+     */
 
     /**
      * Whether to enable or disable the whole Local Storage module.

@@ -11,9 +11,12 @@ public class OracleCloudNamespaceConfiguration implements Toggleable {
     /**
      * Configuration Prefix.
      */
-    public static final String PREFIX = OracleCloudStorageConfiguration.PREFIX + ".bucket-operations";
+    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + ".oracle-cloud-bucket-operations";
 
     private boolean enabled = true;
+
+    @NonNull
+    private String compartmentId;
 
     @NonNull
     private String namespace;
@@ -25,6 +28,14 @@ public class OracleCloudNamespaceConfiguration implements Toggleable {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getCompartmentId() {
+        return compartmentId;
+    }
+
+    public void setCompartmentId(String compartmentId) {
+        this.compartmentId = compartmentId;
     }
 
     public String getNamespace() {
