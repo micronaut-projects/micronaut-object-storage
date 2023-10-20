@@ -18,22 +18,25 @@ package io.micronaut.objectstorage
 import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ThreadLocalRandom
-import java.util.concurrent.TimeUnit
 
 abstract class BucketOperationsSpecification extends Specification {
     void crud() {
         given:
         def bucketOps = getBucketOperations()
         def initBuckets = bucketOps.listBuckets()
+        PollingConditions conditions = new PollingConditions(timeout: 30)
 
         when:
         def name1 = "micronaut-objectstorage-test-" + ThreadLocalRandom.current().nextLong()
         bucketOps.createBucket(name1)
         then:
-        bucketOps.listBuckets() == initBuckets + [name1]
+        conditions.eventually {
+            bucketOps.listBuckets() == initBuckets + [name1]
+        }
 
         when:
         def bucket = bucketOps.storageForBucket(name1)
@@ -48,9 +51,10 @@ abstract class BucketOperationsSpecification extends Specification {
 
         when:
         bucket.copy("key", "key2")
-        TimeUnit.SECONDS.sleep(5) // copy is not instant on OCI apparently
         then:
-        bucket.listObjects() == Set.of("key", "key2")
+        conditions.eventually {
+            bucket.listObjects() == Set.of("key", "key2")
+        }
         new String(bucket.retrieve("key2").get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "foo"
 
         when:

@@ -29,7 +29,7 @@ import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
  * @author Jonas Konrad
  */
 @EachProperty(OracleCloudNamespaceConfiguration.PREFIX)
-public class OracleCloudNamespaceConfiguration implements Toggleable {
+public final class OracleCloudNamespaceConfiguration implements Toggleable {
 
     /**
      * Configuration Prefix.

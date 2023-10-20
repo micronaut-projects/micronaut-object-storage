@@ -2,11 +2,9 @@ package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.objectstorage.ObjectStorageOperations
-import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 
-import javax.swing.plaf.basic.BasicCheckBoxUI
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
@@ -21,10 +19,9 @@ class LocalStorageBucketOperationsSpec extends Specification {
                 "micronaut.object-storage.local.s1.path": tmpStatic1.toString(),
                 "micronaut.object-storage.local.s2.path": tmpStatic2.toString()
         ])
-        def bucketOps = ctx.getBean(BucketOperations)
+        def bucketOps = ctx.getBean(LocalStorageBucketOperations)
 
         expect:
-        bucketOps instanceof LocalStorageBucketOperations
         bucketOps.listBuckets() == Set.of(
                 tmpStatic1.toAbsolutePath().toString(),
                 tmpStatic2.toAbsolutePath().toString()
