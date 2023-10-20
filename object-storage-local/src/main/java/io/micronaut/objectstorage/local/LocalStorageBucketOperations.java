@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage.local;
 
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.bucket.BucketOperations;
@@ -42,6 +43,7 @@ import java.util.stream.Stream;
  * @author Jonas Konrad
  */
 @Singleton
+@Requires(condition = LocalStorageBucketOperationsCondition.class)
 final class LocalStorageBucketOperations implements BucketOperations<
     LocalStorageOperations.LocalStorageFile,
     LocalStorageOperations.LocalStorageFile,
