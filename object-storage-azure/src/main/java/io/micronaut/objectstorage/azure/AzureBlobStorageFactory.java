@@ -88,6 +88,11 @@ public class AzureBlobStorageFactory {
         return builder.buildClient();
     }
 
+    /**
+     * @param configuration   the configuration
+     * @param tokenCredential the token credential
+     * @return the client for this configuration
+     */
     @EachBean(AzureBlobStorageConfiguration.class)
     @Requires(bean = TokenCredential.class)
     @Requires(missingBeans = StorageSharedKeyCredential.class)
@@ -103,6 +108,11 @@ public class AzureBlobStorageFactory {
             .getBlobContainerClient(configuration.getContainer());
     }
 
+    /**
+     * @param configuration   the configuration
+     * @param sharedKeyCredential the shared key credential
+     * @return the client for this configuration
+     */
     @EachBean(AzureBlobStorageConfiguration.class)
     @Requires(bean = StorageSharedKeyCredential.class)
     public BlobContainerClient blobContainerClient(AzureBlobStorageConfiguration configuration,
