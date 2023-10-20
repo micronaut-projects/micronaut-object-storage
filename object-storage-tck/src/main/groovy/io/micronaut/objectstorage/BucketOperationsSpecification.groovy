@@ -31,7 +31,7 @@ abstract class BucketOperationsSpecification extends Specification {
         PollingConditions conditions = new PollingConditions(timeout: 30)
 
         when:
-        def name1 = "micronaut-objectstorage-test-" + ThreadLocalRandom.current().nextLong()
+        def name1 = "micronaut-objectstorage-test-" + ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)
         bucketOps.createBucket(name1)
         then:
         conditions.eventually {

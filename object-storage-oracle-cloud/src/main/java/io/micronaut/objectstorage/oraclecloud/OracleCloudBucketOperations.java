@@ -36,7 +36,10 @@ import io.micronaut.objectstorage.configuration.ToggeableCondition;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * OCI bucket operations.
@@ -91,11 +94,18 @@ final class OracleCloudBucketOperations
     @Override
     public Set<String> listBuckets() {
         try {
-            ListBucketsResponse response = client.listBuckets(ListBucketsRequest.builder()
-                .compartmentId(configuration.getCompartmentId())
-                .namespaceName(configuration.getNamespace())
-                .build());
-            return response.getItems().stream()
+            return OracleCloudBucketOperations.paginate(
+                    np -> {
+                        ListBucketsRequest.Builder builder = ListBucketsRequest.builder()
+                            .compartmentId(configuration.getCompartmentId())
+                            .namespaceName(configuration.getNamespace());
+                        if (np != null) {
+                            builder.page(np);
+                        }
+                        return client.listBuckets(builder.build());
+                    },
+                    ListBucketsResponse::getOpcNextPage
+                ).flatMap(r -> r.getItems().stream())
                 .map(BucketSummary::getName)
                 .collect(Collectors.toSet());
         } catch (BmcException e) {
@@ -111,5 +121,37 @@ final class OracleCloudBucketOperations
         cfg.setNamespace(configuration.getNamespace());
         cfg.setBucket(bucket);
         return new OracleCloudStorageOperations(cfg, client, regionProvider);
+    }
+
+    /**
+     * Helper method for paginating an OCI API.
+     *
+     * @param requestPage Request a single page. The parameter is {@code null} at first, and then
+     *                    the value returned by {@code nextPage}
+     * @param nextPage    The token to request the next page. Should return {@code null} for the last
+     *                    page
+     * @param <I>         The page type
+     * @return The stream of pages
+     */
+    static <I> Stream<I> paginate(
+        Function<String, I> requestPage,
+        Function<I, String> nextPage
+    ) {
+        return Stream.generate(new Supplier<I>() {
+            boolean first = true;
+            String nextPageToken;
+
+            @Override
+            public I get() {
+                if (!first && nextPageToken == null) {
+                    // this will make takeWhile stop
+                    return null;
+                }
+                first = false;
+                I response = requestPage.apply(nextPageToken);
+                nextPageToken = nextPage.apply(response);
+                return response;
+            }
+        }).takeWhile(Objects::nonNull);
     }
 }
