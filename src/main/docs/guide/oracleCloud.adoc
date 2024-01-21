@@ -28,3 +28,5 @@ https://docs.micronaut.io/latest/guide/#events[`BeanCreatedEventListener`]. For 
 ----
 include::doc-examples/example-java/src/main/java/example/oraclecloud/ObjectStorageClientBuilderCustomizer.java[tags="class"]
 ----
+
+TIP: See the guide for https://guides.micronaut.io/latest/micronaut-object-storage-oracle-cloud.html[Use the Micronaut Object Storage API to Store Files in Oracle Cloud Infrastructure (OCI) Object Storage] to learn more.

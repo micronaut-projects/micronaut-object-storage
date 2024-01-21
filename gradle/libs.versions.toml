@@ -1,25 +1,25 @@
 [versions]
-micronaut = "4.2.0"
-micronaut-platform = "4.1.6"
+micronaut = "4.2.3"
+micronaut-platform = "4.2.3"
 micronaut-docs = "2.0.0"
 micronaut-test = "4.0.2"
-micronaut-aws = "4.1.1"
+micronaut-aws = "4.2.3"
 micronaut-azure = "5.1.0"
-micronaut-gcp = "5.2.0"
+micronaut-gcp = "5.3.0"
 micronaut-oracle-cloud = "3.0.7"
-micronaut-validation = "4.1.0"
+micronaut-validation = "4.2.0"
 micronaut-logging = "1.1.2"
 
 groovy = '4.0.15'
 spock = '2.3-groovy-4.0'
-gcp-libraries = '26.26.0'
-testcontainers = '1.19.1'
+gcp-libraries = '26.30.0'
+testcontainers = '1.19.3'
 bytebuddy = '1.14.9'
 
 # Gradle plugins
-micronaut-gradle-plugin = "4.1.2"
+micronaut-gradle-plugin = "4.2.1"
 kotlin-gradle-plugin = "1.9.20"
-kotlin-gradle-ksp-plugin = "1.9.20-1.0.14"
+kotlin-gradle-ksp-plugin = "1.9.22-1.0.17"
 
 [libraries]
 # Core

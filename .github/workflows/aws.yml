@@ -58,7 +58,7 @@ jobs:
            AWS_REGION: ${{ secrets.AWS_REGION }}
       - name: Publish Test Report
         if: always()
-        uses: mikepenz/action-junit-report@v4.0.3
+        uses: mikepenz/action-junit-report@v4.0.4
         with:
           check_name: Java CI / Test Report (${{ matrix.java }})
           report_paths: '**/build/test-results/test/TEST-*.xml'

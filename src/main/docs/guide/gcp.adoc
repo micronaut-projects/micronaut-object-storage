@@ -28,3 +28,5 @@ https://docs.micronaut.io/latest/guide/#events[`BeanCreatedEventListener`]. For 
 ----
 include::doc-examples/example-java/src/main/java/example/gcp/StorageOptionsBuilderCustomizer.java[tags="class"]
 ----
+
+TIP: See the guide for https://guides.micronaut.io/latest/micronaut-object-storage-gcp.html[Use the Micronaut Object Storage API to Store Files in Google Cloud Storage] to learn more.
