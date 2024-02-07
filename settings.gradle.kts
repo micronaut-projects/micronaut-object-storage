@@ -36,5 +36,6 @@ configure<MicronautBuildSettingsExtension> {
     importMicronautCatalog("micronaut-azure")
     importMicronautCatalog("micronaut-gcp")
     importMicronautCatalog("micronaut-oracle-cloud")
+    importMicronautCatalog("micronaut-test-resources")
     importMicronautCatalog("micronaut-validation")
 }

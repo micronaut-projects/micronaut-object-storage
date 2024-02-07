@@ -12,5 +12,5 @@ dependencies {
     testImplementation(mnValidation.micronaut.validation)
     testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
-    testImplementation(libs.testcontainers.spock)
+    testImplementation(mnTestResources.testcontainers.core)
 }

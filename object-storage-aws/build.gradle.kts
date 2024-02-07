@@ -13,8 +13,7 @@ dependencies {
 
     testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
-    testImplementation(libs.testcontainers.spock)
-    testImplementation(libs.testcontainers.localstack)
+    testImplementation(mnTestResources.testcontainers.localstack)
 
     testImplementation(libs.amazon.awssdk.v1) {
         because("it is required by testcontainers-localstack")
