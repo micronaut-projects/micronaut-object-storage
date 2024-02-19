@@ -13,4 +13,7 @@ dependencies {
 
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(mn.micronaut.http.server.netty)
+    
+    testImplementation(mn.reactor)
+
 }
