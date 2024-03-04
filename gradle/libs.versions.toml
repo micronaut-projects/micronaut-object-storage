@@ -17,7 +17,7 @@ gcp-libraries = '26.30.0'
 bytebuddy = '1.14.11'
 
 # Gradle plugins
-micronaut-gradle-plugin = "4.2.1"
+micronaut-gradle-plugin = "4.3.4"
 kotlin-gradle-plugin = "1.9.22"
 kotlin-gradle-ksp-plugin = "1.9.22-1.0.18"
 
