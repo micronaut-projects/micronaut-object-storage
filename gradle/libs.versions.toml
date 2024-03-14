@@ -13,7 +13,7 @@ micronaut-logging = "1.2.3"
 
 groovy = '4.0.15'
 spock = '2.3-groovy-4.0'
-gcp-libraries = '26.30.0'
+gcp-libraries = '26.34.0'
 bytebuddy = '1.14.12'
 
 # Gradle plugins
