@@ -19,6 +19,7 @@ import com.oracle.bmc.auth.RegionProvider;
 import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
 import com.oracle.bmc.objectstorage.model.CopyObjectDetails;
+import com.oracle.bmc.objectstorage.model.ListObjects;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
 import com.oracle.bmc.objectstorage.requests.CopyObjectRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
@@ -176,9 +177,18 @@ public class OracleCloudStorageOperations
                 .namespaceName(configuration.getNamespace())
                 .build());
 
-            return response.getListObjects()
-                .getObjects()
-                .stream()
+            return OracleCloudBucketOperations.paginate(
+                    p -> {
+                        ListObjectsRequest.Builder builder = ListObjectsRequest.builder()
+                            .bucketName(bucket)
+                            .namespaceName(configuration.getNamespace());
+                        if (p != null) {
+                            builder.start(p);
+                        }
+                        return client.listObjects(builder.build()).getListObjects();
+                    },
+                    ListObjects::getNextStartWith
+                ).flatMap(lo -> lo.getObjects().stream())
                 .map(ObjectSummary::getName)
                 .collect(Collectors.toSet());
         } catch (BmcException e) {

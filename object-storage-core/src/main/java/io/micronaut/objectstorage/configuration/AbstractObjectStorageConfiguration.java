@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage.configuration;
 
+import io.micronaut.context.exceptions.DisabledBeanException;
 import io.micronaut.core.annotation.NonNull;
 
 /**
@@ -29,6 +30,10 @@ public abstract class AbstractObjectStorageConfiguration extends AbstractObjectS
     protected final String name;
 
     protected AbstractObjectStorageConfiguration(@NonNull String name) {
+        if (name.equals("enabled")) {
+            // this is a hack
+            throw new DisabledBeanException("This property comes from ObjectStorageModuleConfiguration so it's ignored");
+        }
         this.name = name;
     }
 
