@@ -43,17 +43,6 @@ public class AzureBlobStorageEntry implements ObjectStorageEntry<BinaryData> {
     @Nullable
     private BlobProperties blobProperties;
 
-    /**
-     * @param key the key
-     * @param data the binary data
-     * @deprecated Use {@link #AzureBlobStorageEntry(String, BinaryData, BlobProperties)}
-     */
-    @Deprecated
-    public AzureBlobStorageEntry(@NonNull String key, @NonNull BinaryData data) {
-        this.key = key;
-        this.data = data;
-    }
-
     public AzureBlobStorageEntry(@NonNull String key, @NonNull BinaryData data,
                                  @Nullable BlobProperties blobProperties) {
         this.key = key;
