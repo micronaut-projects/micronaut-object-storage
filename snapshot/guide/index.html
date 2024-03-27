@@ -62,7 +62,9 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#objectStorageGuides"><strong>9</strong><span>Guides</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>10</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>10</strong><span>Breaking Changes</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>11</strong><span>Repository</span></a></div>
                                 
                             </div>
                         </div>
@@ -111,7 +113,9 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-objectStorageGuides"><a href="#objectStorageGuides"><strong>9</strong><span>Guides</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>10</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>10</strong><span>Breaking Changes</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>11</strong><span>Repository</span></a></div>
         
         </div>
     </div>
@@ -121,7 +125,7 @@
         <h1>Micronaut Object Storage</h1>
         <p></p>
         <p>Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers</p>
-        <p><strong>Version:</strong> 2.4.0-SNAPSHOT </p>
+        <p><strong>Version:</strong> 3.0.0-SNAPSHOT </p>
     </div>
     
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
@@ -1609,7 +1613,38 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <p><a href="https://guides.micronaut.io/latest/tag-object_storage.html" class="bare">https://guides.micronaut.io/latest/tag-object_storage.html</a></p>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>10 Repository</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>10 Breaking Changes</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/breaks.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>This section documents breaking changes between Micronaut Object Storage versions:</p>
+</div>
+<div class="sect2">
+<h3 id="_micronaut_object_storage_3_0_0">Micronaut Object Storage 3.0.0</h3>
+<div class="sect3">
+<h4 id="_deprecations">Deprecations</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>The constructor <code>io.micronaut.objectstorage.azure.AzureBlobStorageEntry(String, BinaryData)</code> deprecated previously has been removed.
+Use <code>AzureBlobStorageEntry(String, BinaryData, BlobProperties)</code> instead.</p>
+</li>
+<li>
+<p>The bean constructor <code>io.micronaut.objectstorage.oraclecloud.OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage)</code> deprecated previously has been removed.
+<code>OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)</code> is used instead.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<h1 id="repository"><a class="anchor" href="#repository"></a>11 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/master/src/main/docs/guide/repository.adoc"'>
