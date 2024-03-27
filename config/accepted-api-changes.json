@@ -3,5 +3,15 @@
   "type": "io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration",
   "member": "Field name",
   "reason": "Private field made final"
+  },
+  {
+    "type": "io.micronaut.objectstorage.oraclecloud.OracleCloudStorageOperations",
+    "member": "Constructor io.micronaut.objectstorage.oraclecloud.OracleCloudStorageOperations(io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration,com.oracle.bmc.objectstorage.ObjectStorage)",
+    "reason": "Removed deprecated code for Micronaut Framework 5"
+  },
+  {
+    "type": "io.micronaut.objectstorage.azure.AzureBlobStorageEntry",
+    "member": "Constructor io.micronaut.objectstorage.azure.AzureBlobStorageEntry(java.lang.String,com.azure.core.util.BinaryData)",
+    "reason": "Removed deprecated code for Micronaut Framework 5"
   }
 ]

@@ -1,0 +1,13 @@
+This section documents breaking changes between Micronaut Object Storage versions:
+
+=== Micronaut Object Storage 3.0.0
+
+==== Deprecations
+
+- The constructor `io.micronaut.objectstorage.azure.AzureBlobStorageEntry(String, BinaryData)` deprecated previously has been removed.
+Use `AzureBlobStorageEntry(String, BinaryData, BlobProperties)` instead.
+
+- The bean constructor `io.micronaut.objectstorage.oraclecloud.OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage)` deprecated previously has been removed.
+`OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)` is used instead.
+
+

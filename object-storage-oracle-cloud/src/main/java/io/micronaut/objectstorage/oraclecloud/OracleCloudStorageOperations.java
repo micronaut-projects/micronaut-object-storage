@@ -40,7 +40,6 @@ import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,20 +70,8 @@ public class OracleCloudStorageOperations
     /**
      * @param configuration Oracle Cloud Storage Configuration
      * @param client Object Storage Client
-     * @deprecated use {@link #OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)}
-     */
-    @Deprecated
-    public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
-                                        ObjectStorage client) {
-        this(configuration, client, null);
-    }
-
-    /**
-     * @param configuration Oracle Cloud Storage Configuration
-     * @param client Object Storage Client
      * @param regionProvider Region provider, to determine the current region
      */
-    @Inject
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client, RegionProvider regionProvider) {
         this.configuration = configuration;
