@@ -107,9 +107,33 @@
 </div>
 <div class="sect2">
 <h3 id="_micronaut_object_storage_azure_config_properties">Micronaut Object Storage Azure Config Properties</h3>
+<a id="io.micronaut.objectstorage.azure.AzureBlobStorageModuleConfiguration" href="#io.micronaut.objectstorage.azure.AzureBlobStorageModuleConfiguration">&#128279;</a>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Configuration Properties for <a href="../api/io/micronaut/objectstorage/azure/AzureBlobStorageModuleConfiguration.html">AzureBlobStorageModuleConfiguration</a></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Azure Object Storage module.</p></td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
 <a id="io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration" href="#io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. Configuration Properties for <a href="../api/io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html">AzureBlobStorageConfiguration</a></caption>
+<caption class="title">Table 4. Configuration Properties for <a href="../api/io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html">AzureBlobStorageConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -141,9 +165,12 @@
 </tbody>
 </table>
 <div style="page-break-after: always;"></div>
-<a id="io.micronaut.objectstorage.azure.AzureBlobStorageModuleConfiguration" href="#io.micronaut.objectstorage.azure.AzureBlobStorageModuleConfiguration">&#128279;</a>
+</div>
+<div class="sect2">
+<h3 id="_micronaut_object_storage_gcp_config_properties">Micronaut Object Storage Gcp Config Properties</h3>
+<a id="io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration" href="#io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Configuration Properties for <a href="../api/io/micronaut/objectstorage/azure/AzureBlobStorageModuleConfiguration.html">AzureBlobStorageModuleConfiguration</a></caption>
+<caption class="title">Table 5. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageModuleConfiguration.html">GoogleCloudStorageModuleConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -158,19 +185,16 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Azure Object Storage module.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Google Cloud Storage module.</p></td>
 </tr>
 </tbody>
 </table>
 <div style="page-break-after: always;"></div>
-</div>
-<div class="sect2">
-<h3 id="_micronaut_object_storage_gcp_config_properties">Micronaut Object Storage Gcp Config Properties</h3>
 <a id="io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration" href="#io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html">GoogleCloudStorageConfiguration</a></caption>
+<caption class="title">Table 6. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html">GoogleCloudStorageConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -193,30 +217,6 @@
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the Google Cloud Storage bucket.</p></td>
-</tr>
-</tbody>
-</table>
-<div style="page-break-after: always;"></div>
-<a id="io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration" href="#io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration">&#128279;</a>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageModuleConfiguration.html">GoogleCloudStorageModuleConfiguration</a></caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Property</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Google Cloud Storage module.</p></td>
 </tr>
 </tbody>
 </table>
@@ -280,33 +280,9 @@
 </div>
 <div class="sect2">
 <h3 id="_micronaut_object_storage_oracle_cloud_config_properties">Micronaut Object Storage Oracle Cloud Config Properties</h3>
-<a id="io.micronaut.objectstorage.oraclecloud.OracleCloudStorageModuleConfiguration" href="#io.micronaut.objectstorage.oraclecloud.OracleCloudStorageModuleConfiguration">&#128279;</a>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. Configuration Properties for <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageModuleConfiguration.html">OracleCloudStorageModuleConfiguration</a></caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Property</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Oracle Cloud Storage module.</p></td>
-</tr>
-</tbody>
-</table>
-<div style="page-break-after: always;"></div>
 <a id="io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration" href="#io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. Configuration Properties for <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html">OracleCloudStorageConfiguration</a></caption>
+<caption class="title">Table 9. Configuration Properties for <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html">OracleCloudStorageConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -334,6 +310,30 @@
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.namespace</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The OCI Object Storage namespace used.</p></td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<a id="io.micronaut.objectstorage.oraclecloud.OracleCloudStorageModuleConfiguration" href="#io.micronaut.objectstorage.oraclecloud.OracleCloudStorageModuleConfiguration">&#128279;</a>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 10. Configuration Properties for <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageModuleConfiguration.html">OracleCloudStorageModuleConfiguration</a></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Oracle Cloud Storage module.</p></td>
 </tr>
 </tbody>
 </table>
