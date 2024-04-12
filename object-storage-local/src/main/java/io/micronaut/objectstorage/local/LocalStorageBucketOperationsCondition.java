@@ -15,27 +15,13 @@
  */
 package io.micronaut.objectstorage.local;
 
-import io.micronaut.context.annotation.ConfigurationProperties;
-import io.micronaut.objectstorage.configuration.AbstractObjectStorageModuleConfiguration;
+import io.micronaut.context.condition.Condition;
+import io.micronaut.context.condition.ConditionContext;
 
-/**
- * Local Storage module configuration.
- *
- * @author Álvaro Sánchez-Mariscal
- * @since 2.0.2
- */
-@ConfigurationProperties(LocalStorageConfiguration.PREFIX)
-public class LocalStorageModuleConfiguration extends AbstractObjectStorageModuleConfiguration {
-
-    /*
-    micronaut.object-storage.local.enabled = true
-     */
-
-    /**
-     * Whether to enable or disable the whole Local Storage module.
-     */
+final class LocalStorageBucketOperationsCondition implements Condition {
     @Override
-    public boolean isEnabled() {
-        return enabled;
+    public boolean matches(ConditionContext context) {
+        return !context.getBeansOfType(LocalStorageConfiguration.class).isEmpty() ||
+            context.getBean(LocalStorageBucketOperationsConfiguration.class).getDirectory() != null;
     }
 }
