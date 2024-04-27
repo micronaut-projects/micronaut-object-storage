@@ -21,6 +21,7 @@ import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.channels.Channels;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,7 +48,7 @@ public class GoogleCloudStorageEntry implements ObjectStorageEntry<Blob> {
     @NonNull
     @Override
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(blob.getContent());
+        return Channels.newInputStream(blob.reader());
     }
 
     @NonNull
