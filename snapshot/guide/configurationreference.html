@@ -51,33 +51,9 @@
             </div>
 <div class="sect2">
 <h3 id="_micronaut_object_storage_aws_config_properties">Micronaut Object Storage Aws Config Properties</h3>
-<a id="io.micronaut.objectstorage.aws.AwsS3ModuleConfiguration" href="#io.micronaut.objectstorage.aws.AwsS3ModuleConfiguration">&#128279;</a>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. Configuration Properties for <a href="../api/io/micronaut/objectstorage/aws/AwsS3ModuleConfiguration.html">AwsS3ModuleConfiguration</a></caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Property</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole AWS S3 module.</p></td>
-</tr>
-</tbody>
-</table>
-<div style="page-break-after: always;"></div>
 <a id="io.micronaut.objectstorage.aws.AwsS3Configuration" href="#io.micronaut.objectstorage.aws.AwsS3Configuration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. Configuration Properties for <a href="../api/io/micronaut/objectstorage/aws/AwsS3Configuration.html">AwsS3Configuration</a></caption>
+<caption class="title">Table 1. Configuration Properties for <a href="../api/io/micronaut/objectstorage/aws/AwsS3Configuration.html">AwsS3Configuration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -100,6 +76,30 @@
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the AWS S3 bucket.</p></td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
+<a id="io.micronaut.objectstorage.aws.AwsS3ModuleConfiguration" href="#io.micronaut.objectstorage.aws.AwsS3ModuleConfiguration">&#128279;</a>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Configuration Properties for <a href="../api/io/micronaut/objectstorage/aws/AwsS3ModuleConfiguration.html">AwsS3ModuleConfiguration</a></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole AWS S3 module.</p></td>
 </tr>
 </tbody>
 </table>
@@ -168,9 +168,33 @@
 </div>
 <div class="sect2">
 <h3 id="_micronaut_object_storage_gcp_config_properties">Micronaut Object Storage Gcp Config Properties</h3>
+<a id="io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration" href="#io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration">&#128279;</a>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageModuleConfiguration.html">GoogleCloudStorageModuleConfiguration</a></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Google Cloud Storage module.</p></td>
+</tr>
+</tbody>
+</table>
+<div style="page-break-after: always;"></div>
 <a id="io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration" href="#io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html">GoogleCloudStorageConfiguration</a></caption>
+<caption class="title">Table 6. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageConfiguration.html">GoogleCloudStorageConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -197,9 +221,12 @@
 </tbody>
 </table>
 <div style="page-break-after: always;"></div>
-<a id="io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration" href="#io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration">&#128279;</a>
+</div>
+<div class="sect2">
+<h3 id="_micronaut_object_storage_local_config_properties">Micronaut Object Storage Local Config Properties</h3>
+<a id="io.micronaut.objectstorage.local.LocalStorageModuleConfiguration" href="#io.micronaut.objectstorage.local.LocalStorageModuleConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. Configuration Properties for <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageModuleConfiguration.html">GoogleCloudStorageModuleConfiguration</a></caption>
+<caption class="title">Table 7. Configuration Properties for <a href="../api/io/micronaut/objectstorage/local/LocalStorageModuleConfiguration.html">LocalStorageModuleConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -214,19 +241,16 @@
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Google Cloud Storage module.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Local Storage module.</p></td>
 </tr>
 </tbody>
 </table>
 <div style="page-break-after: always;"></div>
-</div>
-<div class="sect2">
-<h3 id="_micronaut_object_storage_local_config_properties">Micronaut Object Storage Local Config Properties</h3>
 <a id="io.micronaut.objectstorage.local.LocalStorageConfiguration" href="#io.micronaut.objectstorage.local.LocalStorageConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 7. Configuration Properties for <a href="../api/io/micronaut/objectstorage/local/LocalStorageConfiguration.html">LocalStorageConfiguration</a></caption>
+<caption class="title">Table 8. Configuration Properties for <a href="../api/io/micronaut/objectstorage/local/LocalStorageConfiguration.html">LocalStorageConfiguration</a></caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -249,30 +273,6 @@
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.*.path</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.nio.file.Path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The path of the local storage.</p></td>
-</tr>
-</tbody>
-</table>
-<div style="page-break-after: always;"></div>
-<a id="io.micronaut.objectstorage.local.LocalStorageModuleConfiguration" href="#io.micronaut.objectstorage.local.LocalStorageModuleConfiguration">&#128279;</a>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 8. Configuration Properties for <a href="../api/io/micronaut/objectstorage/local/LocalStorageModuleConfiguration.html">LocalStorageModuleConfiguration</a></caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Property</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable the whole Local Storage module.</p></td>
 </tr>
 </tbody>
 </table>
