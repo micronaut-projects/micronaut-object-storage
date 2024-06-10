@@ -155,7 +155,8 @@ public class AzureBlobStorageOperations
         BlockBlobItem item;
         if (request.getContentSize().isPresent()) {
             long length = request.getContentSize().get();
-            BlockBlobSimpleUploadOptions simpleUploadOptions = toBlockBlobSimpleUploadOptions(options, request.getInputStream(), length);
+            InputStream inputStream = Optional.ofNullable(options.getDataStream()).orElse(request.getInputStream());
+            BlockBlobSimpleUploadOptions simpleUploadOptions = toBlockBlobSimpleUploadOptions(options, inputStream, length);
             item = client
                 .getBlockBlobClient()
                 .uploadWithResponse(simpleUploadOptions, null, Context.NONE)
