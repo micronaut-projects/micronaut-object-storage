@@ -18,7 +18,7 @@ bytebuddy = '1.14.17'
 
 # Gradle plugins
 micronaut-gradle-plugin = "4.4.0"
-kotlin-gradle-plugin = "1.9.23"
+kotlin-gradle-plugin = "1.9.25"
 kotlin-gradle-ksp-plugin = "1.9.23-1.0.20"
 
 [libraries]
