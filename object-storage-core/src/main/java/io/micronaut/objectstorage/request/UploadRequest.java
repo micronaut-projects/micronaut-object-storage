@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.request;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.multipart.CompletedFileUpload;
+import io.micronaut.http.multipart.StreamingFileUpload;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -90,6 +91,26 @@ public interface UploadRequest {
     static UploadRequest fromCompletedFileUpload(@NonNull CompletedFileUpload completedFileUpload,
                                                  @NonNull String key) {
         return new CompletedFileUploadRequest(completedFileUpload, key);
+    }
+    
+    /**
+     * @param streamingFileUpload the {@link StreamingFileUpload}.
+     * @return An {@link UploadRequest} from the given {@link StreamingFileUpload}.
+     */
+    @NonNull
+    static UploadRequest fromStreamingFileUpload(@NonNull StreamingFileUpload streamingFileUpload) {
+        return new StreamingFileUploadRequest(streamingFileUpload);
+    }
+    
+    /**
+     * @param streamingFileUpload the {@link StreamingFileUpload}.
+     * @param key the key under which the file will be stored (<code>path/to/file</code>)
+     * @return An {@link UploadRequest} from the given {@link StreamingFileUpload} and key.
+     */
+    @NonNull
+    static UploadRequest fromStreamingFileUpload(@NonNull StreamingFileUpload streamingFileUpload,
+                                                 @NonNull String key) {
+        return new StreamingFileUploadRequest(streamingFileUpload, key);
     }
 
 
