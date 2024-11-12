@@ -74,7 +74,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></code>, <code><a href="BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a></code>, <code><a href="CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></code>, <code><a href="FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></code></dd>
+<dd><code><a href="AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></code>, <code><a href="BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a></code>, <code><a href="CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></code>, <code><a href="FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></code>, <code><a href="StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">UploadRequest</span></div>
@@ -119,6 +119,13 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static @NonNull <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#fromPath(java.nio.file.Path,java.lang.String)" class="member-name-link">fromPath</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;path,
  @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static @NonNull <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#fromStreamingFileUpload(io.micronaut.http.multipart.StreamingFileUpload)" class="member-name-link">fromStreamingFileUpload</a><wbr>(@NonNull io.micronaut.http.multipart.StreamingFileUpload&nbsp;streamingFileUpload)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static @NonNull <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#fromStreamingFileUpload(io.micronaut.http.multipart.StreamingFileUpload,java.lang.String)" class="member-name-link">fromStreamingFileUpload</a><wbr>(@NonNull io.micronaut.http.multipart.StreamingFileUpload&nbsp;streamingFileUpload,
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Long.html" title="class or interface in java.lang" class="external-link">Long</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getContentSize()" class="member-name-link">getContentSize</a>()</code></div>
@@ -251,6 +258,41 @@ loadScripts(document, 'script');</script>
 <dd><code>key</code> - the key under which the file will be stored (<code>path/to/file</code>)</dd>
 <dt>Returns:</dt>
 <dd>An <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request"><code>UploadRequest</code></a> from the given <code>CompletedFileUpload</code> and key.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="fromStreamingFileUpload(io.micronaut.http.multipart.StreamingFileUpload)">
+<h3>fromStreamingFileUpload</h3>
+<div class="member-signature"><span class="annotations">@NonNull
+</span><span class="modifiers">static</span>&nbsp;<span class="return-type">@NonNull <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></span>&nbsp;<span class="element-name">fromStreamingFileUpload</span><wbr><span class="parameters">(@NonNull
+ @NonNull io.micronaut.http.multipart.StreamingFileUpload&nbsp;streamingFileUpload)</span></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>streamingFileUpload</code> - the <code>StreamingFileUpload</code>.</dd>
+<dt>Returns:</dt>
+<dd>An <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request"><code>UploadRequest</code></a> from the given <code>StreamingFileUpload</code>.</dd>
+<dt>Since:</dt>
+<dd>2.7.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="fromStreamingFileUpload(io.micronaut.http.multipart.StreamingFileUpload,java.lang.String)">
+<h3>fromStreamingFileUpload</h3>
+<div class="member-signature"><span class="annotations">@NonNull
+</span><span class="modifiers">static</span>&nbsp;<span class="return-type">@NonNull <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></span>&nbsp;<span class="element-name">fromStreamingFileUpload</span><wbr><span class="parameters">(@NonNull
+ @NonNull io.micronaut.http.multipart.StreamingFileUpload&nbsp;streamingFileUpload,
+ @NonNull
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>streamingFileUpload</code> - the <code>StreamingFileUpload</code>.</dd>
+<dd><code>key</code> - the key under which the file will be stored (<code>path/to/file</code>)</dd>
+<dt>Returns:</dt>
+<dd>An <a href="UploadRequest.html" title="interface in io.micronaut.objectstorage.request"><code>UploadRequest</code></a> from the given <code>StreamingFileUpload</code> and key.</dd>
+<dt>Since:</dt>
+<dd>2.7.0</dd>
 </dl>
 </section>
 </li>
