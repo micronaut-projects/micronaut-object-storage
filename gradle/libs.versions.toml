@@ -7,7 +7,7 @@ micronaut-aws = "4.8.0"
 micronaut-azure = "5.8.0"
 micronaut-gcp = "5.8.1"
 micronaut-oracle-cloud = "4.2.1"
-micronaut-test-resources = "2.6.2"
+micronaut-test-resources = "2.7.2"
 micronaut-validation = "4.8.0"
 micronaut-logging = "1.5.1"
 
