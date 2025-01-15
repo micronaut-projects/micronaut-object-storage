@@ -1,25 +1,26 @@
 [versions]
 micronaut = "4.7.11"
-micronaut-platform = "4.6.3"
+micronaut-platform = "4.7.4"
 micronaut-docs = "2.0.0"
 micronaut-test = "4.6.0"
 micronaut-aws = "4.8.0"
 micronaut-azure = "5.8.0"
 micronaut-gcp = "5.8.1"
-micronaut-oracle-cloud = "4.2.1"
-micronaut-test-resources = "2.6.2"
+micronaut-oracle-cloud = "4.3.6"
+micronaut-test-resources = "2.7.2"
 micronaut-validation = "4.8.0"
 micronaut-logging = "1.5.1"
 
 groovy = '4.0.23'
 spock = '2.3-groovy-4.0'
-gcp-libraries = '26.50.0'
+gcp-libraries = '26.52.0'
 bytebuddy = '1.15.11'
 
 # Gradle plugins
 micronaut-gradle-plugin = "4.4.5"
 kotlin-gradle-plugin = "1.9.25"
 kotlin-gradle-ksp-plugin = "1.9.25-1.0.20"
+sonatype-scan = "3.0.0"
 
 [libraries]
 # Core
@@ -55,3 +56,4 @@ bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }
 gradle-kotlin = { module = 'org.jetbrains.kotlin:kotlin-gradle-plugin', version.ref = 'kotlin-gradle-plugin' }
 gradle-kotlin-ksp = { module = 'com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin', version.ref = 'kotlin-gradle-ksp-plugin' }
+sonatype-scan = { module = "org.sonatype.gradle.plugins:scan-gradle-plugin", version.ref = "sonatype-scan" }
