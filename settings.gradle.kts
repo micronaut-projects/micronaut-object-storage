@@ -28,7 +28,7 @@ include("object-storage-local")
 include("doc-examples:example-java")
 include("doc-examples:example-groovy")
 include("doc-examples:example-kotlin")
-
+include("test-suite-utils")
 configure<MicronautBuildSettingsExtension> {
     useStandardizedProjectNames.set(true)
     importMicronautCatalog()

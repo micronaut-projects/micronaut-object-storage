@@ -30,4 +30,5 @@ dependencies {
         because("it is required by testcontainers-localstack")
     }
     testRuntimeOnly(libs.bytebuddy)
+    testImplementation(project(":test-suite-utils"))
 }

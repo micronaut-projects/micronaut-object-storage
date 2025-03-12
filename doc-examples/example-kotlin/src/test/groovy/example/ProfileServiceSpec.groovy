@@ -15,6 +15,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.nio.file.Path
+import static io.micronaut.objectstorage.test.ObjectStorageTestConstants.LOCAL_STACK_DOCKER_IMAGE
 
 @MicronautTest(environments = Environment.AMAZON_EC2)
 class ProfileServiceSpec extends Specification implements TestPropertyProvider {
@@ -26,7 +27,7 @@ class ProfileServiceSpec extends Specification implements TestPropertyProvider {
 
     @Shared
     @AutoCleanup
-    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:1.3.1"))
+    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
             .withServices(LocalStackContainer.Service.S3)
 
     @Inject

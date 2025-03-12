@@ -18,5 +18,6 @@ dependencies {
     testImplementation(libs.amazon.awssdk.v1) {
         because("it is required by testcontainers-localstack")
     }
+    testImplementation(project(":test-suite-utils"))
 
 }
