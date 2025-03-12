@@ -9,7 +9,7 @@ micronaut-gcp = "5.8.1"
 micronaut-oracle-cloud = "4.3.6"
 micronaut-test-resources = "2.7.3"
 micronaut-validation = "4.8.1"
-micronaut-logging = "1.5.1"
+micronaut-logging = "1.6.1"
 
 groovy = '4.0.23'
 spock = '2.3-groovy-4.0'
