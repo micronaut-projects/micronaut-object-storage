@@ -20,7 +20,7 @@ bytebuddy = '1.17.5'
 micronaut-gradle-plugin = "4.5.3"
 kotlin-gradle-plugin = "1.9.25"
 kotlin-gradle-ksp-plugin = "1.9.25-1.0.20"
-sonatype-scan = "3.0.0"
+sonatype-scan = "3.1.1"
 
 [libraries]
 # Core
