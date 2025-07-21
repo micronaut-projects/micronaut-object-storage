@@ -1,7 +1,6 @@
 package io.micronaut.objectstorage.request;
 
 import java.io.InputStream;
-import java.util.Map;
 import java.util.Optional;
 
 /**
