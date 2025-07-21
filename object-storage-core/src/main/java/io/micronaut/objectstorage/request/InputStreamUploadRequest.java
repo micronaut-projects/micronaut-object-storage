@@ -8,7 +8,7 @@ import java.util.Optional;
  * An {@link UploadRequest} backed by a {@link InputStream}.
  * @since 2.9.1
  */
-class InputStreamUploadRequest implements UploadRequest {
+public class InputStreamUploadRequest implements UploadRequest {
 
     private final InputStream inputStream;
     private final String key;
