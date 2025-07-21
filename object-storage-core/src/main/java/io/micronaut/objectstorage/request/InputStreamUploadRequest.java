@@ -15,7 +15,6 @@ class InputStreamUploadRequest implements UploadRequest {
     private final String key;
     private final String contentType;
     private final Long contentLength;
-    private Map<String, String> metadata;
 
     InputStreamUploadRequest(InputStream inputStream, String key, String contentType, Long contentLength) {
         this.inputStream = inputStream;
