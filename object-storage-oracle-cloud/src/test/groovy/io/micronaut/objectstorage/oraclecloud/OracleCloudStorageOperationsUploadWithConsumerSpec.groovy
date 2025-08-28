@@ -26,6 +26,7 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
 
     private static final String SPEC_NAME = "OracleCloudStorageOperationsUploadWithConsumerSpec"
 
+
     @Inject
     ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, ?> objectStorage
 
