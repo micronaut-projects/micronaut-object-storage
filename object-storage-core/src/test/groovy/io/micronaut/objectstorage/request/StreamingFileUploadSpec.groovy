@@ -6,6 +6,7 @@ import io.micronaut.http.server.netty.multipart.NettyStreamingFileUpload
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.netty.buffer.Unpooled
 import io.netty.handler.codec.http.multipart.FileUpload
+import reactor.core.publisher.Flux
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -48,9 +49,9 @@ class StreamingFileUploadSpec extends Specification {
         HttpServerConfiguration.MultipartConfiguration cfg = new HttpServerConfiguration.MultipartConfiguration()
         cfg.mixed = true
         FileUpload fileUpload = new MicronautHttpData.Factory(cfg, StandardCharsets.UTF_8).createFileUpload(null, "test-file.txt", "test-file.txt", "text/plain", "chunked", Charset.defaultCharset(), TEXT.length())
-        
-        return new NettyStreamingFileUpload.Factory(cfg, null).create(fileUpload, null)
-        
+
+        return new NettyStreamingFileUpload.Factory(cfg, null).create(fileUpload, Flux.empty())
+
     }
 
     private void assertThatRequestIsValid(StreamingFileUploadRequest request, String expectedKey) {
@@ -58,7 +59,7 @@ class StreamingFileUploadSpec extends Specification {
             assert key == expectedKey
             assert contentType.present
             assert contentType.get() == "text/plain"
-            
+
         }
     }
 }
