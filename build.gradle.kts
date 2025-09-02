@@ -1,8 +1,7 @@
 import org.sonarqube.gradle.SonarExtension
 
 plugins {
-    io.micronaut.build.internal.docs
-    io.micronaut.build.internal.`quality-reporting`
+    io.micronaut.build.internal.parent
 }
 
 repositories {
