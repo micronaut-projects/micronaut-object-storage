@@ -31,6 +31,23 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
                     "-scheme", "http"
             ))
 
+    @Override
+    boolean emulatorSupportsPresignInvalidate() {
+        return false
+    }
+
+    @Override
+    boolean emulatorSupportsPresign() {
+        // In GCS pre-signed URLs are signed client side, not by the server, and so there's just not much to test
+        // here.
+        return false
+    }
+
+    @Override
+    boolean emulatorSupportsPresignDownload() {
+        return false
+    }
+
     @Factory
     @Requires(property = 'spec.name', value = SPEC_NAME)
     static class FakeGcsFactory {

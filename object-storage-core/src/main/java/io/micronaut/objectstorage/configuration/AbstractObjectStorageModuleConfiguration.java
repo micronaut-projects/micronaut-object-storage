@@ -15,6 +15,9 @@
  */
 package io.micronaut.objectstorage.configuration;
 
+import java.time.Duration;
+import io.micronaut.core.annotation.NonNull;
+
 /**
  * Base class for all the module configurations.
  *
@@ -26,10 +29,39 @@ public class AbstractObjectStorageModuleConfiguration implements ObjectStorageMo
     protected boolean enabled = DEFAULT_ENABLED;
 
     /**
+     * Default expiration used when generating pre-authorized (signed) requests.
+     * If not configured through the property
+     * <pre>object-storage.default-presign-expiration</pre>, a duration of one hour will be applied.
+     *
+     * @since 2.10
+     */
+    @NonNull
+    protected Duration defaultPresignExpiration = Duration.ofHours(1);
+
+    /**
      * @param enabled Whether to enable or disable this object storage.
      * @since 2.0.2
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * The default expiration duration for presigned requests.
+     * @since 2.10
+     */
+    @NonNull
+    public Duration getDefaultPresignExpiration() {
+        return defaultPresignExpiration;
+    }
+
+    /**
+     * How much time passes before a pre-signed object storage request automatically stops being valid.
+     *
+     * @param defaultPresignExpiration the expiration duration
+     * @since 2.10
+     */
+    public void setDefaultPresignExpiration(@NonNull Duration defaultPresignExpiration) {
+        this.defaultPresignExpiration = defaultPresignExpiration;
     }
 }

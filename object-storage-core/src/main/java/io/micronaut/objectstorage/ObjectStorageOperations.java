@@ -19,6 +19,8 @@ import io.micronaut.core.annotation.Blocking;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
+import io.micronaut.objectstorage.request.PresignRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -97,7 +99,7 @@ public interface ObjectStorageOperations<I, O, D> {
     /**
      * Lists the objects that exist in the object storage.
      *
-     * @return a list of keys (paths) of the existing objects, if any, or an empty list otherwise.
+     * @return a set of keys (paths) of the existing objects, if any, or an empty list otherwise.
      * @since 1.1.0
      */
     @Blocking
@@ -116,5 +118,31 @@ public interface ObjectStorageOperations<I, O, D> {
      */
     @Blocking
     default void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+    }
+
+    /**
+     * Generates a pre-authorized (signed) request for the given operation.
+     *
+     * @param request the presign request parameters
+     * @return information with the generated URL and its expiration
+     * @throws UnsupportedOperationException if the provider does not support presigned operations
+     * @since 2.10
+     */
+    @Blocking
+    @NonNull
+    default PresignResponse presign(@NonNull PresignRequest request) {
+        throw new UnsupportedOperationException("Pre-signed requests are not supported by this implementation");
+    }
+
+    /**
+     * Explicitly invalidates a previously generated pre-signed request.
+     *
+     * @param url The URL returned by {@link #presign(PresignRequest)}.
+     * @throws UnsupportedOperationException if the provider does not support explicit invalidation
+     * @since 2.11
+     */
+    @Blocking
+    default void invalidatePresignedRequest(@NonNull java.net.URI url) {
+        throw new UnsupportedOperationException("Presigned request invalidation is not supported by this implementation");
     }
 }

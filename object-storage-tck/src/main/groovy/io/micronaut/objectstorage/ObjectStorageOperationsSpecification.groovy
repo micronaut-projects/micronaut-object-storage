@@ -17,6 +17,10 @@ package io.micronaut.objectstorage
 
 import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.objectstorage.response.UploadResponse
+import io.micronaut.objectstorage.request.PresignRequest
+import io.micronaut.objectstorage.response.PresignResponse
+import java.time.Instant
+import java.net.URL
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -158,6 +162,56 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         ]
     }
 
+    void 'it can generate and invalidate a presigned URL'(TestFile testFile) {
+        given: 'an uploaded object'
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        UploadRequest uploadRequest = testFile.uploadRequest
+        storage.upload(uploadRequest)
+
+        when: 'requesting a presigned URL'
+        PresignRequest presignRequest = PresignRequest.builder(uploadRequest.key, PresignRequest.Operation.DOWNLOAD).build()
+        PresignResponse presignResponse
+        if (emulatorSupportsPresign()) {
+            presignResponse = storage.presign(presignRequest)
+        }
+
+        then: 'a valid URL and expiration are returned'
+        if (emulatorSupportsPresign()) {
+            assert presignResponse.url
+            assert presignResponse.url.toString().startsWith('http')
+            assert presignResponse.expiration.isAfter(Instant.now())
+        }
+
+        when: 'using the presigned URL to download'
+        String downloaded
+        if (emulatorSupportsPresignDownload()) {
+            def url = new URL(presignResponse.url.toString())
+            println(url)
+            downloaded = url.text
+        }
+
+        then: 'the downloaded content matches the stored object'
+        if (emulatorSupportsPresignDownload()) {
+            assert downloaded == TEXT
+        }
+
+        when: 'explicitly invalidating the URL'
+        if (emulatorSupportsPresignInvalidate()) {
+            storage.invalidatePresignedRequest(presignResponse.url)
+        }
+
+        then: 'no exception is thrown'
+        noExceptionThrown()
+        storage.delete(uploadRequest.key)
+
+        where:
+        testFile << [
+                createTestFile(),
+                createTestFile('dir'),
+                createTestFile('dir/subdir'),
+        ]
+    }
+
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
 
     boolean emulatorSupportsMetadata() {
@@ -169,6 +223,18 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     }
 
     boolean emulatorSupportsCopy() {
+        true
+    }
+
+    boolean emulatorSupportsPresign() {
+        true
+    }
+
+    boolean emulatorSupportsPresignInvalidate() {
+        true
+    }
+
+    boolean emulatorSupportsPresignDownload() {
         true
     }
 

@@ -27,6 +27,7 @@ import com.azure.storage.blob.models.BlobRequestConditions;
 import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import com.azure.storage.blob.options.BlockBlobSimpleUploadOptions;
+import com.azure.storage.blob.sas.BlobSasPermission;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
@@ -35,11 +36,14 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -61,9 +65,12 @@ public class AzureBlobStorageOperations
     implements ObjectStorageOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> {
 
     private final BlobContainerClient blobContainerClient;
+    private final AzureBlobStorageModuleConfiguration moduleConfiguration;
 
-    public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient) {
+    public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient,
+                                      AzureBlobStorageModuleConfiguration moduleConfiguration) {
         this.blobContainerClient = blobContainerClient;
+        this.moduleConfiguration = moduleConfiguration;
     }
 
     @Override
@@ -71,6 +78,41 @@ public class AzureBlobStorageOperations
     public UploadResponse<BlockBlobItem> upload(@NonNull UploadRequest request) {
         BlobParallelUploadOptions options = getUploadOptions(request);
         return doUpload(request, options);
+    }
+
+    @Override
+    @NonNull
+    public PresignResponse presign(
+            @NonNull io.micronaut.objectstorage.request.PresignRequest request) {
+        BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
+
+        // Map Micronaut's operation to Azure SAS permissions
+        BlobSasPermission permission = switch (request.getOperation()) {
+            case DOWNLOAD -> BlobSasPermission.parse("r");
+            case UPLOAD -> BlobSasPermission.parse("cw");
+        };
+
+        // Calculate expiry time
+        Duration expiresIn = request.getExpiresIn()
+                .orElse(moduleConfiguration.getDefaultPresignExpiration());
+        OffsetDateTime expiry = OffsetDateTime.now(java.time.ZoneOffset.UTC).plus(expiresIn);
+
+        // Build SAS Signature values
+        com.azure.storage.blob.sas.BlobServiceSasSignatureValues sasValues =
+            new com.azure.storage.blob.sas.BlobServiceSasSignatureValues(expiry, permission)
+                    .setStartTime(OffsetDateTime.now(java.time.ZoneOffset.UTC))
+                    .setContainerName(blobContainerClient.getBlobContainerName())
+                    .setBlobName(request.getKey());
+
+        String sasToken = blobClient.generateSas(sasValues);
+        String fullUrl = blobClient.getBlobUrl() + "?" + sasToken;
+        java.net.URI presignedUri = java.net.URI.create(fullUrl);
+
+        // Return PresignResponse as per interface
+        return new PresignResponse(
+                presignedUri,
+                expiry.toInstant()
+        );
     }
 
     @Override

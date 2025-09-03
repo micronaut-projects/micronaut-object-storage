@@ -41,6 +41,14 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.runtime.server.EmbeddedServer;
+import io.micronaut.objectstorage.request.PresignRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
+
+import java.net.URI;
+import java.time.Instant;
+import java.time.Duration;
 
 /**
  * An implementation of {@link ObjectStorageOperations} that uses the local file system. Useful for
@@ -62,14 +70,20 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
+    private final EmbeddedServer embeddedServer;
+    private final LocalPresignStore localPresignStore;
 
-    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
+    LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
+                           @Nullable EmbeddedServer embeddedServer,
+                           LocalPresignStore localPresignStore) {
         this.configuration = configuration;
+        this.embeddedServer = embeddedServer;
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
         boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
             throw new ObjectStorageException("Error creating metadata directory: " + metadataPath);
         }
+        this.localPresignStore = localPresignStore;
     }
 
     @Override
@@ -232,5 +246,33 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return file;
     }
 
-    record LocalStorageFile(Path path) { }
+    @Override
+    @NonNull
+    public PresignResponse presign(@NonNull PresignRequest request) {
+        Duration ttl = request.getExpiresIn().orElse(configuration.getDefaultPresignExpiration());
+        Instant expiration = Instant.now().plus(ttl);
+        String token = localPresignStore.register(request.getKey(), request.getOperation(), expiration);
+
+        URI baseUri;
+        if (embeddedServer != null && embeddedServer.isRunning()) {
+            baseUri = embeddedServer.getURI();
+        } else {
+            baseUri = URI.create("https://example.com" + LocalPresignController.LOCAL_PRESIGNED_REQUESTS_URL);
+        }
+
+        URI url = baseUri.resolve(LocalPresignController.LOCAL_PRESIGNED_REQUESTS_URL + "/" + token);
+        return new PresignResponse(url, expiration);
+    }
+
+    @Override
+    public void invalidatePresignedRequest(@NonNull java.net.URI url) {
+        String path = url.getPath();
+        int idx = path.lastIndexOf('/');
+        if (idx >= 0 && idx + 1 < path.length()) {
+            String token = path.substring(idx + 1);
+            localPresignStore.remove(token);
+        }
+    }
+
+    public record LocalStorageFile(Path path) { }
 }
