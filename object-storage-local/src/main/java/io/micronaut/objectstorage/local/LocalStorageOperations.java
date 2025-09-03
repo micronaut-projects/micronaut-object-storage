@@ -20,31 +20,35 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Primary;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
+import io.micronaut.runtime.server.EmbeddedServer;
+import jakarta.inject.Inject;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * An implementation of {@link ObjectStorageOperations} that uses the local file system. Useful for
- * testing.
+ * Implementation of {@link ObjectStorageOperations} for the local file system.
+ * Provides simple object storage used mainly for testing and local deployments,
+ * storing files and metadata in the file system hierarchy.
  *
  * @author Álvaro Sánchez-Mariscal
  * @since 2.0.0
@@ -59,23 +63,48 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     LocalStorageOperations.LocalStorageFile> {
 
     public static final String METADATA_DIRECTORY = ".metadata";
+    static final String LOCAL_PRESIGNED_REQUESTS_URL = "/mn-os/local";
 
     private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
+    private final EmbeddedServer embeddedServer;
+    private final LocalPresignStore localPresignStore;
 
-    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
+    /**
+     * Creates a new LocalStorageOperations instance.
+     *
+     * @param configuration     The local storage configuration.
+     * @param embeddedServer    The embedded server, or null.
+     * @param localPresignStore The presigned request store.
+     */
+    @Inject
+    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
+                                  @Nullable EmbeddedServer embeddedServer,
+                                  LocalPresignStore localPresignStore) {
         this.configuration = configuration;
+        this.embeddedServer = embeddedServer;
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
         boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
             throw new ObjectStorageException("Error creating metadata directory: " + metadataPath);
         }
+        this.localPresignStore = localPresignStore;
+    }
+
+    /**
+     * @deprecated Use {@link #LocalStorageOperations(LocalStorageConfiguration, EmbeddedServer, LocalPresignStore)}.
+     * @param configuration The local storage configuration.
+     */
+    @Deprecated(since = "2.10.0", forRemoval = true)
+    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     @NonNull
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request) {
-        return upload(request, localStorageFile -> { });
+        return upload(request, localStorageFile -> {
+        });
     }
 
     @Override
@@ -116,10 +145,10 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public Set<String> listObjects() {
         try (Stream<Path> stream = Files.find(configuration.getPath(), Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile())) {
             return stream
-            .map(p -> configuration.getPath().relativize(p))
-            .map(Path::toString)
-            .filter(s -> !s.startsWith(METADATA_DIRECTORY))
-            .collect(Collectors.toSet());
+                .map(p -> configuration.getPath().relativize(p))
+                .map(Path::toString)
+                .filter(s -> !s.startsWith(METADATA_DIRECTORY))
+                .collect(Collectors.toSet());
         } catch (IOException e) {
             throw new ObjectStorageException("Error listing objects", e);
         }
@@ -157,7 +186,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             }
         }
         Map<String, String> result = new HashMap<>(metadataProperties.size());
-        for (final String name: metadataProperties.stringPropertyNames()) {
+        for (final String name : metadataProperties.stringPropertyNames()) {
             result.put(name, metadataProperties.getProperty(name));
         }
         return result;
@@ -232,5 +261,38 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return file;
     }
 
-    record LocalStorageFile(Path path) { }
+    @Override
+    @NonNull
+    public PresignResponse presign(@NonNull PresignRequest request) {
+        Duration ttl = request.getExpiresIn().orElse(configuration.getDefaultPresignExpiration());
+        Instant expiration = Instant.now().plus(ttl);
+        String token = localPresignStore.register(request.getKey(), request.getOperation(), expiration);
+
+        URI baseUri;
+        if (embeddedServer != null && embeddedServer.isRunning()) {
+            baseUri = embeddedServer.getURI();
+        } else {
+            baseUri = URI.create("https://example.com" + LocalStorageOperations.LOCAL_PRESIGNED_REQUESTS_URL);
+        }
+
+        URI url = baseUri.resolve(LocalStorageOperations.LOCAL_PRESIGNED_REQUESTS_URL + "/" + token);
+        return new PresignResponse(url, expiration);
+    }
+
+    @Override
+    public void invalidatePresignedRequest(@NonNull java.net.URI url) {
+        String path = url.getPath();
+        int idx = path.lastIndexOf('/');
+        if (idx >= 0 && idx + 1 < path.length()) {
+            String token = path.substring(idx + 1);
+            localPresignStore.remove(token);
+        }
+    }
+
+    /**
+     * A simple wrapper around a path.
+     * @param path Where on disk the local storage provider has stored the actual data.
+     */
+    public record LocalStorageFile(Path path) {
+    }
 }
