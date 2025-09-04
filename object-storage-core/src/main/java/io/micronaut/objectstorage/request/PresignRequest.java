@@ -25,7 +25,6 @@ import java.util.Optional;
 /**
  * Request object for generating pre-authorized (signed) operations against the object storage.
  *
- * @author Micronaut Object Storage
  * @since 2.10
  */
 public final class PresignRequest {

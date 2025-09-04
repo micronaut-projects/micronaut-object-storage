@@ -38,6 +38,7 @@ import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.PresignResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
+import jakarta.inject.Inject;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -67,10 +68,19 @@ public class AzureBlobStorageOperations
     private final BlobContainerClient blobContainerClient;
     private final AzureBlobStorageModuleConfiguration moduleConfiguration;
 
+    @Inject
     public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient,
                                       AzureBlobStorageModuleConfiguration moduleConfiguration) {
         this.blobContainerClient = blobContainerClient;
         this.moduleConfiguration = moduleConfiguration;
+    }
+
+    /**
+     * @deprecated Use {@link #AzureBlobStorageOperations(BlobContainerClient, AzureBlobStorageModuleConfiguration)}.
+     */
+    @Deprecated(forRemoval = true)
+    public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

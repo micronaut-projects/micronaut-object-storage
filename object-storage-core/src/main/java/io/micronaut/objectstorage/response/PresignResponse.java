@@ -28,7 +28,6 @@ import static java.util.Objects.requireNonNull;
  * @param url        The fully qualified URL that clients can use to perform the operation.
  * @param expiration The instant when the URL expires.
  *
- * @author Micronaut Object Storage
  * @since 2.10
  */
 public record PresignResponse(@NonNull URI url,

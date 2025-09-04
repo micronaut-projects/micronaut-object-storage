@@ -32,6 +32,7 @@ import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.PresignResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
+import jakarta.inject.Inject;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -77,6 +78,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
      * @param inputStreamMapper InputStream Mapper
      * @param environment       If non-null, used to read the {@code aws.region} property for presigning.
      */
+    @Inject
     public AwsS3Operations(@Parameter AwsS3Configuration configuration,
                            S3Client s3Client,
                            InputStreamMapper inputStreamMapper,
@@ -103,6 +105,10 @@ public class AwsS3Operations implements ObjectStorageOperations<
         this.presigner = presigner;
     }
 
+    /**
+     * @deprecated Use {@link #AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)}.
+     */
+    @Deprecated(forRemoval = true)
     public AwsS3Operations(@Parameter AwsS3Configuration configuration,
                            S3Client s3Client,
                            InputStreamMapper inputStreamMapper) {

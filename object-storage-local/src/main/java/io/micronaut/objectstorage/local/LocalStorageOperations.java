@@ -45,6 +45,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.runtime.server.EmbeddedServer;
 import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.response.PresignResponse;
+import jakarta.inject.Inject;
 
 import java.net.URI;
 import java.time.Instant;
@@ -73,7 +74,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private final EmbeddedServer embeddedServer;
     private final LocalPresignStore localPresignStore;
 
-    LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
+    @Inject
+    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
                            @Nullable EmbeddedServer embeddedServer,
                            LocalPresignStore localPresignStore) {
         this.configuration = configuration;
@@ -84,6 +86,14 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             throw new ObjectStorageException("Error creating metadata directory: " + metadataPath);
         }
         this.localPresignStore = localPresignStore;
+    }
+
+    /**
+     * @deprecated Use {@link #LocalStorageOperations(LocalStorageConfiguration, EmbeddedServer, LocalPresignStore)}.
+     */
+    @Deprecated(forRemoval = true)
+    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -58,56 +58,6 @@ import java.util.stream.StreamSupport;
 public class GoogleCloudStorageOperations
     implements ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> {
 
-    @Override
-    @NonNull
-    public PresignResponse presign(
-            @NonNull PresignRequest request) {
-
-        // Prevent use on emulators/fake servers or with credentials that can't sign
-        com.google.auth.Credentials creds = storage.getOptions().getCredentials();
-        if (creds != null && creds.getClass().getName().equals("com.google.cloud.NoCredentials")) {
-            throw new UnsupportedOperationException("Presigned URLs require credentials with signing ability and are not supported with emulators such as FakeGcsServer or NoCredentials.");
-        }
-
-        // Resolve expiration
-        java.time.Duration expiresIn = request.getExpiresIn()
-                .orElse(moduleConfiguration.getDefaultPresignExpiration());
-
-        TimeUnit timeUnit = TimeUnit.SECONDS;
-        long expiresSeconds = expiresIn.getSeconds();
-
-        // Build BlobInfo for the object
-        BlobInfo.Builder blobInfoBuilder = BlobInfo.newBuilder(
-                BlobId.of(configuration.getBucket(), request.getKey())
-        );
-        // Set content type if provided and uploading
-        if (request.getOperation() == PresignRequest.Operation.UPLOAD) {
-            request.getContentType().ifPresent(blobInfoBuilder::setContentType);
-        }
-        BlobInfo blobInfo = blobInfoBuilder.build();
-
-        // Select HTTP method
-        HttpMethod httpMethod = switch (request.getOperation()) {
-            case DOWNLOAD -> HttpMethod.GET;
-            case UPLOAD -> HttpMethod.PUT;
-        };
-
-        // Create the signed URL
-        URL signedUrl = storage.signUrl(
-                blobInfo,
-                expiresSeconds,
-                timeUnit,
-                Storage.SignUrlOption.httpMethod(httpMethod)
-        );
-
-        Instant expiration = Instant.now().plusSeconds(expiresSeconds);
-
-        return new PresignResponse(
-                URI.create(signedUrl.toString()),
-                expiration
-        );
-    }
-
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
     private final GoogleCloudStorageConfiguration configuration;
@@ -129,6 +79,16 @@ public class GoogleCloudStorageOperations
         this.storage = storage;
         this.configuration = configuration;
         this.moduleConfiguration = moduleConfiguration;
+    }
+
+    /**
+     * @deprecated Use {@link #GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, GoogleCloudStorageModuleConfiguration, InputStreamMapper, Storage)}.
+     */
+    @Deprecated(forRemoval = true)
+    public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
+                                        InputStreamMapper inputStreamMapper,
+                                        Storage storage) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -242,5 +202,55 @@ public class GoogleCloudStorageOperations
 
     private boolean blobExists(Blob blob) {
         return blob != null && blob.exists();
+    }
+
+    @Override
+    @NonNull
+    public PresignResponse presign(
+        @NonNull PresignRequest request) {
+
+        // Prevent use on emulators/fake servers or with credentials that can't sign
+        com.google.auth.Credentials creds = storage.getOptions().getCredentials();
+        if (creds != null && creds.getClass().getName().equals("com.google.cloud.NoCredentials")) {
+            throw new UnsupportedOperationException("Presigned URLs require credentials with signing ability and are not supported with emulators such as FakeGcsServer or NoCredentials.");
+        }
+
+        // Resolve expiration
+        java.time.Duration expiresIn = request.getExpiresIn()
+            .orElse(moduleConfiguration.getDefaultPresignExpiration());
+
+        TimeUnit timeUnit = TimeUnit.SECONDS;
+        long expiresSeconds = expiresIn.getSeconds();
+
+        // Build BlobInfo for the object
+        BlobInfo.Builder blobInfoBuilder = BlobInfo.newBuilder(
+            BlobId.of(configuration.getBucket(), request.getKey())
+        );
+        // Set content type if provided and uploading
+        if (request.getOperation() == PresignRequest.Operation.UPLOAD) {
+            request.getContentType().ifPresent(blobInfoBuilder::setContentType);
+        }
+        BlobInfo blobInfo = blobInfoBuilder.build();
+
+        // Select HTTP method
+        HttpMethod httpMethod = switch (request.getOperation()) {
+            case DOWNLOAD -> HttpMethod.GET;
+            case UPLOAD -> HttpMethod.PUT;
+        };
+
+        // Create the signed URL
+        URL signedUrl = storage.signUrl(
+            blobInfo,
+            expiresSeconds,
+            timeUnit,
+            Storage.SignUrlOption.httpMethod(httpMethod)
+        );
+
+        Instant expiration = Instant.now().plusSeconds(expiresSeconds);
+
+        return new PresignResponse(
+            URI.create(signedUrl.toString()),
+            expiration
+        );
     }
 }
