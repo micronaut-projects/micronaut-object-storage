@@ -24,6 +24,7 @@ import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.InputStreamUploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
@@ -223,6 +224,9 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } else if (uploadRequest instanceof BytesUploadRequest) {
             BytesUploadRequest request = (BytesUploadRequest) uploadRequest;
             return RequestBody.fromBytes(request.getBytes());
+        } else if (uploadRequest instanceof InputStreamUploadRequest) {
+            InputStreamUploadRequest request = (InputStreamUploadRequest) uploadRequest;
+            return RequestBody.fromInputStream(request.getInputStream(), request.getContentSize().orElse(0L));
         } else {
             byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
             return RequestBody.fromBytes(inputBytes);
