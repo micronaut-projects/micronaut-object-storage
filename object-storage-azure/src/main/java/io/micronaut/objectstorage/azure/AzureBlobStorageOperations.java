@@ -68,6 +68,12 @@ public class AzureBlobStorageOperations
     private final BlobContainerClient blobContainerClient;
     private final AzureBlobStorageModuleConfiguration moduleConfiguration;
 
+    /**
+     * Constructs an AzureBlobStorageOperations.
+     *
+     * @param blobContainerClient The BlobContainerClient.
+     * @param moduleConfiguration The module configuration.
+     */
     @Inject
     public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient,
                                       AzureBlobStorageModuleConfiguration moduleConfiguration) {
@@ -218,7 +224,7 @@ public class AzureBlobStorageOperations
             item = client.uploadWithResponse(options, null, Context.NONE).getValue();
         }
 
-        //TODO: make timeout configurable
+        // TODO: Make timeout configurable.
         return UploadResponse.of(request.getKey(), item.getETag(), item);
     }
 

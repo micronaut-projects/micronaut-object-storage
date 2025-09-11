@@ -15,8 +15,9 @@
  */
 package io.micronaut.objectstorage.configuration;
 
-import java.time.Duration;
 import io.micronaut.core.annotation.NonNull;
+
+import java.time.Duration;
 
 /**
  * Base class for all the module configurations.
@@ -48,6 +49,8 @@ public class AbstractObjectStorageModuleConfiguration implements ObjectStorageMo
 
     /**
      * The default expiration duration for presigned requests.
+     *
+     * @return the default expiration duration for presigned requests.
      * @since 2.10
      */
     @NonNull

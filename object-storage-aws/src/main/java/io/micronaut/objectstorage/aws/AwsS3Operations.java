@@ -72,10 +72,11 @@ public class AwsS3Operations implements ObjectStorageOperations<
     private final S3Presigner presigner;
 
     /**
+     * Constructs an AwsS3Operations.
      *
-     * @param configuration     AWS S3 Configuration
-     * @param s3Client          S3 Client
-     * @param inputStreamMapper InputStream Mapper
+     * @param configuration     AWS S3 Configuration.
+     * @param s3Client          S3 Client.
+     * @param inputStreamMapper InputStream Mapper.
      * @param environment       If non-null, used to read the {@code aws.region} property for presigning.
      */
     @Inject
@@ -107,6 +108,10 @@ public class AwsS3Operations implements ObjectStorageOperations<
 
     /**
      * @deprecated Use {@link #AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)}.
+     *
+     * @param configuration AWS S3 Configuration.
+     * @param s3Client S3 Client.
+     * @param inputStreamMapper InputStream Mapper.
      */
     @Deprecated(forRemoval = true)
     public AwsS3Operations(@Parameter AwsS3Configuration configuration,

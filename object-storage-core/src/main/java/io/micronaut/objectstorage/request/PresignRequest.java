@@ -63,7 +63,7 @@ public final class PresignRequest {
     }
 
     /**
-     * Object key/path (<code>/foo/bar/file</code>).
+     * @return The object key/path. (<code>/foo/bar/file</code>).
      */
     @NonNull
     public String getKey() {
@@ -72,6 +72,8 @@ public final class PresignRequest {
 
     /**
      * Operation for which the pre-signed request should be generated.
+     *
+     * @return The operation to pre-sign.
      */
     @NonNull
     public Operation getOperation() {
@@ -81,6 +83,8 @@ public final class PresignRequest {
     /**
      * Optional expiration override for the generated request. If empty, the implementation
      * will fall back to the configured default (typically 1 hour).
+     *
+     * @return An Optional expiration override for the generated request.
      */
     @NonNull
     public Optional<Duration> getExpiresIn() {
@@ -90,6 +94,8 @@ public final class PresignRequest {
     /**
      * Optional expected content length (bytes) for upload operations. Implementations may
      * embed this as a maximum allowed size within the signature.
+     *
+     * @return An Optional expected content length for upload operations.
      */
     @NonNull
     public Optional<Long> getContentLength() {
@@ -98,6 +104,8 @@ public final class PresignRequest {
 
     /**
      * Optional content-type hint for upload operations.
+     *
+     * @return An Optional content-type hint for upload operations.
      */
     @NonNull
     public Optional<String> getContentType() {
@@ -108,6 +116,8 @@ public final class PresignRequest {
      * Optional custom name for the pre-authorized request.
      * If empty, the provider will generate a default name.
      * @since 2.10
+     *
+     * @return An Optional containing the custom name for the pre-authorized request.
      */
     @NonNull
     public Optional<String> getName() {
@@ -156,6 +166,9 @@ public final class PresignRequest {
 
         /**
          * Sets the expected content length for upload operations.
+         *
+         * @param contentLength Measured in bytes.
+         * @return This builder.
          */
         @NonNull
         public Builder contentLength(long contentLength) {
@@ -168,6 +181,9 @@ public final class PresignRequest {
 
         /**
          * Sets the content type hint for upload operations.
+         *
+         * @param contentType Typically a MIME type.
+         * @return This builder.
          */
         @NonNull
         public Builder contentType(@NonNull String contentType) {

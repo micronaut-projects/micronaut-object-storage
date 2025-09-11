@@ -15,12 +15,7 @@
  */
 package io.micronaut.objectstorage.googlecloud;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.HttpMethod;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageException;
+import com.google.cloud.storage.*;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
@@ -37,7 +32,6 @@ import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.net.URI;
 import java.net.URL;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +76,9 @@ public class GoogleCloudStorageOperations
     }
 
     /**
+     * @param configuration Google Storage Configuration
+     * @param inputStreamMapper Input Stream Mapper
+     * @param storage Interface for Google Cloud Storage
      * @deprecated Use {@link #GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, GoogleCloudStorageModuleConfiguration, InputStreamMapper, Storage)}.
      */
     @Deprecated(forRemoval = true)

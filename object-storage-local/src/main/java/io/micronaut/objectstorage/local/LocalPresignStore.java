@@ -35,18 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 @Internal
 class LocalPresignStore {
-    /**
-     * Information associated with a generated token.
-     *
-     * @param key        The object key.
-     * @param operation  The authorised operation.
-     * @param expiration When the token expires.
-     */
-    record Entry(String key, PresignRequest.Operation operation, Instant expiration) {
-        boolean isExpired() {
-            return Instant.now().isAfter(expiration);
-        }
-    }
 
     private final ConcurrentHashMap<String, Entry> TOKENS = new ConcurrentHashMap<>();
 
@@ -86,5 +74,18 @@ class LocalPresignStore {
      */
     void remove(String token) {
         TOKENS.remove(token);
+    }
+
+    /**
+     * Information associated with a generated token.
+     *
+     * @param key        The object key.
+     * @param operation  The authorised operation.
+     * @param expiration When the token expires.
+     */
+    record Entry(String key, PresignRequest.Operation operation, Instant expiration) {
+        boolean isExpired() {
+            return Instant.now().isAfter(expiration);
+        }
     }
 }

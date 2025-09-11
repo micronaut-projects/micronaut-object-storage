@@ -17,25 +17,18 @@ package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.*;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Consumes;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.*;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
-
-import java.io.InputStream;
-import java.net.URLConnection;
-
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.Optional;
 
 /**
@@ -101,7 +94,7 @@ class LocalPresignController {
     @Put("/{token}")
     @Consumes(MediaType.ALL)
     public HttpResponse<?> upload(@NonNull String token,
-                                  @Body @Nullable byte[] bytes,
+                                  @Body byte[] bytes,
                                   HttpRequest<?> request) {
         Optional<LocalPresignStore.Entry> entryOpt = localPresignStore.consume(token);
         if (entryOpt.isEmpty()) {
