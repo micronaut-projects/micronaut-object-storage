@@ -134,7 +134,7 @@
 
 
 <div class="paragraph">
-<p>Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers:</p>
+<p>Micronaut Object Storage provides a uniform API to create, read, delete and generate pre-authorized requests for objects in the major cloud providers:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -566,6 +566,96 @@ There is also a <code>getNativeEntry()</code> method that gives you access to th
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_pre_authorized_requests">Pre-authorized requests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every cloud supports the creation of URLs that act as bearer tokens: anyone with the URL can upload or download from
+that object using only the URL and no other credentials. Micronaut abstracts this capability behind a uniform interface.</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public String generateDownloadUrl(String userId, String fileName) {
+    String key = userId + "/" + fileName;
+    PresignRequest request = PresignRequest.builder(key, PresignRequest.Operation.DOWNLOAD)
+        .expiresIn(Duration.ofMinutes(15)) // <b class="conum">(1)</b>
+        .build();
+    PresignResponse response = objectStorage.presign(request); // <b class="conum">(2)</b>
+    return response.url().toString(); // <b class="conum">(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">String generateDownloadUrl(String userId, String fileName) {
+    String key = "${userId}/${fileName}"
+    PresignRequest request = PresignRequest.builder(key, PresignRequest.Operation.DOWNLOAD)
+            .expiresIn(Duration.ofMinutes(15)) // <b class="conum">(1)</b>
+            .build()
+    PresignResponse response = objectStorage.presign(request) // <b class="conum">(2)</b>
+    response.url().toString() // <b class="conum">(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun generateDownloadUrl(userId: String, fileName: String): String {
+    val key = "$userId/$fileName"
+    val request = PresignRequest.builder(key, PresignRequest.Operation.DOWNLOAD)
+        .expiresIn(Duration.ofMinutes(15)) // <b class="conum">(1)</b>
+        .build()
+    val response: PresignResponse = objectStorage.presign(request) // <b class="conum">(2)</b>
+    return response.url().toString() // <b class="conum">(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Build a <a href="../api/io/micronaut/objectstorage/request/PresignRequest.html">PresignRequest</a> with the object key and desired operation (<code>DOWNLOAD</code> or <code>UPLOAD</code>). You can optionally specify a custom expiration via <code>expiresIn</code>. For uploads, you may also provide <code>contentLength</code> and <code>contentType</code> hints.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The method <code>presign(PresignRequest)</code> of <a href="../api/io/micronaut/objectstorage/ObjectStorageOperations.html">ObjectStorageOperations</a> returns an <a href="../api/io/micronaut/objectstorage/response/PresignResponse.html">PresignResponse</a> containing the generated URL and its expiration time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>url()</code> on the response to obtain the URL.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public void invalidatePresignedUrl(String url) {
+    objectStorage.invalidatePresignedRequest(URI.create(url)); // <b class="conum">(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">void invalidatePresignedUrl(String url) {
+    objectStorage.invalidatePresignedRequest(URI.create(url)) // <b class="conum">(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun invalidatePresignedUrl(url: String) {
+    objectStorage.invalidatePresignedRequest(URI.create(url)) // <b class="conum">(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To proactively revoke a previously generated URL, use <code>invalidatePresignedRequest(URI)</code> of <a href="../api/io/micronaut/objectstorage/ObjectStorageOperations.html">ObjectStorageOperations</a>. Only a few providers support explicit invalidation (e.g Oracle); in those cases, an <code>UnsupportedOperationException</code> will be thrown and you should rely on expiration instead.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
 
 <h1 id="aws"><a class="anchor" href="#aws"></a>4 Amazon S3</h1>
 
@@ -622,6 +712,11 @@ information about credentials and region configuration.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.default-presign-expiration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.time.Duration</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.aws.*.bucket</code></p></td>
@@ -797,6 +892,11 @@ information about authentication options.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.default-presign-expiration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.time.Duration</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.azure.*.container</code></p></td>
@@ -1016,6 +1116,11 @@ information about configuring your GCP project.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.default-presign-expiration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.time.Duration</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.gcp.*.bucket</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the Google Cloud Storage bucket.</p></td>
@@ -1204,6 +1309,11 @@ for more information about authentication options.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.default-presign-expiration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.time.Duration</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.bucket</code></p></td>
@@ -1507,6 +1617,11 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.*.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.*.default-presign-expiration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.time.Duration</p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.*.path</code></p></td>

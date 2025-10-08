@@ -106,9 +106,14 @@ implements <a href="ObjectStorageModuleConfiguration.html" title="interface in i
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#enabled" class="member-name-link">enabled</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></code></div>
+<div class="col-second even-row-color"><code><a href="#defaultPresignExpiration" class="member-name-link">defaultPresignExpiration</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Default expiration used when generating pre-authorized (signed) requests.</div>
+</div>
+<div class="col-first odd-row-color"><code>protected boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#enabled" class="member-name-link">enabled</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-io.micronaut.objectstorage.configuration.ObjectStorageModuleConfiguration">Fields inherited from interface&nbsp;io.micronaut.objectstorage.configuration.<a href="ObjectStorageModuleConfiguration.html" title="interface in io.micronaut.objectstorage.configuration">ObjectStorageModuleConfiguration</a></h3>
@@ -139,6 +144,16 @@ implements <a href="ObjectStorageModuleConfiguration.html" title="interface in i
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDefaultPresignExpiration()" class="member-name-link">getDefaultPresignExpiration</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">The default expiration duration for presigned requests.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDefaultPresignExpiration(java.time.Duration)" class="member-name-link">setDefaultPresignExpiration</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;defaultPresignExpiration)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">How much time passes before a pre-signed object storage request automatically stops being valid.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setEnabled(boolean)" class="member-name-link">setEnabled</a><wbr>(boolean&nbsp;enabled)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -166,6 +181,20 @@ implements <a href="ObjectStorageModuleConfiguration.html" title="interface in i
 <section class="detail" id="enabled">
 <h3>enabled</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">enabled</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="defaultPresignExpiration">
+<h3>defaultPresignExpiration</h3>
+<div class="member-signature"><span class="annotations">@NonNull
+</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></span>&nbsp;<span class="element-name">defaultPresignExpiration</span></div>
+<div class="block">Default expiration used when generating pre-authorized (signed) requests.
+ If not configured through the property
+ <pre>object-storage.default-presign-expiration</pre>, a duration of one hour will be applied.</div>
+<dl class="notes">
+<dt>Since:</dt>
+<dd>2.10.0</dd>
+</dl>
 </section>
 </li>
 </ul>
@@ -199,6 +228,34 @@ implements <a href="ObjectStorageModuleConfiguration.html" title="interface in i
 <dd><code>enabled</code> - Whether to enable or disable this object storage.</dd>
 <dt>Since:</dt>
 <dd>2.0.2</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getDefaultPresignExpiration()">
+<h3>getDefaultPresignExpiration</h3>
+<div class="member-signature"><span class="annotations">@NonNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a></span>&nbsp;<span class="element-name">getDefaultPresignExpiration</span>()</div>
+<div class="block">The default expiration duration for presigned requests.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the default expiration duration for presigned requests.</dd>
+<dt>Since:</dt>
+<dd>2.10.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setDefaultPresignExpiration(java.time.Duration)">
+<h3>setDefaultPresignExpiration</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDefaultPresignExpiration</span><wbr><span class="parameters">(@NonNull
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;defaultPresignExpiration)</span></div>
+<div class="block">How much time passes before a pre-signed object storage request automatically stops being valid.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>defaultPresignExpiration</code> - the expiration duration</dd>
+<dt>Since:</dt>
+<dd>2.10.0</dd>
 </dl>
 </section>
 </li>

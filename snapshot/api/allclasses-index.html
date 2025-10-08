@@ -55,7 +55,7 @@ loadScripts(document, 'script');</script>
 <h1 title="All Classes and Interfaces" class="title">All Classes and Interfaces</h1>
 </div>
 <div id="all-classes-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="all-classes-table-tab0" role="tab" aria-selected="true" aria-controls="all-classes-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table', 2)" class="active-table-tab">All Classes and Interfaces</button><button id="all-classes-table-tab1" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab1', 2)" class="table-tab">Interfaces</button><button id="all-classes-table-tab2" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab2', 2)" class="table-tab">Classes</button><button id="all-classes-table-tab5" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab5', 2)" class="table-tab">Exceptions</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="all-classes-table-tab0" role="tab" aria-selected="true" aria-controls="all-classes-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table', 2)" class="active-table-tab">All Classes and Interfaces</button><button id="all-classes-table-tab1" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab1', 2)" class="table-tab">Interfaces</button><button id="all-classes-table-tab2" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab2', 2)" class="table-tab">Classes</button><button id="all-classes-table-tab3" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab3', 2)" class="table-tab">Enum Classes</button><button id="all-classes-table-tab4" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab4', 2)" class="table-tab">Record Classes</button><button id="all-classes-table-tab5" role="tab" aria-selected="false" aria-controls="all-classes-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('all-classes-table', 'all-classes-table-tab5', 2)" class="table-tab">Exceptions</button></div>
 <div id="all-classes-table.tabpanel" role="tabpanel">
 <div class="summary-table two-column-summary" aria-labelledby="all-classes-table-tab0">
 <div class="table-header col-first">Class</div>
@@ -164,58 +164,78 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">An implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a> that uses the local file system.</div>
+<div class="block">Implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a> for the local file system.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/configuration/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage.configuration">ObjectStorageConfiguration</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/objectstorage/local/LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab4">
+<div class="block">A simple wrapper around a path.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/configuration/ObjectStorageConfiguration.html" title="interface in io.micronaut.objectstorage.configuration">ObjectStorageConfiguration</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Common properties for the object storage configuration.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="type parameter in ObjectStorageEntry">O</a>&gt;</div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="type parameter in ObjectStorageEntry">O</a>&gt;</div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Object storage entry.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab5"><a href="io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab5">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab5"><a href="io/micronaut/objectstorage/ObjectStorageException.html" title="class in io.micronaut.objectstorage">ObjectStorageException</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab5">
 <div class="block">Represents an error produced when an object storage operation fails.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/configuration/ObjectStorageModuleConfiguration.html" title="interface in io.micronaut.objectstorage.configuration">ObjectStorageModuleConfiguration</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/configuration/ObjectStorageModuleConfiguration.html" title="interface in io.micronaut.objectstorage.configuration">ObjectStorageModuleConfiguration</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Common properties for an Object Storage module.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">I</a>,<wbr><a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>,<wbr><a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">D</a>&gt;</div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">I</a>,<wbr><a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">O</a>,<wbr><a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="type parameter in ObjectStorageOperations">D</a>&gt;</div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Main interface for object storage operations.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageConfiguration</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Oracle Cloud object storage configuration properties.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageEntry</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageEntry</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">An <a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageEntry</code></a> implementation for Oracle Cloud Storage.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageModuleConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageModuleConfiguration</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageModuleConfiguration.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageModuleConfiguration</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Oracle Cloud Storage module configuration.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Oracle Cloud implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a>.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">Request object for generating pre-authorized (signed) operations against the object storage.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/request/PresignRequest.Builder.html" title="class in io.micronaut.objectstorage.request">PresignRequest.Builder</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">Builder for <a href="io/micronaut/objectstorage/request/PresignRequest.html" title="class in io.micronaut.objectstorage.request"><code>PresignRequest</code></a>.</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab3"><a href="io/micronaut/objectstorage/request/PresignRequest.Operation.html" title="enum class in io.micronaut.objectstorage.request">PresignRequest.Operation</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab3">
+<div class="block">Supported operations that can be pre-authorized.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/objectstorage/response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
+<div class="block">Response returned after generating a pre-authorized (signed) request.</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">An <a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request"><code>UploadRequest</code></a> backed by a <code>StreamingFileUpload</code>.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Condition to check whether a bean should be enabled based on <code>Toggleable</code> configuration.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Object storage upload request.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="io/micronaut/objectstorage/response/UploadResponse.html" title="type parameter in UploadResponse">R</a>&gt;</div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="io/micronaut/objectstorage/response/UploadResponse.html" title="type parameter in UploadResponse">R</a>&gt;</div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Object storage upload response.</div>
 </div>
 </div>
