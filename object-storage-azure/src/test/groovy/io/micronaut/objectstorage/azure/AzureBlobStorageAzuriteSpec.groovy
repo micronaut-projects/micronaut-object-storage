@@ -19,6 +19,11 @@ class AzureBlobStorageAzuriteSpec extends AbstractAzureBlobStorageSpec {
             .withExposedPorts(10000)
 
     @Override
+    boolean emulatorSupportsPresignInvalidate() {
+        return false
+    }
+
+    @Override
     Map<String, String> getProperties() {
         azuriteContainer.start()
         super.getProperties() + [

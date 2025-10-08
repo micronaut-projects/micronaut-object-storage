@@ -9,6 +9,10 @@ import jakarta.inject.Singleton
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import io.micronaut.objectstorage.request.PresignRequest
+import io.micronaut.objectstorage.response.PresignResponse
+import java.time.Duration
+import java.net.URI
 
 //tag::beginclass[]
 @Singleton
@@ -50,6 +54,23 @@ class ProfileService {
         objectStorage.delete(key) // <1>
     }
     //end::delete[]
+
+    //tag::presign[]
+    String generateDownloadUrl(String userId, String fileName) {
+        String key = "${userId}/${fileName}"
+        PresignRequest request = PresignRequest.builder(key, PresignRequest.Operation.DOWNLOAD)
+                .expiresIn(Duration.ofMinutes(15)) // <1>
+                .build()
+        PresignResponse response = objectStorage.presign(request) // <2>
+        response.url().toString() // <3>
+    }
+    //end::presign[]
+
+    //tag::invalidate[]
+    void invalidatePresignedUrl(String url) {
+        objectStorage.invalidatePresignedRequest(URI.create(url)) // <1>
+    }
+    //end::invalidate[]
 
 //tag::endclass[]
 }
