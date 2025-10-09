@@ -15,8 +15,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX
 
 abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification implements TestPropertyProvider {
-
-    public static final String BUCKET_NAME = System.currentTimeMillis()
+    public static final String BUCKET_NAME = "micronaut-object-storage-unit-tests-" + System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
 
     @Inject
@@ -37,6 +36,11 @@ abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification im
     @Override
     ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> getObjectStorage() {
         return awsS3Bucket
+    }
+
+    @Override
+    boolean emulatorSupportsPresignInvalidate() {
+        return false  // AWS doesn't support this.
     }
 
     @Override
