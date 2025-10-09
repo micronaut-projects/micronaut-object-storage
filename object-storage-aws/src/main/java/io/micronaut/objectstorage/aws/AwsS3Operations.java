@@ -18,36 +18,34 @@ package io.micronaut.objectstorage.aws;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
-import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
-import io.micronaut.objectstorage.response.PresignResponse;
-import io.micronaut.objectstorage.response.UploadResponse;
-import jakarta.inject.Inject;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
-import java.net.URI;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -69,55 +67,19 @@ public class AwsS3Operations implements ObjectStorageOperations<
     private final S3Client s3Client;
     private final AwsS3Configuration configuration;
     private final InputStreamMapper inputStreamMapper;
-    private final S3Presigner presigner;
 
     /**
-     * Constructs an AwsS3Operations.
      *
-     * @param configuration     AWS S3 Configuration.
-     * @param s3Client          S3 Client.
-     * @param inputStreamMapper InputStream Mapper.
-     * @param environment       If non-null, used to read the {@code aws.region} property for presigning.
+     * @param configuration AWS S3 Configuration
+     * @param s3Client S3 Client
+     * @param inputStreamMapper InputStream Mapper
      */
-    @Inject
-    public AwsS3Operations(@Parameter AwsS3Configuration configuration,
-                           S3Client s3Client,
-                           InputStreamMapper inputStreamMapper,
-                           @Nullable Environment environment) {
-        this.s3Client = s3Client;
-        this.configuration = configuration;
-        this.inputStreamMapper = inputStreamMapper;
-        S3Presigner presigner = null;
-        if (environment != null) {
-            String region = environment.getProperty("aws.region", String.class, (String) null);
-            URI override = environment.getProperty("aws.services.s3.endpoint-override", URI.class, (URI) null);
-
-            if (region != null || override != null) {
-                S3Presigner.Builder builder = S3Presigner.builder().s3Client(s3Client);
-                if (region != null) {
-                    builder.region(Region.of(region));
-                }
-                if (override != null) {
-                    builder.endpointOverride(override);
-                }
-                presigner = builder.build();
-            }
-        }
-        this.presigner = presigner;
-    }
-
-    /**
-     * @deprecated Use {@link #AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)}.
-     *
-     * @param configuration AWS S3 Configuration.
-     * @param s3Client S3 Client.
-     * @param inputStreamMapper InputStream Mapper.
-     */
-    @Deprecated(since = "2.10.0", forRemoval = true)
     public AwsS3Operations(@Parameter AwsS3Configuration configuration,
                            S3Client s3Client,
                            InputStreamMapper inputStreamMapper) {
-        this(configuration, s3Client, inputStreamMapper, null);
+        this.s3Client = s3Client;
+        this.configuration = configuration;
+        this.inputStreamMapper = inputStreamMapper;
     }
 
     @Override
@@ -264,49 +226,6 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } else {
             byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
             return RequestBody.fromBytes(inputBytes);
-        }
-    }
-
-    @Override
-    @NonNull
-    public PresignResponse presign(@NonNull PresignRequest request) {
-        if (presigner == null) {
-            throw new UnsupportedOperationException("Pre-signed requests require 'aws.region' configuration");
-        }
-        Duration duration = request.getExpiresIn().orElse(Duration.ofHours(1));
-        try {
-            switch (request.getOperation()) {
-                case DOWNLOAD -> {
-                    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                        .bucket(configuration.getBucket())
-                        .key(request.getKey())
-                        .build();
-                    PresignedGetObjectRequest presigned = presigner.presignGetObject(
-                        GetObjectPresignRequest.builder()
-                            .signatureDuration(duration)
-                            .getObjectRequest(getObjectRequest)
-                            .build());
-                    return new PresignResponse(java.net.URI.create(presigned.url().toString()), presigned.expiration());
-                }
-                case UPLOAD -> {
-                    PutObjectRequest.Builder putBuilder = PutObjectRequest.builder()
-                        .bucket(configuration.getBucket())
-                        .key(request.getKey());
-                    request.getContentType().ifPresent(putBuilder::contentType);
-                    request.getContentLength().ifPresent(putBuilder::contentLength);
-                    PresignedPutObjectRequest presigned = presigner.presignPutObject(
-                        PutObjectPresignRequest.builder()
-                            .signatureDuration(duration)
-                            .putObjectRequest(putBuilder.build())
-                            .build());
-                    return new PresignResponse(java.net.URI.create(presigned.url().toString()), presigned.expiration());
-                }
-                default -> throw new UnsupportedOperationException("Unsupported presign operation: " + request.getOperation());
-            }
-        } catch (AwsServiceException | SdkClientException e) {
-            String msg = String.format("Error generating presigned %s URL for key [%s] in Amazon S3",
-                request.getOperation(), request.getKey());
-            throw new ObjectStorageException(msg, e);
         }
     }
 }

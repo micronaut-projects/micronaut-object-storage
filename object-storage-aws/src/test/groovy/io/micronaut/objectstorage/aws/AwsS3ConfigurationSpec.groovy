@@ -9,12 +9,13 @@ import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import jakarta.validation.ConstraintViolationException
-import jakarta.validation.Valid
-import jakarta.validation.constraints.NotNull
 import spock.lang.See
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import jakarta.validation.ConstraintViolationException
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 
 @Property(name = "micronaut.object-storage.aws.pictures.bucket", value = "pictures-bucket")
 @Property(name =  "micronaut.object-storage.aws.logos.bucket", value = "logos-bucket")

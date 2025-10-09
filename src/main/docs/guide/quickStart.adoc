@@ -65,18 +65,3 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="delete"]
 
 <1> The delete operation returns the cloud vendor-specific delete response object in case you need it.
-
-== Pre-authorized requests
-
-Every cloud supports the creation of URLs that act as bearer tokens: anyone with the URL can upload or download from
-that object using only the URL and no other credentials. Micronaut abstracts this capability behind a uniform interface.
-
-snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="presign"]
-
-<1> Build a api:objectstorage.request.PresignRequest[] with the object key and desired operation (`DOWNLOAD` or `UPLOAD`). You can optionally specify a custom expiration via `expiresIn`. For uploads, you may also provide `contentLength` and `contentType` hints.
-<2> The method `presign(PresignRequest)` of api:objectstorage.ObjectStorageOperations[] returns an api:objectstorage.response.PresignResponse[] containing the generated URL and its expiration time.
-<3> Use `url()` on the response to obtain the URL.
-
-snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="invalidate"]
-
-<1> To proactively revoke a previously generated URL, use `invalidatePresignedRequest(URI)` of api:objectstorage.ObjectStorageOperations[]. Only a few providers support explicit invalidation (e.g Oracle); in those cases, an `UnsupportedOperationException` will be thrown and you should rely on expiration instead.

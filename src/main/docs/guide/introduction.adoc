@@ -1,4 +1,4 @@
-Micronaut Object Storage provides a uniform API to create, read, delete and generate pre-authorized requests for objects in the major cloud providers:
+Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers:
 
 * https://aws.amazon.com/s3/[Amazon S3].
 * https://azure.microsoft.com/en-gb/services/storage/blobs/[Azure Blob Storage].

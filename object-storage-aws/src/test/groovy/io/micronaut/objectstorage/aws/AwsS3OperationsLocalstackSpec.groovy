@@ -14,27 +14,20 @@ import static io.micronaut.objectstorage.test.ObjectStorageTestConstants.LOCAL_S
 @MicronautTest(startApplication = false)
 @IgnoreIf({ env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY && env.AWS_REGION })
 class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPropertyProvider {
+
     @Shared
     @AutoCleanup
     public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
             .withServices(S3)
 
     @Override
-    boolean emulatorSupportsPresignInvalidate() {
-        return false  // AWS doesn't support this.
-    }
-
-    @Override
     Map<String, String> getProperties() {
         localstack.start()
-        def props = [
+        super.getProperties() + [
                 'aws.accessKeyId'         : localstack.accessKey,
-                'aws.secretAccessKey'     : localstack.secretKey,
+                'aws.secretKey'           : localstack.secretKey,
                 'aws.region'              : localstack.region,
                 'aws.services.s3.endpoint-override': localstack.getEndpointOverride(S3)
         ] as Map
-        // AWS SDK requires these in the system props to authenticate.
-        props.forEach { String k, Object v -> System.setProperty(k, v.toString()) }
-        super.getProperties() + props
     }
 }
