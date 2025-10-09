@@ -106,18 +106,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper)" class="member-name-link">AwsS3Operations</a><wbr>(<a href="AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a>&nbsp;configuration,
  software.amazon.awssdk.services.s3.S3Client&nbsp;s3Client,
  <a href="../InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a>&nbsp;inputStreamMapper)</code></div>
-<div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
-<div class="deprecation-comment">Use <a href="#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper,io.micronaut.context.env.Environment)"><code>AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)</code></a>.</div>
-</div>
-</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper,io.micronaut.context.env.Environment)" class="member-name-link">AwsS3Operations</a><wbr>(<a href="AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a>&nbsp;configuration,
- software.amazon.awssdk.services.s3.S3Client&nbsp;s3Client,
- <a href="../InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a>&nbsp;inputStreamMapper,
- @Nullable io.micronaut.context.env.Environment&nbsp;environment)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Constructs an AwsS3Operations.</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -160,25 +149,20 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Lists the objects that exist in the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#presign(io.micronaut.objectstorage.request.PresignRequest)" class="member-name-link">presign</a><wbr>(@NonNull <a href="../request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a>&nbsp;request)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Generates a pre-authorized (signed) request for the given operation.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the object from object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
  @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder&gt;&nbsp;requestConsumer)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
 </div>
@@ -187,9 +171,6 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
-<div class="inherited-list">
-<h3 id="methods-inherited-from-class-io.micronaut.objectstorage.ObjectStorageOperations">Methods inherited from interface&nbsp;io.micronaut.objectstorage.<a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></h3>
-<code><a href="../ObjectStorageOperations.html#invalidatePresignedRequest(java.net.URI)">invalidatePresignedRequest</a></code></div>
 </section>
 </li>
 </ul>
@@ -202,42 +183,17 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper,io.micronaut.context.env.Environment)">
-<h3>AwsS3Operations</h3>
-<div class="member-signature"><span class="annotations">@Inject
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">AwsS3Operations</span><wbr><span class="parameters">(@Parameter
- <a href="AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a>&nbsp;configuration,
- software.amazon.awssdk.services.s3.S3Client&nbsp;s3Client,
- <a href="../InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a>&nbsp;inputStreamMapper,
- @Nullable
- @Nullable io.micronaut.context.env.Environment&nbsp;environment)</span></div>
-<div class="block">Constructs an AwsS3Operations.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>configuration</code> - AWS S3 Configuration.</dd>
-<dd><code>s3Client</code> - S3 Client.</dd>
-<dd><code>inputStreamMapper</code> - InputStream Mapper.</dd>
-<dd><code>environment</code> - If non-null, used to read the <code>aws.region</code> property for presigning.</dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="&lt;init&gt;(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper)">
 <h3>AwsS3Operations</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="2.10.0",
-            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">AwsS3Operations</span><wbr><span class="parameters">(@Parameter
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">AwsS3Operations</span><wbr><span class="parameters">(@Parameter
  <a href="AwsS3Configuration.html" title="class in io.micronaut.objectstorage.aws">AwsS3Configuration</a>&nbsp;configuration,
  software.amazon.awssdk.services.s3.S3Client&nbsp;s3Client,
  <a href="../InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a>&nbsp;inputStreamMapper)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
-<div class="deprecation-comment">Use <a href="#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper,io.micronaut.context.env.Environment)"><code>AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)</code></a>.</div>
-</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>configuration</code> - AWS S3 Configuration.</dd>
-<dd><code>s3Client</code> - S3 Client.</dd>
-<dd><code>inputStreamMapper</code> - InputStream Mapper.</dd>
+<dd><code>configuration</code> - AWS S3 Configuration</dd>
+<dd><code>s3Client</code> - S3 Client</dd>
+<dd><code>inputStreamMapper</code> - InputStream Mapper</dd>
 </dl>
 </section>
 </li>
@@ -352,7 +308,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <dt>Specified by:</dt>
 <dd><code><a href="../ObjectStorageOperations.html#listObjects()">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder,<wbr>software.amazon.awssdk.services.s3.model.PutObjectResponse,<wbr>software.amazon.awssdk.services.s3.model.DeleteObjectResponse&gt;</code></dd>
 <dt>Returns:</dt>
-<dd>a set of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+<dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
 </dl>
 </section>
 </li>
@@ -400,24 +356,6 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <dd><code>uploadRequest</code> - the upload request</dd>
 <dt>Returns:</dt>
 <dd>An AWS' <code>RequestBody</code> from a Micronaut's <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request"><code>UploadRequest</code></a>.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="presign(io.micronaut.objectstorage.request.PresignRequest)">
-<h3>presign</h3>
-<div class="member-signature"><span class="annotations">@NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></span>&nbsp;<span class="element-name">presign</span><wbr><span class="parameters">(@NonNull
- @NonNull <a href="../request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a>&nbsp;request)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#presign(io.micronaut.objectstorage.request.PresignRequest)">ObjectStorageOperations</a></code></span></div>
-<div class="block">Generates a pre-authorized (signed) request for the given operation.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#presign(io.micronaut.objectstorage.request.PresignRequest)">presign</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder,<wbr>software.amazon.awssdk.services.s3.model.PutObjectResponse,<wbr>software.amazon.awssdk.services.s3.model.DeleteObjectResponse&gt;</code></dd>
-<dt>Parameters:</dt>
-<dd><code>request</code> - the presign request parameters</dd>
-<dt>Returns:</dt>
-<dd>information with the generated URL and its expiration</dd>
 </dl>
 </section>
 </li>

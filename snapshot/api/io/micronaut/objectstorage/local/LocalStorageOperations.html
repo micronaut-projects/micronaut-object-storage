@@ -44,7 +44,7 @@ loadScripts(document, 'script');</script>
 <div>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
-<li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
 <li><a href="#field-summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
@@ -77,7 +77,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@EachBean(<a href="LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration.class</a>)
@@ -85,10 +85,9 @@ loadScripts(document, 'script');</script>
 @Primary
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">LocalStorageOperations</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</span></div>
-<div class="block">Implementation of <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a> for the local file system.
- Provides simple object storage used mainly for testing and local deployments,
- storing files and metadata in the file system hierarchy.</div>
+implements <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</span></div>
+<div class="block">An implementation of <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a> that uses the local file system. Useful for
+ testing.</div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>2.0.0</dd>
@@ -98,23 +97,6 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 </section>
 <section class="summary">
 <ul class="summary-list">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
-<li>
-<section class="nested-class-summary" id="nested-class-summary">
-<h2>Nested Class Summary</h2>
-<div class="caption"><span>Nested Classes</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final record&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="LocalStorageOperations.LocalStorageFile.html" class="type-name-link" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">A simple wrapper around a path.</div>
-</div>
-</div>
-</section>
-</li>
 <!-- =========== FIELD SUMMARY =========== -->
 <li>
 <section class="field-summary" id="field-summary">
@@ -139,17 +121,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration)" class="member-name-link">LocalStorageOperations</a><wbr>(<a href="LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a>&nbsp;configuration)</code></div>
-<div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
-<div class="deprecation-comment">Use <a href="#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration,io.micronaut.runtime.server.EmbeddedServer,io.micronaut.objectstorage.local.LocalPresignStore)"><code>LocalStorageOperations(LocalStorageConfiguration, EmbeddedServer, LocalPresignStore)</code></a>.</div>
-</div>
-</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration,io.micronaut.runtime.server.EmbeddedServer,io.micronaut.objectstorage.local.LocalPresignStore)" class="member-name-link">LocalStorageOperations</a><wbr>(<a href="LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a>&nbsp;configuration,
- @Nullable io.micronaut.runtime.server.EmbeddedServer&nbsp;embeddedServer,
- io.micronaut.objectstorage.local.LocalPresignStore&nbsp;localPresignStore)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Creates a new LocalStorageOperations instance.</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -171,7 +143,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
  same object storage (bucket/container).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#delete(java.lang.String)" class="member-name-link">delete</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Deletes an object from the object storage.</div>
@@ -181,34 +153,24 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks whether an entry with the given key exists in the object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invalidatePresignedRequest(java.net.URI)" class="member-name-link">invalidatePresignedRequest</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;url)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Explicitly invalidates a previously generated pre-signed request.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Lists the objects that exist in the object storage.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#presign(io.micronaut.objectstorage.request.PresignRequest)" class="member-name-link">presign</a><wbr>(@NonNull <a href="../request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a>&nbsp;request)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Generates a pre-authorized (signed) request for the given operation.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="LocalStorageEntry.html" title="class in io.micronaut.objectstorage.local">LocalStorageEntry</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the object from object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
- @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;&nbsp;requestConsumer)</code></div>
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;&nbsp;requestConsumer)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
@@ -252,37 +214,10 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(io.micronaut.objectstorage.local.LocalStorageConfiguration,io.micronaut.runtime.server.EmbeddedServer,io.micronaut.objectstorage.local.LocalPresignStore)">
-<h3>LocalStorageOperations</h3>
-<div class="member-signature"><span class="annotations">@Inject
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">LocalStorageOperations</span><wbr><span class="parameters">(@Parameter
- <a href="LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a>&nbsp;configuration,
- @Nullable
- @Nullable io.micronaut.runtime.server.EmbeddedServer&nbsp;embeddedServer,
- io.micronaut.objectstorage.local.LocalPresignStore&nbsp;localPresignStore)</span></div>
-<div class="block">Creates a new LocalStorageOperations instance.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>configuration</code> - The local storage configuration.</dd>
-<dd><code>embeddedServer</code> - The embedded server, or null.</dd>
-<dd><code>localPresignStore</code> - The presigned request store.</dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="&lt;init&gt;(io.micronaut.objectstorage.local.LocalStorageConfiguration)">
 <h3>LocalStorageOperations</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="2.10.0",
-            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">LocalStorageOperations</span><wbr><span class="parameters">(@Parameter
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">LocalStorageOperations</span><wbr><span class="parameters">(@Parameter
  <a href="LocalStorageConfiguration.html" title="class in io.micronaut.objectstorage.local">LocalStorageConfiguration</a>&nbsp;configuration)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
-<div class="deprecation-comment">Use <a href="#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration,io.micronaut.runtime.server.EmbeddedServer,io.micronaut.objectstorage.local.LocalPresignStore)"><code>LocalStorageOperations(LocalStorageConfiguration, EmbeddedServer, LocalPresignStore)</code></a>.</div>
-</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>configuration</code> - The local storage configuration.</dd>
-</dl>
 </section>
 </li>
 </ul>
@@ -297,13 +232,13 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <section class="detail" id="upload(io.micronaut.objectstorage.request.UploadRequest)">
 <h3>upload</h3>
 <div class="member-signature"><span class="annotations">@NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</span>&nbsp;<span class="element-name">upload</span><wbr><span class="parameters">(@NonNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</span>&nbsp;<span class="element-name">upload</span><wbr><span class="parameters">(@NonNull
  @NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</span></div>
 <div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - the upload request</dd>
 <dt>Returns:</dt>
@@ -315,15 +250,15 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <section class="detail" id="upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">
 <h3>upload</h3>
 <div class="member-signature"><span class="annotations">@NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</span>&nbsp;<span class="element-name">upload</span><wbr><span class="parameters">(@NonNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</span>&nbsp;<span class="element-name">upload</span><wbr><span class="parameters">(@NonNull
  @NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
  @NonNull
- @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;&nbsp;requestConsumer)</span></div>
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;&nbsp;requestConsumer)</span></div>
 <div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - the upload request</dd>
 <dd><code>requestConsumer</code> - Upload request builder consumer</dd>
@@ -342,7 +277,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="block">Gets the object from object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#retrieve(java.lang.String)">retrieve</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#retrieve(java.lang.String)">retrieve</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>
 <dt>Returns:</dt>
@@ -354,13 +289,13 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <section class="detail" id="delete(java.lang.String)">
 <h3>delete</h3>
 <div class="member-signature"><span class="annotations">@NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a></span>&nbsp;<span class="element-name">delete</span><wbr><span class="parameters">(@NonNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile</span>&nbsp;<span class="element-name">delete</span><wbr><span class="parameters">(@NonNull
  @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
 <div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#delete(java.lang.String)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Deletes an object from the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#delete(java.lang.String)">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#delete(java.lang.String)">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt>Returns:</dt>
@@ -377,7 +312,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="block">Checks whether an entry with the given key exists in the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#exists(java.lang.String)">exists</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#exists(java.lang.String)">exists</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt>Returns:</dt>
@@ -394,9 +329,9 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="block">Lists the objects that exist in the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#listObjects()">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#listObjects()">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Returns:</dt>
-<dd>a set of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+<dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
 </dl>
 </section>
 </li>
@@ -412,43 +347,10 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
  same object storage (bucket/container). If the destination exists, it will be overwritten.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#copy(java.lang.String,java.lang.String)">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#copy(java.lang.String,java.lang.String)">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile,<wbr>io.micronaut.objectstorage.local.LocalStorageOperations.LocalStorageFile&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>sourceKey</code> - the key of the source object</dd>
 <dd><code>destinationKey</code> - the key of the destination object</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="presign(io.micronaut.objectstorage.request.PresignRequest)">
-<h3>presign</h3>
-<div class="member-signature"><span class="annotations">@NonNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></span>&nbsp;<span class="element-name">presign</span><wbr><span class="parameters">(@NonNull
- @NonNull <a href="../request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a>&nbsp;request)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#presign(io.micronaut.objectstorage.request.PresignRequest)">ObjectStorageOperations</a></code></span></div>
-<div class="block">Generates a pre-authorized (signed) request for the given operation.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#presign(io.micronaut.objectstorage.request.PresignRequest)">presign</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
-<dt>Parameters:</dt>
-<dd><code>request</code> - the presign request parameters</dd>
-<dt>Returns:</dt>
-<dd>information with the generated URL and its expiration</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="invalidatePresignedRequest(java.net.URI)">
-<h3>invalidatePresignedRequest</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">invalidatePresignedRequest</span><wbr><span class="parameters">(@NonNull
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;url)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#invalidatePresignedRequest(java.net.URI)">ObjectStorageOperations</a></code></span></div>
-<div class="block">Explicitly invalidates a previously generated pre-signed request.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#invalidatePresignedRequest(java.net.URI)">invalidatePresignedRequest</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;<a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>,<wbr><a href="LocalStorageOperations.LocalStorageFile.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations.LocalStorageFile</a>&gt;</code></dd>
-<dt>Parameters:</dt>
-<dd><code>url</code> - The URL returned by <a href="../ObjectStorageOperations.html#presign(io.micronaut.objectstorage.request.PresignRequest)"><code>ObjectStorageOperations.presign(PresignRequest)</code></a>.</dd>
 </dl>
 </section>
 </li>
