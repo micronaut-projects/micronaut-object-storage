@@ -12,7 +12,7 @@ if (sonatypePluginConfigured) {
     password = ossIndexPassword
 }
     excludeCoordinates = [
-            "io.projectreactor.netty:reactor-netty-http:1.0.48" // https://ossindex.sonatype.org/vulnerability/CVE-2025-22227?component-type=maven&component-name=io.projectreactor.netty%2Freactor-netty-http&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.2
+            "io.projectreactor.netty:reactor-netty-http:1.2.10" // https://ossindex.sonatype.org/vulnerability/CVE-2025-22227?component-type=maven&component-name=io.projectreactor.netty%2Freactor-netty-http&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.2
     ]
 }
 dependencies {
