@@ -21,7 +21,6 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
-
 import jakarta.validation.constraints.Pattern;
 
 import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
