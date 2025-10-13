@@ -32,14 +32,7 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
             ))
 
     @Override
-    boolean emulatorSupportsPresignInvalidate() {
-        return false
-    }
-
-    @Override
-    boolean emulatorSupportsPresign() {
-        // In GCS pre-signed URLs are signed client side, not by the server, and so there's just not much to test
-        // here.
+    boolean supportsPresignInvalidate() {
         return false
     }
 

@@ -43,4 +43,9 @@ abstract class AbstractAwsS3Spec extends ObjectStorageOperationsSpecification im
     Map<String, String> getProperties() {
         [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.bucket'): BUCKET_NAME]
     }
+
+    @Override
+    boolean supportsPresignInvalidate() {
+        return false  // AWS doesn't support this.
+    }
 }

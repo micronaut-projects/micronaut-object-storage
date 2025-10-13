@@ -20,11 +20,6 @@ class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPro
             .withServices(S3)
 
     @Override
-    boolean emulatorSupportsPresignInvalidate() {
-        return false  // AWS doesn't support this.
-    }
-
-    @Override
     Map<String, String> getProperties() {
         localstack.start()
         def props = [

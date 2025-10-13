@@ -163,7 +163,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         ]
     }
 
-    @IgnoreIf({ !instance.emulatorSupportsPresign() })
+    @IgnoreIf({ !instance.supportsPresign() })
     void 'it can generate and invalidate a presigned URL'(TestFile testFile) {
         given: 'an uploaded object'
         ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
@@ -188,7 +188,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         assert downloaded == TEXT
 
         when: 'explicitly invalidating the URL'
-        if (emulatorSupportsPresignInvalidate()) {
+        if (supportsPresignInvalidate()) {
             storage.invalidatePresignedRequest(presignResponse.url)
         }
 
@@ -204,7 +204,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         ]
     }
 
-    @IgnoreIf({ !instance.emulatorSupportsPresignUpload() })
+    @IgnoreIf({ !instance.supportsPresignUpload() })
     void 'it can upload an object using a presigned URL'(TestFile testFile) {
         given: "A presigned upload URL"
         ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
@@ -266,16 +266,16 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         true
     }
 
-    boolean emulatorSupportsPresign() {
+    boolean supportsPresign() {
         true
     }
 
-    boolean emulatorSupportsPresignInvalidate() {
-        emulatorSupportsPresign()
+    boolean supportsPresignInvalidate() {
+        supportsPresign()
     }
 
-    boolean emulatorSupportsPresignUpload() {
-        emulatorSupportsPresign()
+    boolean supportsPresignUpload() {
+        supportsPresign()
     }
 
     static Path createTempFile() {
