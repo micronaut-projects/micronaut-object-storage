@@ -11,5 +11,4 @@ dependencies {
     implementation(libs.gradle.micronaut)
     implementation(libs.gradle.kotlin)
     implementation(libs.gradle.kotlin.ksp)
-    implementation(libs.sonatype.scan)
 }
