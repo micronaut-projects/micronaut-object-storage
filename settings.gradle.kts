@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "6.7.0"
+    id("io.micronaut.build.shared.settings") version "7.6.4"
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -28,7 +28,7 @@ include("object-storage-local")
 include("doc-examples:example-java")
 include("doc-examples:example-groovy")
 include("doc-examples:example-kotlin")
-
+include("test-suite-utils")
 configure<MicronautBuildSettingsExtension> {
     useStandardizedProjectNames.set(true)
     importMicronautCatalog()

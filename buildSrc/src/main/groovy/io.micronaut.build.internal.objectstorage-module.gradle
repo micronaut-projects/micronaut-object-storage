@@ -3,6 +3,11 @@ plugins {
     id "io.micronaut.build.internal.objectstorage-base"
 }
 
+ossIndexAudit {
+    excludeCoordinates = [
+            "io.projectreactor.netty:reactor-netty-http:1.0.48" // https://ossindex.sonatype.org/vulnerability/CVE-2025-22227?component-type=maven&component-name=io.projectreactor.netty%2Freactor-netty-http&utm_source=ossindex-client&utm_medium=integration&utm_content=1.8.2
+    ]
+}
 dependencies {
     annotationProcessor mn.micronaut.inject.java
     implementation mn.micronaut.inject

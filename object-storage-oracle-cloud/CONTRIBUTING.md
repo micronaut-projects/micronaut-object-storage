@@ -4,18 +4,13 @@ To properly execute the cloud test suite, an Oracle Cloud account is required. T
 
 1. Create the API key [configuration file](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdkconfig.htm#SDK_and_CLI_Configuration_File) under the target tenancy:
 
-2. Create the bucket. Example using the [Oracle CLI](https://docs.oracle.com/en-us/iaas/tools/oci-cli/2.9.1/oci_cli_docs/cmdref/os/bucket/create.html)
+2. Configure the ENV variables that are required to run the tests:
 ```shell
-oci os bucket create --compartment-id <compartment_id> --name <bucket_name>
-```
-
-3. Configure the ENV variables that are required to run the tests:
-```shell
-export ORACLE_CLOUD_TEST_BUCKET_NAME=<bucket_name>
+export ORACLE_CLOUD_TEST_COMPARTMENT_ID=<compartment_ociid>
 export ORACLE_CLOUD_TEST_NAMESPACE=<tenancy_name>
 ```
 
-4Run the tests:
+3. Run the tests:
 ```shell
-./gradlew test
+./gradlew :micronaut-object-storage-oracle-cloud:test
 ```

@@ -20,6 +20,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 @Property(name = "micronaut.object-storage.oracle-cloud.default.bucket", value = "profile-pictures-bucket")
+@Property(name = "oci.config.enabled", value = "false")
+@Property(name = "oci.config.instance-principal", value = "false")
 @Property(name = "spec.name", value = SPEC_NAME)
 @MicronautTest
 class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
