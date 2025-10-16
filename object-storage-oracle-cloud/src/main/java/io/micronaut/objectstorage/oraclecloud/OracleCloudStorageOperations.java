@@ -19,9 +19,15 @@ import com.oracle.bmc.auth.RegionProvider;
 import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
 import com.oracle.bmc.objectstorage.model.CopyObjectDetails;
+import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails;
+import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails.AccessType;
+import com.oracle.bmc.objectstorage.model.PreauthenticatedRequest;
+import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest;
+import com.oracle.bmc.objectstorage.responses.CreatePreauthenticatedRequestResponse;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
 import com.oracle.bmc.objectstorage.requests.CopyObjectRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
+import com.oracle.bmc.objectstorage.requests.DeletePreauthenticatedRequestRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.HeadObjectRequest;
 import com.oracle.bmc.objectstorage.requests.ListObjectsRequest;
@@ -44,7 +50,12 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.net.URI;
 import java.util.Collections;
+import io.micronaut.objectstorage.request.PresignRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -229,5 +240,53 @@ public class OracleCloudStorageOperations
             putObjectRequestBuilder.opcMeta(request.getMetadata());
         }
         return putObjectRequestBuilder;
+    }
+
+    @Override
+    @NonNull
+    public PresignResponse presign(@NonNull PresignRequest request) {
+        try {
+            Duration ttl = request.getExpiresIn()
+                .orElse(configuration.getDefaultPresignExpiration());
+            Instant expiration = Instant.now().plus(ttl);
+
+            CreatePreauthenticatedRequestDetails details = CreatePreauthenticatedRequestDetails.builder()
+                .name(request.getName().orElse("mn-par-" + System.currentTimeMillis()))
+                .bucketListingAction(null)
+                .objectName(request.getKey())
+                .accessType(request.getOperation() == PresignRequest.Operation.UPLOAD
+                        ? AccessType.ObjectWrite
+                        : AccessType.ObjectRead)
+                .bucketListingAction(PreauthenticatedRequest.BucketListingAction.ListObjects)
+                .timeExpires(java.util.Date.from(expiration))
+                .build();
+
+            CreatePreauthenticatedRequestResponse response = client.createPreauthenticatedRequest(
+                CreatePreauthenticatedRequestRequest.builder()
+                    .bucketName(configuration.getBucket())
+                    .namespaceName(configuration.getNamespace())
+                    .createPreauthenticatedRequestDetails(details)
+                    .build()
+            );
+            URI url = URI.create(response.getPreauthenticatedRequest().getFullPath());
+            String parId = response.getPreauthenticatedRequest().getId();
+            return new PresignResponse(url, expiration, parId);
+        } catch (BmcException e) {
+            throw new ObjectStorageException("Error generating a pre-authorized request in Oracle Cloud Storage", e);
+        }
+    }
+
+    @Override
+    public void invalidatePresignedRequest(@NonNull PresignResponse presignResponse) {
+        String parId = presignResponse.id();
+        try {
+            client.deletePreauthenticatedRequest(DeletePreauthenticatedRequestRequest.builder()
+                .bucketName(configuration.getBucket())
+                .namespaceName(configuration.getNamespace())
+                .parId(parId)
+                .build());
+        } catch (BmcException e) {
+            throw new ObjectStorageException("Error invalidating pre-authorized request in Oracle Cloud Storage", e);
+        }
     }
 }

@@ -15,11 +15,9 @@
  */
 package io.micronaut.objectstorage.googlecloud;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageException;
+import com.google.auth.Credentials;
+import com.google.cloud.NoCredentials;
+import com.google.cloud.storage.*;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
@@ -29,11 +27,17 @@ import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 
+import java.net.URI;
+import java.net.URL;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -53,19 +57,37 @@ public class GoogleCloudStorageOperations
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
     private final GoogleCloudStorageConfiguration configuration;
+    private final GoogleCloudStorageModuleConfiguration moduleConfiguration;
 
     /**
      * Constructor.
      * @param configuration Google Storage Configuration
+     * @param moduleConfiguration GoogleCloudStorageModuleConfiguration (global module config, for defaults)
      * @param inputStreamMapper Input Stream Mapper
      * @param storage Interface for Google Cloud Storage
      */
-    public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
-                                        InputStreamMapper inputStreamMapper,
-                                        Storage storage) {
+    public GoogleCloudStorageOperations(
+            @Parameter GoogleCloudStorageConfiguration configuration,
+            GoogleCloudStorageModuleConfiguration moduleConfiguration,
+            InputStreamMapper inputStreamMapper,
+            Storage storage) {
         this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
         this.configuration = configuration;
+        this.moduleConfiguration = moduleConfiguration;
+    }
+
+    /**
+     * @param configuration Google Storage Configuration
+     * @param inputStreamMapper Input Stream Mapper
+     * @param storage Interface for Google Cloud Storage
+     * @deprecated Use {@link #GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, GoogleCloudStorageModuleConfiguration, InputStreamMapper, Storage)}.
+     */
+    @Deprecated(since = "2.10.0", forRemoval = true)
+    public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
+                                        InputStreamMapper inputStreamMapper,
+                                        Storage storage) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -179,5 +201,55 @@ public class GoogleCloudStorageOperations
 
     private boolean blobExists(Blob blob) {
         return blob != null && blob.exists();
+    }
+
+    @Override
+    @NonNull
+    public PresignResponse presign(
+        @NonNull PresignRequest request) {
+
+        // Prevent use on emulators/fake servers or with credentials that can't sign
+        Credentials creds = storage.getOptions().getCredentials();
+        if (creds != null && !(creds instanceof NoCredentials)) {
+            throw new UnsupportedOperationException("Presigned URLs require credentials with signing ability and are not supported with emulators such as FakeGcsServer or NoCredentials.");
+        }
+
+        // Resolve expiration
+        java.time.Duration expiresIn = request.getExpiresIn()
+            .orElse(moduleConfiguration.getDefaultPresignExpiration());
+
+        TimeUnit timeUnit = TimeUnit.SECONDS;
+        long expiresSeconds = expiresIn.getSeconds();
+
+        // Build BlobInfo for the object
+        BlobInfo.Builder blobInfoBuilder = BlobInfo.newBuilder(
+            BlobId.of(configuration.getBucket(), request.getKey())
+        );
+        // Set content type if provided and uploading
+        if (request.getOperation() == PresignRequest.Operation.UPLOAD) {
+            request.getContentType().ifPresent(blobInfoBuilder::setContentType);
+        }
+        BlobInfo blobInfo = blobInfoBuilder.build();
+
+        // Select HTTP method
+        HttpMethod httpMethod = switch (request.getOperation()) {
+            case DOWNLOAD -> HttpMethod.GET;
+            case UPLOAD -> HttpMethod.PUT;
+        };
+
+        // Create the signed URL
+        URL signedUrl = storage.signUrl(
+            blobInfo,
+            expiresSeconds,
+            timeUnit,
+            Storage.SignUrlOption.httpMethod(httpMethod)
+        );
+
+        Instant expiration = Instant.now().plusSeconds(expiresSeconds);
+
+        return new PresignResponse(
+            URI.create(signedUrl.toString()),
+            expiration
+        );
     }
 }

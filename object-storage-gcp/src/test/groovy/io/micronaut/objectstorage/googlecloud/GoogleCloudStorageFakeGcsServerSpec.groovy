@@ -31,6 +31,11 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
                     "-scheme", "http"
             ))
 
+    @Override
+    boolean supportsPresignInvalidate() {
+        return false
+    }
+
     @Factory
     @Requires(property = 'spec.name', value = SPEC_NAME)
     static class FakeGcsFactory {

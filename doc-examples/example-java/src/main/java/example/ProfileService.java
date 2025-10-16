@@ -15,6 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import io.micronaut.objectstorage.request.PresignRequest;
+import io.micronaut.objectstorage.response.PresignResponse;
+import java.time.Duration;
 
 //tag::beginclass[]
 @Singleton
@@ -64,6 +67,23 @@ public class ProfileService {
         objectStorage.delete(key); // <1>
     }
     //end::delete[]
+
+    //tag::presign[]
+    public String generateDownloadUrl(String userId, String fileName) {
+        String key = userId + "/" + fileName;
+        PresignRequest request = PresignRequest.builder(key, PresignRequest.Operation.DOWNLOAD)
+            .expiresIn(Duration.ofMinutes(15)) // <1>
+            .build();
+        PresignResponse response = objectStorage.presign(request); // <2>
+        return response.url().toString(); // <3>
+    }
+    //end::presign[]
+
+    //tag::invalidate[]
+    public void invalidatePresignedUrl(PresignResponse presignResponse) {
+        objectStorage.invalidatePresignedRequest(presignResponse); // <1>
+    }
+    //end::invalidate[]
 
 //tag::endclass[]
 }

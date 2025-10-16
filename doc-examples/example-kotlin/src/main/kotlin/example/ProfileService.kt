@@ -8,6 +8,10 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import io.micronaut.objectstorage.request.PresignRequest
+import io.micronaut.objectstorage.response.PresignResponse
+import java.time.Duration
+import java.net.URI
 
 //tag::beginclass[]
 @Singleton
@@ -44,6 +48,23 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
         objectStorage.delete(key) // <1>
     }
     //end::delete[]
+
+    //tag::presign[]
+    open fun generateDownloadUrl(userId: String, fileName: String): String {
+        val key = "$userId/$fileName"
+        val request = PresignRequest.builder(key, PresignRequest.Operation.DOWNLOAD)
+            .expiresIn(Duration.ofMinutes(15)) // <1>
+            .build()
+        val response: PresignResponse = objectStorage.presign(request) // <2>
+        return response.url().toString() // <3>
+    }
+    //end::presign[]
+
+    //tag::invalidate[]
+    open fun invalidatePresignedUrl(presignResponse: PresignResponse) {
+        objectStorage.invalidatePresignedRequest(presignResponse) // <1>
+    }
+    //end::invalidate[]
 
 //tag::endclass[]
 }

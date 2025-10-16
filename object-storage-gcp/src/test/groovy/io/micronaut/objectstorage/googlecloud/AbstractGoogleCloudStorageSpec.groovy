@@ -41,4 +41,11 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
     void cleanupSpec() {
         storage.get(BUCKET_NAME).delete()
     }
+
+    @Override
+    boolean supportsPresign() {
+        // In GCS pre-signed URLs are signed client side, not by the server, and so there's just not much to test
+        // here.
+        return false
+    }
 }

@@ -15,13 +15,18 @@
  */
 package io.micronaut.objectstorage
 
+
+import io.micronaut.objectstorage.request.PresignRequest
 import io.micronaut.objectstorage.request.UploadRequest
+import io.micronaut.objectstorage.response.PresignResponse
 import io.micronaut.objectstorage.response.UploadResponse
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.Instant
 
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
@@ -158,6 +163,100 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         ]
     }
 
+    @IgnoreIf({ !instance.supportsPresign() })
+    void 'it can generate and invalidate a presigned URL'(TestFile testFile) {
+        given: 'an uploaded object'
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        UploadRequest uploadRequest = testFile.uploadRequest
+        storage.upload(uploadRequest)
+
+        when: 'requesting a presigned URL'
+        PresignRequest presignRequest = PresignRequest.builder(uploadRequest.key, PresignRequest.Operation.DOWNLOAD).build()
+        PresignResponse presignResponse = storage.presign(presignRequest)
+
+        then: 'a valid URL and expiration are returned'
+        assert presignResponse.url
+        assert presignResponse.url.toString().startsWith('http')
+        assert presignResponse.expiration.isAfter(Instant.now())
+
+        when: 'using the presigned URL to download'
+        String downloaded
+        def url = new URL(presignResponse.url.toString())
+        downloaded = url.text
+
+        then: 'the downloaded content matches the stored object'
+        assert downloaded == TEXT
+
+        when: 'explicitly invalidating the URL'
+        if (supportsPresignInvalidate()) {
+            storage.invalidatePresignedRequest(presignResponse)
+        }
+
+        then: 'no exception is thrown'
+        noExceptionThrown()
+
+        cleanup:
+        storage.delete(uploadRequest.key)
+
+        where:
+        testFile << [
+                createTestFile(),
+                createTestFile('dir'),
+                createTestFile('dir/subdir'),
+        ]
+    }
+
+    @IgnoreIf({ !instance.supportsPresignUpload() })
+    void 'it can upload an object using a presigned URL'(TestFile testFile) {
+        given: "A presigned upload URL"
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        String newKey = "presigned-upload"
+        if (testFile.uploadRequest.key.contains("/")) {
+            String dirKey = testFile.uploadRequest.key.substring(0, testFile.uploadRequest.key.lastIndexOf('/'))
+            newKey = dirKey + "/presigned-upload"
+        }
+        PresignRequest presignRequest = PresignRequest.builder(newKey, PresignRequest.Operation.UPLOAD).build()
+        PresignResponse presignResponse = storage.presign(presignRequest)
+
+        when: "Uploading to the presigned URL"
+        def url = new URL(presignResponse.url.toString())
+        def connection = (HttpURLConnection) url.openConnection()
+        connection.setDoOutput(true)
+        connection.setRequestMethod("PUT")
+        connection.setRequestProperty("Content-Type", CONTENT_TYPE)
+        connection.setRequestProperty("x-ms-blob-type", "BlockBlob")
+        def bytes = Files.readAllBytes(testFile.path)
+        connection.setRequestProperty("Content-Length", bytes.length.toString())
+        connection.getOutputStream().withStream { os ->
+            os.write(bytes)
+        }
+        int responseCode = connection.responseCode
+        println("response is $responseCode")
+
+        then: "The upload returns a successful response"
+        assert responseCode in [200, 201, 204]
+
+        when: "Retrieving the uploaded file"
+        Optional<ObjectStorageEntry<?>> objectStorageEntry  = storage.retrieve(newKey)
+
+        then: "The content is correct"
+        assert objectStorageEntry.isPresent()
+        assert objectStorageEntry.get().inputStream.text == TEXT
+
+        cleanup:
+        if (supportsPresignInvalidate()) {
+            storage.invalidatePresignedRequest(presignResponse)
+        }
+        storage.delete(newKey)
+
+        where:
+        testFile << [
+            createTestFile(),
+            createTestFile('dir'),
+            createTestFile('dir/subdir'),
+        ]
+    }
+
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
 
     boolean emulatorSupportsMetadata() {
@@ -170,6 +269,18 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
     boolean emulatorSupportsCopy() {
         true
+    }
+
+    boolean supportsPresign() {
+        true
+    }
+
+    boolean supportsPresignInvalidate() {
+        supportsPresign()
+    }
+
+    boolean supportsPresignUpload() {
+        supportsPresign()
     }
 
     static Path createTempFile() {
