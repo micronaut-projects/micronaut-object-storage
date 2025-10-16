@@ -244,7 +244,9 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         assert objectStorageEntry.get().inputStream.text == TEXT
 
         cleanup:
-        storage.invalidatePresignedRequest(presignResponse)
+        if (supportsPresignInvalidate()) {
+            storage.invalidatePresignedRequest(presignResponse)
+        }
         storage.delete(newKey)
 
         where:
