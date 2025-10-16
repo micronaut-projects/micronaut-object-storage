@@ -51,9 +51,37 @@ loadScripts(document, 'script');</script>
 <h1 title="Deprecated API" class="title">Deprecated API</h1>
 <h2 title="Contents">Contents</h2>
 <ul>
+<li><a href="#for-removal">Terminally Deprecated</a></li>
 <li><a href="#constructor">Constructors</a></li>
 </ul>
 </div>
+<ul class="block-list">
+<li>
+<div id="for-removal">
+<div class="caption"><span>Terminally Deprecated Elements</span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Element</div>
+<div class="table-header col-last">Description</div>
+<div class="col-summary-item-name even-row-color"><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper)">io.micronaut.objectstorage.aws.AwsS3Operations<wbr>(AwsS3Configuration, S3Client, InputStreamMapper)</a></div>
+<div class="col-last even-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper,io.micronaut.context.env.Environment)"><code>AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)</code></a>.</div>
+</div>
+<div class="col-summary-item-name odd-row-color"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient)">io.micronaut.objectstorage.azure.AzureBlobStorageOperations<wbr>(BlobContainerClient)</a></div>
+<div class="col-last odd-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient,io.micronaut.objectstorage.azure.AzureBlobStorageModuleConfiguration)"><code>AzureBlobStorageOperations(BlobContainerClient, AzureBlobStorageModuleConfiguration)</code></a>.</div>
+</div>
+<div class="col-summary-item-name even-row-color"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)">io.micronaut.objectstorage.googlecloud.GoogleCloudStorageOperations<wbr>(GoogleCloudStorageConfiguration, InputStreamMapper, Storage)</a></div>
+<div class="col-last even-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)"><code>GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, GoogleCloudStorageModuleConfiguration, InputStreamMapper, Storage)</code></a>.</div>
+</div>
+<div class="col-summary-item-name odd-row-color"><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration)">io.micronaut.objectstorage.local.LocalStorageOperations<wbr>(LocalStorageConfiguration)</a></div>
+<div class="col-last odd-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration,io.micronaut.runtime.server.EmbeddedServer,io.micronaut.objectstorage.local.LocalPresignStore)"><code>LocalStorageOperations(LocalStorageConfiguration, EmbeddedServer, LocalPresignStore)</code></a>.</div>
+</div>
+</div>
+</div>
+</li>
+</ul>
 <ul class="block-list">
 <li>
 <div id="constructor">
@@ -61,9 +89,25 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-summary-item-name even-row-color"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#%3Cinit%3E(java.lang.String,com.azure.core.util.BinaryData)">io.micronaut.objectstorage.azure.AzureBlobStorageEntry<wbr>(String, BinaryData)</a></div>
+<div class="col-summary-item-name even-row-color"><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper)">io.micronaut.objectstorage.aws.AwsS3Operations<wbr>(AwsS3Configuration, S3Client, InputStreamMapper)</a></div>
 <div class="col-last even-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3Client,io.micronaut.objectstorage.InputStreamMapper,io.micronaut.context.env.Environment)"><code>AwsS3Operations(AwsS3Configuration, S3Client, InputStreamMapper, Environment)</code></a>.</div>
+</div>
+<div class="col-summary-item-name odd-row-color"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#%3Cinit%3E(java.lang.String,com.azure.core.util.BinaryData)">io.micronaut.objectstorage.azure.AzureBlobStorageEntry<wbr>(String, BinaryData)</a></div>
+<div class="col-last odd-row-color">
 <div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/azure/AzureBlobStorageEntry.html#%3Cinit%3E(java.lang.String,com.azure.core.util.BinaryData,com.azure.storage.blob.models.BlobProperties)"><code>AzureBlobStorageEntry(String, BinaryData, BlobProperties)</code></a></div>
+</div>
+<div class="col-summary-item-name even-row-color"><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient)">io.micronaut.objectstorage.azure.AzureBlobStorageOperations<wbr>(BlobContainerClient)</a></div>
+<div class="col-last even-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient,io.micronaut.objectstorage.azure.AzureBlobStorageModuleConfiguration)"><code>AzureBlobStorageOperations(BlobContainerClient, AzureBlobStorageModuleConfiguration)</code></a>.</div>
+</div>
+<div class="col-summary-item-name odd-row-color"><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)">io.micronaut.objectstorage.googlecloud.GoogleCloudStorageOperations<wbr>(GoogleCloudStorageConfiguration, InputStreamMapper, Storage)</a></div>
+<div class="col-last odd-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)"><code>GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, GoogleCloudStorageModuleConfiguration, InputStreamMapper, Storage)</code></a>.</div>
+</div>
+<div class="col-summary-item-name even-row-color"><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration)">io.micronaut.objectstorage.local.LocalStorageOperations<wbr>(LocalStorageConfiguration)</a></div>
+<div class="col-last even-row-color">
+<div class="deprecation-comment">Use <a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageConfiguration,io.micronaut.runtime.server.EmbeddedServer,io.micronaut.objectstorage.local.LocalPresignStore)"><code>LocalStorageOperations(LocalStorageConfiguration, EmbeddedServer, LocalPresignStore)</code></a>.</div>
 </div>
 <div class="col-summary-item-name odd-row-color"><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration,com.oracle.bmc.objectstorage.ObjectStorage)">io.micronaut.objectstorage.oraclecloud.OracleCloudStorageOperations<wbr>(OracleCloudStorageConfiguration, ObjectStorage)</a></div>
 <div class="col-last odd-row-color">

@@ -122,10 +122,20 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Checks whether an entry with the given key exists in the object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#invalidatePresignedRequest(io.micronaut.objectstorage.response.PresignResponse)" class="member-name-link">invalidatePresignedRequest</a><wbr>(@NonNull <a href="response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a>&nbsp;presignResponse)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Explicitly invalidates a previously generated pre-signed request.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Lists the objects that exist in the object storage.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#presign(io.micronaut.objectstorage.request.PresignRequest)" class="member-name-link">presign</a><wbr>(@NonNull <a href="request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a>&nbsp;request)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Generates a pre-authorized (signed) request for the given operation.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;E extends <a href="ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;?&gt;&gt;<br>@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;E&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
@@ -255,7 +265,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Lists the objects that exist in the object storage.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+<dd>a set of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
 <dt>Since:</dt>
 <dd>1.1.0</dd>
 </dl>
@@ -276,6 +286,41 @@ loadScripts(document, 'script');</script>
 <dd><code>destinationKey</code> - the key of the destination object</dd>
 <dt>Since:</dt>
 <dd>1.1.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="presign(io.micronaut.objectstorage.request.PresignRequest)">
+<h3>presign</h3>
+<div class="member-signature"><span class="annotations">@NonNull
+</span><span class="modifiers">default</span>&nbsp;<span class="return-type">@NonNull <a href="response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a></span>&nbsp;<span class="element-name">presign</span><wbr><span class="parameters">(@NonNull
+ @NonNull <a href="request/PresignRequest.html" title="class in io.micronaut.objectstorage.request">PresignRequest</a>&nbsp;request)</span></div>
+<div class="block">Generates a pre-authorized (signed) request for the given operation.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>request</code> - the presign request parameters</dd>
+<dt>Returns:</dt>
+<dd>information with the generated URL and its expiration</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link">UnsupportedOperationException</a></code> - if the provider does not support presigned operations</dd>
+<dt>Since:</dt>
+<dd>2.10.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="invalidatePresignedRequest(io.micronaut.objectstorage.response.PresignResponse)">
+<h3>invalidatePresignedRequest</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">invalidatePresignedRequest</span><wbr><span class="parameters">(@NonNull
+ @NonNull <a href="response/PresignResponse.html" title="class in io.micronaut.objectstorage.response">PresignResponse</a>&nbsp;presignResponse)</span></div>
+<div class="block">Explicitly invalidates a previously generated pre-signed request.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>presignResponse</code> - The response returned by <a href="#presign(io.micronaut.objectstorage.request.PresignRequest)"><code>presign(PresignRequest)</code></a>.</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link">UnsupportedOperationException</a></code> - if the provider does not support explicit invalidation</dd>
+<dt>Since:</dt>
+<dd>2.10.0</dd>
 </dl>
 </section>
 </li>
