@@ -67,8 +67,8 @@ class ProfileService {
     //end::presign[]
 
     //tag::invalidate[]
-    void invalidatePresignedUrl(String url) {
-        objectStorage.invalidatePresignedRequest(URI.create(url)) // <1>
+    void invalidatePresignedUrl(PresignResponse presignResponse) {
+        objectStorage.invalidatePresignedRequest(presignResponse) // <1>
     }
     //end::invalidate[]
 

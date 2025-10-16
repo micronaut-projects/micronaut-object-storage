@@ -18,7 +18,6 @@ import java.util.Optional;
 import io.micronaut.objectstorage.request.PresignRequest;
 import io.micronaut.objectstorage.response.PresignResponse;
 import java.time.Duration;
-import java.net.URI;
 
 //tag::beginclass[]
 @Singleton
@@ -81,8 +80,8 @@ public class ProfileService {
     //end::presign[]
 
     //tag::invalidate[]
-    public void invalidatePresignedUrl(String url) {
-        objectStorage.invalidatePresignedRequest(URI.create(url)); // <1>
+    public void invalidatePresignedUrl(PresignResponse presignResponse) {
+        objectStorage.invalidatePresignedRequest(presignResponse); // <1>
     }
     //end::invalidate[]
 

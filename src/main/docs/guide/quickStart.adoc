@@ -79,4 +79,4 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="invalidate"]
 
-<1> To proactively revoke a previously generated URL, use `invalidatePresignedRequest(URI)` of api:objectstorage.ObjectStorageOperations[]. Only a few providers support explicit invalidation (e.g Oracle); in those cases, an `UnsupportedOperationException` will be thrown and you should rely on expiration instead.
+<1> To proactively revoke a previously generated URL, use `invalidatePresignedRequest(presignResponse)` of api:objectstorage.ObjectStorageOperations[]. Only a few providers support explicit invalidation (e.g Oracle); in those other cases, an `UnsupportedOperationException` will be thrown and you should rely on expiration instead.

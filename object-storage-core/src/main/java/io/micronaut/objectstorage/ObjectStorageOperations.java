@@ -137,12 +137,12 @@ public interface ObjectStorageOperations<I, O, D> {
     /**
      * Explicitly invalidates a previously generated pre-signed request.
      *
-     * @param url The URL returned by {@link #presign(PresignRequest)}.
+     * @param presignResponse The response returned by {@link #presign(PresignRequest)}.
      * @throws UnsupportedOperationException if the provider does not support explicit invalidation
      * @since 2.10.0
      */
     @Blocking
-    default void invalidatePresignedRequest(@NonNull java.net.URI url) {
+    default void invalidatePresignedRequest(@NonNull PresignResponse presignResponse) {
         throw new UnsupportedOperationException("Presigned request invalidation is not supported by this implementation");
     }
 }

@@ -61,8 +61,8 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
     //end::presign[]
 
     //tag::invalidate[]
-    open fun invalidatePresignedUrl(url: String) {
-        objectStorage.invalidatePresignedRequest(URI.create(url)) // <1>
+    open fun invalidatePresignedUrl(presignResponse: PresignResponse) {
+        objectStorage.invalidatePresignedRequest(presignResponse) // <1>
     }
     //end::invalidate[]
 

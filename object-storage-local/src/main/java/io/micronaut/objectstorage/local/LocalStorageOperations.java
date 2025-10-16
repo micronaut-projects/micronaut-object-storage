@@ -280,8 +280,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     @Override
-    public void invalidatePresignedRequest(@NonNull java.net.URI url) {
-        String path = url.getPath();
+    public void invalidatePresignedRequest(@NonNull PresignResponse presignResponse) {
+        String path = presignResponse.url().getPath();
         int idx = path.lastIndexOf('/');
         if (idx >= 0 && idx + 1 < path.length()) {
             String token = path.substring(idx + 1);

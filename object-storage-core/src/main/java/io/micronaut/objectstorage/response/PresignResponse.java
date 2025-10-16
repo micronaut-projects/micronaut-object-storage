@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.response;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 
 import java.net.URI;
 import java.time.Instant;
@@ -27,11 +28,16 @@ import static java.util.Objects.requireNonNull;
  *
  * @param url        The fully qualified URL that clients can use to perform the operation.
  * @param expiration The instant when the URL expires.
+ * @param id         The PAR id (if any).
  *
  * @since 2.10.0
  */
-public record PresignResponse(@NonNull URI url,
-                              @NonNull Instant expiration) {
+public record PresignResponse(@NonNull URI url, @NonNull Instant expiration, @Nullable String id) {
+
+    public PresignResponse(final URI url, final Instant expiration) {
+        this(url, expiration, null);
+    }
+
     public PresignResponse {
         requireNonNull(url, "url must not be null");
         requireNonNull(expiration, "expiration must not be null");

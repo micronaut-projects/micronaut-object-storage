@@ -189,11 +189,13 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
 
         when: 'explicitly invalidating the URL'
         if (supportsPresignInvalidate()) {
-            storage.invalidatePresignedRequest(presignResponse.url)
+            storage.invalidatePresignedRequest(presignResponse)
         }
 
         then: 'no exception is thrown'
         noExceptionThrown()
+
+        cleanup:
         storage.delete(uploadRequest.key)
 
         where:
@@ -242,6 +244,7 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         assert objectStorageEntry.get().inputStream.text == TEXT
 
         cleanup:
+        storage.invalidatePresignedRequest(presignResponse)
         storage.delete(newKey)
 
         where:

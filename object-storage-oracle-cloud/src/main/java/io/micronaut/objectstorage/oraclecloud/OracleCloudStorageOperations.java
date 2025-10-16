@@ -21,6 +21,7 @@ import com.oracle.bmc.objectstorage.ObjectStorage;
 import com.oracle.bmc.objectstorage.model.CopyObjectDetails;
 import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails;
 import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails.AccessType;
+import com.oracle.bmc.objectstorage.model.PreauthenticatedRequest;
 import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest;
 import com.oracle.bmc.objectstorage.responses.CreatePreauthenticatedRequestResponse;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
@@ -256,6 +257,7 @@ public class OracleCloudStorageOperations
                 .accessType(request.getOperation() == PresignRequest.Operation.UPLOAD
                         ? AccessType.ObjectWrite
                         : AccessType.ObjectRead)
+                .bucketListingAction(PreauthenticatedRequest.BucketListingAction.ListObjects)
                 .timeExpires(java.util.Date.from(expiration))
                 .build();
 
@@ -267,25 +269,16 @@ public class OracleCloudStorageOperations
                     .build()
             );
             URI url = URI.create(response.getPreauthenticatedRequest().getFullPath());
-            return new PresignResponse(url, expiration);
+            String parId = response.getPreauthenticatedRequest().getId();
+            return new PresignResponse(url, expiration, parId);
         } catch (BmcException e) {
             throw new ObjectStorageException("Error generating a pre-authorized request in Oracle Cloud Storage", e);
         }
     }
 
     @Override
-    public void invalidatePresignedRequest(@NonNull java.net.URI url) {
-        String path = url.getPath(); // .../p/{parId}/n/{namespace}/b/...
-        int pIdx = path.indexOf("/p/");
-        if (pIdx < 0) {
-            return; // not a PAR url – nothing to do
-        }
-        int idStart = pIdx + 3;
-        int idEnd = path.indexOf('/', idStart);
-        if (idEnd == -1) {
-            idEnd = path.length();
-        }
-        String parId = path.substring(idStart, idEnd);
+    public void invalidatePresignedRequest(@NonNull PresignResponse presignResponse) {
+        String parId = presignResponse.id();
         try {
             client.deletePreauthenticatedRequest(DeletePreauthenticatedRequestRequest.builder()
                 .bucketName(configuration.getBucket())
