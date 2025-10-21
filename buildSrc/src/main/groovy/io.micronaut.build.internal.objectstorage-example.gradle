@@ -12,6 +12,10 @@ micronaut {
     testRuntime("spock2")
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation(mn.micronaut.http.client)
     implementation(projects.micronautObjectStorageAws)
@@ -31,5 +35,6 @@ dependencies {
         because("it is required by testcontainers-localstack")
     }
     testRuntimeOnly(libs.bytebuddy)
+    testRuntimeOnly(mnTest.junit.platform.suite)
     testImplementation(project(":test-suite-utils"))
 }
