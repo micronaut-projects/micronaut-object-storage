@@ -4,5 +4,4 @@ plugins {
 
 dependencies {
     annotationProcessor(mn.micronaut.http.validation)
-    testRuntimeOnly(mnTest.junit.platform.suite)
 }

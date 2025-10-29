@@ -6,5 +6,4 @@ plugins {
 
 dependencies {
     ksp(mn.micronaut.http.validation)
-    testRuntimeOnly(mnTest.junit.platform.suite)
 }
