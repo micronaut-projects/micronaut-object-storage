@@ -1,9 +1,7 @@
 plugins {
     id 'groovy'
-    id 'java-library'
     id 'io.micronaut.minimal.application'
     id "io.micronaut.build.internal.objectstorage-base"
-    id "io.micronaut.build.internal.kotlin-base"
 }
 
 micronaut {
@@ -11,10 +9,6 @@ micronaut {
     coreVersion.set(libs.versions.micronaut.asProvider())
     runtime("netty")
     testRuntime("spock2")
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -36,6 +30,5 @@ dependencies {
         because("it is required by testcontainers-localstack")
     }
     testRuntimeOnly(libs.bytebuddy)
-    testRuntimeOnly(mnTest.junit.platform.suite)
     testImplementation(project(":test-suite-utils"))
 }
