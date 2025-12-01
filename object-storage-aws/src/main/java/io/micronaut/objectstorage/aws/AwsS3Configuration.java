@@ -18,7 +18,7 @@ package io.micronaut.objectstorage.aws;
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.Introspected;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 

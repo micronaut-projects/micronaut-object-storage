@@ -16,7 +16,7 @@
 package io.micronaut.objectstorage.response;
 
 import io.micronaut.context.annotation.DefaultImplementation;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Object storage upload response.

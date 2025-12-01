@@ -16,7 +16,7 @@
 package io.micronaut.objectstorage.oraclecloud;
 
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 

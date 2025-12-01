@@ -17,8 +17,8 @@ package io.micronaut.objectstorage.azure;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.models.BlobProperties;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.InputStream;

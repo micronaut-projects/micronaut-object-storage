@@ -16,7 +16,7 @@
 package io.micronaut.objectstorage.googlecloud;
 
 import com.google.cloud.storage.Blob;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
 import java.io.ByteArrayInputStream;
