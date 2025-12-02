@@ -15,7 +15,7 @@
  */
 package io.micronaut.objectstorage;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import jakarta.inject.Singleton;
 
 import java.io.ByteArrayOutputStream;

@@ -21,7 +21,7 @@ import io.micronaut.context.condition.Condition;
 import io.micronaut.context.condition.ConditionContext;
 import io.micronaut.core.annotation.AnnotationMetadataProvider;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.Toggleable;
 import io.micronaut.inject.QualifiedBeanType;
 import io.micronaut.inject.qualifiers.Qualifiers;

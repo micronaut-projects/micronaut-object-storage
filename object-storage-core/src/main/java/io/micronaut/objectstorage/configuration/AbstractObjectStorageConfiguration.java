@@ -15,7 +15,7 @@
  */
 package io.micronaut.objectstorage.configuration;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Base class for all the cloud-specific configurations.

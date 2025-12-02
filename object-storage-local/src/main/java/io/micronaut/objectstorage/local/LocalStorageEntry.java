@@ -15,7 +15,7 @@
  */
 package io.micronaut.objectstorage.local;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageException;
 

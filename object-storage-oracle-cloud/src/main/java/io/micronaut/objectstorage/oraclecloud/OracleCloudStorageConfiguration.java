@@ -17,7 +17,7 @@ package io.micronaut.objectstorage.oraclecloud;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 

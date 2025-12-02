@@ -19,7 +19,7 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Primary;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;

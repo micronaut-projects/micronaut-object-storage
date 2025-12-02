@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.multipart.StreamingFileUpload;
 

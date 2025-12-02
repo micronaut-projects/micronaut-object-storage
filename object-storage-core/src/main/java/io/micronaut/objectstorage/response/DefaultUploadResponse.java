@@ -15,7 +15,7 @@
  */
 package io.micronaut.objectstorage.response;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Default implementation of {@link UploadResponse}.

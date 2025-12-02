@@ -15,7 +15,7 @@
  */
 package io.micronaut.objectstorage.aws;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;

@@ -15,7 +15,7 @@
  */
 package io.micronaut.objectstorage.request;
 
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.objectstorage.ObjectStorageException;

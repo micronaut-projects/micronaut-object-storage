@@ -4,7 +4,7 @@ import com.google.cloud.http.HttpTransportOptions;
 import com.google.cloud.storage.StorageOptions;
 import io.micronaut.context.event.BeanCreatedEvent;
 import io.micronaut.context.event.BeanCreatedEventListener;
-import io.micronaut.core.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 import jakarta.inject.Singleton;
 
 //tag::class[]
