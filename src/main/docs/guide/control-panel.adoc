@@ -1,0 +1,7 @@
+The Micronaut Control Panel module has support for Micronaut Object Storage by adding the following dependency:
+
+dependency:io.micronaut.controlpanel:micronaut-control-panel-object-storage[scope=developmentOnly]
+
+Check
+https://micronaut-projects.github.io/micronaut-control-panel/latest/guide/#objectStorage[the documentation] for more information
+https://micronaut-projects.github.io/micronaut-control-panel/latest/guide/#objectStorage[the documentation] for more information

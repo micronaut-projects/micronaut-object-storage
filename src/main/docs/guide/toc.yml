@@ -6,6 +6,7 @@ azure: Azure Blob Storage
 gcp: Google Cloud Storage
 oracleCloud: Oracle Cloud Infrastructure (OCI) Object Storage
 local: Local Storage
+control-panel: Control Panel
 objectStorageGuides: Guides
 breaks: Breaking Changes
 repository: Repository
