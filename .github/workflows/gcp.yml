@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ['21']
+        java: ['25']
     permissions:
       contents: 'read'
       id-token: 'write'
