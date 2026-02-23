@@ -23,7 +23,6 @@ import com.google.cloud.storage.StorageException;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
-import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
@@ -31,6 +30,7 @@ import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.Set;
@@ -156,8 +156,7 @@ public class GoogleCloudStorageOperations
      * @param uploadRequest Upload Request
      * @return BlobInfo Builder
      */
-    @NonNull
-    protected BlobInfo.Builder createBlobInfoBuilder(@NonNull UploadRequest uploadRequest) {
+    protected BlobInfo.@NonNull Builder createBlobInfoBuilder(@NonNull UploadRequest uploadRequest) {
         BlobId blobId = BlobId.of(configuration.getBucket(), uploadRequest.getKey());
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId)
             .setContentType(uploadRequest.getContentType().orElse(null));

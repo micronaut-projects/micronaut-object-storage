@@ -30,12 +30,12 @@ import com.azure.storage.blob.options.BlockBlobSimpleUploadOptions;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
-import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
+import org.jspecify.annotations.NonNull;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -122,7 +122,6 @@ public class AzureBlobStorageOperations
             .collect(Collectors.toSet());
     }
 
-    @NonNull
     @Override
     public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
         final BlobClient sourceBlobClient = blobContainerClient.getBlobClient(sourceKey);

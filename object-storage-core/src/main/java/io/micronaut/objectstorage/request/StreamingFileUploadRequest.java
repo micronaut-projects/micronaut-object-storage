@@ -15,17 +15,18 @@
  */
 package io.micronaut.objectstorage.request;
 
+import io.micronaut.http.MediaType;
+import io.micronaut.http.multipart.StreamingFileUpload;
+import org.jspecify.annotations.NonNull;
+
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-
-import org.jspecify.annotations.NonNull;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.multipart.StreamingFileUpload;
+import java.util.OptionalLong;
 
 /**
- * 
+ *
  * An {@link UploadRequest} backed by a {@link StreamingFileUpload}.
  * @since 2.7.0
  */
@@ -56,7 +57,7 @@ public class StreamingFileUploadRequest implements UploadRequest {
     @NonNull
     @Override
     public Optional<String> getContentType() {
-        return streamingFileUpload.getContentType()
+        return Optional.ofNullable(streamingFileUpload.metadata().mediaType())
             .map(MediaType::getName);
     }
 
@@ -69,7 +70,8 @@ public class StreamingFileUploadRequest implements UploadRequest {
     @NonNull
     @Override
     public Optional<Long> getContentSize() {
-        return Optional.of(streamingFileUpload.getSize());
+        OptionalLong definedSize = streamingFileUpload.getDefinedSize();
+        return definedSize.isPresent() ? Optional.of(definedSize.getAsLong()) : Optional.empty();
     }
 
     @NonNull
