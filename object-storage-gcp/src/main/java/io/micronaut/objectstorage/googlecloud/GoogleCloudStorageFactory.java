@@ -20,10 +20,10 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
-import org.jspecify.annotations.NonNull;
 import io.micronaut.gcp.GoogleCloudConfiguration;
 import io.micronaut.gcp.condition.RequiresGoogleProjectId;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Pavol Gressa
@@ -39,9 +39,8 @@ public class GoogleCloudStorageFactory {
      */
     @RequiresGoogleProjectId
     @Singleton
-    @NonNull
-    public StorageOptions.Builder builder(@NonNull GoogleCloudConfiguration configuration,
-                                          @NonNull GoogleCredentials googleCredentials) {
+    public StorageOptions.@NonNull Builder builder(@NonNull GoogleCloudConfiguration configuration,
+                                                   @NonNull GoogleCredentials googleCredentials) {
         return StorageOptions.newBuilder()
             .setProjectId(configuration.getProjectId())
             .setCredentials(googleCredentials);
@@ -54,7 +53,7 @@ public class GoogleCloudStorageFactory {
     @Requires(bean = StorageOptions.Builder.class)
     @Singleton
     @NonNull
-    public StorageOptions storageOptions(@NonNull StorageOptions.Builder builder) {
+    public StorageOptions storageOptions(StorageOptions.@NonNull Builder builder) {
         return builder.build();
     }
 
