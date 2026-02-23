@@ -18,16 +18,16 @@ package io.micronaut.objectstorage.aws;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
-import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
-import io.micronaut.objectstorage.response.UploadResponse;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.UploadResponse;
+import org.jspecify.annotations.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -197,8 +197,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
      * @param request the upload request
      * @return An AWS' {@link PutObjectRequest.Builder} from a Micronaut's {@link UploadRequest}.
      */
-    @NonNull
-    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
+    protected PutObjectRequest.@NonNull Builder getRequestBuilder(@NonNull UploadRequest request) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
             .bucket(configuration.getBucket())
             .key(request.getKey());

@@ -33,13 +33,13 @@ import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
-import org.jspecify.annotations.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,8 +202,7 @@ public class OracleCloudStorageOperations
      * @param request Upload Request
      * @return The Put Object Request Builder
      */
-    @NonNull
-    protected PutObjectRequest.Builder getRequestBuilder(@NonNull UploadRequest request) {
+    protected PutObjectRequest.@NonNull Builder getRequestBuilder(@NonNull UploadRequest request) {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
             .objectName(request.getKey())
             .bucketName(configuration.getBucket())
