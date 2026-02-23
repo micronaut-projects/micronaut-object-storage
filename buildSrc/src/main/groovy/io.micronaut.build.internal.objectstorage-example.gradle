@@ -15,7 +15,6 @@ dependencies {
     implementation(projects.micronautObjectStorageAws)
     implementation(projects.micronautObjectStorageAzure)
     implementation(projects.micronautObjectStorageGcp)
-    implementation(projects.micronautObjectStorageOracleCloud)
     testImplementation(mnTest.micronaut.test.spock)
 
     runtimeOnly(mnLogging.logback.classic)
