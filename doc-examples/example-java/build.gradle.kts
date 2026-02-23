@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     annotationProcessor(mn.micronaut.http.validation)
-    //implementation(projects.micronautObjectStorageOracleCloud)
+    implementation(projects.micronautObjectStorageOracleCloud)
 }
