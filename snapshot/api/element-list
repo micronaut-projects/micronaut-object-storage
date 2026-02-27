@@ -5,6 +5,7 @@ io.micronaut.objectstorage.configuration
 io.micronaut.objectstorage.googlecloud
 io.micronaut.objectstorage.info
 io.micronaut.objectstorage.local
+io.micronaut.objectstorage.oraclecloud
 io.micronaut.objectstorage.request
 io.micronaut.objectstorage.response
 io.micronaut.objectstorage.test

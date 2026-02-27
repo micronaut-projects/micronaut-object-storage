@@ -58,15 +58,17 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#gcp"><strong>6</strong><span>Google Cloud Storage</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#local"><strong>7</strong><span>Local Storage</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#oracleCloud"><strong>7</strong><span>Oracle Cloud Infrastructure (OCI) Object Storage</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#control-panel"><strong>8</strong><span>Control Panel</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#local"><strong>8</strong><span>Local Storage</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#objectStorageGuides"><strong>9</strong><span>Guides</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#control-panel"><strong>9</strong><span>Control Panel</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>10</strong><span>Breaking Changes</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#objectStorageGuides"><strong>10</strong><span>Guides</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>11</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>11</strong><span>Breaking Changes</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>12</strong><span>Repository</span></a></div>
                                 
                             </div>
                         </div>
@@ -109,15 +111,17 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-gcp"><a href="#gcp"><strong>6</strong><span>Google Cloud Storage</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-local"><a href="#local"><strong>7</strong><span>Local Storage</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-oracleCloud"><a href="#oracleCloud"><strong>7</strong><span>Oracle Cloud Infrastructure (OCI) Object Storage</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-control-panel"><a href="#control-panel"><strong>8</strong><span>Control Panel</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-local"><a href="#local"><strong>8</strong><span>Local Storage</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-objectStorageGuides"><a href="#objectStorageGuides"><strong>9</strong><span>Guides</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-control-panel"><a href="#control-panel"><strong>9</strong><span>Control Panel</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>10</strong><span>Breaking Changes</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-objectStorageGuides"><a href="#objectStorageGuides"><strong>10</strong><span>Guides</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>11</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>11</strong><span>Breaking Changes</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>12</strong><span>Repository</span></a></div>
         
         </div>
     </div>
@@ -127,7 +131,7 @@
         <h1>Micronaut Object Storage</h1>
         <p></p>
         <p>Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers</p>
-        <p><strong>Version:</strong> 3.0.0-SNAPSHOT </p>
+        <p><strong>Version:</strong> 3.0.0-M1 </p>
     </div>
     
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
@@ -1171,7 +1175,233 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
 </div>
 </div>
 
-<h1 id="local"><a class="anchor" href="#local"></a>7 Local Storage</h1>
+<h1 id="oracleCloud"><a class="anchor" href="#oracleCloud"></a>7 Oracle Cloud Infrastructure (OCI) Object Storage</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.0.x/src/main/docs/guide/oracleCloud.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To use <a href="https://www.oracle.com/cloud/storage/object-storage/">Oracle Cloud Infrastructure (OCI) Object Storage</a>, you need the following dependency:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-object-storage-oracle-cloud&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>Refer to the <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide">Micronaut Oracle Cloud documentation</a>
+for more information about authentication options.</p>
+</div>
+<div class="paragraph">
+<p>The object storage specific configuration options available are:</p>
+</div>
+<a id="io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration" href="#io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration">&#128279;</a>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Configuration Properties for <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageConfiguration.html">OracleCloudStorageConfiguration</a></caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.bucket</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the OCI Object Storage bucket.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.oracle-cloud.*.namespace</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">the OCI Object Storage namespace used.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="openblock">
+<div class="title"><code>src/main/resources/application-oraclecloud.yml</code></div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">oci.config.profile=DEFAULT
+micronaut.object-storage.oracle-cloud.default.bucket=profile-pictures-bucket
+micronaut.object-storage.oracle-cloud.default.namespace=MyNamespace</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">oci:
+  config:
+    profile: DEFAULT
+
+micronaut:
+  object-storage:
+    oracle-cloud:
+      default:
+        bucket: profile-pictures-bucket
+        namespace: MyNamespace</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[oci]
+  [oci.config]
+    profile="DEFAULT"
+[micronaut]
+  [micronaut.object-storage]
+    [micronaut.object-storage.oracle-cloud]
+      [micronaut.object-storage.oracle-cloud.default]
+        bucket="profile-pictures-bucket"
+        namespace="MyNamespace"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">oci {
+  config {
+    profile = "DEFAULT"
+  }
+}
+micronaut {
+  objectStorage {
+    oracleCloud {
+      'default' {
+        bucket = "profile-pictures-bucket"
+        namespace = "MyNamespace"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  oci {
+    config {
+      profile = "DEFAULT"
+    }
+  }
+  micronaut {
+    object-storage {
+      oracle-cloud {
+        default {
+          bucket = "profile-pictures-bucket"
+          namespace = "MyNamespace"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "oci": {
+    "config": {
+      "profile": "DEFAULT"
+    }
+  },
+  "micronaut": {
+    "object-storage": {
+      "oracle-cloud": {
+        "default": {
+          "bucket": "profile-pictures-bucket",
+          "namespace": "MyNamespace"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html">OracleCloudStorageOperations</a></p>
+</div>
+<div class="sect1">
+<h2 id="_advanced_configuration">Advanced configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For configuration properties other than the specified above, you can add bean to your application that implements
+<a href="https://docs.micronaut.io/latest/guide/#events"><code>BeanCreatedEventListener</code></a>. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
+@Singleton
+public class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventListener&lt;ObjectStorageClient.Builder&gt; {
+
+    public static final int CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000;
+    public static final int READ_TIMEOUT_IN_MILLISECONDS = 35000;
+
+    @Override
+    public ObjectStorageClient.Builder onCreated(@NonNull BeanCreatedEvent&lt;ObjectStorageClient.Builder&gt; event) {
+        ClientConfiguration clientConfiguration =
+            ClientConfiguration.builder()
+                .connectionTimeoutMillis(CONNECTION_TIMEOUT_IN_MILLISECONDS)
+                .readTimeoutMillis(READ_TIMEOUT_IN_MILLISECONDS)
+                .build();
+
+
+        return event.getBean()
+            .configuration(clientConfiguration);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-storage-oracle-cloud.html">Use the Micronaut Object Storage API to Store Files in Oracle Cloud Infrastructure (OCI) Object Storage</a> to learn more.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+
+<h1 id="local"><a class="anchor" href="#local"></a>8 Local Storage</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.0.x/src/main/docs/guide/local.adoc"'>
@@ -1400,7 +1630,7 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/local/LocalStorageOperations.html">LocalStorageOperations</a>.</p>
 </div>
 
-<h1 id="control-panel"><a class="anchor" href="#control-panel"></a>8 Control Panel</h1>
+<h1 id="control-panel"><a class="anchor" href="#control-panel"></a>9 Control Panel</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.0.x/src/main/docs/guide/control-panel.adoc"'>
@@ -1436,7 +1666,7 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <a href="https://micronaut-projects.github.io/micronaut-control-panel/latest/guide/#objectStorage">the documentation</a> for more information</p>
 </div>
 
-<h1 id="objectStorageGuides"><a class="anchor" href="#objectStorageGuides"></a>9 Guides</h1>
+<h1 id="objectStorageGuides"><a class="anchor" href="#objectStorageGuides"></a>10 Guides</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.0.x/src/main/docs/guide/objectStorageGuides.adoc"'>
@@ -1452,7 +1682,7 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <p><a href="https://guides.micronaut.io/latest/tag-object_storage.html" class="bare">https://guides.micronaut.io/latest/tag-object_storage.html</a></p>
 </div>
 
-<h1 id="breaks"><a class="anchor" href="#breaks"></a>10 Breaking Changes</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>11 Breaking Changes</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.0.x/src/main/docs/guide/breaks.adoc"'>
@@ -1483,7 +1713,7 @@ Use <code>AzureBlobStorageEntry(String, BinaryData, BlobProperties)</code> inste
 </div>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>11 Repository</h1>
+<h1 id="repository"><a class="anchor" href="#repository"></a>12 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.0.x/src/main/docs/guide/repository.adoc"'>
