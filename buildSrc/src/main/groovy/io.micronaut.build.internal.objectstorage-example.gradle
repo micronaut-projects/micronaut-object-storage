@@ -29,6 +29,7 @@ dependencies {
         because("it is required by testcontainers-localstack")
     }
     testRuntimeOnly(libs.bytebuddy)
+    testImplementation(mnTest.micronaut.test.spock)
     testImplementation(project(":test-suite-utils"))
 
     testImplementation(mnTest.junit.platform.launcher)

@@ -13,6 +13,7 @@ dependencies {
     implementation(mn.micronaut.inject.groovy)
     implementation(mn.micronaut.context)
     implementation(mnTest.micronaut.test.spock)
+    testRuntimeOnly(mn.micronaut.jackson.databind)
 }
 
 repositories {
