@@ -11,7 +11,7 @@ micronaut-validation = "5.0.0-M1"
 micronaut-logging = "2.0.0-M2"
 
 gcp-libraries = '26.78.0'
-bytebuddy = '1.17.8'
+bytebuddy = '1.18.7'
 
 # Gradle plugins
 micronaut-gradle-plugin = "4.6.2"
