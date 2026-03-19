@@ -284,9 +284,6 @@ public class AwsS3Operations implements ObjectStorageOperations<
         if (response.nextContinuationToken() == null || response.nextContinuationToken().isEmpty()) {
             return null;
         }
-        if (request.getPrefix().isEmpty() && requestedContinuationToken != null && !requestedContinuationToken.isEmpty()) {
-            return requestedContinuationToken;
-        }
         String rawToken = response.nextContinuationToken();
         return CONTINUATION_TOKEN_PREFIX + Base64.getUrlEncoder().withoutPadding().encodeToString(rawToken.getBytes(StandardCharsets.UTF_8));
     }
