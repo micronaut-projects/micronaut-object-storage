@@ -28,6 +28,7 @@ import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -138,9 +139,14 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         int pageSize = request.getPageSize();
         TreeSet<String> candidates = new TreeSet<>();
         String[] maximumMatchingKey = new String[1];
+        final int maxCandidates = (pageSize == Integer.MAX_VALUE) ? Integer.MAX_VALUE : pageSize + 1;
         try (Stream<Path> stream = Files.find(configuration.getPath(), Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile())) {
             stream.forEach(path -> {
-                String key = configuration.getPath().relativize(path).toString();
+                Path relativePath = configuration.getPath().relativize(path);
+                String key = relativePath.toString();
+                if (File.separatorChar != '/') {
+                    key = key.replace(File.separatorChar, '/');
+                }
                 if (key.startsWith(METADATA_DIRECTORY)) {
                     return;
                 }
@@ -154,7 +160,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                     return;
                 }
                 candidates.add(key);
-                if (candidates.size() > pageSize + 1) {
+                if (candidates.size() > maxCandidates) {
                     candidates.pollLast();
                 }
             });
