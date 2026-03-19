@@ -35,6 +35,18 @@ micronaut:
 
 You then need to use `@Named("pictures")` or `@Named("logos")` to specify which of the object storages you want to use.
 
+When you also use the metadata-aware storage bean, keep the same qualifier on both injections so the storage and its
+metadata view stay paired.
+
+snippet::example.MetadataProfileService[project-base="doc-examples/example", source="main", indent="0", tags="beginclass,endclass"]
+
+The example below injects the `@Named("pictures")` metadata-aware storage and the matching metadata query bean.
+It is an executable example, backed by the example module's test fixture, that demonstrates qualifier pairing,
+metadata-aware upload invocation, prefix query usage, and hook observation semantics.
+It is not meant to prove the full JDBC/outbox runtime path.
+
+snippet::example.MetadataProfileService[project-base="doc-examples/example", source="main", indent="0", tags="upload,prefix,hook"]
+
 == Uploading files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="upload"]

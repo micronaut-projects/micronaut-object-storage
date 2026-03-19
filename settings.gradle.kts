@@ -24,6 +24,7 @@ include("object-storage-azure")
 include("object-storage-gcp")
 include("object-storage-oracle-cloud")
 include("object-storage-local")
+include("object-storage-metadata-jdbc")
 
 include("doc-examples:example-java")
 include("doc-examples:example-groovy")
@@ -36,6 +37,8 @@ configure<MicronautBuildSettingsExtension> {
     importMicronautCatalog("micronaut-azure")
     importMicronautCatalog("micronaut-gcp")
     importMicronautCatalog("micronaut-oracle-cloud")
+    importMicronautCatalog("micronaut-data")
+    importMicronautCatalog("micronaut-sql")
     importMicronautCatalog("micronaut-test-resources")
     importMicronautCatalog("micronaut-validation")
 }

@@ -12,6 +12,8 @@ micronaut-logging = "2.0.0-M2"
 
 gcp-libraries = '26.78.0'
 bytebuddy = '1.17.8'
+testcontainers = '1.21.3'
+postgresql = '42.7.8'
 
 # Gradle plugins
 micronaut-gradle-plugin = "4.6.2"
@@ -40,6 +42,10 @@ gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
 # Oracle Cloud
 micronaut-oracle-cloud = { module = 'io.micronaut.oraclecloud:micronaut-oraclecloud-bom', version.ref = 'micronaut-oracle-cloud' }
 
+# Data
+micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version = "4.13.6" }
+micronaut-sql = { module = "io.micronaut.sql:micronaut-sql-bom", version = "6.1.0" }
+
 # Others
 micronaut-test-resources = { module = "io.micronaut.testresources:micronaut-test-resources-bom", version.ref = "micronaut-test-resources" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
@@ -51,3 +57,8 @@ bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }
 gradle-kotlin = { module = 'org.jetbrains.kotlin:kotlin-gradle-plugin', version.ref = 'kotlin-gradle-plugin' }
 gradle-kotlin-ksp = { module = 'com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin', version.ref = 'kotlin-gradle-ksp-plugin' }
+
+ojdbc11 = { module = "com.oracle.database.jdbc:ojdbc11", version = "23.8.0.25.04" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+testcontainers-oracle-free = { module = "org.testcontainers:oracle-free", version = "1.21.3" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }

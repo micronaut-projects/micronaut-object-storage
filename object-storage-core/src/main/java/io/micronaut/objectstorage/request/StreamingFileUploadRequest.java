@@ -77,7 +77,7 @@ public class StreamingFileUploadRequest implements UploadRequest {
     @NonNull
     @Override
     public InputStream getInputStream() {
-    	return streamingFileUpload.asInputStream();
+        return streamingFileUpload.asInputStream();
     }
 
     @Override

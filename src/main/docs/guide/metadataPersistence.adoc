@@ -1,0 +1,94 @@
+= Metadata persistence
+
+Micronaut Object Storage can persist container and object metadata in JDBC-backed storage through the `micronaut-object-storage-metadata-jdbc` module.
+
+Add the dependency to your application:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-metadata-jdbc[]
+
+The module contributes `ObjectStorageMetadataJdbcConfiguration` under the `micronaut.object-storage.metadata.jdbc` prefix.
+Use it to configure the JDBC-backed metadata store, outbox processing, and hook behavior.
+
+== Configuration
+
+The metadata store is configured with regular Micronaut property binding. The exact schema and repository behavior depend on the chosen database, but the feature set is the same across supported JDBC backends.
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.metadata.jdbc.ObjectStorageMetadataJdbcConfiguration.adoc[]
+
+== Named storage behavior
+
+Metadata-aware workflows keep the existing named storage model intact.
+If you already inject storages with `@Named("pictures")` or `@Named("logos")`, the metadata-aware bean follows the same qualifier.
+That means the storage selection and the metadata store stay aligned.
+
+The executable example in the docs is backed by the example module's test fixture, so it shows the qualifier pairing and metadata flow in a small, test-backed setup.
+It is illustrative, not a proof of the full JDBC/outbox runtime path.
+What it does show is the same qualifier used for the metadata-aware upload bean, the metadata query bean, and the descriptor for that named storage.
+That keeps the cloud upload target, descriptor, and metadata queries in sync for the selected named storage.
+
+== Query API usage
+
+The public query API is tenant scoped and descriptor aware.
+Use it to query by exact key, by prefix, or by container, depending on the lookup you need.
+The current contract supports exact object lookups, prefix queries, container reads, and tenant-scoped reads.
+
+Public reads only expose reconciled metadata.
+Pending, processing, failed, and dead-letter rows stay hidden until reconciliation marks them visible.
+That is intentional, because the foreground upload path is eventual-consistency based.
+
+== Hook lifecycle
+
+Hooks run around the metadata-aware foreground workflow in a fixed order.
+The lifecycle is:
+
+. `before`, before the delegate upload starts
+. delegate upload, which writes to the object store
+. durable metadata enqueue
+. `after`, after reconciliation persists the final metadata state
+. `error`, if the foreground path fails after delegate success, or if reconciliation later fails and the outbox entry is retried/dead-lettered
+
+In the example fixture, the hook observation is exercised through the test harness, which checks the `before` state around the first upload.
+That illustrates hook timing without claiming the snippet stands in for full production persistence plumbing.
+
+Hooks receive the operation context, not provider-specific builders.
+That keeps the contract portable and avoids tying hook logic to one cloud SDK.
+
+Hooks can observe whether container metadata already exists before upload.
+That makes it possible to prepare containers once, react to first upload, or detect repeated uploads without guessing from storage-only state.
+
+== Tenant resolver expectations
+
+The metadata query and workflow beans expect a tenant resolver to be available.
+Tenant resolution happens centrally, so callers do not pass tenant ids on each query method.
+Applications should provide a resolver that matches their request model, whether that comes from the current authentication context, headers, or another application-specific source.
+
+If no tenant can be resolved, the metadata-aware workflow cannot safely scope reads and writes.
+
+== Eventual-consistency semantics
+
+The foreground upload, delete, and copy flows do not make metadata visible immediately.
+They enqueue durable work first, then reconciliation publishes the final metadata state.
+
+This means:
+
+- upload success does not imply immediate query visibility
+- hooks may observe the container state before metadata becomes visible
+- query results reflect the reconciled state, not the just-written foreground intent
+
+That delay is expected, and tests should wait for reconciliation when they need to observe visible metadata.
+
+== Oracle-first notes
+
+Oracle is a first-class validation target for the metadata JDBC module.
+The shipped Oracle schema covers the supported metadata workflow, including the outbox tables needed for reconciliation.
+
+The module does not generate Oracle policies automatically.
+If you need Oracle VPD or RAS rules, define them separately in your application or database setup.
+
+== Portability boundary
+
+The metadata layer stays portable as long as you stay within the documented query and workflow contract.
+Supported behavior includes logical containers, exact and prefix object queries, container reads, tenant-scoped reads, and eventual-consistency publishing through reconciliation.
+
+The portability boundary stops at provider-specific storage behavior and database-specific DDL details.
+Do not expect automatic Oracle policy creation, provider-native query extensions, or direct access to vendor SDK request builders from metadata hooks.
