@@ -52,7 +52,6 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 import java.util.Collections;
 import java.util.Base64;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -207,10 +206,9 @@ public class AwsS3Operations implements ObjectStorageOperations<
             decodedToken.rawContinuationToken().ifPresent(builder::continuationToken);
 
             ListObjectsV2Response response = s3Client.listObjectsV2(builder.build());
-            List<String> keys = response.contents().stream().map(S3Object::key).toList();
             return new ListObjectsResponse(
-                keys,
-                encodeContinuationToken(request, response, keys)
+                response.contents().stream().map(S3Object::key).toList(),
+                encodeContinuationToken(response)
             );
         } catch (NoSuchBucketException e) {
             return new ListObjectsResponse(Collections.emptyList());
@@ -284,31 +282,15 @@ public class AwsS3Operations implements ObjectStorageOperations<
         }
         String encodedToken = continuationToken.substring(CONTINUATION_TOKEN_PREFIX.length());
         String decodedToken = new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8);
-        String[] parts = decodedToken.split("\\n", -1);
-        if (parts.length != 4) {
-            throw new ObjectStorageException("Invalid AWS S3 continuation token");
-        }
-        String expectedPageSize = Integer.toString(request.getPageSize());
-        String expectedPrefix = request.getPrefix().orElse("");
-        if (!expectedPageSize.equals(parts[0]) || !expectedPrefix.equals(parts[1])) {
-            throw new ObjectStorageException("AWS S3 continuation token does not match the current request");
-        }
-        return new DecodedContinuationToken(Optional.of(parts[3]));
+        return new DecodedContinuationToken(Optional.of(decodedToken));
     }
 
-    private String encodeContinuationToken(ListObjectsRequest request,
-                                           ListObjectsV2Response response,
-                                           List<String> keys) {
+    private String encodeContinuationToken(ListObjectsV2Response response) {
         if (response.nextContinuationToken() == null || response.nextContinuationToken().isEmpty()) {
             return null;
         }
-        String prefix = request.getPrefix().orElse("");
-        String lastKey = keys.isEmpty() ? "" : keys.get(keys.size() - 1);
-        String payload = request.getPageSize()
-            + "\n" + prefix
-            + "\n" + lastKey
-            + "\n" + response.nextContinuationToken();
-        return CONTINUATION_TOKEN_PREFIX + Base64.getUrlEncoder().withoutPadding().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
+        return CONTINUATION_TOKEN_PREFIX + Base64.getUrlEncoder().withoutPadding()
+            .encodeToString(response.nextContinuationToken().getBytes(StandardCharsets.UTF_8));
     }
 
     private record DecodedContinuationToken(Optional<String> rawContinuationToken) {
