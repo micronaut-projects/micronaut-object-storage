@@ -50,10 +50,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.util.Collections;
+import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -68,6 +70,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
     PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private static final int LEGACY_LIST_PAGE_SIZE = 1_000;
+    private static final String CONTINUATION_TOKEN_PREFIX = "aws-s3:v1:";
 
     private final S3Client s3Client;
     private final AwsS3Configuration configuration;
@@ -194,16 +197,17 @@ public class AwsS3Operations implements ObjectStorageOperations<
     public ListObjectsResponse listObjects(@NonNull ListObjectsRequest request) {
         String bucket = configuration.getBucket();
         try {
+            String stableContinuationToken = request.getContinuationToken().orElse(null);
             ListObjectsV2Request.Builder builder = ListObjectsV2Request.builder()
                 .bucket(bucket)
                 .maxKeys(request.getPageSize());
             request.getPrefix().ifPresent(builder::prefix);
-            request.getContinuationToken().ifPresent(builder::continuationToken);
+            decodeRawContinuationToken(stableContinuationToken).ifPresent(builder::continuationToken);
 
             ListObjectsV2Response response = s3Client.listObjectsV2(builder.build());
             return new ListObjectsResponse(
                 response.contents().stream().map(S3Object::key).toList(),
-                response.nextContinuationToken()
+                encodeContinuationToken(request, response, stableContinuationToken)
             );
         } catch (NoSuchBucketException e) {
             return new ListObjectsResponse(Collections.emptyList());
@@ -261,5 +265,29 @@ public class AwsS3Operations implements ObjectStorageOperations<
             byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
             return RequestBody.fromBytes(inputBytes);
         }
+    }
+
+    private Optional<String> decodeRawContinuationToken(String continuationToken) {
+        if (continuationToken == null || continuationToken.isEmpty()) {
+            return Optional.empty();
+        }
+        if (!continuationToken.startsWith(CONTINUATION_TOKEN_PREFIX)) {
+            return Optional.of(continuationToken);
+        }
+        String encodedToken = continuationToken.substring(CONTINUATION_TOKEN_PREFIX.length());
+        return Optional.of(new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8));
+    }
+
+    private String encodeContinuationToken(ListObjectsRequest request,
+                                           ListObjectsV2Response response,
+                                           String requestedContinuationToken) {
+        if (response.nextContinuationToken() == null || response.nextContinuationToken().isEmpty()) {
+            return null;
+        }
+        if (request.getPrefix().isEmpty() && requestedContinuationToken != null && !requestedContinuationToken.isEmpty()) {
+            return requestedContinuationToken;
+        }
+        String rawToken = response.nextContinuationToken();
+        return CONTINUATION_TOKEN_PREFIX + Base64.getUrlEncoder().withoutPadding().encodeToString(rawToken.getBytes(StandardCharsets.UTF_8));
     }
 }

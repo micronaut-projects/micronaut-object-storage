@@ -70,4 +70,33 @@ class AwsS3PaginationSpec extends AbstractAwsS3Spec implements TestPropertyProvi
             awsS3Bucket.delete(it)
         }
     }
+
+    void 'replaying the first AWS page returns the same Micronaut continuation token'() {
+        given:
+        List<String> keys = [
+                'animals/cat.txt',
+                'animals/dog.txt',
+                'animals/mammals/fox.txt',
+                'plants/oak.txt',
+                'plants/pine.txt',
+        ]
+        keys.each { awsS3Bucket.upload(UploadRequest.fromBytes(TEXT.bytes, it, CONTENT_TYPE)) }
+        ListObjectsRequest request = new ListObjectsRequest(2)
+
+        when:
+        def firstPage = awsS3Bucket.listObjects(request)
+        def replayedFirstPage = awsS3Bucket.listObjects(request)
+        def secondPage = awsS3Bucket.listObjects(new ListObjectsRequest(2, null, firstPage.continuationToken.orElse(null)))
+
+        then:
+        firstPage.keys == ['animals/cat.txt', 'animals/dog.txt']
+        replayedFirstPage.keys == firstPage.keys
+        replayedFirstPage.continuationToken == firstPage.continuationToken
+        secondPage.keys == ['animals/mammals/fox.txt', 'plants/oak.txt']
+
+        cleanup:
+        keys.each {
+            awsS3Bucket.delete(it)
+        }
+    }
 }
