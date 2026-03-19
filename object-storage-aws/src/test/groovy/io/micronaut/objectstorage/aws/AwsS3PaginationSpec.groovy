@@ -99,4 +99,29 @@ class AwsS3PaginationSpec extends AbstractAwsS3Spec implements TestPropertyProvi
             awsS3Bucket.delete(it)
         }
     }
+
+    void 'AWS continuation token is scoped to the original request'() {
+        given:
+        List<String> keys = [
+                'animals/cat.txt',
+                'animals/dog.txt',
+                'animals/mammals/fox.txt',
+                'plants/oak.txt',
+                'plants/pine.txt',
+        ]
+        keys.each { awsS3Bucket.upload(UploadRequest.fromBytes(TEXT.bytes, it, CONTENT_TYPE)) }
+        def firstPage = awsS3Bucket.listObjects(new ListObjectsRequest(2, 'animals/'))
+
+        when:
+        awsS3Bucket.listObjects(new ListObjectsRequest(3, 'plants/', firstPage.continuationToken.orElse(null)))
+
+        then:
+        def e = thrown(Exception)
+        e.message == 'AWS S3 continuation token does not match the current request'
+
+        cleanup:
+        keys.each {
+            awsS3Bucket.delete(it)
+        }
+    }
 }
