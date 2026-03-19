@@ -2,7 +2,9 @@ package example;
 
 import io.micronaut.objectstorage.ObjectStorageEntry;
 import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
@@ -64,6 +66,23 @@ public class ProfileService {
         objectStorage.delete(key); // <1>
     }
     //end::delete[]
+
+    //tag::paginated-listing[]
+    public void listProfilePicturesByPage(String userId) {
+        String prefix = userId + "/"; // raw prefix filtering
+        String continuation = null;
+        do {
+            ListObjectsRequest request = new ListObjectsRequest(2, prefix, continuation); // page size 2
+            ListObjectsResponse response = objectStorage.listObjects(request); // <1>
+
+            // Process the keys in this page
+            response.getKeys().forEach(key -> System.out.println("Found: " + key));
+
+            // Replay the continuation token returned by the provider for the next page
+            continuation = response.getContinuationToken().orElse(null); // explicit continuation-token replay
+        } while (continuation != null);
+    }
+    //end::paginated-listing[]
 
 //tag::endclass[]
 }

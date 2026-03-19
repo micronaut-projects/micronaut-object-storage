@@ -65,3 +65,21 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="delete"]
 
 <1> The delete operation returns the cloud vendor-specific delete response object in case you need it.
+
+== Listing objects page by page
+
+The frozen listing API exposes ObjectStorageOperations#listObjects(ListObjectsRequest) which returns a
+ListObjectsResponse containing the ordered keys for the current page and an opaque continuation token for the next page.
+The request accepts a raw prefix for simple starts-with filtering and normalizes empty strings to absent. The examples below
+show how to iterate pages by replaying the continuation token returned by each response. Providers do not promise global
+ordering across all keys, so the safe pattern is: use a small deterministic page size, filter by a raw prefix such as
+userId + "/", and repeat requests while replaying the continuation token until the response omits it.
+
+NOTE: the examples intentionally keep the code provider-agnostic and rely only on ObjectStorageOperations API.
+
+snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="paginated-listing"]
+
+<1> Build a ListObjectsRequest with the desired page size, an optional raw prefix like userId + "/", and the last seen
+    continuation token (null for the first page).
+<2> Call ObjectStorageOperations#listObjects(ListObjectsRequest) and process the returned keys.
+<3> Replay the continuation token returned by the response for the next page until it is absent.

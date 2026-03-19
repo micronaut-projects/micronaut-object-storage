@@ -5,14 +5,12 @@ import io.micronaut.test.support.TestPropertyProvider
 import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
-import spock.lang.IgnoreIf
 import spock.lang.Shared
 
-import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3
 import static io.micronaut.objectstorage.test.ObjectStorageTestConstants.LOCAL_STACK_DOCKER_IMAGE
+import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3
 
 @MicronautTest(startApplication = false)
-@IgnoreIf({ env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY && env.AWS_REGION })
 class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPropertyProvider {
 
     @Shared

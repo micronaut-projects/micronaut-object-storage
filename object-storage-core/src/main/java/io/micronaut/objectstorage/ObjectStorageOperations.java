@@ -17,10 +17,13 @@ package io.micronaut.objectstorage;
 
 import io.micronaut.core.annotation.Blocking;
 import org.jspecify.annotations.NonNull;
+import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -104,6 +107,37 @@ public interface ObjectStorageOperations<I, O, D> {
     @NonNull
     default Set<String> listObjects() {
         return Collections.emptySet();
+    }
+
+    /**
+     * Lists a page of objects that exist in the object storage.
+     *
+     * @param request the paginated listing request
+     * @return the ordered keys in the current page and an optional continuation token for the next page
+     * @since 3.0.0
+     */
+    @Blocking
+    @NonNull
+    default ListObjectsResponse listObjects(@NonNull ListObjectsRequest request) {
+        List<String> filtered = listObjects().stream()
+            .filter(key -> request.getPrefix().map(key::startsWith).orElse(true))
+            .sorted()
+            .toList();
+
+        int startIndex = request.getContinuationToken()
+            .map(token -> {
+                int index = Collections.binarySearch(filtered, token);
+                return index >= 0 ? index + 1 : -index - 1;
+            })
+            .orElse(0);
+        if (startIndex >= filtered.size()) {
+            return new ListObjectsResponse(Collections.emptyList());
+        }
+
+        int endIndex = Math.min(startIndex + request.getPageSize(), filtered.size());
+        List<String> page = filtered.subList(startIndex, endIndex);
+        String nextContinuationToken = endIndex < filtered.size() ? page.get(page.size() - 1) : null;
+        return new ListObjectsResponse(page, nextContinuationToken);
     }
 
     /**

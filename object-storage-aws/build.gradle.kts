@@ -21,3 +21,9 @@ dependencies {
     testImplementation(project(":test-suite-utils"))
 
 }
+
+micronautBuild {
+    binaryCompatibility {
+        enabledAfter("3.0.0")
+    }
+}

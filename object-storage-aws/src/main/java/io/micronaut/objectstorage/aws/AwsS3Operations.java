@@ -25,7 +25,9 @@ import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
+import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -39,7 +41,8 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -47,10 +50,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -63,6 +66,8 @@ import java.util.stream.Collectors;
 @Requires(beans = AwsS3Configuration.class)
 public class AwsS3Operations implements ObjectStorageOperations<
     PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
+
+    private static final int LEGACY_LIST_PAGE_SIZE = 1_000;
 
     private final S3Client s3Client;
     private final AwsS3Configuration configuration;
@@ -165,13 +170,43 @@ public class AwsS3Operations implements ObjectStorageOperations<
     @Override
     public Set<String> listObjects() {
         String bucket = configuration.getBucket();
+        ListObjectsRequest request = new ListObjectsRequest(LEGACY_LIST_PAGE_SIZE);
+        LinkedHashSet<String> keys = new LinkedHashSet<>();
         try {
-            ListObjectsResponse response = s3Client.listObjects(b -> b.bucket(bucket));
-            return response.contents().stream()
-                .map(S3Object::key)
-                .collect(Collectors.toSet());
+            String continuationToken;
+            do {
+                ListObjectsResponse response = listObjects(request);
+                keys.addAll(response.getKeys());
+                continuationToken = response.getContinuationToken().orElse(null);
+                request = new ListObjectsRequest(LEGACY_LIST_PAGE_SIZE, null, continuationToken);
+            } while (continuationToken != null);
+            return keys;
         } catch (NoSuchBucketException e) {
             return Collections.emptySet();
+        } catch (AwsServiceException | SdkClientException e) {
+            String msg = String.format("Error when listing the objects of the bucket [%s] in Amazon S3", bucket);
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    @NonNull
+    public ListObjectsResponse listObjects(@NonNull ListObjectsRequest request) {
+        String bucket = configuration.getBucket();
+        try {
+            ListObjectsV2Request.Builder builder = ListObjectsV2Request.builder()
+                .bucket(bucket)
+                .maxKeys(request.getPageSize());
+            request.getPrefix().ifPresent(builder::prefix);
+            request.getContinuationToken().ifPresent(builder::continuationToken);
+
+            ListObjectsV2Response response = s3Client.listObjectsV2(builder.build());
+            return new ListObjectsResponse(
+                response.contents().stream().map(S3Object::key).toList(),
+                response.nextContinuationToken()
+            );
+        } catch (NoSuchBucketException e) {
+            return new ListObjectsResponse(Collections.emptyList());
         } catch (AwsServiceException | SdkClientException e) {
             String msg = String.format("Error when listing the objects of the bucket [%s] in Amazon S3", bucket);
             throw new ObjectStorageException(msg, e);

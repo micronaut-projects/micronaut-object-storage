@@ -15,7 +15,9 @@
  */
 package io.micronaut.objectstorage
 
+import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
+import io.micronaut.objectstorage.response.ListObjectsResponse
 import io.micronaut.objectstorage.response.UploadResponse
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
@@ -29,6 +31,13 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     public static final String NEW_TEXT = 'object-storage'
     public static final Map<String, String> METADATA = [project: "micronaut-object-storage"]
     public static final String CONTENT_TYPE = "text/plain"
+    private static final List<String> PAGINATED_LISTING_KEYS = [
+            'animals/cat.txt',
+            'animals/dog.txt',
+            'animals/mammals/fox.txt',
+            'plants/oak.txt',
+            'plants/pine.txt',
+    ]
 
     void 'it can upload, get and delete object from file'(TestFile testFile) {
         given: 'a temporary file'
@@ -158,6 +167,53 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         ]
     }
 
+    void 'it can list objects with portable pagination semantics'() {
+        given:
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        List<TestFile> testFiles = PAGINATED_LISTING_KEYS.collect { key ->
+            createTestFileForKey(key)
+        }
+        testFiles.each { storage.upload(it.uploadRequest) }
+
+        when: 'listing the full dataset across sequential pages'
+        ListObjectsRequest firstPageRequest = new ListObjectsRequest(2)
+        ListObjectsResponse firstPage = storage.listObjects(firstPageRequest)
+        ListObjectsResponse replayedFirstPage = storage.listObjects(firstPageRequest)
+        List<ListObjectsResponse> pages = collectPages(storage, firstPageRequest)
+        List<String> combinedKeys = pages.collectMany { it.keys }
+
+        then: 'pages stay bounded, replay is stable, and sequential union is complete without adjacent duplicates'
+        pages
+        pages.every { it.keys.size() <= firstPageRequest.pageSize }
+        replayedFirstPage.keys == firstPage.keys
+        replayedFirstPage.continuationToken == firstPage.continuationToken
+        pages.first().keys == firstPage.keys
+        pages.first().continuationToken == firstPage.continuationToken
+        pages.dropRight(1).every { it.keys }
+        adjacentPages(pages).every { pair -> !pair[0].keys.intersect(pair[1].keys) }
+        combinedKeys.toSet() == PAGINATED_LISTING_KEYS.toSet()
+        combinedKeys.size() == PAGINATED_LISTING_KEYS.size()
+        !pages.last().continuationToken.present
+
+        when: 'listing only the animals prefix'
+        ListObjectsRequest animalsRequest = new ListObjectsRequest(2, 'animals/')
+        List<ListObjectsResponse> animalPages = collectPages(storage, animalsRequest)
+        List<String> animalKeys = animalPages.collectMany { it.keys }
+
+        then: 'prefix filtering remains portable and excludes non-matching keys'
+        animalPages
+        animalPages.every { it.keys.size() <= animalsRequest.pageSize }
+        animalKeys.every { it.startsWith('animals/') }
+        animalKeys.toSet() == PAGINATED_LISTING_KEYS.findAll { it.startsWith('animals/') }.toSet()
+        animalKeys.size() == PAGINATED_LISTING_KEYS.count { it.startsWith('animals/') }
+        animalPages.dropRight(1).every { it.keys }
+        adjacentPages(animalPages).every { pair -> !pair[0].keys.intersect(pair[1].keys) }
+        !animalPages.last().continuationToken.present
+
+        cleanup:
+        testFiles.each { storage.delete(it.uploadRequest.key) }
+    }
+
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
 
     boolean emulatorSupportsMetadata() {
@@ -187,6 +243,31 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
             uploadRequest = UploadRequest.fromPath(path)
         }
         return new TestFile(path: path, uploadRequest: uploadRequest)
+    }
+
+    static TestFile createTestFileForKey(String key) {
+        Path path = createTempFile()
+        return new TestFile(path: path, uploadRequest: UploadRequest.fromBytes(TEXT.bytes, key, CONTENT_TYPE))
+    }
+
+    private static List<ListObjectsResponse> collectPages(ObjectStorageOperations<?, ?, ?> storage, ListObjectsRequest request) {
+        List<ListObjectsResponse> pages = []
+        ListObjectsRequest currentRequest = request
+        while (true) {
+            ListObjectsResponse page = storage.listObjects(currentRequest)
+            pages << page
+            Optional<String> continuationToken = page.continuationToken
+            if (!continuationToken.present) {
+                return pages
+            }
+            currentRequest = new ListObjectsRequest(request.pageSize, request.prefix.orElse(null), continuationToken.get())
+        }
+    }
+
+    private static List<List<ListObjectsResponse>> adjacentPages(List<ListObjectsResponse> pages) {
+        (0..<Math.max(pages.size() - 1, 0)).collect { index ->
+            [pages[index], pages[index + 1]]
+        }
     }
 
     static class TestFile {

@@ -2,7 +2,9 @@ package example
 
 import io.micronaut.objectstorage.ObjectStorageEntry
 import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
+import io.micronaut.objectstorage.response.ListObjectsResponse
 import jakarta.inject.Singleton
 import java.io.File
 import java.nio.file.Files
@@ -44,6 +46,23 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
         objectStorage.delete(key) // <1>
     }
     //end::delete[]
+
+    //tag::paginated-listing[]
+    open fun listProfilePicturesByPage(userId: String) {
+        val prefix = "$userId/" // raw prefix filtering
+        var continuation: String? = null
+        do {
+            val request = ListObjectsRequest(2, prefix, continuation) // page size 2
+            val response: ListObjectsResponse = objectStorage.listObjects(request) // <1>
+
+            // Process the keys in this page
+            response.keys.forEach { key -> println("Found: $key") }
+
+            // Replay the continuation token returned by the provider for the next page
+            continuation = response.continuationToken.orElse(null) // explicit continuation-token replay
+        } while (continuation != null)
+    }
+    //end::paginated-listing[]
 
 //tag::endclass[]
 }

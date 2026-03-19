@@ -14,3 +14,9 @@ dependencies {
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(mnTestResources.testcontainers.core)
 }
+
+micronautBuild {
+    binaryCompatibility {
+        enabledAfter("3.0.0")
+    }
+}
