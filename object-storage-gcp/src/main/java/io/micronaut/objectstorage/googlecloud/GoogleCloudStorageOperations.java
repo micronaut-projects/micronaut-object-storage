@@ -20,6 +20,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
+import com.google.api.gax.paging.Page;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
@@ -53,7 +54,7 @@ import java.util.function.Consumer;
 public class GoogleCloudStorageOperations
     implements ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> {
 
-    private static final int LEGACY_LIST_PAGE_SIZE = 1000;
+    private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
@@ -139,7 +140,7 @@ public class GoogleCloudStorageOperations
         try {
             String continuationToken = null;
             do {
-                ListObjectsResponse response = listObjects(new ListObjectsRequest(LEGACY_LIST_PAGE_SIZE, null, continuationToken));
+                ListObjectsResponse response = listObjects(new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE, null, continuationToken));
                 keys.addAll(response.getKeys());
                 continuationToken = response.getContinuationToken().orElse(null);
             } while (continuationToken != null);
@@ -159,7 +160,7 @@ public class GoogleCloudStorageOperations
             request.getPrefix().map(Storage.BlobListOption::prefix).ifPresent(filteredOptions::add);
             filteredOptions.add(Storage.BlobListOption.pageSize(request.getPageSize()));
             request.getContinuationToken().map(Storage.BlobListOption::pageToken).ifPresent(filteredOptions::add);
-            com.google.api.gax.paging.Page<Blob> page = storage.list(bucket, filteredOptions.toArray(Storage.BlobListOption[]::new));
+            Page<Blob> page = storage.list(bucket, filteredOptions.toArray(Storage.BlobListOption[]::new));
             List<String> keys = new ArrayList<>();
             for (Blob blob : page.getValues()) {
                 keys.add(blob.getName());
