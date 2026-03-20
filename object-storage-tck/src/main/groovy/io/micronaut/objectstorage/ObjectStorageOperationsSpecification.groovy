@@ -253,6 +253,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     private static List<ListObjectsResponse> collectPages(ObjectStorageOperations<?, ?, ?> storage, ListObjectsRequest request) {
         List<ListObjectsResponse> pages = []
         ListObjectsRequest currentRequest = request
+        Set<String> seenTokens = [] as Set
+        int maxPages = PAGINATED_LISTING_KEYS.size() + 1
         while (true) {
             ListObjectsResponse page = storage.listObjects(currentRequest)
             pages << page
@@ -260,6 +262,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
             if (!continuationToken.present) {
                 return pages
             }
+            assert seenTokens.add(continuationToken.get()): "Repeated continuation token returned while collecting pages"
+            assert pages.size() <= maxPages: "Exceeded maximum expected page count while collecting pages"
             currentRequest = new ListObjectsRequest(request.pageSize, request.prefix.orElse(null), continuationToken.get())
         }
     }

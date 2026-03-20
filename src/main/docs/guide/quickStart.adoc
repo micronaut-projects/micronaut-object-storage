@@ -68,7 +68,7 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 
 == Listing objects page by page
 
-The frozen listing API exposes ObjectStorageOperations#listObjects(ListObjectsRequest) which returns a
+The paginated listing API exposes ObjectStorageOperations#listObjects(ListObjectsRequest) which returns a
 ListObjectsResponse containing the ordered keys for the current page and an opaque continuation token for the next page.
 The request accepts a raw prefix for simple starts-with filtering and normalizes empty strings to absent. The examples below
 show how to iterate pages by replaying the continuation token returned by each response. Providers do not promise global

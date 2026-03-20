@@ -57,6 +57,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.nio.charset.StandardCharsets;
+import java.util.StringJoiner;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -277,29 +278,36 @@ public class AwsS3Operations implements ObjectStorageOperations<
         if (continuationToken == null || continuationToken.isEmpty()) {
             return new DecodedContinuationToken(Optional.empty(), Optional.empty());
         }
-        if (!continuationToken.startsWith(CONTINUATION_TOKEN_PREFIX)) {
-            if (continuationToken.startsWith(LEGACY_CONTINUATION_TOKEN_PREFIX)) {
-                String encodedToken = continuationToken.substring(LEGACY_CONTINUATION_TOKEN_PREFIX.length());
-                return new DecodedContinuationToken(Optional.of(new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8)), Optional.empty());
+        try {
+            if (!continuationToken.startsWith(CONTINUATION_TOKEN_PREFIX)) {
+                if (continuationToken.startsWith(LEGACY_CONTINUATION_TOKEN_PREFIX)) {
+                    String encodedToken = continuationToken.substring(LEGACY_CONTINUATION_TOKEN_PREFIX.length());
+                    return new DecodedContinuationToken(Optional.of(new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8)), Optional.empty());
+                }
+                if (continuationToken.startsWith(RAW_CONTINUATION_TOKEN_PREFIX)) {
+                    String encodedToken = continuationToken.substring(RAW_CONTINUATION_TOKEN_PREFIX.length());
+                    return new DecodedContinuationToken(Optional.of(new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8)), Optional.empty());
+                }
+                return new DecodedContinuationToken(Optional.of(continuationToken), Optional.empty());
             }
-            if (continuationToken.startsWith(RAW_CONTINUATION_TOKEN_PREFIX)) {
-                String encodedToken = continuationToken.substring(RAW_CONTINUATION_TOKEN_PREFIX.length());
-                return new DecodedContinuationToken(Optional.of(new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8)), Optional.empty());
+            String encodedToken = continuationToken.substring(CONTINUATION_TOKEN_PREFIX.length());
+            String decodedToken = new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8);
+            String[] parts = decodedToken.split("\n", -1);
+            if (parts.length != 3) {
+                throw new ObjectStorageException("Invalid AWS S3 continuation token");
             }
-            return new DecodedContinuationToken(Optional.of(continuationToken), Optional.empty());
+            String expectedPrefix = request.getPrefix().orElse("");
+            String expectedPageSize = Integer.toString(request.getPageSize());
+            String prefix = decodeTokenPart(parts[0]);
+            String pageSize = decodeTokenPart(parts[1]);
+            String lastKey = decodeTokenPart(parts[2]);
+            if (!expectedPrefix.equals(prefix) || !expectedPageSize.equals(pageSize)) {
+                throw new ObjectStorageException("AWS S3 continuation token does not match the current request");
+            }
+            return new DecodedContinuationToken(Optional.empty(), Optional.of(lastKey));
+        } catch (IllegalArgumentException e) {
+            throw new ObjectStorageException("Invalid AWS S3 continuation token", e);
         }
-        String encodedToken = continuationToken.substring(CONTINUATION_TOKEN_PREFIX.length());
-        String decodedToken = new String(Base64.getUrlDecoder().decode(encodedToken), StandardCharsets.UTF_8);
-        String[] parts = decodedToken.split("\n", -1);
-        if (parts.length != 3) {
-            throw new ObjectStorageException("Invalid AWS S3 continuation token");
-        }
-        String expectedPrefix = request.getPrefix().orElse("");
-        String expectedPageSize = Integer.toString(request.getPageSize());
-        if (!expectedPrefix.equals(parts[0]) || !expectedPageSize.equals(parts[1])) {
-            throw new ObjectStorageException("AWS S3 continuation token does not match the current request");
-        }
-        return new DecodedContinuationToken(Optional.empty(), Optional.of(parts[2]));
     }
 
     private String encodeContinuationToken(ListObjectsRequest request,
@@ -311,11 +319,21 @@ public class AwsS3Operations implements ObjectStorageOperations<
         if (keys.isEmpty()) {
             return null;
         }
-        String payload = request.getPrefix().orElse("")
-            + "\n" + request.getPageSize()
-            + "\n" + keys.get(keys.size() - 1);
+        String payload = new StringJoiner("\n")
+            .add(encodeTokenPart(request.getPrefix().orElse("")))
+            .add(encodeTokenPart(Integer.toString(request.getPageSize())))
+            .add(encodeTokenPart(keys.get(keys.size() - 1)))
+            .toString();
         return CONTINUATION_TOKEN_PREFIX + Base64.getUrlEncoder().withoutPadding()
             .encodeToString(payload.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String encodeTokenPart(String value) {
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String decodeTokenPart(String value) {
+        return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
     }
 
     private record DecodedContinuationToken(Optional<String> rawContinuationToken,
