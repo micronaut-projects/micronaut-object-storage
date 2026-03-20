@@ -58,14 +58,14 @@ class ProfileService {
         String prefix = userId + "/" // raw prefix filtering
         String continuation = null
         do {
-            ListObjectsRequest request = new ListObjectsRequest(2, prefix, continuation) // page size 2
-            ListObjectsResponse response = objectStorage.listObjects(request) // <1>
+            ListObjectsRequest request = new ListObjectsRequest(2, prefix, continuation) // <1>
+            ListObjectsResponse response = objectStorage.listObjects(request)
 
             // Process the keys in this page
-            response.keys.forEach { key -> println("Found: $key") }
+            response.keys.forEach { key -> println("Found: $key") } // <2>
 
             // Replay the continuation token returned by the provider for the next page
-            continuation = response.continuationToken.orElse(null) // explicit continuation-token replay
+            continuation = response.continuationToken.orElse(null) // <3>
         } while (continuation != null)
     }
     //end::paginated-listing[]
