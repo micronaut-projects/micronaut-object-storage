@@ -68,6 +68,8 @@ import static java.lang.Boolean.TRUE;
 public class AzureBlobStorageOperations
     implements ObjectStorageOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> {
 
+    private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
+
     private final BlobContainerClient blobContainerClient;
 
     public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient) {
@@ -128,7 +130,7 @@ public class AzureBlobStorageOperations
         Set<String> keys = new LinkedHashSet<>();
         String continuationToken = null;
         do {
-            ListObjectsResponse response = listObjects(new ListObjectsRequest(1000, null, continuationToken));
+            ListObjectsResponse response = listObjects(new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE, null, continuationToken));
             keys.addAll(response.getKeys());
             continuationToken = response.getContinuationToken().orElse(null);
         } while (continuationToken != null);

@@ -71,7 +71,7 @@ import java.util.StringJoiner;
 public class AwsS3Operations implements ObjectStorageOperations<
     PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
-    private static final int LEGACY_LIST_PAGE_SIZE = 1_000;
+    private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
     private static final String LEGACY_CONTINUATION_TOKEN_PREFIX = "aws-s3:v1:";
     private static final String RAW_CONTINUATION_TOKEN_PREFIX = "aws-s3:v2:";
     private static final String CONTINUATION_TOKEN_PREFIX = "aws-s3:v3:";
@@ -177,7 +177,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
     @Override
     public Set<String> listObjects() {
         String bucket = configuration.getBucket();
-        ListObjectsRequest request = new ListObjectsRequest(LEGACY_LIST_PAGE_SIZE);
+        ListObjectsRequest request = new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE);
         LinkedHashSet<String> keys = new LinkedHashSet<>();
         try {
             String continuationToken;
@@ -185,7 +185,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
                 ListObjectsResponse response = listObjects(request);
                 keys.addAll(response.getKeys());
                 continuationToken = response.getContinuationToken().orElse(null);
-                request = new ListObjectsRequest(LEGACY_LIST_PAGE_SIZE, null, continuationToken);
+                request = new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE, null, continuationToken);
             } while (continuationToken != null);
             return keys;
         } catch (NoSuchBucketException e) {

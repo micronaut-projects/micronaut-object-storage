@@ -66,6 +66,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     LocalStorageOperations.LocalStorageFile> {
 
     public static final String METADATA_DIRECTORY = ".metadata";
+    private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
     private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
@@ -124,7 +125,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         Set<String> keys = new LinkedHashSet<>();
         String continuationToken = null;
         do {
-            ListObjectsResponse response = listObjects(new ListObjectsRequest(1000, null, continuationToken));
+            ListObjectsResponse response = listObjects(new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE, null, continuationToken));
             keys.addAll(response.getKeys());
             continuationToken = response.getContinuationToken().orElse(null);
         } while (continuationToken != null);
@@ -298,5 +299,9 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return file;
     }
 
-    record LocalStorageFile(Path path) { }
+    /**
+     * A simple wrapper around a path.
+     * @param path Where on disk the local storage provider has stored the actual data.
+     */
+    public record LocalStorageFile(Path path) { }
 }
