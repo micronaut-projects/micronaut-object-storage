@@ -12,8 +12,7 @@ dependencies {
 }
 
 micronautBuild {
-    // New module
     binaryCompatibility {
-        enabled.set(false)
+        enabledAfter("3.0.0")
     }
 }

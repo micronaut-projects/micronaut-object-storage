@@ -65,3 +65,5 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="delete"]
 
 <1> The delete operation returns the cloud vendor-specific delete response object in case you need it.
+
+See the dedicated <<paginatedListing,Paginated Listing>> section for provider-agnostic page-by-page object listing.

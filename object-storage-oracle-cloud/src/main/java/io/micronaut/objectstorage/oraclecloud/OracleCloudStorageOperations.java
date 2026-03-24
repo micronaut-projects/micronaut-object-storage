@@ -24,11 +24,9 @@ import com.oracle.bmc.objectstorage.requests.CopyObjectRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.HeadObjectRequest;
-import com.oracle.bmc.objectstorage.requests.ListObjectsRequest;
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
-import com.oracle.bmc.objectstorage.responses.ListObjectsResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
@@ -37,17 +35,20 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Oracle Cloud implementation of {@link ObjectStorageOperations}.
@@ -61,6 +62,7 @@ import java.util.stream.Collectors;
 public class OracleCloudStorageOperations
     implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
+    private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
     private static final Logger LOG = LoggerFactory.getLogger(OracleCloudStorageOperations.class);
 
     private final OracleCloudStorageConfiguration configuration;
@@ -156,23 +158,40 @@ public class OracleCloudStorageOperations
     @NonNull
     @Override
     public Set<String> listObjects() {
+        Set<String> keys = new LinkedHashSet<>();
+        String continuationToken = null;
+        do {
+            ListObjectsResponse response = listObjects(new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE, null, continuationToken));
+            keys.addAll(response.getKeys());
+            continuationToken = response.getContinuationToken().orElse(null);
+        } while (continuationToken != null);
+        return keys;
+    }
+
+    @Override
+    @NonNull
+    public ListObjectsResponse listObjects(@NonNull ListObjectsRequest request) {
         String bucket = configuration.getBucket();
         try {
-            ListObjectsResponse response = client.listObjects(ListObjectsRequest.builder()
+            com.oracle.bmc.objectstorage.responses.ListObjectsResponse response = client.listObjects(com.oracle.bmc.objectstorage.requests.ListObjectsRequest.builder()
                 .bucketName(bucket)
                 .namespaceName(configuration.getNamespace())
+                .prefix(request.getPrefix().orElse(null))
+                .limit(request.getPageSize())
+                .startAfter(request.getContinuationToken().orElse(null))
                 .build());
 
-            return response.getListObjects()
+            List<String> keys = response.getListObjects()
                 .getObjects()
                 .stream()
                 .map(ObjectSummary::getName)
-                .collect(Collectors.toSet());
+                .toList();
+            return new ListObjectsResponse(keys, response.getListObjects().getNextStartWith());
         } catch (BmcException e) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Error when listing the objects in the bucket {} from Oracle Cloud Storage: {}", bucket, e.getMessage(), e);
             }
-            return Collections.emptySet();
+            return new ListObjectsResponse(Collections.emptyList());
         }
     }
 

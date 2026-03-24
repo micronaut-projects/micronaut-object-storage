@@ -17,3 +17,8 @@ dependencies {
     testImplementation(mn.reactor)
 
 }
+micronautBuild {
+    binaryCompatibility {
+        enabledAfter("3.0.0")
+    }
+}

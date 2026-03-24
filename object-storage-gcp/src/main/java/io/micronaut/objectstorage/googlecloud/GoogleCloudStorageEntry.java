@@ -19,7 +19,6 @@ import com.google.cloud.storage.Blob;
 import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.ObjectStorageEntry;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.util.Map;

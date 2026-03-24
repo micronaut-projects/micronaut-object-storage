@@ -20,6 +20,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
+import com.google.api.gax.paging.Page;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
@@ -28,15 +29,18 @@ import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Google Cloud implementation of {@link ObjectStorageOperations}.
@@ -49,6 +53,8 @@ import java.util.stream.StreamSupport;
 @Requires(beans = GoogleCloudStorageConfiguration.class)
 public class GoogleCloudStorageOperations
     implements ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> {
+
+    private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
     private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
@@ -129,14 +135,39 @@ public class GoogleCloudStorageOperations
     @NonNull
     @Override
     public Set<String> listObjects() {
+        LinkedHashSet<String> keys = new LinkedHashSet<>();
         String bucket = configuration.getBucket();
         try {
-            Iterable<Blob> blobs = storage.list(bucket).iterateAll();
-            return StreamSupport.stream(blobs.spliterator(), false)
-                .map(BlobInfo::getName)
-                .collect(Collectors.toSet());
+            String continuationToken = null;
+            do {
+                ListObjectsResponse response = listObjects(new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE, null, continuationToken));
+                keys.addAll(response.getKeys());
+                continuationToken = response.getContinuationToken().orElse(null);
+            } while (continuationToken != null);
+            return keys;
         } catch (StorageException e) {
             String msg = String.format("Error when listing the objects of the Google Cloud Storage bucket [%s]", bucket);
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    @NonNull
+    public ListObjectsResponse listObjects(@NonNull ListObjectsRequest request) {
+        String bucket = configuration.getBucket();
+        try {
+            List<Storage.BlobListOption> filteredOptions = new ArrayList<>();
+            request.getPrefix().map(Storage.BlobListOption::prefix).ifPresent(filteredOptions::add);
+            filteredOptions.add(Storage.BlobListOption.pageSize(request.getPageSize()));
+            request.getContinuationToken().map(Storage.BlobListOption::pageToken).ifPresent(filteredOptions::add);
+            Page<Blob> page = storage.list(bucket, filteredOptions.toArray(Storage.BlobListOption[]::new));
+            List<String> keys = new ArrayList<>();
+            for (Blob blob : page.getValues()) {
+                keys.add(blob.getName());
+            }
+            return new ListObjectsResponse(keys, page.getNextPageToken());
+        } catch (StorageException e) {
+            String msg = String.format("Error when listing a page of objects of the Google Cloud Storage bucket [%s]", bucket);
             throw new ObjectStorageException(msg, e);
         }
     }

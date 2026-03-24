@@ -1,6 +1,7 @@
 package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.objectstorage.request.ListObjectsRequest
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -33,6 +34,13 @@ class LocalStoragePathTraversalSpec extends Specification {
         ctx.getBean(LocalStorageOperations).retrieve("../secret")
         then:
         thrown IllegalArgumentException
+
+        when:
+        def listedKeys = ctx.getBean(LocalStorageOperations).listObjects(new ListObjectsRequest(10, '../'))
+
+        then:
+        listedKeys.keys.empty
+        listedKeys.continuationToken.empty
 
         cleanup:
         ctx.close()

@@ -6,7 +6,13 @@ import spock.lang.Requires
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
 
 @MicronautTest
-@Requires({ env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT && env.AZURE_CLIENT_ID && env.AZURE_CLIENT_SECRET && env.AZURE_TENANT_ID })
+@Requires({
+    String endpoint = env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT
+    String clientId = env.AZURE_CLIENT_ID
+    String clientSecret = env.AZURE_CLIENT_SECRET
+    String tenantId = env.AZURE_TENANT_ID
+    return endpoint?.startsWith('https://') && clientId && clientSecret && tenantId && !Boolean.getBoolean('azure.test.skip.cloud')
+})
 class AzureBlobStorageCloudSpec extends AbstractAzureBlobStorageSpec {
 
     @Override
