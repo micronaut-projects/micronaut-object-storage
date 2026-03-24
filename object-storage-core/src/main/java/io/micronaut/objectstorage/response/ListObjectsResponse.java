@@ -26,11 +26,8 @@ import java.util.Optional;
  *
  * @since 3.0.0
  */
-public final class ListObjectsResponse {
-
-    private final List<String> keys;
-    @Nullable
-    private final String continuationToken;
+public record ListObjectsResponse(@NonNull List<String> keys,
+                                  @Nullable String continuationToken) {
 
     /**
      * @param keys the ordered keys in the current page
@@ -39,13 +36,9 @@ public final class ListObjectsResponse {
         this(keys, null);
     }
 
-    /**
-     * @param keys the ordered keys in the current page
-     * @param continuationToken the opaque continuation token for the next page
-     */
-    public ListObjectsResponse(@NonNull List<String> keys, @Nullable String continuationToken) {
-        this.keys = List.copyOf(keys);
-        this.continuationToken = continuationToken == null || continuationToken.isEmpty() ? null : continuationToken;
+    public ListObjectsResponse {
+        keys = List.copyOf(keys);
+        continuationToken = continuationToken == null || continuationToken.isEmpty() ? null : continuationToken;
     }
 
     /**
