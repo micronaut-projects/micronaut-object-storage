@@ -25,13 +25,9 @@ import java.util.Optional;
  *
  * @since 3.0.0
  */
-public final class ListObjectsRequest {
-
-    private final int pageSize;
-    @Nullable
-    private final String prefix;
-    @Nullable
-    private final String continuationToken;
+public record ListObjectsRequest(int pageSize,
+                                 @Nullable String prefix,
+                                 @Nullable String continuationToken) {
 
     /**
      * @param pageSize the maximum number of keys to return
@@ -48,18 +44,12 @@ public final class ListObjectsRequest {
         this(pageSize, prefix, null);
     }
 
-    /**
-     * @param pageSize the maximum number of keys to return
-     * @param prefix the prefix to filter keys by
-     * @param continuationToken the opaque continuation token for the next page
-     */
-    public ListObjectsRequest(int pageSize, @Nullable String prefix, @Nullable String continuationToken) {
+    public ListObjectsRequest {
         if (pageSize <= 0) {
             throw new IllegalArgumentException("pageSize must be greater than 0");
         }
-        this.pageSize = pageSize;
-        this.prefix = normalize(prefix);
-        this.continuationToken = normalize(continuationToken);
+        prefix = normalize(prefix);
+        continuationToken = normalize(continuationToken);
     }
 
     /**
