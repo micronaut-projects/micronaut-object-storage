@@ -12,13 +12,13 @@ class ListObjectsRequestSpec extends Specification {
 
         then:
         request.pageSize == 25
-        request.getPrefix().empty
-        request.getContinuationToken().empty
+        request.prefix.empty
+        request.continuationToken.empty
     }
 
     void "it normalizes null and empty prefix to absent"() {
         expect:
-        new ListObjectsRequest(10, prefix).getPrefix().empty
+        new ListObjectsRequest(10, prefix).prefix.empty
 
         where:
         prefix << [null, ""]
@@ -30,13 +30,13 @@ class ListObjectsRequestSpec extends Specification {
 
         then:
         request.pageSize == 15
-        request.getPrefix().get() == "folder/"
-        request.getContinuationToken().get() == "token-1"
+        request.prefix.get() == "folder/"
+        request.continuationToken.get() == "token-1"
     }
 
     void "it allows empty continuation token semantics as absent"() {
         expect:
-        new ListObjectsRequest(10, "prefix", token).getContinuationToken() == expected
+        new ListObjectsRequest(10, "prefix", token).continuationToken == expected
 
         where:
         token      || expected
