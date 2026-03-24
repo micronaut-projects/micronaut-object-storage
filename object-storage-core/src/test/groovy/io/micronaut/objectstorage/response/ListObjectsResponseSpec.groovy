@@ -26,7 +26,7 @@ class ListObjectsResponseSpec extends Specification {
 
     void "it exposes empty continuation token semantics"() {
         expect:
-        new ListObjectsResponse(['a'], token).getContinuationToken() == expected
+        new ListObjectsResponse(['a'], token).continuationToken == expected
 
         where:
         token      || expected
@@ -41,6 +41,6 @@ class ListObjectsResponseSpec extends Specification {
 
         then:
         response.keys == ['prefix/b', 'prefix/a']
-        response.getContinuationToken().get() == 'token-2'
+        response.continuationToken.get() == 'token-2'
     }
 }

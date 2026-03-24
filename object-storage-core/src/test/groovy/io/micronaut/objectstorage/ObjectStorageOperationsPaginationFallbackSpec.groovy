@@ -21,7 +21,7 @@ class ObjectStorageOperationsPaginationFallbackSpec extends Specification {
 
         then:
         response.keys == ["animals/cat.txt", "animals/dog.txt"]
-        response.getContinuationToken().get() == "animals/dog.txt"
+        response.continuationToken.get() == "animals/dog.txt"
     }
 
     void "it starts strictly after continuation token in sorted filtered keys"() {
@@ -30,7 +30,7 @@ class ObjectStorageOperationsPaginationFallbackSpec extends Specification {
 
         then:
         response.keys == ["animals/mammals/fox.txt"]
-        response.getContinuationToken().empty
+        response.continuationToken.empty
     }
 
     void "it starts from the first lexicographically greater key when the continuation token is unknown"() {
@@ -39,7 +39,7 @@ class ObjectStorageOperationsPaginationFallbackSpec extends Specification {
 
         then:
         response.keys == ["animals/dog.txt", "animals/mammals/fox.txt"]
-        response.getContinuationToken().empty
+        response.continuationToken.empty
     }
 
     void "it starts from first matching key when continuation token is absent"() {
@@ -48,7 +48,7 @@ class ObjectStorageOperationsPaginationFallbackSpec extends Specification {
 
         then:
         response.keys == ["plants/oak.txt"]
-        response.getContinuationToken().empty
+        response.continuationToken.empty
     }
 
     void "it falls back to full sorted legacy listing without prefix"() {
@@ -57,7 +57,7 @@ class ObjectStorageOperationsPaginationFallbackSpec extends Specification {
 
         then:
         response.keys == ["animals/cat.txt", "animals/dog.txt", "animals/mammals/fox.txt"]
-        response.getContinuationToken().get() == "animals/mammals/fox.txt"
+        response.continuationToken.get() == "animals/mammals/fox.txt"
     }
 
     private static final class LegacyOnlyOperations implements ObjectStorageOperations<Object, Object, Object> {
