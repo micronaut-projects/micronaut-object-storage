@@ -68,6 +68,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#delete(java.lang.String)" tabindex="0">delete(String)</a></li>
 <li><a href="#exists(java.lang.String)" tabindex="0">exists(String)</a></li>
 <li><a href="#listObjects()" tabindex="0">listObjects()</a></li>
+<li><a href="#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" tabindex="0">listObjects(ListObjectsRequest)</a></li>
 <li><a href="#copy(java.lang.String,java.lang.String)" tabindex="0">copy(String, String)</a></li>
 <li><a href="#getRequestBuilder(io.micronaut.objectstorage.request.UploadRequest)" tabindex="0">getRequestBuilder(UploadRequest)</a></li>
 <li><a href="#getRequestBody(io.micronaut.objectstorage.request.UploadRequest)" tabindex="0">getRequestBody(UploadRequest)</a></li>
@@ -160,20 +161,25 @@ same object storage (bucket/container).</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Lists the objects that exist in the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/ListObjectsResponse.html" title="class in io.micronaut.objectstorage.response">ListObjectsResponse</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects</a><wbr>(@NonNull <a href="../request/ListObjectsRequest.html" title="class in io.micronaut.objectstorage.request">ListObjectsRequest</a>&nbsp;request)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Lists a page of objects that exist in the object storage.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the object from object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;software.amazon.awssdk.services.s3.model.PutObjectResponse&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
  @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder&gt;&nbsp;requestConsumer)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
 </div>
@@ -322,6 +328,24 @@ same object storage (bucket/container).</div>
 <dd><code><a href="../ObjectStorageOperations.html#listObjects()">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder, software.amazon.awssdk.services.s3.model.PutObjectResponse, software.amazon.awssdk.services.s3.model.DeleteObjectResponse&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)">
+<h3>listObjects</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/ListObjectsResponse.html" title="class in io.micronaut.objectstorage.response">ListObjectsResponse</a></span>&nbsp;<span class="element-name">listObjects</span><wbr><span class="parameters">(@NonNull <a href="../request/ListObjectsRequest.html" title="class in io.micronaut.objectstorage.request">ListObjectsRequest</a>&nbsp;request)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)">ObjectStorageOperations</a></code></span></div>
+<div class="block">Lists a page of objects that exist in the object storage.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../ObjectStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder, software.amazon.awssdk.services.s3.model.PutObjectResponse, software.amazon.awssdk.services.s3.model.DeleteObjectResponse&gt;</code></dd>
+<dt>Parameters:</dt>
+<dd><code>request</code> - the paginated listing request</dd>
+<dt>Returns:</dt>
+<dd>the ordered keys in the current page and an optional continuation token for the next page</dd>
 </dl>
 </div>
 </section>
