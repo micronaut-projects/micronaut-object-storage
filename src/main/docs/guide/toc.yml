@@ -1,6 +1,7 @@
 introduction: Introduction
 releaseHistory: Release History
 quickStart: Quick Start
+paginatedListing: Paginated Listing
 aws: Amazon S3
 azure: Azure Blob Storage
 gcp: Google Cloud Storage
@@ -10,4 +11,3 @@ control-panel: Control Panel
 objectStorageGuides: Guides
 breaks: Breaking Changes
 repository: Repository
-
