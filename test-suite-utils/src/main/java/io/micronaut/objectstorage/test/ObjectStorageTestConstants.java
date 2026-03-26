@@ -16,7 +16,7 @@
 package io.micronaut.objectstorage.test;
 
 public final class ObjectStorageTestConstants {
-    public static final String LOCAL_STACK_DOCKER_IMAGE = "localstack/localstack:4.2.0";
+    public static final String LOCAL_STACK_DOCKER_IMAGE = "localstack/localstack:4.14.0";
     private ObjectStorageTestConstants() {
 
     }

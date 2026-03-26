@@ -13,7 +13,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import jakarta.inject.Named
-import org.testcontainers.containers.localstack.LocalStackContainer
+import org.testcontainers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.services.s3.S3Client
 import spock.lang.AutoCleanup
@@ -32,7 +32,7 @@ class UploadControllerSpec extends Specification implements TestPropertyProvider
     @Shared
     @AutoCleanup
     public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
-            .withServices(LocalStackContainer.Service.S3)
+            .withServices("s3")
 
     @Inject
     @Named(OBJECT_STORAGE_NAME)
@@ -53,7 +53,7 @@ class UploadControllerSpec extends Specification implements TestPropertyProvider
                 "aws.accessKeyId": localstack.getAccessKey(),
                 "aws.secretKey": localstack.getSecretKey(),
                 "aws.region": localstack.getRegion(),
-                "aws.services.s3.endpoint-override": localstack.getEndpointOverride(LocalStackContainer.Service.S3)
+                "aws.services.s3.endpoint-override": localstack.getEndpoint().toString()
 
         ]
     }
