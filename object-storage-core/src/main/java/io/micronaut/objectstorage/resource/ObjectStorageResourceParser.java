@@ -33,6 +33,9 @@ public final class ObjectStorageResourceParser {
     public static final String GS_SCHEME = "gs";
     public static final String AZB_SCHEME = "azb";
     public static final String OS_SCHEME = "os";
+    private static final String EXPECTED_PREFIX = "Expected ";
+    private static final String OBJECT_KEY_MUST_NOT_BE_EMPTY = "Object key must not be empty";
+    private static final String ORACLE_CLOUD_URI_FORMAT = "os:<region>:<namespace>://<bucket>/<key>";
 
     private ObjectStorageResourceParser() {
     }
@@ -51,11 +54,11 @@ public final class ObjectStorageResourceParser {
             return Optional.empty();
         }
         if (!path.startsWith(storageName + "://")) {
-            throw invalid(path, "Expected " + storageName + "://<key>");
+            throw invalid(path, EXPECTED_PREFIX + storageName + "://<key>");
         }
         String key = path.substring(storageName.length() + 3);
         if (key.isEmpty()) {
-            throw invalid(path, "Object key must not be empty");
+            throw invalid(path, OBJECT_KEY_MUST_NOT_BE_EMPTY);
         }
         return Optional.of(new NamedStorageUri(storageName, key));
     }
@@ -66,12 +69,12 @@ public final class ObjectStorageResourceParser {
             return Optional.empty();
         }
         if (!path.startsWith(scheme + "://")) {
-            throw invalid(path, "Expected " + scheme + "://<bucket>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + scheme + "://<bucket>/<key>");
         }
         String remainder = path.substring(scheme.length() + 3);
         int separator = remainder.indexOf('/');
         if (separator < 0) {
-            throw invalid(path, "Expected " + scheme + "://<bucket>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + scheme + "://<bucket>/<key>");
         }
         String bucket = remainder.substring(0, separator);
         String key = remainder.substring(separator + 1);
@@ -79,7 +82,7 @@ public final class ObjectStorageResourceParser {
             throw invalid(path, "Bucket name must not be empty");
         }
         if (key.isEmpty()) {
-            throw invalid(path, "Object key must not be empty");
+            throw invalid(path, OBJECT_KEY_MUST_NOT_BE_EMPTY);
         }
         return Optional.of(new BucketStorageUri(scheme, bucket, key));
     }
@@ -91,7 +94,7 @@ public final class ObjectStorageResourceParser {
         String remainder = path.substring(AZB_SCHEME.length() + 1);
         int authoritySeparator = remainder.indexOf("://");
         if (authoritySeparator < 0) {
-            throw invalid(path, "Expected azb:<account>://<container>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + "azb:<account>://<container>/<key>");
         }
         String account = remainder.substring(0, authoritySeparator);
         if (account.isEmpty()) {
@@ -100,7 +103,7 @@ public final class ObjectStorageResourceParser {
         String containerAndKey = remainder.substring(authoritySeparator + 3);
         int keySeparator = containerAndKey.indexOf('/');
         if (keySeparator < 0) {
-            throw invalid(path, "Expected azb:<account>://<container>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + "azb:<account>://<container>/<key>");
         }
         String container = containerAndKey.substring(0, keySeparator);
         String key = containerAndKey.substring(keySeparator + 1);
@@ -108,7 +111,7 @@ public final class ObjectStorageResourceParser {
             throw invalid(path, "Azure container must not be empty");
         }
         if (key.isEmpty()) {
-            throw invalid(path, "Object key must not be empty");
+            throw invalid(path, OBJECT_KEY_MUST_NOT_BE_EMPTY);
         }
         return Optional.of(new AzureBlobStorageUri(account, container, key));
     }
@@ -120,16 +123,16 @@ public final class ObjectStorageResourceParser {
         String remainder = path.substring(OS_SCHEME.length() + 1);
         int authoritySeparator = remainder.indexOf("://");
         if (authoritySeparator < 0) {
-            throw invalid(path, "Expected os:<region>:<namespace>://<bucket>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + ORACLE_CLOUD_URI_FORMAT);
         }
         String[] authorityParts = remainder.substring(0, authoritySeparator).split(":", 2);
         if (authorityParts.length != 2 || authorityParts[0].isEmpty() || authorityParts[1].isEmpty()) {
-            throw invalid(path, "Expected os:<region>:<namespace>://<bucket>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + ORACLE_CLOUD_URI_FORMAT);
         }
         String bucketAndKey = remainder.substring(authoritySeparator + 3);
         int keySeparator = bucketAndKey.indexOf('/');
         if (keySeparator < 0) {
-            throw invalid(path, "Expected os:<region>:<namespace>://<bucket>/<key>");
+            throw invalid(path, EXPECTED_PREFIX + ORACLE_CLOUD_URI_FORMAT);
         }
         String bucket = bucketAndKey.substring(0, keySeparator);
         String key = bucketAndKey.substring(keySeparator + 1);
@@ -137,7 +140,7 @@ public final class ObjectStorageResourceParser {
             throw invalid(path, "Oracle Cloud bucket must not be empty");
         }
         if (key.isEmpty()) {
-            throw invalid(path, "Object key must not be empty");
+            throw invalid(path, OBJECT_KEY_MUST_NOT_BE_EMPTY);
         }
         return Optional.of(new OracleCloudStorageUri(authorityParts[0], authorityParts[1], bucket, key));
     }
