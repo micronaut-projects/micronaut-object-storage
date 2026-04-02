@@ -7,6 +7,8 @@ dependencies {
 
     compileOnly(mn.micronaut.http)
 
+    api("io.micronaut:micronaut-core-reactive")
+
     implementation(mn.micronaut.inject)
     implementation(mn.micronaut.context)
     implementation(mn.micronaut.http.server)

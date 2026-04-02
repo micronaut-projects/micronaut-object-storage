@@ -1,6 +1,7 @@
 introduction: Introduction
 releaseHistory: Release History
 quickStart: Quick Start
+reactiveOperations: Reactive Operations
 paginatedListing: Paginated Listing
 aws: Amazon S3
 azure: Azure Blob Storage

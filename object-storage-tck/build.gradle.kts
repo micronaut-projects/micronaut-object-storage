@@ -8,6 +8,7 @@ dependencies {
 
     api(projects.micronautObjectStorageCore)
     api(mn.micronaut.http)
+    api(mn.reactor)
 
     testImplementation(mnValidation.micronaut.validation.processor)
     implementation(mn.micronaut.inject.groovy)
