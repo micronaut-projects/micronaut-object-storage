@@ -62,7 +62,7 @@ import static com.azure.storage.common.implementation.Constants.HeaderConstants.
 @EachBean(BlobContainerAsyncClient.class)
 @Requires(beans = BlobContainerAsyncClient.class)
 @Requires(condition = AzureBlobStorageEnabledCondition.class)
-public class AzureBlobStorageReactiveOperations implements ReactiveObjectStorageOperations<
+public final class AzureBlobStorageReactiveOperations implements ReactiveObjectStorageOperations<
     BlobParallelUploadOptions,
     BlockBlobItem,
     Response<Void>> {
@@ -157,7 +157,7 @@ public class AzureBlobStorageReactiveOperations implements ReactiveObjectStorage
             .onErrorMap(this::copyException);
     }
 
-    protected @NonNull BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
+    private @NonNull BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
         BlobParallelUploadOptions options = request.getContentSize().isPresent()
             ? new BlobParallelUploadOptions(request.getInputStream(), request.getContentSize().get())
             : new BlobParallelUploadOptions(request.getInputStream());
@@ -172,7 +172,7 @@ public class AzureBlobStorageReactiveOperations implements ReactiveObjectStorage
         return options;
     }
 
-    protected @NonNull PagedFlux<BlobItem> listNativeBlobs(String prefix) {
+    private @NonNull PagedFlux<BlobItem> listNativeBlobs(String prefix) {
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(prefix);
         return blobContainerAsyncClient.listBlobs(options, null);
     }

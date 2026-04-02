@@ -7,6 +7,7 @@ import io.micronaut.objectstorage.ReactiveObjectStorageOperations
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
+import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.S3Client
 import spock.lang.Specification
 
@@ -41,5 +42,11 @@ class LocalStorageReactivePrimarySpec extends Specification {
     @MockBean(S3Client)
     S3Client s3Client() {
         return Mock(S3Client)
+    }
+
+    @Requires(property = "spec.name", value = SPEC_NAME)
+    @MockBean(S3AsyncClient)
+    S3AsyncClient s3AsyncClient() {
+        return Mock(S3AsyncClient)
     }
 }

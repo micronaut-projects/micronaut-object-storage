@@ -42,7 +42,6 @@ import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
@@ -74,7 +73,7 @@ import java.util.function.Consumer;
 @EachBean(AwsS3Configuration.class)
 @Requires(beans = AwsS3Configuration.class)
 @Requires(beans = S3AsyncClient.class)
-public class AwsS3ReactiveOperations implements ReactiveObjectStorageOperations<
+public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOperations<
     PutObjectRequest.Builder,
     PutObjectResponse,
     DeleteObjectResponse> {
@@ -257,7 +256,7 @@ public class AwsS3ReactiveOperations implements ReactiveObjectStorageOperations<
         );
     }
 
-    protected PutObjectRequest.@NonNull Builder getRequestBuilder(@NonNull UploadRequest request) {
+    private PutObjectRequest.@NonNull Builder getRequestBuilder(@NonNull UploadRequest request) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
             .bucket(configuration.getBucket())
             .key(request.getKey());
@@ -270,7 +269,7 @@ public class AwsS3ReactiveOperations implements ReactiveObjectStorageOperations<
         return builder;
     }
 
-    protected @NonNull AsyncRequestBody getRequestBody(@NonNull UploadRequest uploadRequest) {
+    private @NonNull AsyncRequestBody getRequestBody(@NonNull UploadRequest uploadRequest) {
         if (uploadRequest instanceof FileUploadRequest request) {
             return AsyncRequestBody.fromFile(request.getFile());
         }
