@@ -16,7 +16,6 @@
 package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.EachBean;
-import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Primary;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.internal.DefaultReactiveObjectStorageOperations;
@@ -40,8 +39,7 @@ public class LocalStorageReactiveOperations extends DefaultReactiveObjectStorage
     LocalStorageOperations.LocalStorageFile,
     LocalStorageOperations.LocalStorageFile> {
 
-    public LocalStorageReactiveOperations(@Parameter LocalStorageConfiguration configuration,
-                                          LocalStorageOperations operations,
+    public LocalStorageReactiveOperations(LocalStorageOperations operations,
                                           @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         super(operations, blockingExecutor);
     }

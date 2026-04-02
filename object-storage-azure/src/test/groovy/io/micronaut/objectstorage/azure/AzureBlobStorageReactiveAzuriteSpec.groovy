@@ -4,13 +4,11 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
 
-@Ignore("The API version 2026-02-06 is not supported by Azurite. Please upgrade Azurite to latest version and retry.")
 @MicronautTest
 @IgnoreIf({ env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT && env.AZURE_CLIENT_ID && env.AZURE_CLIENT_SECRET && env.AZURE_TENANT_ID })
 class AzureBlobStorageReactiveAzuriteSpec extends AbstractAzureBlobStorageReactiveSpec {

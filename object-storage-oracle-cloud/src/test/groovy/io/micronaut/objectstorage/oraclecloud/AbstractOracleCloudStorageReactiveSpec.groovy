@@ -38,12 +38,13 @@ abstract class AbstractOracleCloudStorageReactiveSpec extends ReactiveObjectStor
     }
 
     void setup() {
-        def builder = CreateBucketDetails.builder()
-            .compartmentId(System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID'))
-            .name(BUCKET_NAME)
-        if (System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID')) {
-            builder.compartmentId(System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID'))
+        def compartmentId = System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID')
+        if (!compartmentId) {
+            throw new IllegalStateException('ORACLE_CLOUD_TEST_COMPARTMENT_ID environment variable must be set for Oracle Cloud storage tests')
         }
+        def builder = CreateBucketDetails.builder()
+            .compartmentId(compartmentId)
+            .name(BUCKET_NAME)
         client.createBucket(CreateBucketRequest.builder()
             .namespaceName(configuration.getNamespace())
             .createBucketDetails(builder.build())

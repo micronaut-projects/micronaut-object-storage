@@ -24,8 +24,12 @@ import reactor.core.publisher.Mono
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
+import java.time.Duration
+
 abstract class ReactiveObjectStorageOperationsSpecification extends Specification {
 
+    private static final Duration AWAIT_TIMEOUT = Duration.ofSeconds(30)
+    private static final String ANIMALS_PREFIX = 'animals/'
     public static final String TEXT = ObjectStorageOperationsSpecification.TEXT
     public static final String NEW_TEXT = ObjectStorageOperationsSpecification.NEW_TEXT
     public static final Map<String, String> METADATA = ObjectStorageOperationsSpecification.METADATA
@@ -194,16 +198,16 @@ abstract class ReactiveObjectStorageOperationsSpecification extends Specificatio
         !pages.last().continuationToken.present
 
         when:
-        ListObjectsRequest animalsRequest = new ListObjectsRequest(2, 'animals/')
+        ListObjectsRequest animalsRequest = new ListObjectsRequest(2, ANIMALS_PREFIX)
         List<ListObjectsResponse> animalPages = collectPages(storage, animalsRequest)
         List<String> animalKeys = animalPages.collectMany { it.keys }
 
         then:
         animalPages
         animalPages.every { it.keys.size() <= animalsRequest.pageSize }
-        animalKeys.every { it.startsWith('animals/') }
-        animalKeys.toSet() == PAGINATED_LISTING_KEYS.findAll { it.startsWith('animals/') }.toSet()
-        animalKeys.size() == PAGINATED_LISTING_KEYS.count { it.startsWith('animals/') }
+        animalKeys.every { it.startsWith(ANIMALS_PREFIX) }
+        animalKeys.toSet() == PAGINATED_LISTING_KEYS.findAll { it.startsWith(ANIMALS_PREFIX) }.toSet()
+        animalKeys.size() == PAGINATED_LISTING_KEYS.count { it.startsWith(ANIMALS_PREFIX) }
         animalPages.dropRight(1).every { it.keys }
         adjacentPages(animalPages).every { pair -> !pair[0].keys.intersect(pair[1].keys) }
         !animalPages.last().continuationToken.present
@@ -227,11 +231,11 @@ abstract class ReactiveObjectStorageOperationsSpecification extends Specificatio
     }
 
     protected static <T> T awaitOne(org.reactivestreams.Publisher<T> publisher) {
-        Mono.from(publisher).block()
+        Mono.from(publisher).block(AWAIT_TIMEOUT)
     }
 
     protected static void awaitCompletion(org.reactivestreams.Publisher<Void> publisher) {
-        Flux.from(publisher).collectList().block()
+        Flux.from(publisher).collectList().block(AWAIT_TIMEOUT)
     }
 
     private static List<ListObjectsResponse> collectPages(ReactiveObjectStorageOperations<?, ?, ?> storage,

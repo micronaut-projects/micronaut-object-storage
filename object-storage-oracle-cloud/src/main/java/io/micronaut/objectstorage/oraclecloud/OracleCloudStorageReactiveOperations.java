@@ -19,7 +19,6 @@ import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
 import io.micronaut.context.annotation.EachBean;
-import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.internal.DefaultReactiveObjectStorageOperations;
 import io.micronaut.scheduling.TaskExecutors;
@@ -41,8 +40,7 @@ public class OracleCloudStorageReactiveOperations extends DefaultReactiveObjectS
     PutObjectResponse,
     DeleteObjectResponse> {
 
-    public OracleCloudStorageReactiveOperations(@Parameter OracleCloudStorageConfiguration configuration,
-                                                OracleCloudStorageOperations operations,
+    public OracleCloudStorageReactiveOperations(OracleCloudStorageOperations operations,
                                                 @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         super(operations, blockingExecutor);
     }

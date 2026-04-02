@@ -17,7 +17,7 @@ import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PRE
 
 abstract class AbstractAzureBlobStorageReactiveSpec extends ReactiveObjectStorageOperationsSpecification implements TestPropertyProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractAzureBlobStorageReactiveSpec.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAzureBlobStorageReactiveSpec.class)
     public static final String CONTAINER_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
 

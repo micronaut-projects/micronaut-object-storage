@@ -40,6 +40,7 @@ import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.BufferedInputStream;
@@ -50,8 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import static com.azure.storage.common.implementation.Constants.HeaderConstants.ETAG_WILDCARD;
 
 /**
  * Reactive Azure Blob Storage operations backed by Azure async blob clients.
@@ -127,8 +126,7 @@ public final class AzureBlobStorageReactiveOperations implements ReactiveObjectS
     @Override
     @NonNull
     public Publisher<Set<String>> listObjects() {
-        return listNativeBlobs(null)
-            .byPage(null, DEFAULT_LIST_PAGE_SIZE)
+        return firstPage(listNativeBlobs(null), null, DEFAULT_LIST_PAGE_SIZE)
             .concatMapIterable(PagedResponse::getElements)
             .map(BlobItem::getName)
             .collect(LinkedHashSet<String>::new, LinkedHashSet::add)
@@ -139,8 +137,11 @@ public final class AzureBlobStorageReactiveOperations implements ReactiveObjectS
     @Override
     @NonNull
     public Publisher<ListObjectsResponse> listObjects(@NonNull ListObjectsRequest request) {
-        return listNativeBlobs(request.getPrefix().orElse(null))
-            .byPage(request.getContinuationToken().orElse(null), request.getPageSize())
+        return firstPage(
+            listNativeBlobs(request.getPrefix().orElse(null)),
+            request.getContinuationToken().orElse(null),
+            request.getPageSize()
+        )
             .next()
             .map(this::toListObjectsResponse)
             .switchIfEmpty(Mono.just(new ListObjectsResponse(Collections.emptyList())))
@@ -158,15 +159,16 @@ public final class AzureBlobStorageReactiveOperations implements ReactiveObjectS
     }
 
     private @NonNull BlobParallelUploadOptions getUploadOptions(@NonNull UploadRequest request) {
-        BlobParallelUploadOptions options = request.getContentSize().isPresent()
-            ? new BlobParallelUploadOptions(request.getInputStream(), request.getContentSize().get())
+        Optional<Long> contentSize = request.getContentSize();
+        BlobParallelUploadOptions options = contentSize.isPresent()
+            ? new BlobParallelUploadOptions(request.getInputStream(), contentSize.get())
             : new BlobParallelUploadOptions(request.getInputStream());
-        options.setRequestConditions(new BlobRequestConditions().setIfNoneMatch(ETAG_WILDCARD));
         if (CollectionUtils.isNotEmpty(request.getMetadata())) {
             options.setMetadata(request.getMetadata());
         }
-        if (request.getContentType().isPresent()) {
-            BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(request.getContentType().get());
+        Optional<String> contentType = request.getContentType();
+        if (contentType.isPresent()) {
+            BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(contentType.get());
             options.setHeaders(headers);
         }
         return options;
@@ -177,12 +179,19 @@ public final class AzureBlobStorageReactiveOperations implements ReactiveObjectS
         return blobContainerAsyncClient.listBlobs(options, null);
     }
 
+    private Flux<PagedResponse<BlobItem>> firstPage(@NonNull PagedFlux<BlobItem> pagedFlux,
+                                                    String continuationToken,
+                                                    int pageSize) {
+        return continuationToken == null ? pagedFlux.byPage(pageSize) : pagedFlux.byPage(continuationToken, pageSize);
+    }
+
     private Mono<UploadResponse<BlockBlobItem>> doUpload(@NonNull UploadRequest request,
                                                          @NonNull BlobParallelUploadOptions options) {
         BlobAsyncClient blobAsyncClient = blobContainerAsyncClient.getBlobAsyncClient(request.getKey());
-        Mono<BlockBlobItem> upload = request.getContentSize().isPresent()
+        Optional<Long> contentSize = request.getContentSize();
+        Mono<BlockBlobItem> upload = contentSize.isPresent()
             ? blobAsyncClient.getBlockBlobAsyncClient()
-                .uploadWithResponse(toBlockBlobSimpleUploadOptions(options, request.getInputStream(), request.getContentSize().get()))
+                .uploadWithResponse(toBlockBlobSimpleUploadOptions(options, request.getInputStream(), contentSize.get()))
                 .map(Response::getValue)
             : blobAsyncClient.deleteIfExists()
                 .then(blobAsyncClient.uploadWithResponse(options).map(Response::getValue));
