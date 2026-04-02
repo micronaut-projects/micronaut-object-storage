@@ -35,6 +35,7 @@ import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -199,10 +200,10 @@ public class GoogleCloudStorageOperations
 
     @NonNull
     private UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
-        try {
-            Blob blob = storage.create(blobInfo, inputStreamMapper.toByteArray(uploadRequest.getInputStream()));
+        try (InputStream inputStream = uploadRequest.getInputStream()) {
+            Blob blob = storage.create(blobInfo, inputStream);
             return UploadResponse.of(uploadRequest.getKey(), blob.getEtag(), blob);
-        } catch (StorageException e) {
+        } catch (Exception e) {
             throw new ObjectStorageException("Error when trying to upload an object to Google Cloud Storage", e);
         }
     }

@@ -268,8 +268,9 @@ public class AwsS3Operations implements ObjectStorageOperations<
             BytesUploadRequest request = (BytesUploadRequest) uploadRequest;
             return RequestBody.fromBytes(request.getBytes());
         } else {
-            byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
-            return RequestBody.fromBytes(inputBytes);
+            return uploadRequest.getContentSize()
+                .map(contentSize -> RequestBody.fromInputStream(uploadRequest.getInputStream(), contentSize))
+                .orElseGet(() -> RequestBody.fromBytes(inputStreamMapper.toByteArray(uploadRequest.getInputStream())));
         }
     }
 

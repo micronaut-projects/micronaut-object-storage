@@ -5,6 +5,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
+import io.micronaut.http.multipart.StreamingFileUpload;
 import io.micronaut.objectstorage.aws.AwsS3Operations;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
@@ -35,6 +36,17 @@ public class UploadController {
             .created(response.getKey())
             .header("ETag", response.getNativeResponse().eTag());
     }
+
+//tag::streaming[]
+    @Post(uri = "/stream", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)
+    public HttpResponse<String> streamingUpload(StreamingFileUpload fileUpload) {
+        UploadRequest objectStorageUpload = UploadRequest.fromStreamingFileUpload(fileUpload, "uploads/" + fileUpload.getFilename());
+        UploadResponse<PutObjectResponse> response = objectStorage.upload(objectStorageUpload);
+        return HttpResponse
+            .created(response.getKey())
+            .header("ETag", response.getNativeResponse().eTag());
+    }
+//end::streaming[]
 
 //tag::endclass[]
 }
