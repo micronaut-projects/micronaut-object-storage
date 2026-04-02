@@ -8,6 +8,7 @@ on:
       - 'object-storage-azure/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -44,6 +45,13 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
+      - name: Export Azure cloud test credentials
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> "$GITHUB_ENV"
+          echo "AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> "$GITHUB_ENV"
+          echo "AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> "$GITHUB_ENV"
+          echo "AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT=${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}" >> "$GITHUB_ENV"
       - name: Build with Gradle
         run: |
           ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
@@ -53,10 +61,6 @@ jobs:
            GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
            GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
-           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-           AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v6.2.0

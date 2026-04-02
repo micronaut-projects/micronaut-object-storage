@@ -8,6 +8,7 @@ on:
       - 'object-storage-gcp/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -47,8 +48,13 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
+      - name: Export Google Cloud test config
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "GCLOUD_TEST_PROJECT_ID=${{ secrets.GCLOUD_TEST_PROJECT_ID }}" >> "$GITHUB_ENV"
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
+        if: github.event_name != 'pull_request'
         uses: 'google-github-actions/auth@v3'
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
@@ -61,7 +67,6 @@ jobs:
            GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
            GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
-           GCLOUD_TEST_PROJECT_ID: ${{ secrets.GCLOUD_TEST_PROJECT_ID }}
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v6.2.0

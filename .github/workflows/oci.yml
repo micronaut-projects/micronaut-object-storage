@@ -8,6 +8,7 @@ on:
       - 'object-storage-oracle-cloud/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -47,6 +48,16 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
+      - name: Export Oracle Cloud test credentials
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "OCI_FINGERPRINT=${{ secrets.OCI_FINGERPRINT }}" >> "$GITHUB_ENV"
+          echo "OCI_PRIVATE_KEY=${{ secrets.OCI_PRIVATE_KEY }}" >> "$GITHUB_ENV"
+          echo "OCI_REGION=${{ secrets.OCI_REGION }}" >> "$GITHUB_ENV"
+          echo "OCI_TENANT_ID=${{ secrets.OCI_TENANT_ID }}" >> "$GITHUB_ENV"
+          echo "OCI_USER_ID=${{ secrets.OCI_USER_ID }}" >> "$GITHUB_ENV"
+          echo "ORACLE_CLOUD_TEST_NAMESPACE=${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}" >> "$GITHUB_ENV"
+          echo "ORACLE_CLOUD_TEST_COMPARTMENT_ID=${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}" >> "$GITHUB_ENV"
       - name: Build with Gradle
         run: |
           ./gradlew :micronaut-object-storage-oracle-cloud:test --no-daemon --parallel --continue
@@ -56,13 +67,6 @@ jobs:
            GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
            GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
-           OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
-           OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
-           OCI_REGION: ${{ secrets.OCI_REGION }}
-           OCI_TENANT_ID: ${{ secrets.OCI_TENANT_ID }}
-           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
-           ORACLE_CLOUD_TEST_NAMESPACE: ${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}
-           ORACLE_CLOUD_TEST_COMPARTMENT_ID: ${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v6.2.0
