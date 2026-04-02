@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Oracle Cloud implementation of {@link ObjectStorageOperations}.
@@ -70,6 +71,7 @@ public class OracleCloudStorageOperations
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
     private final RegionProvider regionProvider;
+    private final Supplier<UploadManager> uploadManagerSupplier;
 
     /**
      * @param configuration Oracle Cloud Storage Configuration
@@ -78,9 +80,17 @@ public class OracleCloudStorageOperations
      */
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client, RegionProvider regionProvider) {
+        this(configuration, client, regionProvider, () -> new UploadManager(client, UploadConfiguration.builder().build()));
+    }
+
+    OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
+                                 ObjectStorage client,
+                                 RegionProvider regionProvider,
+                                 Supplier<UploadManager> uploadManagerSupplier) {
         this.configuration = configuration;
         this.client = client;
         this.regionProvider = regionProvider;
+        this.uploadManagerSupplier = uploadManagerSupplier;
     }
 
     @Override
@@ -107,13 +117,8 @@ public class OracleCloudStorageOperations
     }
 
     @NonNull
-    protected UploadManager createUploadManager() {
-        return new UploadManager(client, UploadConfiguration.builder().build());
-    }
-
-    @NonNull
-    protected PutObjectResponse uploadWithManager(@NonNull PutObjectRequest putObjectRequest, long contentSize) {
-        UploadManager.UploadResponse response = createUploadManager().upload(
+    private PutObjectResponse uploadWithManager(@NonNull PutObjectRequest putObjectRequest, long contentSize) {
+        UploadManager.UploadResponse response = uploadManagerSupplier.get().upload(
             UploadManager.UploadRequest.builder(putObjectRequest.getPutObjectBody(), contentSize)
                 .build(putObjectRequest)
         );

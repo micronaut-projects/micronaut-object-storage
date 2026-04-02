@@ -8,6 +8,8 @@ import com.oracle.bmc.objectstorage.transfer.UploadManager
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 
+import java.util.function.Supplier
+
 class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
 
     void "known-length uploads use UploadManager and preserve PutObjectResponse"() {
@@ -19,7 +21,7 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         ObjectStorage client = Mock()
         RegionProvider regionProvider = Stub()
         UploadManager uploadManager = Mock()
-        OracleCloudStorageOperations operations = new TestOracleCloudStorageOperations(configuration, client, regionProvider, uploadManager)
+        OracleCloudStorageOperations operations = new OracleCloudStorageOperations(configuration, client, regionProvider, { uploadManager } as Supplier<UploadManager>)
         UploadRequest uploadRequest = UploadRequest.fromBytes('micronaut'.bytes, 'guide.txt', 'text/plain')
 
         when:
@@ -74,7 +76,7 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         ObjectStorage client = Mock()
         RegionProvider regionProvider = Stub()
         UploadManager uploadManager = Mock()
-        OracleCloudStorageOperations operations = new TestOracleCloudStorageOperations(configuration, client, regionProvider, uploadManager)
+        OracleCloudStorageOperations operations = new OracleCloudStorageOperations(configuration, client, regionProvider, { uploadManager } as Supplier<UploadManager>)
         UploadRequest uploadRequest = Stub() {
             getKey() >> 'streaming.txt'
             getContentSize() >> Optional.empty()
@@ -109,23 +111,5 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         def field = UploadManager.UploadRequest.getDeclaredField('putObjectRequest')
         field.accessible = true
         return (PutObjectRequest) field.get(uploadRequest)
-    }
-
-    private static final class TestOracleCloudStorageOperations extends OracleCloudStorageOperations {
-
-        private final UploadManager uploadManager
-
-        TestOracleCloudStorageOperations(OracleCloudStorageConfiguration configuration,
-                                         ObjectStorage client,
-                                         RegionProvider regionProvider,
-                                         UploadManager uploadManager) {
-            super(configuration, client, regionProvider)
-            this.uploadManager = uploadManager
-        }
-
-        @Override
-        protected UploadManager createUploadManager() {
-            return uploadManager
-        }
     }
 }

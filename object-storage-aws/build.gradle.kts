@@ -7,6 +7,7 @@ dependencies {
     api(mnAws.micronaut.aws.sdk.v2)
     api(libs.amazon.awssdk.s3)
 
+    implementation(platform(libs.netty.bom))
     implementation(platform(mnAws.micronaut.aws.bom))
     annotationProcessor(mnValidation.micronaut.validation.processor)
     implementation(mnValidation.micronaut.validation)
