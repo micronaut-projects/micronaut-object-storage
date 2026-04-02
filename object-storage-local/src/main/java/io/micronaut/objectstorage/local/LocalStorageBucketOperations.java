@@ -92,6 +92,7 @@ final class LocalStorageBucketOperations implements BucketOperations<
         try {
             deleteRecursively(path);
         } catch (NoSuchFileException ignored) {
+            // Deleting a missing bucket is a no-op.
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -127,12 +128,12 @@ final class LocalStorageBucketOperations implements BucketOperations<
 
     @Override
     public Set<String> listBuckets() {
-        Stream<String> staticStores = this.staticStores.stream()
+        Stream<String> staticBucketNames = this.staticStores.stream()
             .map(this::staticIdentifier);
         Path dynamicStorePath = moduleConfiguration.getDirectory();
         if (dynamicStorePath != null) {
             try (Stream<Path> list = Files.list(dynamicStorePath)) {
-                return Stream.concat(staticStores, list.map(p -> p.getFileName().toString()))
+                return Stream.concat(staticBucketNames, list.map(p -> p.getFileName().toString()))
                     .collect(Collectors.toSet());
             } catch (NoSuchFileException | NotDirectoryException ignored) {
                 // just list static stores
@@ -140,7 +141,7 @@ final class LocalStorageBucketOperations implements BucketOperations<
                 throw new UncheckedIOException(e);
             }
         }
-        return staticStores.collect(Collectors.toSet());
+        return staticBucketNames.collect(Collectors.toSet());
     }
 
     @Override

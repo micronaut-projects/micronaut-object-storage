@@ -31,12 +31,12 @@ import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 @EachProperty(AzureBlobStorageEndpointConfiguration.PREFIX)
 public class AzureBlobStorageEndpointConfiguration extends AbstractObjectStorageConfiguration {
 
-    public static final String NAME = "azure-bucket-operations";
+    public static final String CONFIGURATION_NAME = "azure-bucket-operations";
 
-    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + NAME;
+    public static final String PREFIX = ObjectStorageConfiguration.PREFIX + '.' + CONFIGURATION_NAME;
 
     @NonNull
-    private String endpoint;
+    private String endpoint = "";
 
     public AzureBlobStorageEndpointConfiguration(@Parameter String name) {
         super(name);
