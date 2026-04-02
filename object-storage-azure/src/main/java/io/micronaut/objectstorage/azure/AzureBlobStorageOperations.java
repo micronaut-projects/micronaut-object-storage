@@ -225,6 +225,11 @@ public class AzureBlobStorageOperations
             new BlockBlobSimpleUploadOptions(new BufferedInputStream(inputStream), length);
         simpleUploadOptions.setMetadata(options.getMetadata());
         simpleUploadOptions.setHeaders(options.getHeaders());
+        simpleUploadOptions.setTags(options.getTags());
+        simpleUploadOptions.setTier(options.getTier());
+        simpleUploadOptions.setRequestConditions(options.getRequestConditions());
+        simpleUploadOptions.setImmutabilityPolicy(options.getImmutabilityPolicy());
+        simpleUploadOptions.setLegalHold(options.isLegalHold());
         return simpleUploadOptions;
     }
 
