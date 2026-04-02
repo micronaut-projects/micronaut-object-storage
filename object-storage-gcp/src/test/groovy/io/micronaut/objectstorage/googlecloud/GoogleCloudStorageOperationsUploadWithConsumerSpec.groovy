@@ -1,7 +1,6 @@
 package io.micronaut.objectstorage.googlecloud
 
 
-import com.google.cloud.WriteChannel
 import com.google.cloud.storage.*
 import groovy.transform.AutoImplement
 import io.micronaut.context.annotation.Property
@@ -17,9 +16,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.util.Optional
 
@@ -66,7 +63,7 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         objectStorage.upload(uploadRequest)
 
         then:
-        storageReplacement.writerInvoked
+        storageReplacement.createFromInvoked
         storageReplacement.blobInfo
         storageReplacement.blobInfo.contentType == "text/plain"
         storageReplacement.streamedBytes == bytes
@@ -83,61 +80,21 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     static class StorageReplacement implements Storage {
 
         BlobInfo blobInfo
-        boolean writerInvoked
+        boolean createFromInvoked
         byte[] streamedBytes
 
         @Override
-        WriteChannel writer(BlobInfo blobInfo, Storage.BlobWriteOption... options) {
+        Blob createFrom(BlobInfo blobInfo, InputStream content, Storage.BlobWriteOption... options) {
             this.blobInfo = blobInfo
-            this.writerInvoked = true
-            return new RecordingWriteChannel(this)
-        }
-
-        @Override
-        Blob get(BlobId blob, Storage.BlobGetOption... options) {
-            return blobMock()
-        }
-
-        @Override
-        Blob get(BlobId blob) {
+            this.createFromInvoked = true
+            this.streamedBytes = content.bytes
             return blobMock()
         }
 
         void reset() {
             blobInfo = null
-            writerInvoked = false
+            createFromInvoked = false
             streamedBytes = null
-        }
-    }
-
-    @AutoImplement
-    static class RecordingWriteChannel implements WriteChannel {
-        private final StorageReplacement storageReplacement
-        private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-        private boolean open = true
-
-        RecordingWriteChannel(StorageReplacement storageReplacement) {
-            this.storageReplacement = storageReplacement
-        }
-
-        @Override
-        int write(ByteBuffer buffer) {
-            byte[] chunk = new byte[buffer.remaining()]
-            buffer.get(chunk)
-            outputStream.write(chunk)
-            storageReplacement.streamedBytes = outputStream.toByteArray()
-            return chunk.length
-        }
-
-        @Override
-        boolean isOpen() {
-            return open
-        }
-
-        @Override
-        void close() {
-            open = false
-            storageReplacement.streamedBytes = outputStream.toByteArray()
         }
     }
 
