@@ -16,7 +16,9 @@
 package io.micronaut.objectstorage.azure;
 
 import com.azure.core.credential.TokenCredential;
+import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.common.StorageSharedKeyCredential;
@@ -34,7 +36,9 @@ import io.micronaut.inject.qualifiers.Qualifiers;
  * <ul>
  *     <li>For each {@link AzureBlobStorageConfiguration}, creates a {@link BlobServiceClientBuilder}.</li>
  *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceClient}</li>
+ *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceAsyncClient}</li>
  *     <li>For each {@link BlobServiceClient}, creates a {@link BlobContainerClient}</li>
+ *     <li>For each {@link BlobServiceAsyncClient}, creates a {@link BlobContainerAsyncClient}</li>
  * </ul>
  *
  * @author Pavol Gressa
@@ -94,6 +98,15 @@ public class AzureBlobStorageFactory {
     }
 
     /**
+     * @param builder the builder
+     * @return the {@link BlobServiceAsyncClient}
+     */
+    @EachBean(BlobServiceClientBuilder.class)
+    public BlobServiceAsyncClient blobServiceAsyncClient(@NonNull BlobServiceClientBuilder builder) {
+        return builder.buildAsyncClient();
+    }
+
+    /**
      * @param name          The configuration
      * @param serviceClient The service client
      * @return The {@link BlobContainerClient}
@@ -103,5 +116,17 @@ public class AzureBlobStorageFactory {
                                                    @NonNull BlobServiceClient serviceClient) {
         final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
         return serviceClient.getBlobContainerClient(configuration.getContainer());
+    }
+
+    /**
+     * @param name               The configuration
+     * @param serviceAsyncClient The async service client
+     * @return The {@link BlobContainerAsyncClient}
+     */
+    @EachBean(BlobServiceAsyncClient.class)
+    public BlobContainerAsyncClient blobContainerAsyncClient(@Parameter String name,
+                                                             @NonNull BlobServiceAsyncClient serviceAsyncClient) {
+        final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
+        return serviceAsyncClient.getBlobContainerAsyncClient(configuration.getContainer());
     }
 }

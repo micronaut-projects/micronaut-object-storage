@@ -41,3 +41,10 @@ payload streaming would require new additive request and entry abstractions in a
 Reactive beans are created alongside the existing blocking beans, so current injections of
 api:objectstorage.ObjectStorageOperations[] continue to work unchanged. To opt in, inject
 api:objectstorage.ReactiveObjectStorageOperations[] instead.
+
+Provider behavior in phase 1 is intentionally split:
+
+- AWS S3 uses the AWS SDK v2 `S3AsyncClient`
+- Azure Blob Storage uses Azure async blob clients
+- Google Cloud Storage, Oracle Cloud Infrastructure, and local storage keep the same additive reactive API,
+  but currently adapt their existing blocking implementations onto Micronaut's blocking executor
