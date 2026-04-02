@@ -1,6 +1,7 @@
 package io.micronaut.objectstorage.aws
 
 import io.micronaut.context.BeanContext
+import io.micronaut.context.ApplicationContext
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import io.micronaut.core.annotation.NonNull
@@ -40,6 +41,23 @@ class AwsS3ConfigurationSpec extends Specification {
         then:
         'pictures' == awsS3Configuration.name
         'pictures-bucket' == awsS3Configuration.bucket
+    }
+
+    void "module enabled flag does not create an extra named configuration"() {
+        given:
+        def context = ApplicationContext.run([
+            'micronaut.object-storage.aws.default.bucket': 'pictures-bucket',
+            'micronaut.object-storage.aws.enabled'       : true
+        ])
+
+        expect:
+        context.containsBean(ObjectStorageOperations, Qualifiers.byName("default"))
+        context.containsBean(AwsS3Configuration, Qualifiers.byName("default"))
+        !context.containsBean(ObjectStorageOperations, Qualifiers.byName("enabled"))
+        !context.containsBean(AwsS3Configuration, Qualifiers.byName("enabled"))
+
+        cleanup:
+        context.close()
     }
 
     @See("https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html")

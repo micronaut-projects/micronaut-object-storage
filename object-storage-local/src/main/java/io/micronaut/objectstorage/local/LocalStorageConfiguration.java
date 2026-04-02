@@ -17,9 +17,11 @@ package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.EachPropertyContainsEntriesCondition;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 
 import java.nio.file.Files;
@@ -34,6 +36,7 @@ import static io.micronaut.objectstorage.local.LocalStorageConfiguration.PREFIX;
  * @since 2.0.0
  */
 @EachProperty(PREFIX)
+@Requires(condition = EachPropertyContainsEntriesCondition.class)
 public class LocalStorageConfiguration extends AbstractObjectStorageConfiguration {
 
     public static final String NAME = "local";

@@ -17,9 +17,11 @@ package io.micronaut.objectstorage.aws;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.Introspected;
 import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.EachPropertyContainsEntriesCondition;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 
 import jakarta.validation.constraints.Pattern;
@@ -33,6 +35,7 @@ import static io.micronaut.objectstorage.aws.AwsS3Configuration.PREFIX;
  * @since 1.0
  */
 @EachProperty(PREFIX)
+@Requires(condition = EachPropertyContainsEntriesCondition.class)
 @Introspected
 public class AwsS3Configuration extends AbstractObjectStorageConfiguration {
 
