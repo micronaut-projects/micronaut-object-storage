@@ -42,6 +42,9 @@ class GoogleCloudBucketFakeGcsServerSpec extends AbstractGoogleCloudBucketSpec {
         @Singleton
         @Primary
         Storage storage() {
+            if (!fakeGcs.running) {
+                fakeGcs.start()
+            }
             String fakeGcsExternalUrl = "http://${fakeGcs.host}:${fakeGcs.firstMappedPort}"
             StorageOptions.newBuilder()
                     .setHost(fakeGcsExternalUrl)

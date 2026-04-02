@@ -15,57 +15,49 @@
  */
 package io.micronaut.objectstorage.googlecloud;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.BucketInfo;
 import com.google.cloud.storage.Storage;
-import io.micronaut.objectstorage.InputStreamMapper;
-import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.context.annotation.EachBean;
+import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.objectstorage.bucket.BucketEntry;
 import io.micronaut.objectstorage.bucket.BucketOperations;
-import jakarta.inject.Singleton;
+import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import org.jspecify.annotations.NonNull;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * GCP bucket operations.
  *
- * @since 2.2.0
- * @author Jonas Konrad
+ * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
  */
-@Singleton
-public class GoogleCloudBucketOperations
-    implements BucketOperations<BlobInfo.Builder, Blob, Boolean> {
-
-    private final InputStreamMapper inputStreamMapper;
+@EachBean(GoogleCloudStorageConfiguration.class)
+@Requires(condition = ToggeableCondition.class)
+@Requires(beans = GoogleCloudStorageConfiguration.class)
+public class GoogleCloudBucketOperations implements BucketOperations<Bucket> {
     private final Storage storage;
 
-    public GoogleCloudBucketOperations(InputStreamMapper inputStreamMapper, Storage storage) {
-        this.inputStreamMapper = inputStreamMapper;
+    public GoogleCloudBucketOperations(@Parameter GoogleCloudStorageConfiguration configuration,
+                                       Storage storage) {
         this.storage = storage;
     }
 
     @Override
-    public void createBucket(String name) {
+    public void create(@NonNull String name) {
         storage.create(BucketInfo.newBuilder(name).build());
     }
 
     @Override
-    public void deleteBucket(String name) {
+    public Optional<BucketEntry<Bucket>> retrieve(@NonNull String name) {
+        Bucket bucket = storage.get(name);
+        return bucket == null ? Optional.empty() : Optional.of(new BucketEntry<>(name, bucket));
+    }
+
+    @Override
+    public void delete(@NonNull String name) {
         storage.delete(name);
-    }
-
-    @Override
-    public Set<String> listBuckets() {
-        return storage.list().streamAll()
-            .map(b -> b.asBucketInfo().getName())
-            .collect(Collectors.toSet());
-    }
-
-    @Override
-    public ObjectStorageOperations<BlobInfo.Builder, Blob, Boolean> storageForBucket(String bucket) {
-        GoogleCloudStorageConfiguration configuration = new GoogleCloudStorageConfiguration("");
-        configuration.setBucket(bucket);
-        return new GoogleCloudStorageOperations(configuration, inputStreamMapper, storage);
     }
 }

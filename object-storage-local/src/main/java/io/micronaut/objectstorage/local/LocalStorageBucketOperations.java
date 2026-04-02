@@ -15,52 +15,41 @@
  */
 package io.micronaut.objectstorage.local;
 
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.context.annotation.EachBean;
+import io.micronaut.context.annotation.Parameter;
 import io.micronaut.objectstorage.bucket.BucketOperations;
-import jakarta.inject.Singleton;
+import io.micronaut.objectstorage.bucket.BucketEntry;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 /**
  * Local bucket operations.
  *
- * @since 2.2.0
- * @author Jonas Konrad
+ * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
  */
-@Singleton
-@Requires(condition = LocalStorageBucketOperationsCondition.class)
-final class LocalStorageBucketOperations implements BucketOperations<
-    LocalStorageOperations.LocalStorageFile,
-    LocalStorageOperations.LocalStorageFile,
-    LocalStorageOperations.LocalStorageFile> {
-    private final LocalStorageBucketOperationsConfiguration moduleConfiguration;
-    private final List<LocalStorageOperations> staticStores;
+@EachBean(LocalStorageConfiguration.class)
+final class LocalStorageBucketOperations implements BucketOperations<Path> {
+    private final Path rootDirectory;
 
-    public LocalStorageBucketOperations(
-        @NonNull List<LocalStorageOperations> staticStores,
-        @NonNull LocalStorageBucketOperationsConfiguration moduleConfiguration
-    ) {
-        this.staticStores = staticStores;
-        this.moduleConfiguration = moduleConfiguration;
+    LocalStorageBucketOperations(@Parameter LocalStorageConfiguration configuration) {
+        this.rootDirectory = configuration.getPath().toAbsolutePath().normalize().getParent();
+        if (rootDirectory == null) {
+            throw new IllegalArgumentException("Local storage bucket operations require a bucket path with a parent directory");
+        }
     }
 
     @Override
-    public void createBucket(String name) {
+    public void create(@NonNull String name) {
         Path path = resolveDynamicBucketPath(name);
         try {
             Files.createDirectories(path);
@@ -70,13 +59,8 @@ final class LocalStorageBucketOperations implements BucketOperations<
     }
 
     private Path resolveDynamicBucketPath(String name) {
-        // this method does no IO, just safety checks
-        Path dynamicStorePath = moduleConfiguration.getDirectory();
-        if (dynamicStorePath == null) {
-            throw new IllegalStateException("Please configure " + LocalStorageBucketOperationsConfiguration.BUCKET_OPERATIONS_DIRECTORY + " to create dynamic buckets");
-        }
-        Path path = dynamicStorePath.resolve(name).normalize();
-        if (!path.getParent().equals(dynamicStorePath) ||
+        Path path = rootDirectory.resolve(name).normalize();
+        if (!path.getParent().equals(rootDirectory) ||
             !path.getFileName().toString().equals(name)) {
             throw new IllegalArgumentException("Bucket name must not contain filesystem special characters");
         }
@@ -84,10 +68,17 @@ final class LocalStorageBucketOperations implements BucketOperations<
     }
 
     @Override
-    public void deleteBucket(String name) {
-        if (Path.of(name).isAbsolute()) {
-            throw new IllegalArgumentException("Cannot delete statically configured local storage buckets");
+    @NonNull
+    public Optional<BucketEntry<Path>> retrieve(@NonNull String name) {
+        Path path = resolveDynamicBucketPath(name);
+        if (!Files.isDirectory(path)) {
+            return Optional.empty();
         }
+        return Optional.of(new BucketEntry<>(name, path));
+    }
+
+    @Override
+    public void delete(@NonNull String name) {
         Path path = resolveDynamicBucketPath(name);
         try {
             deleteRecursively(path);
@@ -124,43 +115,5 @@ final class LocalStorageBucketOperations implements BucketOperations<
                 return FileVisitResult.CONTINUE;
             }
         });
-    }
-
-    @Override
-    public Set<String> listBuckets() {
-        Stream<String> staticBucketNames = this.staticStores.stream()
-            .map(this::staticIdentifier);
-        Path dynamicStorePath = moduleConfiguration.getDirectory();
-        if (dynamicStorePath != null) {
-            try (Stream<Path> list = Files.list(dynamicStorePath)) {
-                return Stream.concat(staticBucketNames, list.map(p -> p.getFileName().toString()))
-                    .collect(Collectors.toSet());
-            } catch (NoSuchFileException | NotDirectoryException ignored) {
-                // just list static stores
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
-        return staticBucketNames.collect(Collectors.toSet());
-    }
-
-    @Override
-    public ObjectStorageOperations<LocalStorageOperations.LocalStorageFile, LocalStorageOperations.LocalStorageFile, LocalStorageOperations.LocalStorageFile> storageForBucket(String bucket) {
-        // absolute paths are static stores, relative paths are dynamic
-        if (Path.of(bucket).isAbsolute()) {
-            // we only permit configured buckets to prevent access to the whole file system
-            return staticStores.stream()
-                .filter(lso -> staticIdentifier(lso).equals(bucket))
-                .findFirst().orElseThrow(() -> new NoSuchElementException("No such bucket configured. Please create it under the " + LocalStorageConfiguration.PREFIX + " config prefix: " + bucket));
-        } else {
-            Path path = resolveDynamicBucketPath(bucket);
-            LocalStorageConfiguration mockConfig = new LocalStorageConfiguration("");
-            mockConfig.setPath(path);
-            return new LocalStorageOperations(mockConfig);
-        }
-    }
-
-    private String staticIdentifier(LocalStorageOperations lso) {
-        return lso.configuration.getPath().toAbsolutePath().toString();
     }
 }

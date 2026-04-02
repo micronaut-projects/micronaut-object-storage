@@ -1,0 +1,41 @@
+== Bucket and Container Management
+
+The `BucketOperations` API adds provider-agnostic lifecycle management for object storage buckets and containers
+without changing the existing `ObjectStorageOperations` contract.
+
+[source,java]
+----
+import io.micronaut.objectstorage.bucket.BucketOperations;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+@Inject
+@Named("default")
+BucketOperations<?> bucketOperations;
+----
+
+Use the injected bean to create, retrieve, and delete provider-managed buckets or containers by name:
+
+[source,java]
+----
+bucketOperations.create("reports-archive");
+boolean exists = bucketOperations.exists("reports-archive");
+bucketOperations.retrieve("reports-archive").ifPresent(bucket -> {
+    System.out.println(bucket.name());
+});
+bucketOperations.delete("reports-archive");
+----
+
+The provider-specific native metadata is exposed through `BucketEntry#nativeEntry()` for advanced use cases, while
+the portable API keeps the logical bucket or container name available via `BucketEntry#name()`.
+
+NOTE: Creating or deleting a bucket or container does not retarget an already injected `ObjectStorageOperations` bean.
+Existing object-operation beans continue to use the configured default bucket or container for their named storage.
+
+Provider notes:
+
+- AWS, Google Cloud Storage, and Oracle Cloud use bucket terminology.
+- Azure Blob Storage uses container terminology, but the same `BucketOperations` API is exposed for portability.
+- Local storage maps bucket names to sibling directories under the configured local storage root.
+- Oracle Cloud bucket lifecycle operations require `micronaut.object-storage.oracle-cloud.<name>.compartment-id`
+  in addition to the existing `bucket` and `namespace` configuration.

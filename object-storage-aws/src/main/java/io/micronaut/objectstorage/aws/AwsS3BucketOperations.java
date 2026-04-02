@@ -15,43 +15,44 @@
  */
 package io.micronaut.objectstorage.aws;
 
-import io.micronaut.objectstorage.InputStreamMapper;
+import io.micronaut.context.annotation.EachBean;
+import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.ObjectStorageException;
-import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.bucket.BucketEntry;
 import io.micronaut.objectstorage.bucket.BucketOperations;
-import jakarta.inject.Singleton;
+import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import org.jspecify.annotations.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * AWS bucket operations.
  *
- * @since 2.2.0
- * @author Jonas Konrad
+ * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
  */
-@Singleton
-public class AwsS3BucketOperations implements BucketOperations<
-    PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
+@EachBean(AwsS3Configuration.class)
+@Requires(condition = ToggeableCondition.class)
+@Requires(beans = AwsS3Configuration.class)
+public class AwsS3BucketOperations implements BucketOperations<HeadBucketResponse> {
     private final S3Client s3Client;
-    private final InputStreamMapper inputStreamMapper;
 
-    public AwsS3BucketOperations(S3Client s3Client, InputStreamMapper inputStreamMapper) {
+    public AwsS3BucketOperations(@Parameter AwsS3Configuration configuration,
+                                 S3Client s3Client) {
         this.s3Client = s3Client;
-        this.inputStreamMapper = inputStreamMapper;
     }
 
     @Override
-    public void createBucket(String name) {
+    public void create(@NonNull String name) {
         try {
             s3Client.createBucket(CreateBucketRequest.builder()
                 .bucket(name)
@@ -63,7 +64,23 @@ public class AwsS3BucketOperations implements BucketOperations<
     }
 
     @Override
-    public void deleteBucket(String name) {
+    @NonNull
+    public Optional<BucketEntry<HeadBucketResponse>> retrieve(@NonNull String name) {
+        try {
+            HeadBucketResponse response = s3Client.headBucket(HeadBucketRequest.builder()
+                .bucket(name)
+                .build());
+            return Optional.of(new BucketEntry<>(name, response));
+        } catch (NoSuchBucketException e) {
+            return Optional.empty();
+        } catch (AwsServiceException | SdkClientException e) {
+            String msg = String.format("Error when trying to retrieve a bucket with name [%s] from Amazon S3", name);
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    public void delete(@NonNull String name) {
         try {
             s3Client.deleteBucket(DeleteBucketRequest.builder()
                 .bucket(name)
@@ -72,23 +89,5 @@ public class AwsS3BucketOperations implements BucketOperations<
             String msg = String.format("Error when trying to delete a bucket with name [%s] on Amazon S3", name);
             throw new ObjectStorageException(msg, e);
         }
-    }
-
-    @Override
-    public Set<String> listBuckets() {
-        try {
-            return s3Client.listBuckets().buckets().stream()
-                .map(Bucket::name)
-                .collect(Collectors.toSet());
-        } catch (AwsServiceException | SdkClientException e) {
-            throw new ObjectStorageException("Error when trying to list buckets on Amazon S3", e);
-        }
-    }
-
-    @Override
-    public ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> storageForBucket(String bucket) {
-        AwsS3Configuration cfg = new AwsS3Configuration("");
-        cfg.setBucket(bucket);
-        return new AwsS3Operations(cfg, s3Client, inputStreamMapper);
     }
 }

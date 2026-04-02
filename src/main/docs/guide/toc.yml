@@ -2,6 +2,7 @@ introduction: Introduction
 releaseHistory: Release History
 quickStart: Quick Start
 paginatedListing: Paginated Listing
+bucketManagement: Bucket and Container Management
 aws: Amazon S3
 azure: Azure Blob Storage
 gcp: Google Cloud Storage

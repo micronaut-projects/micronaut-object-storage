@@ -15,27 +15,23 @@
  */
 package io.micronaut.objectstorage.azure;
 
-import com.azure.core.http.rest.Response;
 import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.models.BlobContainerItem;
-import com.azure.storage.blob.models.BlockBlobItem;
-import com.azure.storage.blob.options.BlobParallelUploadOptions;
+import com.azure.storage.blob.models.BlobContainerProperties;
 import io.micronaut.context.annotation.EachBean;
-import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.bucket.BucketEntry;
 import io.micronaut.objectstorage.bucket.BucketOperations;
+import org.jspecify.annotations.NonNull;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * Azure bucket operations.
  *
- * @since 2.2.0
- * @author Jonas Konrad
+ * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
  */
 @EachBean(BlobServiceClient.class)
-public class AzureBlobBucketOperations
-    implements BucketOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> {
+public class AzureBlobBucketOperations implements BucketOperations<BlobContainerProperties> {
 
     private final BlobServiceClient blobServiceClient;
 
@@ -44,24 +40,21 @@ public class AzureBlobBucketOperations
     }
 
     @Override
-    public void createBucket(String name) {
+    public void create(@NonNull String name) {
         blobServiceClient.createBlobContainer(name);
     }
 
     @Override
-    public void deleteBucket(String name) {
+    public Optional<BucketEntry<BlobContainerProperties>> retrieve(@NonNull String name) {
+        var containerClient = blobServiceClient.getBlobContainerClient(name);
+        if (!containerClient.exists()) {
+            return Optional.empty();
+        }
+        return Optional.of(new BucketEntry<>(name, containerClient.getProperties()));
+    }
+
+    @Override
+    public void delete(@NonNull String name) {
         blobServiceClient.deleteBlobContainer(name);
-    }
-
-    @Override
-    public Set<String> listBuckets() {
-        return blobServiceClient.listBlobContainers().stream()
-            .map(BlobContainerItem::getName)
-            .collect(Collectors.toSet());
-    }
-
-    @Override
-    public ObjectStorageOperations<BlobParallelUploadOptions, BlockBlobItem, Response<Void>> storageForBucket(String bucket) {
-        return new AzureBlobStorageOperations(blobServiceClient.getBlobContainerClient(bucket));
     }
 }

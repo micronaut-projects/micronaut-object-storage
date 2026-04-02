@@ -18,9 +18,9 @@ class AzureBlobStorageFactorySpec extends Specification {
 
     void 'it builds blob service clients for both credential types'() {
         given:
-        def factory = new AzureBlobStorageFactory()
-        def tokenConfiguration = endpointConfiguration('token-endpoint', ACCOUNT_URL, true)
-        def sharedKeyConfiguration = endpointConfiguration('shared-key-endpoint', ACCOUNT_URL, true)
+        def factory = new AzureBlobStorageFactory(Mock(io.micronaut.context.BeanContext))
+        def tokenConfiguration = storageConfiguration('token-endpoint', ACCOUNT_URL, true)
+        def sharedKeyConfiguration = storageConfiguration('shared-key-endpoint', ACCOUNT_URL, true)
 
         when:
         def tokenBuilder = factory.blobServiceClientBuilderWithTokenCredential(tokenConfiguration, tokenCredential())
@@ -39,61 +39,44 @@ class AzureBlobStorageFactorySpec extends Specification {
 
     void 'it builds blob container clients for both credential types'() {
         given:
-        def factory = new AzureBlobStorageFactory()
+        def beanContext = Mock(io.micronaut.context.BeanContext)
+        def factory = new AzureBlobStorageFactory(beanContext)
         def tokenConfiguration = storageConfiguration('token-container', ACCOUNT_URL, true)
         def sharedKeyConfiguration = storageConfiguration('shared-key-container', ACCOUNT_URL, true)
+        def tokenClient = factory.blobServiceClient(factory.blobServiceClientBuilderWithTokenCredential(tokenConfiguration, tokenCredential()))
+        def sharedKeyClient = factory.blobServiceClient(factory.blobServiceClientBuilderWithSharedKeyCredential(sharedKeyConfiguration, sharedKeyCredential()))
 
         when:
-        def tokenClient = factory.blobContainerClient(tokenConfiguration, tokenCredential())
-        def sharedKeyClient = factory.blobContainerClient(sharedKeyConfiguration, sharedKeyCredential())
+        def tokenContainerClient = factory.blobContainerClient('token-container', tokenClient)
+        def sharedKeyContainerClient = factory.blobContainerClient('shared-key-container', sharedKeyClient)
 
         then:
-        tokenClient.accountUrl == ACCOUNT_URL
-        tokenClient.blobContainerName == 'token-container'
-        sharedKeyClient.accountUrl == ACCOUNT_URL
-        sharedKeyClient.blobContainerName == 'shared-key-container'
+        1 * beanContext.getBean(AzureBlobStorageConfiguration, _ as io.micronaut.context.Qualifier) >> tokenConfiguration
+        1 * beanContext.getBean(AzureBlobStorageConfiguration, _ as io.micronaut.context.Qualifier) >> sharedKeyConfiguration
+        tokenContainerClient.accountUrl == ACCOUNT_URL
+        tokenContainerClient.blobContainerName == 'token-container'
+        sharedKeyContainerClient.accountUrl == ACCOUNT_URL
+        sharedKeyContainerClient.blobContainerName == 'shared-key-container'
     }
 
     void 'it rejects disabled endpoint and storage configurations'() {
         given:
-        def factory = new AzureBlobStorageFactory()
-        def disabledEndpointConfiguration = endpointConfiguration('disabled-endpoint', ACCOUNT_URL, false)
-        def disabledStorageConfiguration = storageConfiguration('disabled-container', ACCOUNT_URL, false)
+        def factory = new AzureBlobStorageFactory(Mock(io.micronaut.context.BeanContext))
+        def disabledConfiguration = storageConfiguration('disabled-endpoint', ACCOUNT_URL, false)
 
         when:
-        factory.blobServiceClientBuilderWithTokenCredential(disabledEndpointConfiguration, tokenCredential())
+        factory.blobServiceClientBuilderWithTokenCredential(disabledConfiguration, tokenCredential())
 
         then:
         def e = thrown(DisabledBeanException)
-        e.message == 'azure object-storage-configuration disabled-endpointis disabled'
+        e.message == 'azure object-storage-configuration disabled-endpoint is disabled'
 
         when:
-        factory.blobServiceClientBuilderWithSharedKeyCredential(disabledEndpointConfiguration, sharedKeyCredential())
+        factory.blobServiceClientBuilderWithSharedKeyCredential(disabledConfiguration, sharedKeyCredential())
 
         then:
         e = thrown(DisabledBeanException)
-        e.message == 'azure object-storage-configuration disabled-endpointis disabled'
-
-        when:
-        factory.blobContainerClient(disabledStorageConfiguration, tokenCredential())
-
-        then:
-        e = thrown(DisabledBeanException)
-        e.message == 'azure object-storage-configuration disabled-containeris disabled'
-
-        when:
-        factory.blobContainerClient(disabledStorageConfiguration, sharedKeyCredential())
-
-        then:
-        e = thrown(DisabledBeanException)
-        e.message == 'azure object-storage-configuration disabled-containeris disabled'
-    }
-
-    private static AzureBlobStorageEndpointConfiguration endpointConfiguration(String name, String endpoint, boolean enabled) {
-        def configuration = new AzureBlobStorageEndpointConfiguration(name)
-        configuration.endpoint = endpoint
-        configuration.enabled = enabled
-        configuration
+        e.message == 'azure object-storage-configuration disabled-endpoint is disabled'
     }
 
     private static AzureBlobStorageConfiguration storageConfiguration(String name, String endpoint, boolean enabled) {

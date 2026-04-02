@@ -27,7 +27,6 @@ class AzureBlobStorageAzuriteSpec extends AbstractAzureBlobStorageSpec {
     Map<String, String> getProperties() {
         azuriteContainer.start()
         super.getProperties() + [
-                (AzureBlobStorageEndpointConfiguration.PREFIX + '.default.endpoint'): "http://127.0.0.1:${azuriteContainer.getMappedPort(10000)}/devstoreaccount1",
                 (PREFIX + '.' + OBJECT_STORAGE_NAME + '.endpoint'): "http://127.0.0.1:${azuriteContainer.getMappedPort(10000)}/devstoreaccount1",
                 'azure.credential.storage-shared-key.account-name': 'devstoreaccount1',
                 'azure.credential.storage-shared-key.account-key' : 'Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=='

@@ -16,57 +16,52 @@
 package io.micronaut.objectstorage.bucket;
 
 import io.micronaut.core.annotation.Blocking;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.objectstorage.ObjectStorageOperations;
+import org.jspecify.annotations.NonNull;
 
-import java.util.Set;
+import java.util.Optional;
 
 /**
- * API for creating, listing, updating, and deleting buckets.
+ * API for bucket/container lifecycle management.
  *
- * @param <I> See {@link ObjectStorageOperations}
- * @param <O> See {@link ObjectStorageOperations}
- * @param <D> See {@link ObjectStorageOperations}
- * @since 2.2.0
- * @author Jonas Konrad
+ * @param <T> The provider-native bucket/container representation type.
+ * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
  */
-public interface BucketOperations<I, O, D> {
+public interface BucketOperations<T> {
     /**
      * Create a new bucket with the given name.
      *
      * @param name The name of the new bucket
      */
     @Blocking
-    @NonNull
-    void createBucket(String name);
+    void create(@NonNull String name);
 
     /**
-     * Delete a new bucket with the given name.
+     * Retrieve an existing bucket/container.
      *
      * @param name The name of the bucket
+     * @return The provider-native bucket/container data if it exists.
      */
     @Blocking
     @NonNull
-    void deleteBucket(String name);
+    Optional<BucketEntry<T>> retrieve(@NonNull String name);
 
     /**
-     * List the available buckets. This operation may be blocking.
+     * Delete a bucket/container with the given name.
      *
-     * @return The available buckets
+     * @param name The name of the bucket/container.
      */
     @Blocking
-    @NonNull
-    Set<String> listBuckets();
+    void delete(@NonNull String name);
 
     /**
-     * Create an {@link ObjectStorageOperations} implementation to access data in the given bucket.
-     * <br>
-     * If the bucket does not exist, this operation <i>may</i> fail, but usually it will only fail
-     * when trying to access the bucket contents.
-     *
-     * @param bucket The bucket name as returned by {@link #listBuckets()}
-     * @return An {@link ObjectStorageOperations} for the given bucket
+     * Checks whether a bucket/container exists.
+     * 
+     * @param name The bucket/container name.
+     * @return {@code true} if the bucket/container exists.
      */
-    @NonNull
-    ObjectStorageOperations<I, O, D> storageForBucket(@NonNull String bucket);
+    @Blocking
+    default boolean exists(@NonNull String name) {
+        return retrieve(name).isPresent();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.local;
+package io.micronaut.objectstorage.bucket;
 
-import io.micronaut.context.condition.Condition;
-import io.micronaut.context.condition.ConditionContext;
+import org.jspecify.annotations.NonNull;
 
-final class LocalStorageBucketOperationsCondition implements Condition {
-    @Override
-    public boolean matches(ConditionContext context) {
-        return !context.getBeansOfType(LocalStorageConfiguration.class).isEmpty() ||
-            context.getBean(LocalStorageBucketOperationsConfiguration.class).getDirectory() != null;
-    }
+/**
+ * Portable bucket/container lookup result.
+ *
+ * @param name The logical bucket/container name.
+ * @param nativeEntry The provider-native bucket/container representation.
+ * @param <T> The provider-native bucket/container representation type.
+ * @author Álvaro Sánchez-Mariscal
+ * @since 3.1.0
+ */
+public record BucketEntry<T>(
+    @NonNull String name,
+    @NonNull T nativeEntry
+) {
 }

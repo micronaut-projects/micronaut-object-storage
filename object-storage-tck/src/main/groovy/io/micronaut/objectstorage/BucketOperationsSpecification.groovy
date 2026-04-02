@@ -15,59 +15,100 @@
  */
 package io.micronaut.objectstorage
 
+import io.micronaut.objectstorage.bucket.BucketEntry
 import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.ThreadLocalRandom
+import java.util.UUID
 
 abstract class BucketOperationsSpecification extends Specification {
-    void crud() {
+    void 'it can create retrieve and delete buckets'() {
         given:
         def bucketOps = getBucketOperations()
-        def initBuckets = bucketOps.listBuckets()
+        def name = newBucketName()
+        PollingConditions conditions = new PollingConditions(timeout: 30)
+
+        expect:
+        !bucketOps.retrieve(name).present
+        !bucketOps.exists(name)
+
+        when:
+        bucketOps.create(name)
+
+        then:
+        conditions.eventually {
+            assert bucketOps.exists(name)
+            assert bucketOps.retrieve(name).present
+        }
+
+        and:
+        BucketEntry<?> bucket = bucketOps.retrieve(name).orElseThrow()
+
+        then:
+        bucket.name() == name
+        bucket.nativeEntry()
+
+        when:
+        bucketOps.delete(name)
+
+        then:
+        conditions.eventually {
+            assert !bucketOps.exists(name)
+            assert !bucketOps.retrieve(name).present
+        }
+
+        cleanup:
+        if (bucketOps.exists(name)) {
+            bucketOps.delete(name)
+        }
+    }
+
+    void 'it does not retarget the configured object storage bean while managing other buckets'() {
+        given:
+        def bucketOps = getBucketOperations()
+        def storage = getObjectStorage()
+        def bucketName = newBucketName()
+        def key = "bucket-ops-regression-${UUID.randomUUID()}"
         PollingConditions conditions = new PollingConditions(timeout: 30)
 
         when:
-        def name1 = "micronaut-objectstorage-test-" + ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)
-        bucketOps.createBucket(name1)
+        storage.upload(UploadRequest.fromBytes("foo".bytes, key))
+        bucketOps.create(bucketName)
+
         then:
         conditions.eventually {
-            bucketOps.listBuckets() == initBuckets + [name1]
+            assert bucketOps.exists(bucketName)
         }
+        storage.exists(key)
+        new String(storage.retrieve(key).orElseThrow().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "foo"
 
         when:
-        def bucket = bucketOps.storageForBucket(name1)
-        then:
-        bucket.listObjects().isEmpty()
+        bucketOps.delete(bucketName)
 
-        when:
-        bucket.upload(UploadRequest.fromBytes("foo".bytes, "key"))
-        then:
-        bucket.listObjects() == Set.of("key")
-        new String(bucket.retrieve("key").get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "foo"
-
-        when:
-        bucket.copy("key", "key2")
         then:
         conditions.eventually {
-            bucket.listObjects() == Set.of("key", "key2")
+            assert !bucketOps.exists(bucketName)
         }
-        new String(bucket.retrieve("key2").get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "foo"
+        storage.exists(key)
+        new String(storage.retrieve(key).orElseThrow().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "foo"
 
-        when:
-        bucket.delete("key")
-        then:
-        bucket.listObjects() == Set.of("key2")
-
-        when:
-        bucket.delete("key2")
-        bucketOps.deleteBucket(name1)
-        then:
-        bucketOps.listBuckets() == initBuckets
+        cleanup:
+        if (storage.exists(key)) {
+            storage.delete(key)
+        }
+        if (bucketOps.exists(bucketName)) {
+            bucketOps.delete(bucketName)
+        }
     }
 
-    abstract BucketOperations<?, ?, ?> getBucketOperations()
+    abstract BucketOperations<?> getBucketOperations()
+
+    abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
+
+    String newBucketName() {
+        "micronaut-object-storage-${UUID.randomUUID().toString().replace('-', '').substring(0, 20)}"
+    }
 }
