@@ -42,6 +42,11 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
     @Inject
     InputStreamMapperReplacement inputStreamMapperReplacement
 
+    void setup() {
+        s3ClientReplacement.reset()
+        inputStreamMapperReplacement.reset()
+    }
+
     void "consumer accept is invoked"() {
         given:
         Path path = ObjectStorageOperationsSpecification.createTempFile()
@@ -97,6 +102,11 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         PutObjectRequest request
         RequestBody requestBody
 
+        void reset() {
+            request = null
+            requestBody = null
+        }
+
         @Override
         PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody)
                 throws AwsServiceException, SdkClientException, S3Exception {
@@ -119,6 +129,11 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
     static class InputStreamMapperReplacement implements InputStreamMapper {
         int invocationCount
         byte[] lastBytes
+
+        void reset() {
+            invocationCount = 0
+            lastBytes = null
+        }
 
         @Override
         byte[] toByteArray(InputStream inputStream) {

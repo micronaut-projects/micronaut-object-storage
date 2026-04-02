@@ -36,9 +36,13 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     @Shared
     static Blob blobMock
 
+    void setup() {
+        blobMock = Mock(Blob)
+        storageReplacement.reset()
+    }
+
     void "consumer accept is invoked"() {
         given:
-        blobMock = Mock(Blob)
         Path path = ObjectStorageOperationsSpecification.createTempFile()
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
 
@@ -55,8 +59,6 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     void "uploads use the google cloud stream API"() {
         given:
         byte[] bytes = "stream-body".bytes
-        blobMock = Mock(Blob)
-        storageReplacement.reset()
         UploadRequest uploadRequest = new StubUploadRequest("stream.txt", bytes)
 
         when:

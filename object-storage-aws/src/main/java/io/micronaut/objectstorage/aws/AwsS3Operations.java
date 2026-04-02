@@ -49,15 +49,17 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 /**
  * AWS implementation of {@link ObjectStorageOperations}.
@@ -270,7 +272,13 @@ public class AwsS3Operations implements ObjectStorageOperations<
         } else {
             return uploadRequest.getContentSize()
                 .map(contentSize -> RequestBody.fromInputStream(uploadRequest.getInputStream(), contentSize))
-                .orElseGet(() -> RequestBody.fromBytes(inputStreamMapper.toByteArray(uploadRequest.getInputStream())));
+                .orElseGet(() -> {
+                    try (InputStream inputStream = uploadRequest.getInputStream()) {
+                        return RequestBody.fromBytes(inputStreamMapper.toByteArray(inputStream));
+                    } catch (IOException e) {
+                        throw new ObjectStorageException("Error uploading file", e);
+                    }
+                });
         }
     }
 
