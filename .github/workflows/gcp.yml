@@ -50,8 +50,10 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Export Google Cloud test config
         if: github.event_name != 'pull_request'
+        env:
+          GCLOUD_TEST_PROJECT_ID_VALUE: ${{ secrets.GCLOUD_TEST_PROJECT_ID }}
         run: |
-          echo "GCLOUD_TEST_PROJECT_ID=${{ secrets.GCLOUD_TEST_PROJECT_ID }}" >> "$GITHUB_ENV"
+          echo "GCLOUD_TEST_PROJECT_ID=$GCLOUD_TEST_PROJECT_ID_VALUE" >> "$GITHUB_ENV"
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
         if: github.event_name != 'pull_request'

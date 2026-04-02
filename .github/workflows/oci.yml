@@ -50,14 +50,22 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Export Oracle Cloud test credentials
         if: github.event_name != 'pull_request'
+        env:
+          OCI_FINGERPRINT_VALUE: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_PRIVATE_KEY_VALUE: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION_VALUE: ${{ secrets.OCI_REGION }}
+          OCI_TENANT_ID_VALUE: ${{ secrets.OCI_TENANT_ID }}
+          OCI_USER_ID_VALUE: ${{ secrets.OCI_USER_ID }}
+          ORACLE_CLOUD_TEST_NAMESPACE_VALUE: ${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}
+          ORACLE_CLOUD_TEST_COMPARTMENT_ID_VALUE: ${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}
         run: |
-          echo "OCI_FINGERPRINT=${{ secrets.OCI_FINGERPRINT }}" >> "$GITHUB_ENV"
-          echo "OCI_PRIVATE_KEY=${{ secrets.OCI_PRIVATE_KEY }}" >> "$GITHUB_ENV"
-          echo "OCI_REGION=${{ secrets.OCI_REGION }}" >> "$GITHUB_ENV"
-          echo "OCI_TENANT_ID=${{ secrets.OCI_TENANT_ID }}" >> "$GITHUB_ENV"
-          echo "OCI_USER_ID=${{ secrets.OCI_USER_ID }}" >> "$GITHUB_ENV"
-          echo "ORACLE_CLOUD_TEST_NAMESPACE=${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}" >> "$GITHUB_ENV"
-          echo "ORACLE_CLOUD_TEST_COMPARTMENT_ID=${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}" >> "$GITHUB_ENV"
+          echo "OCI_FINGERPRINT=$OCI_FINGERPRINT_VALUE" >> "$GITHUB_ENV"
+          echo "OCI_PRIVATE_KEY=$OCI_PRIVATE_KEY_VALUE" >> "$GITHUB_ENV"
+          echo "OCI_REGION=$OCI_REGION_VALUE" >> "$GITHUB_ENV"
+          echo "OCI_TENANT_ID=$OCI_TENANT_ID_VALUE" >> "$GITHUB_ENV"
+          echo "OCI_USER_ID=$OCI_USER_ID_VALUE" >> "$GITHUB_ENV"
+          echo "ORACLE_CLOUD_TEST_NAMESPACE=$ORACLE_CLOUD_TEST_NAMESPACE_VALUE" >> "$GITHUB_ENV"
+          echo "ORACLE_CLOUD_TEST_COMPARTMENT_ID=$ORACLE_CLOUD_TEST_COMPARTMENT_ID_VALUE" >> "$GITHUB_ENV"
       - name: Build with Gradle
         run: |
           ./gradlew :micronaut-object-storage-oracle-cloud:test --no-daemon --parallel --continue

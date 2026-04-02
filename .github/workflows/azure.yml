@@ -47,11 +47,16 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Export Azure cloud test credentials
         if: github.event_name != 'pull_request'
+        env:
+          AZURE_TENANT_ID_VALUE: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID_VALUE: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET_VALUE: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT_VALUE: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
         run: |
-          echo "AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> "$GITHUB_ENV"
-          echo "AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> "$GITHUB_ENV"
-          echo "AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> "$GITHUB_ENV"
-          echo "AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT=${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}" >> "$GITHUB_ENV"
+          echo "AZURE_TENANT_ID=$AZURE_TENANT_ID_VALUE" >> "$GITHUB_ENV"
+          echo "AZURE_CLIENT_ID=$AZURE_CLIENT_ID_VALUE" >> "$GITHUB_ENV"
+          echo "AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET_VALUE" >> "$GITHUB_ENV"
+          echo "AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT=$AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT_VALUE" >> "$GITHUB_ENV"
       - name: Build with Gradle
         run: |
           ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
