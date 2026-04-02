@@ -14,6 +14,7 @@ dependencies {
     testImplementation(mnValidation.micronaut.validation.processor)
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(mnTestResources.testcontainers.localstack)
+    testImplementation(platform(libs.netty.bom))
 
     testImplementation(libs.amazon.awssdk.v1) {
         because("it is required by testcontainers-localstack")

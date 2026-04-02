@@ -1,6 +1,7 @@
 package io.micronaut.objectstorage.googlecloud
 
 
+import com.google.cloud.WriteChannel
 import com.google.cloud.storage.*
 import groovy.transform.AutoImplement
 import io.micronaut.context.annotation.Property
@@ -16,7 +17,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.nio.ByteBuffer
 import java.nio.file.Path
 import java.util.Optional
 
@@ -55,6 +58,7 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     void "uploads use the google cloud stream API"() {
         given:
         byte[] bytes = "stream-body".bytes
+        blobMock = Mock(Blob)
         storageReplacement.reset()
         UploadRequest uploadRequest = new StubUploadRequest("stream.txt", bytes)
 
@@ -62,8 +66,7 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         objectStorage.upload(uploadRequest)
 
         then:
-        storageReplacement.inputStreamCreateInvoked
-        !storageReplacement.byteArrayCreateInvoked
+        storageReplacement.writerInvoked
         storageReplacement.blobInfo
         storageReplacement.blobInfo.contentType == "text/plain"
         storageReplacement.streamedBytes == bytes
@@ -80,30 +83,61 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     static class StorageReplacement implements Storage {
 
         BlobInfo blobInfo
-        boolean byteArrayCreateInvoked
-        boolean inputStreamCreateInvoked
+        boolean writerInvoked
         byte[] streamedBytes
 
         @Override
-        Blob create(BlobInfo blobInfo, byte[] content, BlobTargetOption... options) {
+        WriteChannel writer(BlobInfo blobInfo, Storage.BlobWriteOption... options) {
             this.blobInfo = blobInfo
-            this.byteArrayCreateInvoked = true
+            this.writerInvoked = true
+            return new RecordingWriteChannel(this)
+        }
+
+        @Override
+        Blob get(BlobId blob, Storage.BlobGetOption... options) {
             return blobMock()
         }
 
         @Override
-        Blob create(BlobInfo blobInfo, InputStream content, BlobWriteOption... options) {
-            this.blobInfo = blobInfo
-            this.inputStreamCreateInvoked = true
-            this.streamedBytes = content.bytes
+        Blob get(BlobId blob) {
             return blobMock()
         }
 
         void reset() {
             blobInfo = null
-            byteArrayCreateInvoked = false
-            inputStreamCreateInvoked = false
+            writerInvoked = false
             streamedBytes = null
+        }
+    }
+
+    @AutoImplement
+    static class RecordingWriteChannel implements WriteChannel {
+        private final StorageReplacement storageReplacement
+        private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+        private boolean open = true
+
+        RecordingWriteChannel(StorageReplacement storageReplacement) {
+            this.storageReplacement = storageReplacement
+        }
+
+        @Override
+        int write(ByteBuffer buffer) {
+            byte[] chunk = new byte[buffer.remaining()]
+            buffer.get(chunk)
+            outputStream.write(chunk)
+            storageReplacement.streamedBytes = outputStream.toByteArray()
+            return chunk.length
+        }
+
+        @Override
+        boolean isOpen() {
+            return open
+        }
+
+        @Override
+        void close() {
+            open = false
+            storageReplacement.streamedBytes = outputStream.toByteArray()
         }
     }
 

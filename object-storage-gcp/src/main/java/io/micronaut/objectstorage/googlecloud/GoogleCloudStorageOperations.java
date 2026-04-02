@@ -25,7 +25,6 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
@@ -36,6 +35,7 @@ import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 
 import java.io.InputStream;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -57,20 +57,16 @@ public class GoogleCloudStorageOperations
 
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
-    private final InputStreamMapper inputStreamMapper;
     private final Storage storage;
     private final GoogleCloudStorageConfiguration configuration;
 
     /**
      * Constructor.
      * @param configuration Google Storage Configuration
-     * @param inputStreamMapper Input Stream Mapper
      * @param storage Interface for Google Cloud Storage
      */
     public GoogleCloudStorageOperations(@Parameter GoogleCloudStorageConfiguration configuration,
-                                        InputStreamMapper inputStreamMapper,
                                         Storage storage) {
-        this.inputStreamMapper = inputStreamMapper;
         this.storage = storage;
         this.configuration = configuration;
     }
@@ -200,8 +196,10 @@ public class GoogleCloudStorageOperations
 
     @NonNull
     private UploadResponse<Blob> upload(@NonNull UploadRequest uploadRequest, @NonNull BlobInfo blobInfo) {
-        try (InputStream inputStream = uploadRequest.getInputStream()) {
-            Blob blob = storage.create(blobInfo, inputStream);
+        try (InputStream inputStream = uploadRequest.getInputStream();
+             com.google.cloud.WriteChannel writeChannel = storage.writer(blobInfo)) {
+            inputStream.transferTo(Channels.newOutputStream(writeChannel));
+            Blob blob = storage.get(blobInfo.getBlobId());
             return UploadResponse.of(uploadRequest.getKey(), blob.getEtag(), blob);
         } catch (Exception e) {
             throw new ObjectStorageException("Error when trying to upload an object to Google Cloud Storage", e);
