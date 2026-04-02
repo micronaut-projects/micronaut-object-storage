@@ -7,5 +7,4 @@ dependencies {
     implementation platform(libs.netty.bom)
     implementation mn.micronaut.inject
     implementation mn.micronaut.context
-    testImplementation platform(libs.netty.bom)
 }
