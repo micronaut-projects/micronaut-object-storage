@@ -8,6 +8,7 @@ import com.azure.storage.blob.BlobServiceAsyncClient
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.BlobServiceClientBuilder
 import io.micronaut.context.ApplicationContext
+import io.micronaut.context.annotation.Primary
 import io.micronaut.context.exceptions.NoSuchBeanException
 import reactor.core.publisher.Mono
 import spock.lang.Specification
@@ -80,6 +81,7 @@ class AzureBlobStorageFactorySpec extends Specification {
         applicationContext.close()
     }
 
+    @Primary
     private static final class TestTokenCredential implements TokenCredential {
         @Override
         Mono<AccessToken> getToken(com.azure.core.credential.TokenRequestContext request) {
