@@ -1,6 +1,16 @@
+import org.gradle.api.artifacts.VersionCatalogsExtension
+
 repositories {
     mavenCentral()
 }
+
+def libs = extensions.getByType(VersionCatalogsExtension).named("libs")
+
+dependencies {
+    implementation(platform(libs.findLibrary("netty-bom").get()))
+    testImplementation(platform(libs.findLibrary("netty-bom").get()))
+}
+
 configurations.all {
     resolutionStrategy.preferProjectModules()
 }
