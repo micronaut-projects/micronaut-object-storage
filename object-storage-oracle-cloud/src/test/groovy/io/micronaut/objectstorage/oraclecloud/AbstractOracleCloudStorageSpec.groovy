@@ -7,10 +7,14 @@ import com.oracle.bmc.objectstorage.requests.DeleteBucketRequest
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse
 import io.micronaut.core.annotation.NonNull
+import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
+import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+
+import java.util.stream.IntStream
 
 import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration.PREFIX
 
@@ -51,6 +55,25 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
                 .createBucketDetails(builder.build())
                 .build())
 
+    }
+
+    def 'many bucket entries list'() {
+        when:
+        def names = IntStream.range(0, 40).mapToObj { it.toString() }.toList()
+        for (def name : names) {
+            oracleCloudStorageOperations.upload(UploadRequest.fromBytes(name.bytes, name))
+        }
+
+        then:
+        oracleCloudStorageOperations.listObjects().containsAll(names)
+
+        cleanup:
+        for (def name : names) {
+            try {
+                oracleCloudStorageOperations.delete(name)
+            } catch (ObjectStorageException ignored) {
+            }
+        }
     }
 
     void cleanup() {

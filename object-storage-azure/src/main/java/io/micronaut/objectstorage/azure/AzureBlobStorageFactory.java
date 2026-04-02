@@ -20,14 +20,11 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.common.StorageSharedKeyCredential;
-import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Factory;
-import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.exceptions.DisabledBeanException;
 import org.jspecify.annotations.NonNull;
-import io.micronaut.inject.qualifiers.Qualifiers;
 
 /**
  * <p>Creates beans of the following types:</p>
@@ -43,21 +40,15 @@ import io.micronaut.inject.qualifiers.Qualifiers;
 @Factory
 public class AzureBlobStorageFactory {
 
-    private final BeanContext beanContext;
-
-    public AzureBlobStorageFactory(BeanContext beanContext) {
-        this.beanContext = beanContext;
-    }
-
     /**
      * @param configuration   the configuration
      * @param tokenCredential the token credential
      * @return the {@link BlobServiceClientBuilder}
      */
-    @EachBean(AzureBlobStorageConfiguration.class)
+    @EachBean(AzureBlobStorageEndpointConfiguration.class)
     @Requires(bean = TokenCredential.class)
     @Requires(missingBeans = StorageSharedKeyCredential.class)
-    public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(AzureBlobStorageConfiguration configuration,
+    public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(AzureBlobStorageEndpointConfiguration configuration,
                                                                                 @NonNull TokenCredential tokenCredential) {
         if (!configuration.isEnabled()) {
             throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
@@ -72,9 +63,9 @@ public class AzureBlobStorageFactory {
      * @param sharedKeyCredential the shared key credential
      * @return the {@link BlobServiceClientBuilder}
      */
-    @EachBean(AzureBlobStorageConfiguration.class)
+    @EachBean(AzureBlobStorageEndpointConfiguration.class)
     @Requires(bean = StorageSharedKeyCredential.class)
-    public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(AzureBlobStorageConfiguration configuration,
+    public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(AzureBlobStorageEndpointConfiguration configuration,
                                                                                     @NonNull StorageSharedKeyCredential sharedKeyCredential) {
         if (!configuration.isEnabled()) {
             throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
@@ -94,14 +85,41 @@ public class AzureBlobStorageFactory {
     }
 
     /**
-     * @param name          The configuration
-     * @param serviceClient The service client
-     * @return The {@link BlobContainerClient}
+     * @param configuration   the configuration
+     * @param tokenCredential the token credential
+     * @return the client for this configuration
      */
-    @EachBean(BlobServiceClient.class)
-    public BlobContainerClient blobContainerClient(@Parameter String name,
-                                                   @NonNull BlobServiceClient serviceClient) {
-        final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
-        return serviceClient.getBlobContainerClient(configuration.getContainer());
+    @EachBean(AzureBlobStorageConfiguration.class)
+    @Requires(bean = TokenCredential.class)
+    @Requires(missingBeans = StorageSharedKeyCredential.class)
+    public BlobContainerClient blobContainerClient(AzureBlobStorageConfiguration configuration,
+                                                   @NonNull TokenCredential tokenCredential) {
+        if (!configuration.isEnabled()) {
+            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
+        }
+        return new BlobServiceClientBuilder()
+            .endpoint(configuration.getEndpoint())
+            .credential(tokenCredential)
+            .buildClient()
+            .getBlobContainerClient(configuration.getContainer());
+    }
+
+    /**
+     * @param configuration   the configuration
+     * @param sharedKeyCredential the shared key credential
+     * @return the client for this configuration
+     */
+    @EachBean(AzureBlobStorageConfiguration.class)
+    @Requires(bean = StorageSharedKeyCredential.class)
+    public BlobContainerClient blobContainerClient(AzureBlobStorageConfiguration configuration,
+                                                   @NonNull StorageSharedKeyCredential sharedKeyCredential) {
+        if (!configuration.isEnabled()) {
+            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
+        }
+        return new BlobServiceClientBuilder()
+            .endpoint(configuration.getEndpoint())
+            .credential(sharedKeyCredential)
+            .buildClient()
+            .getBlobContainerClient(configuration.getContainer());
     }
 }
