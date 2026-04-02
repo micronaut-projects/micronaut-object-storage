@@ -18,6 +18,7 @@ package io.micronaut.objectstorage.googlecloud;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.api.gax.paging.Page;
@@ -28,18 +29,25 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.CreatePresignedUploadRequest;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
+import io.micronaut.objectstorage.response.PresignedUpload;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 
 import java.io.InputStream;
+import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -178,6 +186,43 @@ public class GoogleCloudStorageOperations
         }
     }
 
+    @Override
+    @NonNull
+    public Optional<PresignedUpload> createPresignedUpload(@NonNull CreatePresignedUploadRequest request) {
+        try {
+            BlobInfo blobInfo = createBlobInfoBuilder(request).build();
+            Instant expiration = Instant.now().plus(request.getExpiresIn());
+            Map<String, String> signedHeaders = buildSignedHeaders(request);
+            List<Storage.SignUrlOption> options = new ArrayList<>();
+            options.add(Storage.SignUrlOption.httpMethod(HttpMethod.PUT));
+            options.add(Storage.SignUrlOption.withV4Signature());
+            if (request.getContentType().isPresent()) {
+                options.add(Storage.SignUrlOption.withContentType());
+            }
+            if (CollectionUtils.isNotEmpty(signedHeaders)) {
+                options.add(Storage.SignUrlOption.withExtHeaders(signedHeaders));
+            }
+            URL url = storage.signUrl(
+                blobInfo,
+                request.getExpiresIn().toMillis(),
+                TimeUnit.MILLISECONDS,
+                options.toArray(Storage.SignUrlOption[]::new)
+            );
+            return Optional.of(new PresignedUpload(
+                java.net.URI.create(url.toString()),
+                "PUT",
+                toPortableHeaders(request, signedHeaders),
+                expiration
+            ));
+        } catch (RuntimeException e) {
+            String msg = String.format(
+                "Error when trying to create a pre-signed upload request with key [%s] in Google Cloud Storage",
+                request.getKey()
+            );
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
     /**
      *
      * @param uploadRequest Upload Request
@@ -189,6 +234,21 @@ public class GoogleCloudStorageOperations
             .setContentType(uploadRequest.getContentType().orElse(null));
         if (CollectionUtils.isNotEmpty(uploadRequest.getMetadata())) {
             builder.setMetadata(uploadRequest.getMetadata());
+        }
+        return builder;
+    }
+
+    /**
+     * @param request the pre-signed upload request
+     * @return BlobInfo Builder
+     * @since 3.1.0
+     */
+    protected BlobInfo.@NonNull Builder createBlobInfoBuilder(@NonNull CreatePresignedUploadRequest request) {
+        BlobId blobId = BlobId.of(configuration.getBucket(), request.getKey());
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId)
+            .setContentType(request.getContentType().orElse(null));
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            builder.setMetadata(request.getMetadata());
         }
         return builder;
     }
@@ -205,5 +265,22 @@ public class GoogleCloudStorageOperations
 
     private boolean blobExists(Blob blob) {
         return blob != null && blob.exists();
+    }
+
+    @NonNull
+    private Map<String, String> buildSignedHeaders(@NonNull CreatePresignedUploadRequest request) {
+        Map<String, String> headers = new LinkedHashMap<>();
+        request.getContentLength().ifPresent(length -> headers.put("Content-Length", Long.toString(length)));
+        request.getMetadata().forEach((key, value) -> headers.put("x-goog-meta-" + key, value));
+        return headers;
+    }
+
+    @NonNull
+    private Map<String, List<String>> toPortableHeaders(@NonNull CreatePresignedUploadRequest request,
+                                                        @NonNull Map<String, String> signedHeaders) {
+        Map<String, List<String>> headers = new LinkedHashMap<>();
+        request.getContentType().ifPresent(contentType -> headers.put("Content-Type", List.of(contentType)));
+        signedHeaders.forEach((name, value) -> headers.put(name, List.of(value)));
+        return headers;
     }
 }

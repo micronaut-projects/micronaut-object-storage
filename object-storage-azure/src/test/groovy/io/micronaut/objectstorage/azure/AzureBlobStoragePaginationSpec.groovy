@@ -88,7 +88,7 @@ class AzureBlobStoragePaginationSpec extends Specification {
         private final Iterator<RecordedPageCall> calls
 
         TestAzureBlobStorageOperations(List<RecordedPageCall> calls) {
-            super(null)
+            super(null, null)
             this.calls = calls.iterator()
         }
 

@@ -23,11 +23,13 @@ import io.micronaut.objectstorage.InputStreamMapper;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.CreatePresignedUploadRequest;
 import io.micronaut.objectstorage.request.BytesUploadRequest;
 import io.micronaut.objectstorage.request.FileUploadRequest;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
+import io.micronaut.objectstorage.response.PresignedUpload;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -48,14 +50,18 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -240,6 +246,40 @@ public class AwsS3Operations implements ObjectStorageOperations<
         }
     }
 
+    @Override
+    @NonNull
+    public Optional<PresignedUpload> createPresignedUpload(@NonNull CreatePresignedUploadRequest request) {
+        try {
+            PresignedPutObjectRequest presignedRequest;
+            try (S3Presigner s3Presigner = createS3Presigner()) {
+                presignedRequest = s3Presigner.presignPutObject(builder -> builder
+                    .signatureDuration(request.getExpiresIn())
+                    .putObjectRequest(getPresignedUploadRequestBuilder(request).build()));
+            }
+            return Optional.of(new PresignedUpload(
+                java.net.URI.create(presignedRequest.url().toString()),
+                presignedRequest.httpRequest().method().name(),
+                toPortableHeaders(presignedRequest.signedHeaders()),
+                presignedRequest.expiration()
+            ));
+        } catch (RuntimeException e) {
+            String msg = String.format(
+                "Error when trying to create a pre-signed upload request with key [%s] in Amazon S3",
+                request.getKey()
+            );
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    /**
+     * @return the presigner used to create pre-signed upload requests.
+     * @since 3.1.0
+     */
+    @NonNull
+    protected S3Presigner createS3Presigner() {
+        return S3Presigner.builder().s3Client(s3Client).build();
+    }
+
     /**
      * @param request the upload request
      * @return An AWS' {@link PutObjectRequest.Builder} from a Micronaut's {@link UploadRequest}.
@@ -251,6 +291,24 @@ public class AwsS3Operations implements ObjectStorageOperations<
 
         request.getContentType().ifPresent(builder::contentType);
         request.getContentSize().ifPresent(builder::contentLength);
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            builder.metadata(request.getMetadata());
+        }
+        return builder;
+    }
+
+    /**
+     * @param request the pre-signed upload request
+     * @return An AWS' {@link PutObjectRequest.Builder} from a Micronaut pre-signed upload request.
+     * @since 3.1.0
+     */
+    protected PutObjectRequest.@NonNull Builder getPresignedUploadRequestBuilder(@NonNull CreatePresignedUploadRequest request) {
+        PutObjectRequest.Builder builder = PutObjectRequest.builder()
+            .bucket(configuration.getBucket())
+            .key(request.getKey());
+
+        request.getContentType().ifPresent(builder::contentType);
+        request.getContentLength().ifPresent(builder::contentLength);
         if (CollectionUtils.isNotEmpty(request.getMetadata())) {
             builder.metadata(request.getMetadata());
         }
@@ -343,6 +401,13 @@ public class AwsS3Operations implements ObjectStorageOperations<
 
     private String decodeTokenPart(String value) {
         return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
+    }
+
+    @NonNull
+    private Map<String, List<String>> toPortableHeaders(Map<String, List<String>> signedHeaders) {
+        Map<String, List<String>> headers = new LinkedHashMap<>(signedHeaders.size());
+        signedHeaders.forEach((name, values) -> headers.put(name, List.copyOf(values)));
+        return headers;
     }
 
     private record DecodedContinuationToken(Optional<String> rawContinuationToken,
