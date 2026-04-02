@@ -108,7 +108,7 @@ jobs:
           if_true: "micronaut-projects/micronaut-docs"
           if_false: ${{ github.repository }}
 
-      - name: "📑 Publish to Github Pages"
+      - name: "📑 Publish to GitHub Pages"
         if: success() && github.event_name == 'push' && matrix.java == '25'
         uses: micronaut-projects/github-pages-deploy-action@76d63aafbab7108d74e83be4e5b3b0501382e829 # master
         env:
