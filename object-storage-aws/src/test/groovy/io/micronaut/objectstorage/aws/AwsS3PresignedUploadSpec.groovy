@@ -78,7 +78,7 @@ class AwsS3PresignedUploadSpec extends Specification {
         given:
         AwsS3Configuration configuration = new AwsS3Configuration("default")
         configuration.bucket = "profile-pictures"
-        AwsS3Operations operations = new AwsS3Operations(
+        AwsS3Operations operations = new FailingAwsS3Operations(
             configuration,
             Mock(S3Client),
             Mock(InputStreamMapper)
@@ -91,6 +91,20 @@ class AwsS3PresignedUploadSpec extends Specification {
         then:
         ObjectStorageException e = thrown()
         e.message.contains("pre-signed upload request")
+    }
+
+    private static final class FailingAwsS3Operations extends AwsS3Operations {
+
+        FailingAwsS3Operations(AwsS3Configuration configuration,
+                               S3Client s3Client,
+                               InputStreamMapper inputStreamMapper) {
+            super(configuration, s3Client, inputStreamMapper)
+        }
+
+        @Override
+        protected S3Presigner createS3Presigner() {
+            throw new IllegalStateException("boom")
+        }
     }
 
     private static final class TestAwsS3Operations extends AwsS3Operations {
