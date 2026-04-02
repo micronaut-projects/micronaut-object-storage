@@ -29,7 +29,8 @@ Portable contract:
 * The signed request uploads exactly one object key.
 * Clients must send an HTTP `PUT`.
 * Clients must preserve all required headers from the response.
-* Provider support is optional. Unsupported providers return `Optional.empty()`.
+* Provider support is optional. Providers that do not support pre-signed uploads, or cannot sign in the current
+  configuration, return `Optional.empty()`.
 * Local storage does not support this API because it has no HTTP endpoint to sign.
 
 The following controller example returns a JSON payload your frontend can use to upload directly to object storage:

@@ -158,7 +158,7 @@ public interface ObjectStorageOperations<I, O, D> {
      * Creates a pre-signed upload request for a single object key.
      *
      * @param request the pre-signed upload request parameters
-     * @return the signed upload request, if the provider supports it
+     * @return the signed upload request, if the provider supports it in the current configuration
      * @since 3.1.0
      */
     @Blocking

@@ -83,6 +83,9 @@ public final class CreatePresignedUploadRequest {
      */
     public void setContentType(@NonNull String contentType) {
         this.contentType = Objects.requireNonNull(contentType, "contentType");
+        if (this.contentType.isBlank()) {
+            throw new IllegalArgumentException("contentType must not be blank");
+        }
     }
 
     /**

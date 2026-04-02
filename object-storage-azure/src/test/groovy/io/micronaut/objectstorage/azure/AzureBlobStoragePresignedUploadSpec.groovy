@@ -2,7 +2,6 @@ package io.micronaut.objectstorage.azure
 
 import com.azure.storage.blob.BlobContainerClientBuilder
 import com.azure.storage.common.StorageSharedKeyCredential
-import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.request.CreatePresignedUploadRequest
 import io.micronaut.objectstorage.response.PresignedUpload
 import spock.lang.Specification
@@ -46,7 +45,7 @@ class AzureBlobStoragePresignedUploadSpec extends Specification {
         response.expiration <= after.plus(Duration.ofMinutes(5))
     }
 
-    void "it fails fast when shared key credentials are unavailable"() {
+    void "it returns empty when shared key credentials are unavailable"() {
         given:
         AzureBlobStorageOperations operations = new AzureBlobStorageOperations(
             new BlobContainerClientBuilder()
@@ -57,11 +56,7 @@ class AzureBlobStoragePresignedUploadSpec extends Specification {
             null
         )
 
-        when:
-        operations.createPresignedUpload(new CreatePresignedUploadRequest("avatars/alice.png", Duration.ofMinutes(5)))
-
-        then:
-        ObjectStorageException e = thrown()
-        e.message.contains("StorageSharedKeyCredential")
+        expect:
+        operations.createPresignedUpload(new CreatePresignedUploadRequest("avatars/alice.png", Duration.ofMinutes(5))).empty
     }
 }

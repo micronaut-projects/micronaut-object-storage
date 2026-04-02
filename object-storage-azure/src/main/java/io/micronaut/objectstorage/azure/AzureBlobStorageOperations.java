@@ -201,9 +201,7 @@ public class AzureBlobStorageOperations
     @NonNull
     public Optional<PresignedUpload> createPresignedUpload(@NonNull CreatePresignedUploadRequest request) {
         if (sharedKeyCredential == null) {
-            throw new ObjectStorageException(
-                "Error when trying to create a pre-signed upload request in Azure Blob Storage: a StorageSharedKeyCredential bean is required"
-            );
+            return Optional.empty();
         }
         BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
         try {
