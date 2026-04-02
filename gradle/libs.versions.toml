@@ -11,6 +11,7 @@ micronaut-validation = "5.0.0-M1"
 micronaut-logging = "2.0.0-M2"
 
 gcp-libraries = '26.79.0'
+netty = "4.2.12.Final"
 bytebuddy = '1.18.7'
 
 # Gradle plugins
@@ -36,6 +37,7 @@ azure-storage-blob = { module = 'com.azure:azure-storage-blob' }
 micronaut-gcp = { module = 'io.micronaut.gcp:micronaut-gcp-bom', version.ref = 'micronaut-gcp' }
 gcp-libraries-bom = { module = 'com.google.cloud:libraries-bom', version.ref = 'gcp-libraries' }
 gcp-storage = { module = 'com.google.cloud:google-cloud-storage' }
+netty-bom = { module = "io.netty:netty-bom", version.ref = "netty" }
 
 # Oracle Cloud
 micronaut-oracle-cloud = { module = 'io.micronaut.oraclecloud:micronaut-oraclecloud-bom', version.ref = 'micronaut-oracle-cloud' }

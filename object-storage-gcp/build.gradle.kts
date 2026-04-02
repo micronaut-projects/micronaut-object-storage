@@ -7,6 +7,7 @@ dependencies {
     api(mnGcp.micronaut.gcp.common)
 
     api(platform(libs.gcp.libraries.bom))
+    api(platform(libs.netty.bom))
     api(libs.gcp.storage)
 
     implementation(platform(mnGcp.micronaut.gcp.bom))
