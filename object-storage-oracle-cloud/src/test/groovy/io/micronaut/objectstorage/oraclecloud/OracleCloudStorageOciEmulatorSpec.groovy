@@ -22,7 +22,7 @@ import static io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfigura
 class OracleCloudStorageOciEmulatorSpec extends AbstractOracleCloudStorageSpec {
 
     public static final String SPEC_NAME = 'OracleCloudStorageOciEmulatorSpec'
-    private static final DockerImageName OCI_EMULATOR_IMAGE = DockerImageName.parse('cameritelabs/oci-emulator:latest@sha256:9ce34c503569a117b0ebd7549bb561b69c6f96aca2ea1f7bd4817d992ac63811')
+    private static final DockerImageName OCI_EMULATOR_IMAGE = DockerImageName.parse('cameritelabs/oci-emulator@sha256:9ce34c503569a117b0ebd7549bb561b69c6f96aca2ea1f7bd4817d992ac63811')
 
     @Shared
     @AutoCleanup

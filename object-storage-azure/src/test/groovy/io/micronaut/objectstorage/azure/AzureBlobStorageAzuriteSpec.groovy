@@ -10,7 +10,7 @@ import spock.lang.Shared
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
 
-@Ignore("The API version 2026-02-06 is not supported by Azurite. Please upgrade Azurite to latest version and retry.")
+@Ignore("The pinned Azurite image 3.35.0 does not support API version 2026-02-06 yet. Update the pinned image when Azurite adds support and retry.")
 @MicronautTest
 @IgnoreIf({ env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT && env.AZURE_CLIENT_ID && env.AZURE_CLIENT_SECRET && env.AZURE_TENANT_ID })
 class AzureBlobStorageAzuriteSpec extends AbstractAzureBlobStorageSpec {
