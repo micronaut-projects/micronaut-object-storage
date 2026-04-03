@@ -225,7 +225,43 @@ public class AzureBlobStorageOperations
             new BlockBlobSimpleUploadOptions(new BufferedInputStream(inputStream), length);
         simpleUploadOptions.setMetadata(options.getMetadata());
         simpleUploadOptions.setHeaders(options.getHeaders());
+        simpleUploadOptions.setTags(options.getTags());
+        simpleUploadOptions.setTier(options.getTier());
+        BlobRequestConditions requestConditions = toSimpleUploadRequestConditions(options.getRequestConditions());
+        if (requestConditions != null) {
+            simpleUploadOptions.setRequestConditions(requestConditions);
+        }
+        simpleUploadOptions.setImmutabilityPolicy(options.getImmutabilityPolicy());
+        simpleUploadOptions.setLegalHold(options.isLegalHold());
         return simpleUploadOptions;
+    }
+
+    private BlobRequestConditions toSimpleUploadRequestConditions(BlobRequestConditions requestConditions) {
+        if (requestConditions == null) {
+            return null;
+        }
+        BlobRequestConditions simpleRequestConditions = new BlobRequestConditions()
+            .setIfMatch(requestConditions.getIfMatch())
+            .setIfNoneMatch(requestConditions.getIfNoneMatch())
+            .setIfModifiedSince(requestConditions.getIfModifiedSince())
+            .setIfUnmodifiedSince(requestConditions.getIfUnmodifiedSince())
+            .setLeaseId(requestConditions.getLeaseId())
+            .setTagsConditions(requestConditions.getTagsConditions());
+        if (ETAG_WILDCARD.equals(simpleRequestConditions.getIfNoneMatch())) {
+            simpleRequestConditions.setIfNoneMatch(null);
+            if (!hasExplicitSimpleUploadRequestConditions(simpleRequestConditions)) {
+                return null;
+            }
+        }
+        return simpleRequestConditions;
+    }
+
+    private boolean hasExplicitSimpleUploadRequestConditions(BlobRequestConditions requestConditions) {
+        return requestConditions.getIfMatch() != null
+            || requestConditions.getIfModifiedSince() != null
+            || requestConditions.getIfUnmodifiedSince() != null
+            || requestConditions.getLeaseId() != null
+            || requestConditions.getTagsConditions() != null;
     }
 
 }
