@@ -53,6 +53,10 @@ For example, for AWS S3:
 
 snippet::example.UploadController[project-base="doc-examples/example", source="main", indent="0", tags="consumer"]
 
+If you receive a `StreamingFileUpload` in a multipart controller, you can forward it to object storage without first converting it to a local file or byte array:
+
+snippet::example.UploadController[project-base="doc-examples/example", source="main", indent="0", tags="streaming"]
+
 == Retrieving files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="retrieve"]

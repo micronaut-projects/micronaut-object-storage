@@ -15,7 +15,10 @@ import jakarta.inject.Singleton
 import spock.lang.Shared
 import spock.lang.Specification
 
+import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.nio.file.Path
+import java.util.Optional
 
 @Property(name = "micronaut.object-storage.gcp.default.bucket", value = "profile-pictures-bucket")
 @Property(name = "spec.name", value = SPEC_NAME)
@@ -33,9 +36,13 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     @Shared
     static Blob blobMock
 
+    void setup() {
+        blobMock = Mock(Blob)
+        storageReplacement.reset()
+    }
+
     void "consumer accept is invoked"() {
         given:
-        blobMock = Mock(Blob)
         Path path = ObjectStorageOperationsSpecification.createTempFile()
         UploadRequest uploadRequest = UploadRequest.fromPath(path)
 
@@ -49,6 +56,21 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         [project: "micronaut-object-storage"] == storageReplacement.blobInfo.metadata
     }
 
+    void "uploads use the google cloud stream API"() {
+        given:
+        byte[] bytes = "stream-body".bytes
+        UploadRequest uploadRequest = new StubUploadRequest("stream.txt", bytes)
+
+        when:
+        objectStorage.upload(uploadRequest)
+
+        then:
+        storageReplacement.createFromInvoked
+        storageReplacement.blobInfo
+        storageReplacement.blobInfo.contentType == "text/plain"
+        storageReplacement.streamedBytes == bytes
+    }
+
     static Blob blobMock() {
         return blobMock
     }
@@ -60,12 +82,51 @@ class GoogleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
     static class StorageReplacement implements Storage {
 
         BlobInfo blobInfo
+        boolean createFromInvoked
+        byte[] streamedBytes
 
         @Override
-        Blob create(BlobInfo blobInfo, byte[] content, BlobTargetOption... options) {
+        Blob createFrom(BlobInfo blobInfo, InputStream content, Storage.BlobWriteOption... options) {
             this.blobInfo = blobInfo
+            this.createFromInvoked = true
+            this.streamedBytes = content.bytes
             return blobMock()
         }
 
+        void reset() {
+            blobInfo = null
+            createFromInvoked = false
+            streamedBytes = null
+        }
+    }
+
+    private static final class StubUploadRequest implements UploadRequest {
+        private final String key
+        private final byte[] bytes
+
+        StubUploadRequest(String key, byte[] bytes) {
+            this.key = key
+            this.bytes = bytes
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            return Optional.of("text/plain")
+        }
+
+        @Override
+        String getKey() {
+            return key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            return Optional.of(bytes.length as long)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            return new ByteArrayInputStream(bytes)
+        }
     }
 }
