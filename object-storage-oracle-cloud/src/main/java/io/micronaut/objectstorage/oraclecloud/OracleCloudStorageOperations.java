@@ -45,6 +45,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.HttpURLConnection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Collections;
@@ -66,12 +67,14 @@ public class OracleCloudStorageOperations
     implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
+    private static final int PUT_OBJECT_SUCCESS_STATUS = HttpURLConnection.HTTP_OK;
     private static final Logger LOG = LoggerFactory.getLogger(OracleCloudStorageOperations.class);
 
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
     private final RegionProvider regionProvider;
     private final Supplier<UploadManager> uploadManagerSupplier;
+    private volatile UploadManager uploadManager;
 
     /**
      * @param configuration Oracle Cloud Storage Configuration
@@ -107,8 +110,9 @@ public class OracleCloudStorageOperations
         requestConsumer.accept(builder);
         try {
             PutObjectRequest putObjectRequest = builder.build();
-            PutObjectResponse response = request.getContentSize()
-                .map(contentSize -> uploadWithManager(putObjectRequest, contentSize))
+            Long contentLength = putObjectRequest.getContentLength();
+            PutObjectResponse response = Optional.ofNullable(contentLength)
+                .map(length -> uploadWithManager(putObjectRequest, length))
                 .orElseGet(() -> client.putObject(putObjectRequest));
             return UploadResponse.of(request.getKey(), response.getETag(), response);
         } catch (BmcException e) {
@@ -117,13 +121,23 @@ public class OracleCloudStorageOperations
     }
 
     @NonNull
+    protected UploadManager getUploadManager() {
+        UploadManager current = uploadManager;
+        if (current == null) {
+            current = uploadManagerSupplier.get();
+            uploadManager = current;
+        }
+        return current;
+    }
+
+    @NonNull
     private PutObjectResponse uploadWithManager(@NonNull PutObjectRequest putObjectRequest, long contentSize) {
-        UploadManager.UploadResponse response = uploadManagerSupplier.get().upload(
+        UploadManager.UploadResponse response = getUploadManager().upload(
             UploadManager.UploadRequest.builder(putObjectRequest.getPutObjectBody(), contentSize)
                 .build(putObjectRequest)
         );
         return PutObjectResponse.builder()
-            .__httpStatusCode__(200)
+            .__httpStatusCode__(PUT_OBJECT_SUCCESS_STATUS)
             .eTag(response.getETag())
             .opcClientRequestId(response.getOpcClientRequestId())
             .opcRequestId(response.getOpcRequestId())
