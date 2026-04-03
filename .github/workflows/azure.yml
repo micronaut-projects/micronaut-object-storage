@@ -65,9 +65,6 @@ jobs:
           ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
         env:
            TESTCONTAINERS_RYUK_DISABLED: true
-           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
-           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "true"
       - name: Publish Test Report
         if: always()
