@@ -63,6 +63,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Reactive AWS S3 object storage operations backed by the native async SDK client.
@@ -99,7 +101,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
     @NonNull
     public Publisher<UploadResponse<PutObjectResponse>> upload(@NonNull UploadRequest request) {
         PutObjectRequest objectRequest = getRequestBuilder(request).build();
-        return Publishers.fromCompletableFuture(() -> s3AsyncClient
+        return fromCompletableFuture(() -> s3AsyncClient
             .putObject(objectRequest, getRequestBody(request))
             .handle((response, throwable) -> {
                 if (throwable != null) {
@@ -115,7 +117,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
                                                                @NonNull Consumer<PutObjectRequest.Builder> requestConsumer) {
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
-        return Publishers.fromCompletableFuture(() -> s3AsyncClient
+        return fromCompletableFuture(() -> s3AsyncClient
             .putObject(builder.build(), getRequestBody(request))
             .handle((response, throwable) -> {
                 if (throwable != null) {
@@ -129,7 +131,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
     @NonNull
     @SuppressWarnings("unchecked")
     public <E extends ObjectStorageEntry<?>> Publisher<Optional<E>> retrieve(@NonNull String key) {
-        return Publishers.fromCompletableFuture(() -> s3AsyncClient
+        return fromCompletableFuture(() -> s3AsyncClient
             .getObject(
                 GetObjectRequest.builder()
                     .bucket(configuration.getBucket())
@@ -153,7 +155,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
     @Override
     @NonNull
     public Publisher<DeleteObjectResponse> delete(@NonNull String key) {
-        return Publishers.fromCompletableFuture(() -> s3AsyncClient
+        return fromCompletableFuture(() -> s3AsyncClient
             .deleteObject(DeleteObjectRequest.builder()
                 .bucket(configuration.getBucket())
                 .key(key)
@@ -169,7 +171,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
     @Override
     @NonNull
     public Publisher<Boolean> exists(@NonNull String key) {
-        return Publishers.fromCompletableFuture(() -> s3AsyncClient
+        return fromCompletableFuture(() -> s3AsyncClient
             .headObject(HeadObjectRequest.builder()
                 .bucket(configuration.getBucket())
                 .key(key)
@@ -189,7 +191,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
     @Override
     @NonNull
     public Publisher<Set<String>> listObjects() {
-        return Publishers.fromCompletableFuture(() -> {
+        return fromCompletableFuture(() -> {
             LinkedHashSet<String> keys = new LinkedHashSet<>();
             return collectKeys(new ListObjectsRequest(DEFAULT_LIST_PAGE_SIZE), keys)
                 .handle((result, throwable) -> {
@@ -208,7 +210,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
     @Override
     @NonNull
     public Publisher<ListObjectsResponse> listObjects(@NonNull ListObjectsRequest request) {
-        return Publishers.fromCompletableFuture(() -> {
+        return fromCompletableFuture(() -> {
             DecodedContinuationToken decodedToken;
             try {
                 decodedToken = decodeContinuationToken(request);
@@ -281,6 +283,12 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
             uploadRequest.getContentSize().orElse(null),
             blockingExecutor
         );
+    }
+
+    private <T> Publisher<T> fromCompletableFuture(Supplier<CompletableFuture<T>> supplier) {
+        return Publishers.fromCompletableFuture(() -> CompletableFuture
+            .supplyAsync(supplier, blockingExecutor)
+            .thenCompose(Function.identity()));
     }
 
     private CompletableFuture<Set<String>> collectKeys(ListObjectsRequest request, LinkedHashSet<String> keys) {
