@@ -31,7 +31,7 @@ import java.util.Optional;
 /**
  * GCP bucket operations.
  *
- * @since 3.1.0
+ * @since 3.0.0
  * @author Álvaro Sánchez-Mariscal
  */
 @EachBean(GoogleCloudStorageConfiguration.class)

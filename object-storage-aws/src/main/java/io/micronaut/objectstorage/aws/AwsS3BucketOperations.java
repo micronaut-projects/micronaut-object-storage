@@ -37,7 +37,7 @@ import java.util.Optional;
 /**
  * AWS bucket operations.
  *
- * @since 3.1.0
+ * @since 3.0.0
  * @author Álvaro Sánchez-Mariscal
  */
 @EachBean(AwsS3Configuration.class)

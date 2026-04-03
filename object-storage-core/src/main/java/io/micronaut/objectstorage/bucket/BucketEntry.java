@@ -24,7 +24,7 @@ import org.jspecify.annotations.NonNull;
  * @param nativeEntry The provider-native bucket/container representation.
  * @param <T> The provider-native bucket/container representation type.
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 public record BucketEntry<T>(
     @NonNull String name,

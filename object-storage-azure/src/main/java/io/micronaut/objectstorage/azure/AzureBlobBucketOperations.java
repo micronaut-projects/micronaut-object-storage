@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * Azure bucket operations.
  *
- * @since 3.1.0
+ * @since 3.0.0
  * @author Álvaro Sánchez-Mariscal
  */
 @EachBean(BlobServiceClient.class)
