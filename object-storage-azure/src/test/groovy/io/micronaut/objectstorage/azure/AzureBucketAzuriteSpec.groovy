@@ -12,9 +12,11 @@ import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PRE
 @MicronautTest
 @IgnoreIf({ env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT && env.AZURE_CLIENT_ID && env.AZURE_CLIENT_SECRET && env.AZURE_TENANT_ID })
 class AzureBucketAzuriteSpec extends AbstractAzureBucketSpec {
+    private static final DockerImageName AZURITE_IMAGE = DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.30.0')
+
     @Shared
     @AutoCleanup
-    GenericContainer azuriteContainer = new GenericContainer(DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:latest'))
+    GenericContainer azuriteContainer = new GenericContainer(AZURITE_IMAGE)
             .withCommand("azurite-blob", "--blobHost", "0.0.0.0", "--skipApiVersionCheck")
             .withExposedPorts(10000)
 

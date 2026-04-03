@@ -14,6 +14,7 @@ import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PRE
 @MicronautTest
 @IgnoreIf({ env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT && env.AZURE_CLIENT_ID && env.AZURE_CLIENT_SECRET && env.AZURE_TENANT_ID })
 class AzureBlobStorageAzuriteSpec extends AbstractAzureBlobStorageSpec {
+    private static final DockerImageName AZURITE_IMAGE = DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.30.0')
 
     private static final DockerImageName AZURITE_IMAGE = DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.35.0@sha256:647c63a91102a9d8e8000aab803436e1fc85fbb285e7ce830a82ee5d6661cf37')
 

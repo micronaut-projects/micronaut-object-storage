@@ -27,10 +27,6 @@ import io.micronaut.objectstorage.configuration.AbstractObjectStorageModuleConfi
 @ConfigurationProperties(LocalStorageConfiguration.PREFIX)
 public class LocalStorageModuleConfiguration extends AbstractObjectStorageModuleConfiguration {
 
-    /*
-    micronaut.object-storage.local.enabled = true
-     */
-
     /**
      * Whether to enable or disable the whole Local Storage module.
      */

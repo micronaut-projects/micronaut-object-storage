@@ -68,7 +68,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public static final String METADATA_DIRECTORY = ".metadata";
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
-    final LocalStorageConfiguration configuration;
+    private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
 
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {

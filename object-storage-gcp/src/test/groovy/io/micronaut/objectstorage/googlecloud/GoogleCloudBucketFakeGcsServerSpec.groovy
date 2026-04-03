@@ -10,6 +10,7 @@ import io.micronaut.context.annotation.Requires
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Singleton
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
 import spock.lang.IgnoreIf
 import spock.lang.Shared
@@ -21,10 +22,11 @@ class GoogleCloudBucketFakeGcsServerSpec extends AbstractGoogleCloudBucketSpec {
 
     public static final String TEST_PROJECT_ID = 'test-project'
     public static final String SPEC_NAME = 'GoogleCloudBucketFakeGcsServerSpec'
+    private static final DockerImageName FAKE_GCS_IMAGE = DockerImageName.parse('fsouza/fake-gcs-server:1.53.0')
 
     @Shared
     @AutoCleanup
-    static final GenericContainer<?> fakeGcs = new GenericContainer<>("fsouza/fake-gcs-server")
+    static final GenericContainer<?> fakeGcs = new GenericContainer<>(FAKE_GCS_IMAGE)
             .withExposedPorts(4443)
             .withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint(
                     "/bin/fake-gcs-server",
