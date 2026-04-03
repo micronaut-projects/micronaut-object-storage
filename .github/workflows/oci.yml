@@ -8,6 +8,7 @@ on:
       - 'object-storage-oracle-cloud/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -47,15 +48,12 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
+      - name: Build with Gradle (trusted events)
+        if: github.event_name != 'pull_request'
         run: |
           ./gradlew :micronaut-object-storage-oracle-cloud:test --no-daemon --parallel --continue
         env:
            TESTCONTAINERS_RYUK_DISABLED: true
-           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
-           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
-           PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
            OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
            OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
            OCI_REGION: ${{ secrets.OCI_REGION }}
@@ -63,6 +61,20 @@ jobs:
            OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
            ORACLE_CLOUD_TEST_NAMESPACE: ${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}
            ORACLE_CLOUD_TEST_COMPARTMENT_ID: ${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}
+           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+           PREDICTIVE_TEST_SELECTION: "false"
+      - name: Build with Gradle (pull requests)
+        if: github.event_name == 'pull_request'
+        run: |
+          ./gradlew :micronaut-object-storage-oracle-cloud:test --no-daemon --parallel --continue
+        env:
+           TESTCONTAINERS_RYUK_DISABLED: true
+           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+           PREDICTIVE_TEST_SELECTION: "true"
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v6.2.0

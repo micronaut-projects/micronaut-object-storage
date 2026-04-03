@@ -8,6 +8,7 @@ on:
       - 'object-storage-azure/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -44,7 +45,22 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
+      - name: Build with Gradle (trusted events)
+        if: github.event_name != 'pull_request'
+        run: |
+          ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
+        env:
+           TESTCONTAINERS_RYUK_DISABLED: true
+           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+           AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
+           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+           PREDICTIVE_TEST_SELECTION: "false"
+      - name: Build with Gradle (pull requests)
+        if: github.event_name == 'pull_request'
         run: |
           ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
         env:
@@ -52,11 +68,7 @@ jobs:
            GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
            GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
            GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
-           PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
-           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-           AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
+           PREDICTIVE_TEST_SELECTION: "true"
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v6.2.0
