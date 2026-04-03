@@ -37,7 +37,7 @@ You then need to use `@Named("pictures")` or `@Named("logos")` to specify which 
 
 == Resolving resources by URI
 
-Configured storages also publish Micronaut api:io.micronaut.core.io.ResourceLoader[] beans, so you can resolve
+Configured storages also publish Micronaut's api:io.micronaut.core.io.ResourceLoader[] beans, so you can resolve
 objects through api:io.micronaut.core.io.ResourceResolver[] instead of injecting an
 api:objectstorage.ObjectStorageOperations[] bean directly.
 

@@ -41,7 +41,15 @@ public final class ObjectStorageResourceParser {
     }
 
     public static boolean isRelativePath(@NonNull String path) {
-        return path.indexOf(':') < 0;
+        int schemeSeparator = path.indexOf(':');
+        if (schemeSeparator < 0) {
+            return true;
+        }
+        int firstSlash = path.indexOf('/');
+        if (firstSlash >= 0 && firstSlash < schemeSeparator) {
+            return true;
+        }
+        return path.indexOf("://", schemeSeparator) < 0;
     }
 
     public static String ensureTrailingSlash(@NonNull String value) {

@@ -78,7 +78,11 @@ public abstract class AbstractObjectStorageResourceLoader implements ResourceLoa
         if (!hasRecognizedPrefix(path)) {
             return false;
         }
-        return resolveAbsolute(path).isPresent();
+        try {
+            return resolveAbsolute(path).isPresent();
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
     }
 
     @Override
@@ -104,7 +108,7 @@ public abstract class AbstractObjectStorageResourceLoader implements ResourceLoa
     }
 
     protected final Optional<ResolvedObjectStorageResource> resolveRelative(@NonNull String path) {
-        if (relativeBase == null || !ObjectStorageResourceParser.isRelativePath(path)) {
+        if (relativeBase == null || hasRecognizedPrefix(path) || !ObjectStorageResourceParser.isRelativePath(path)) {
             return Optional.empty();
         }
         return Optional.of(new ResolvedObjectStorageResource(

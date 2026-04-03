@@ -14,7 +14,8 @@ class NamedObjectStorageResourceLoaderSpec extends Specification {
     void 'it resolves named storage resources and rebases relative lookups'() {
         given:
         def operations = new TestObjectStorageOperations([
-            'avatars/logo.txt': 'logo-bytes'
+            'avatars/logo.txt': 'logo-bytes',
+            'avatars/logo:v2.txt': 'logo-v2-bytes'
         ])
         def loader = new NamedObjectStorageResourceLoader('public-images', operations)
 
@@ -30,6 +31,8 @@ class NamedObjectStorageResourceLoaderSpec extends Specification {
         then:
         rebased.supportsPrefix('logo.txt')
         rebased.getResourceAsStream('logo.txt').get().text == 'logo-bytes'
+        rebased.supportsPrefix('logo:v2.txt')
+        rebased.getResourceAsStream('logo:v2.txt').get().text == 'logo-v2-bytes'
     }
 
     void 'it returns empty for missing objects'() {
@@ -46,8 +49,23 @@ class NamedObjectStorageResourceLoaderSpec extends Specification {
         given:
         def loader = new NamedObjectStorageResourceLoader('public-images', new TestObjectStorageOperations([:]))
 
+        expect:
+        loader.supportsPrefix('public-images:/avatars/logo.txt')
+
         when:
         loader.getResourceAsStream('public-images://')
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message.contains('Invalid object storage URI')
+    }
+
+    void 'it rejects malformed named storage uris after supportsPrefix'() {
+        given:
+        def loader = new NamedObjectStorageResourceLoader('public-images', new TestObjectStorageOperations([:]))
+
+        when:
+        loader.getResourceAsStream('public-images:/avatars/logo.txt')
 
         then:
         def e = thrown(IllegalArgumentException)
