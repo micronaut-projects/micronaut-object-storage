@@ -9,8 +9,6 @@ micronaut-oracle-cloud = "6.0.0-M1"
 micronaut-test-resources = "3.0.0-M6"
 micronaut-validation = "5.0.0-M1"
 micronaut-logging = "2.0.0-M2"
-netty = "4.2.11.Final"
-netty = "4.2.11.Final"
 
 gcp-libraries = '26.79.0'
 bytebuddy = '1.18.8'
@@ -47,7 +45,6 @@ micronaut-test-resources = { module = "io.micronaut.testresources:micronaut-test
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
 micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 micronaut-core-reactive = { module = "io.micronaut:micronaut-core-reactive" }
-netty-bom = { module = "io.netty:netty-bom", version.ref = "netty" }
 
 bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 
