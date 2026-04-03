@@ -1,6 +1,6 @@
 # Contributing Code or Documentation to Micronaut
 
-Sign the [Contributor License Agreement (CLA)](https://cla-assistant.io/pgressa/micronaut-object-storage). This is required before any of your code or pull requests are accepted.
+Sign the [Contributor License Agreement (CLA)](https://cla-assistant.io/micronaut-projects/micronaut-object-storage). This is required before any of your code or pull requests are accepted.
 
 ## Finding Issues to Work On
 
