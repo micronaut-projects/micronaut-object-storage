@@ -30,7 +30,7 @@ import java.util.Optional;
  * Google Cloud Storage {@link io.micronaut.core.io.ResourceLoader} for {@code gs://<bucket>/<key>}.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Internal
 final class GoogleCloudStorageResourceLoader extends AbstractObjectStorageResourceLoader {

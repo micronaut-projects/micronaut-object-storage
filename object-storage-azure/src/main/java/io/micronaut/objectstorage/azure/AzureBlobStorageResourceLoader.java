@@ -32,7 +32,7 @@ import java.util.Optional;
  * {@code azb:<account>://<container>/<key>}.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Internal
 final class AzureBlobStorageResourceLoader extends AbstractObjectStorageResourceLoader {

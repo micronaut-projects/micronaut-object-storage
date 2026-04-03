@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  * Shared {@link ResourceLoader} support for object storage-backed resources.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Internal
 public abstract class AbstractObjectStorageResourceLoader implements ResourceLoader {

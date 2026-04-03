@@ -30,7 +30,7 @@ import java.util.Optional;
  * AWS S3 {@link io.micronaut.core.io.ResourceLoader} for {@code s3://<bucket>/<key>}.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Internal
 final class AwsS3ResourceLoader extends AbstractObjectStorageResourceLoader {

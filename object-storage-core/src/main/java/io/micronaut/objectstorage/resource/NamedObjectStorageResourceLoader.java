@@ -28,7 +28,7 @@ import java.util.Optional;
  * Named storage resource loader for {@code <storage-name>://<key>}.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Internal
 public final class NamedObjectStorageResourceLoader extends AbstractObjectStorageResourceLoader {

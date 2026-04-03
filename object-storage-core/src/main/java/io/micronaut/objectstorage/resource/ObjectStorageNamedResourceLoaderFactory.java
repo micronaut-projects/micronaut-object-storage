@@ -29,7 +29,7 @@ import java.util.Set;
  * Registers named object storage resource loaders.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Factory
 @Internal

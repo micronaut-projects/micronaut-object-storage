@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * Registers the {@code azb:} resource loader.
  *
  * @author Álvaro Sánchez-Mariscal
- * @since 3.1.0
+ * @since 3.0.0
  */
 @Factory
 @Internal
