@@ -45,19 +45,22 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
-      - name: Export Azure cloud test credentials
+      - name: Build with Gradle (trusted events)
         if: github.event_name != 'pull_request'
-        env:
-          AZURE_TENANT_ID_VALUE: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID_VALUE: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET_VALUE: ${{ secrets.AZURE_CLIENT_SECRET }}
-          AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT_VALUE: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
         run: |
-          echo "AZURE_TENANT_ID=$AZURE_TENANT_ID_VALUE" >> "$GITHUB_ENV"
-          echo "AZURE_CLIENT_ID=$AZURE_CLIENT_ID_VALUE" >> "$GITHUB_ENV"
-          echo "AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET_VALUE" >> "$GITHUB_ENV"
-          echo "AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT=$AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT_VALUE" >> "$GITHUB_ENV"
-      - name: Build with Gradle
+          ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
+        env:
+           TESTCONTAINERS_RYUK_DISABLED: true
+           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+           AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
+           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+           PREDICTIVE_TEST_SELECTION: "false"
+      - name: Build with Gradle (pull requests)
+        if: github.event_name == 'pull_request'
         run: |
           ./gradlew :micronaut-object-storage-azure:test --no-daemon --parallel --continue
         env:
@@ -65,7 +68,7 @@ jobs:
            GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
            GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
            GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
-           PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
+           PREDICTIVE_TEST_SELECTION: "true"
       - name: Publish Test Report
         if: always()
         uses: mikepenz/action-junit-report@v6.2.0
