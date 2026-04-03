@@ -57,7 +57,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
-<li><a href="#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)" tabindex="0">GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, InputStreamMapper, Storage)</a></li>
+<li><a href="#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,com.google.cloud.storage.Storage)" tabindex="0">GoogleCloudStorageOperations(GoogleCloudStorageConfiguration, Storage)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -114,8 +114,7 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)" class="member-name-link">GoogleCloudStorageOperations</a><wbr>(<a href="GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a>&nbsp;configuration,
- <a href="../InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a>&nbsp;inputStreamMapper,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,com.google.cloud.storage.Storage)" class="member-name-link">GoogleCloudStorageOperations</a><wbr>(<a href="GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a>&nbsp;configuration,
  com.google.cloud.storage.Storage&nbsp;storage)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Constructor.</div>
@@ -198,18 +197,16 @@ same object storage (bucket/container).</div>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,io.micronaut.objectstorage.InputStreamMapper,com.google.cloud.storage.Storage)">
+<section class="detail" id="&lt;init&gt;(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration,com.google.cloud.storage.Storage)">
 <h3>GoogleCloudStorageOperations</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GoogleCloudStorageOperations</span><wbr><span class="parameters">(@Parameter
  <a href="GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a>&nbsp;configuration,
- <a href="../InputStreamMapper.html" title="interface in io.micronaut.objectstorage">InputStreamMapper</a>&nbsp;inputStreamMapper,
  com.google.cloud.storage.Storage&nbsp;storage)</span></div>
 <div class="block">Constructor.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>configuration</code> - Google Storage Configuration</dd>
-<dd><code>inputStreamMapper</code> - Input Stream Mapper</dd>
 <dd><code>storage</code> - Interface for Google Cloud Storage</dd>
 </dl>
 </div>

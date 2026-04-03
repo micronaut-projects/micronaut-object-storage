@@ -472,6 +472,45 @@ cloud vendor-specific request class or builder.</p>
 })</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>If you receive a <code>StreamingFileUpload</code> in a multipart controller, you can forward it to object storage without first converting it to a local file or byte array:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Post(uri = "/stream", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)
+public HttpResponse&lt;String&gt; streamingUpload(StreamingFileUpload fileUpload) {
+    UploadRequest objectStorageUpload = UploadRequest.fromStreamingFileUpload(fileUpload, "uploads/" + fileUpload.getFilename());
+    UploadResponse&lt;PutObjectResponse&gt; response = objectStorage.upload(objectStorageUpload);
+    return HttpResponse
+        .created(response.getKey())
+        .header("ETag", response.getNativeResponse().eTag());
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Post(uri = "/stream", consumes = [MediaType.MULTIPART_FORM_DATA], produces = [MediaType.TEXT_PLAIN])
+open fun streamingUpload(fileUpload: StreamingFileUpload): HttpResponse&lt;String&gt;? {
+    val objectStorageUpload = UploadRequest.fromStreamingFileUpload(fileUpload, "uploads/${fileUpload.filename}")
+    val response: io.micronaut.objectstorage.response.UploadResponse&lt;PutObjectResponse&gt; = objectStorage.upload(objectStorageUpload)
+    return HttpResponse
+        .created(response.key)
+        .header("ETag", response.nativeResponse.eTag())
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Post(uri = "/stream", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)
+HttpResponse&lt;String&gt; streamingUpload(StreamingFileUpload fileUpload) {
+    UploadRequest objectStorageUpload = UploadRequest.fromStreamingFileUpload(fileUpload, "uploads/${fileUpload.filename}")
+    UploadResponse&lt;PutObjectResponse&gt; response = objectStorage.upload(objectStorageUpload)
+    return HttpResponse
+            .created(response.key)
+            .header("ETag", response.getNativeResponse().eTag())
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
