@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * A complete pre-signed HTTP request that can upload a single object.
  *
- * @since 3.1.0
+ * @since 3.0.0
  */
 public final class PresignedUpload {
 

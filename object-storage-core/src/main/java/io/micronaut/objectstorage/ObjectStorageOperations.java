@@ -159,7 +159,7 @@ public interface ObjectStorageOperations<I, O, D> {
      *
      * @param request the pre-signed upload request parameters
      * @return the signed upload request, if the provider supports it in the current configuration
-     * @since 3.1.0
+     * @since 3.0.0
      */
     @Blocking
     @NonNull

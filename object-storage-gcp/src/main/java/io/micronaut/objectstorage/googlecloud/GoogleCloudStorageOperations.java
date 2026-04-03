@@ -241,7 +241,7 @@ public class GoogleCloudStorageOperations
     /**
      * @param request the pre-signed upload request
      * @return BlobInfo Builder
-     * @since 3.1.0
+     * @since 3.0.0
      */
     protected BlobInfo.@NonNull Builder createBlobInfoBuilder(@NonNull CreatePresignedUploadRequest request) {
         BlobId blobId = BlobId.of(configuration.getBucket(), request.getKey());

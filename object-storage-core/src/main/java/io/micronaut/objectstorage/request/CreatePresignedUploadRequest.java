@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * Request to create a pre-signed upload for a single object key.
  *
- * @since 3.1.0
+ * @since 3.0.0
  */
 public final class CreatePresignedUploadRequest {
 

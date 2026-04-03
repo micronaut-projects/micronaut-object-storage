@@ -273,7 +273,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
 
     /**
      * @return the presigner used to create pre-signed upload requests.
-     * @since 3.1.0
+     * @since 3.0.0
      */
     @NonNull
     protected S3Presigner createS3Presigner() {
@@ -300,7 +300,7 @@ public class AwsS3Operations implements ObjectStorageOperations<
     /**
      * @param request the pre-signed upload request
      * @return An AWS' {@link PutObjectRequest.Builder} from a Micronaut pre-signed upload request.
-     * @since 3.1.0
+     * @since 3.0.0
      */
     protected PutObjectRequest.@NonNull Builder getPresignedUploadRequestBuilder(@NonNull CreatePresignedUploadRequest request) {
         PutObjectRequest.Builder builder = PutObjectRequest.builder()
