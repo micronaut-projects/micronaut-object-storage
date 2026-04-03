@@ -56,6 +56,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -94,7 +95,7 @@ public final class AwsS3ReactiveOperations implements ReactiveObjectStorageOpera
                                    @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         this.configuration = configuration;
         this.s3AsyncClient = s3AsyncClient;
-        this.blockingExecutor = blockingExecutor;
+        this.blockingExecutor = Objects.requireNonNull(blockingExecutor, "blockingExecutor");
     }
 
     @Override
