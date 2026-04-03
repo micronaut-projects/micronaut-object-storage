@@ -13,10 +13,10 @@ import java.time.OffsetDateTime
 
 class AzureBlobStorageUploadOptionsSpec extends Specification {
 
-    void "simple upload conversion preserves azure upload options parity"() {
+    void "simple upload conversion preserves explicit azure upload options by value"() {
         given:
         def requestConditions = new BlobRequestConditions()
-            .setIfNoneMatch("*")
+            .setIfMatch('"etag"')
             .setTagsConditions("\"type\"='invoice'")
         def headers = new BlobHttpHeaders().setContentType("application/pdf")
         def immutabilityPolicy = new BlobImmutabilityPolicy()
@@ -35,13 +35,42 @@ class AzureBlobStorageUploadOptionsSpec extends Specification {
         BlockBlobSimpleUploadOptions simpleUploadOptions = convertToSimpleUploadOptions(parallelUploadOptions, 4L)
 
         then:
-        simpleUploadOptions.headers.is(headers)
+        simpleUploadOptions.headers.contentType == "application/pdf"
         simpleUploadOptions.metadata == [tenant: "cliponaut"]
         simpleUploadOptions.tags == [type: "invoice", issued: "2026-04-02"]
         simpleUploadOptions.tier == AccessTier.COOL
-        simpleUploadOptions.requestConditions.is(requestConditions)
-        simpleUploadOptions.immutabilityPolicy.is(immutabilityPolicy)
+        simpleUploadOptions.requestConditions.ifMatch == '"etag"'
+        simpleUploadOptions.requestConditions.tagsConditions == "\"type\"='invoice'"
+        simpleUploadOptions.immutabilityPolicy.expiryTime == OffsetDateTime.parse("2026-04-02T00:00:00Z")
+        simpleUploadOptions.immutabilityPolicy.policyMode == BlobImmutabilityPolicyMode.UNLOCKED
         simpleUploadOptions.legalHold == true
+    }
+
+    void "simple upload conversion removes default wildcard while preserving explicit conditions"() {
+        given:
+        def parallelUploadOptions = new BlobParallelUploadOptions(new ByteArrayInputStream("test".bytes))
+            .setRequestConditions(new BlobRequestConditions()
+                .setIfNoneMatch("*")
+                .setTagsConditions("\"type\"='invoice'"))
+
+        when:
+        BlockBlobSimpleUploadOptions simpleUploadOptions = convertToSimpleUploadOptions(parallelUploadOptions, 4L)
+
+        then:
+        simpleUploadOptions.requestConditions.ifNoneMatch == null
+        simpleUploadOptions.requestConditions.tagsConditions == "\"type\"='invoice'"
+    }
+
+    void "simple upload conversion omits wildcard-only overwrite guard"() {
+        given:
+        def parallelUploadOptions = new BlobParallelUploadOptions(new ByteArrayInputStream("test".bytes))
+            .setRequestConditions(new BlobRequestConditions().setIfNoneMatch("*"))
+
+        when:
+        BlockBlobSimpleUploadOptions simpleUploadOptions = convertToSimpleUploadOptions(parallelUploadOptions, 4L)
+
+        then:
+        simpleUploadOptions.requestConditions == null
     }
 
     private static BlockBlobSimpleUploadOptions convertToSimpleUploadOptions(BlobParallelUploadOptions options, long length) {
@@ -51,7 +80,7 @@ class AzureBlobStorageUploadOptionsSpec extends Specification {
             InputStream,
             long
         )
-        method.accessible = true
+        assert method.trySetAccessible()
         (BlockBlobSimpleUploadOptions) method.invoke(new AzureBlobStorageOperations(null), options, options.dataStream, length)
     }
 }
