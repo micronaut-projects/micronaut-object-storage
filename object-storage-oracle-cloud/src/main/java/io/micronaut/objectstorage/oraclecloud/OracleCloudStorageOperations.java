@@ -45,7 +45,6 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.HttpURLConnection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Collections;
@@ -67,7 +66,6 @@ public class OracleCloudStorageOperations
     implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
 
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
-    private static final int PUT_OBJECT_SUCCESS_STATUS = HttpURLConnection.HTTP_OK;
     private static final Logger LOG = LoggerFactory.getLogger(OracleCloudStorageOperations.class);
 
     private final OracleCloudStorageConfiguration configuration;
@@ -137,7 +135,6 @@ public class OracleCloudStorageOperations
                 .build(putObjectRequest)
         );
         return PutObjectResponse.builder()
-            .__httpStatusCode__(PUT_OBJECT_SUCCESS_STATUS)
             .eTag(response.getETag())
             .opcClientRequestId(response.getOpcClientRequestId())
             .opcRequestId(response.getOpcRequestId())

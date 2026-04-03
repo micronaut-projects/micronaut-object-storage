@@ -9,7 +9,6 @@ import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 
 import java.util.function.Supplier
-import java.net.HttpURLConnection
 import java.util.Optional
 
 class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
@@ -61,7 +60,6 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         response.eTag == 'etag'
         response.nativeResponse instanceof PutObjectResponse
         response.nativeResponse.eTag == 'etag'
-        response.nativeResponse.__httpStatusCode__ == HttpURLConnection.HTTP_OK
         response.nativeResponse.opcRequestId == 'opc-request-id'
         response.nativeResponse.opcClientRequestId == 'opc-client-request-id'
         response.nativeResponse.opcContentMd5 == 'content-md5'
@@ -117,7 +115,7 @@ class OracleCloudStorageOperationsUploadWithConsumerSpec extends Specification {
         and:
         response.key == 'streaming.txt'
         response.eTag == 'etag'
-        response.nativeResponse.__httpStatusCode__ == HttpURLConnection.HTTP_OK
+        response.nativeResponse.opcRequestId == 'opc-request-id'
     }
 
     void "unknown-length uploads with consumer fall back to ObjectStorage client"() {
