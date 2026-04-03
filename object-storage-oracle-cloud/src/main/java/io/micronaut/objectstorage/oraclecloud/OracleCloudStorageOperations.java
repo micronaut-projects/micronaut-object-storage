@@ -71,8 +71,7 @@ public class OracleCloudStorageOperations
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
     private final RegionProvider regionProvider;
-    private final Supplier<UploadManager> uploadManagerSupplier;
-    private volatile UploadManager uploadManager;
+    private final UploadManager uploadManager;
 
     /**
      * @param configuration Oracle Cloud Storage Configuration
@@ -91,7 +90,7 @@ public class OracleCloudStorageOperations
         this.configuration = configuration;
         this.client = client;
         this.regionProvider = regionProvider;
-        this.uploadManagerSupplier = uploadManagerSupplier;
+        this.uploadManager = uploadManagerSupplier.get();
     }
 
     @Override
@@ -119,18 +118,8 @@ public class OracleCloudStorageOperations
     }
 
     @NonNull
-    protected UploadManager getUploadManager() {
-        UploadManager current = uploadManager;
-        if (current == null) {
-            current = uploadManagerSupplier.get();
-            uploadManager = current;
-        }
-        return current;
-    }
-
-    @NonNull
     private PutObjectResponse uploadWithManager(@NonNull PutObjectRequest putObjectRequest, long contentSize) {
-        UploadManager.UploadResponse response = getUploadManager().upload(
+        UploadManager.UploadResponse response = uploadManager.upload(
             UploadManager.UploadRequest.builder(putObjectRequest.getPutObjectBody(), contentSize)
                 .build(putObjectRequest)
         );
