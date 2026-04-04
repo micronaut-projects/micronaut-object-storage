@@ -38,6 +38,8 @@ Examples:
 ./gradlew check
 ```
 
+To verify the dedicated native-image path used by CI, run `./gradlew :test-suite-graal:nativeTest`.
+
 ## Building Documentation
 
 The documentation sources are located at `src/main/docs/guide`.
