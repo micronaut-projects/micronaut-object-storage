@@ -1,12 +1,5 @@
-import org.gradle.api.artifacts.VersionCatalogsExtension
-
 repositories {
     mavenCentral()
-}
-
-def libs = extensions.getByType(VersionCatalogsExtension).named("libs")
-
-dependencies {
 }
 
 configurations.all {
