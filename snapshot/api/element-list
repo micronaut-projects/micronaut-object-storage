@@ -7,5 +7,6 @@ io.micronaut.objectstorage.info
 io.micronaut.objectstorage.local
 io.micronaut.objectstorage.oraclecloud
 io.micronaut.objectstorage.request
+io.micronaut.objectstorage.resource
 io.micronaut.objectstorage.response
 io.micronaut.objectstorage.test

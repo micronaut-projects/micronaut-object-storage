@@ -396,6 +396,41 @@ micronaut.object-storage.aws.logos.bucket=logos-bucket</code></pre>
 <p>You then need to use <code>@Named("pictures")</code> or <code>@Named("logos")</code> to specify which of the object storages you want to use.</p>
 </div>
 <div class="sect1">
+<h2 id="_resolving_resources_by_uri">Resolving resources by URI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Configured storages also publish Micronaut&#8217;s <a href="../api/io/micronaut/core/io/ResourceLoader.html">ResourceLoader</a> beans, so you can resolve
+objects through <a href="../api/io/micronaut/core/io/ResourceResolver.html">ResourceResolver</a> instead of injecting an
+<a href="../api/io/micronaut/objectstorage/ObjectStorageOperations.html">ObjectStorageOperations</a> bean directly.</p>
+</div>
+<div class="paragraph">
+<p>For the configuration above, the following URI resolves through the <code>pictures</code> storage:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">pictures://avatars/logo.png</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This resolution stays additive to the existing API:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Existing <code>@Named</code> injection continues to work unchanged.</p>
+</li>
+<li>
+<p>Provider-native aliases resolve only when the target bucket or container is already backed by a configured storage.</p>
+</li>
+<li>
+<p>Storage names must not reuse reserved Micronaut prefixes such as <code>classpath</code>, <code>file</code>, <code>string</code>, or <code>base64</code>, and
+they must not collide with the provider aliases <code>s3</code>, <code>gs</code>, <code>azb</code>, or <code>os</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_uploading_files">Uploading files</h2>
 <div class="sectionbody">
 <div class="listingblock multi-language-sample">
@@ -579,6 +614,15 @@ HttpResponse&lt;String&gt; streamingUpload(StreamingFileUpload fileUpload) {
 There is also a <code>getNativeEntry()</code> method that gives you access to the cloud vendor-specific response object.</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>If you prefer URI-based resolution, you can retrieve the same object through <a href="../api/io/micronaut/core/io/ResourceResolver.html">ResourceResolver</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">ResourceResolver resourceResolver = new ResourceResolver(resourceLoaders);
+Optional&lt;InputStream&gt; logo = resourceResolver.getResourceAsStream("pictures://avatars/logo.png");</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -874,6 +918,22 @@ information about credentials and region configuration.</p>
 <div class="paragraph">
 <p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/aws/AwsS3Operations.html">AwsS3Operations</a>.</p>
 </div>
+<div class="paragraph">
+<p>You can also resolve objects through Micronaut&#8217;s <code>ResourceLoader</code> abstraction:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Named storage URI: <code>pictures://avatars/logo.png</code></p>
+</li>
+<li>
+<p>AWS alias URI: <code>s3://pictures-bucket/avatars/logo.png</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>s3:</code> alias only resolves buckets that are already configured under <code>micronaut.object-storage.aws</code>.</p>
+</div>
 <div class="sect1">
 <h2 id="_advanced_configuration">Advanced configuration</h2>
 <div class="sectionbody">
@@ -1109,6 +1169,23 @@ micronaut {
 <div class="paragraph">
 <p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html">AzureBlobStorageOperations</a>.</p>
 </div>
+<div class="paragraph">
+<p>You can also resolve objects through Micronaut&#8217;s <code>ResourceLoader</code> abstraction:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Named storage URI: <code>pictures://avatars/logo.png</code></p>
+</li>
+<li>
+<p>Azure alias URI: <code>azb:storageaccount://pictures/avatars/logo.png</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>azb:</code> alias only resolves configured storages, matching the account name from <code>endpoint</code> together with the
+configured container name.</p>
+</div>
 <div class="sect1">
 <h2 id="_advanced_configuration">Advanced configuration</h2>
 <div class="sectionbody">
@@ -1291,6 +1368,22 @@ micronaut {
 </div>
 <div class="paragraph">
 <p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html">GoogleCloudStorageOperations</a>.</p>
+</div>
+<div class="paragraph">
+<p>You can also resolve objects through Micronaut&#8217;s <code>ResourceLoader</code> abstraction:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Named storage URI: <code>pictures://avatars/logo.png</code></p>
+</li>
+<li>
+<p>Google Cloud alias URI: <code>gs://pictures-bucket/avatars/logo.png</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>gs:</code> alias only resolves buckets that are already configured under <code>micronaut.object-storage.gcp</code>.</p>
 </div>
 <div class="sect1">
 <h2 id="_advanced_configuration">Advanced configuration</h2>
@@ -1506,6 +1599,23 @@ micronaut {
 </div>
 <div class="paragraph">
 <p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html">OracleCloudStorageOperations</a></p>
+</div>
+<div class="paragraph">
+<p>You can also resolve objects through Micronaut&#8217;s <code>ResourceLoader</code> abstraction:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Named storage URI: <code>pictures://avatars/logo.png</code></p>
+</li>
+<li>
+<p>Oracle Cloud alias URI: <code>os:us-ashburn-1:my-namespace://pictures-bucket/avatars/logo.png</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>os:</code> alias only resolves configured storages and must match the active OCI region together with the configured
+namespace and bucket.</p>
 </div>
 <div class="sect1">
 <h2 id="_advanced_configuration">Advanced configuration</h2>
