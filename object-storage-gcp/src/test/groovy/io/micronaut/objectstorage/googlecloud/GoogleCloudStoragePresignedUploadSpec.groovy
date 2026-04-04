@@ -3,7 +3,6 @@ package io.micronaut.objectstorage.googlecloud
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.Storage
-import io.micronaut.objectstorage.InputStreamMapper
 import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.request.CreatePresignedUploadRequest
 import io.micronaut.objectstorage.response.PresignedUpload
@@ -33,7 +32,6 @@ class GoogleCloudStoragePresignedUploadSpec extends Specification {
         }
         GoogleCloudStorageOperations operations = new GoogleCloudStorageOperations(
             configuration,
-            Mock(InputStreamMapper),
             storage
         )
         CreatePresignedUploadRequest request = new CreatePresignedUploadRequest("avatars/alice.png", Duration.ofMinutes(5))
@@ -67,7 +65,6 @@ class GoogleCloudStoragePresignedUploadSpec extends Specification {
         configuration.bucket = "profile-pictures"
         GoogleCloudStorageOperations operations = new GoogleCloudStorageOperations(
             configuration,
-            Mock(InputStreamMapper),
             Mock(Storage) {
                 1 * signUrl(_ as BlobInfo, _ as Long, _ as TimeUnit, _ as Storage.SignUrlOption[]) >> {
                     throw new IllegalStateException("signer unavailable")

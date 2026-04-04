@@ -81,6 +81,6 @@ class AzureBlobStorageUploadOptionsSpec extends Specification {
             long
         )
         assert method.trySetAccessible()
-        (BlockBlobSimpleUploadOptions) method.invoke(new AzureBlobStorageOperations(null), options, options.dataStream, length)
+        (BlockBlobSimpleUploadOptions) method.invoke(new AzureBlobStorageOperations(null, null), options, options.dataStream, length)
     }
 }
