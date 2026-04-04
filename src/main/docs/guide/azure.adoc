@@ -19,6 +19,14 @@ include::doc-examples/example-java/src/test/resources/application-azure.yml[]
 
 The concrete implementation of `ObjectStorageOperations` is api:objectstorage.azure.AzureBlobStorageOperations[].
 
+You can also resolve objects through Micronaut's `ResourceLoader` abstraction:
+
+* Named storage URI: `pictures://avatars/logo.png`
+* Azure alias URI: `azb:storageaccount://pictures/avatars/logo.png`
+
+The `azb:` alias only resolves configured storages, matching the account name from `endpoint` together with the
+configured container name.
+
 == Advanced configuration
 
 For configuration properties other than the specified above, you can add bean to your application that implements

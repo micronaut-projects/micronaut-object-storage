@@ -35,6 +35,26 @@ micronaut:
 
 You then need to use `@Named("pictures")` or `@Named("logos")` to specify which of the object storages you want to use.
 
+== Resolving resources by URI
+
+Configured storages also publish Micronaut's api:io.micronaut.core.io.ResourceLoader[] beans, so you can resolve
+objects through api:io.micronaut.core.io.ResourceResolver[] instead of injecting an
+api:objectstorage.ObjectStorageOperations[] bean directly.
+
+For the configuration above, the following URI resolves through the `pictures` storage:
+
+[source]
+----
+pictures://avatars/logo.png
+----
+
+This resolution stays additive to the existing API:
+
+* Existing `@Named` injection continues to work unchanged.
+* Provider-native aliases resolve only when the target bucket or container is already backed by a configured storage.
+* Storage names must not reuse reserved Micronaut prefixes such as `classpath`, `file`, `string`, or `base64`, and
+  they must not collide with the provider aliases `s3`, `gs`, `azb`, or `os`.
+
 == Uploading files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="upload"]
@@ -63,6 +83,14 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 
 <1> The retrieve operation returns an api:objectstorage.ObjectStorageEntry[], from which you can get an `InputStream`.
     There is also a `getNativeEntry()` method that gives you access to the cloud vendor-specific response object.
+
+If you prefer URI-based resolution, you can retrieve the same object through api:io.micronaut.core.io.ResourceResolver[]:
+
+[source,java]
+----
+ResourceResolver resourceResolver = new ResourceResolver(resourceLoaders);
+Optional<InputStream> logo = resourceResolver.getResourceAsStream("pictures://avatars/logo.png");
+----
 
 == Deleting files
 
