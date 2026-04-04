@@ -55,8 +55,8 @@ import java.util.function.Consumer;
 /**
  * Reactive Azure Blob Storage operations backed by Azure async blob clients.
  *
- * @author Cliponaut
- * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
+ * @since 3.0.0
  */
 @EachBean(BlobContainerAsyncClient.class)
 @Requires(beans = BlobContainerAsyncClient.class)

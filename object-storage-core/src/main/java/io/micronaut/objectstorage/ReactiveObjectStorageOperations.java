@@ -33,8 +33,8 @@ import java.util.function.Consumer;
  * {@link UploadRequest} and {@link ObjectStorageEntry} payload abstractions, which are still
  * {@link java.io.InputStream}-based.</p>
  *
- * @author Cliponaut
- * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
+ * @since 3.0.0
  * @param <I> Cloud vendor-specific upload request class or builder.
  * @param <O> Cloud vendor-specific upload response.
  * @param <D> Cloud vendor-specific delete response.

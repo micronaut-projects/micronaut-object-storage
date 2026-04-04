@@ -70,8 +70,8 @@ import java.util.function.Supplier;
 /**
  * Reactive AWS S3 object storage operations backed by the native async SDK client.
  *
- * @author Cliponaut
- * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
+ * @since 3.0.0
  */
 @EachBean(AwsS3Configuration.class)
 @Requires(beans = AwsS3Configuration.class)

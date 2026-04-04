@@ -29,8 +29,8 @@ import java.util.concurrent.ExecutorService;
 /**
  * Reactive Oracle Cloud object storage operations.
  *
- * @author Cliponaut
- * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
+ * @since 3.0.0
  */
 @EachBean(OracleCloudStorageConfiguration.class)
 @Requires(beans = OracleCloudStorageConfiguration.class)

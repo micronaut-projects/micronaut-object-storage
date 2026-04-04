@@ -27,8 +27,8 @@ import java.util.concurrent.ExecutorService;
 /**
  * Reactive local storage operations.
  *
- * @author Cliponaut
- * @since 3.1.0
+ * @author Álvaro Sánchez-Mariscal
+ * @since 3.0.0
  */
 @EachBean(LocalStorageConfiguration.class)
 @Requires(beans = LocalStorageConfiguration.class)
