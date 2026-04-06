@@ -7,6 +7,8 @@ import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import spock.lang.Specification
 
+import java.io.File
+
 @MicronautTest
 class LocalStorageReservedMetadataSpec extends Specification implements TestPropertyProvider {
 
@@ -33,7 +35,7 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
 
         then:
         def ex = thrown(IllegalArgumentException)
-        ex.message.contains('.metadata')
+        ex.message == 'Key uses the reserved .metadata namespace: .metadata/foo.txt'
         operations.listObjects() == ['foo.txt'] as Set
         operations.retrieve('foo.txt').get().metadata == [owner: 'safe']
     }
@@ -43,28 +45,32 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.retrieve(key)
 
         then:
-        thrown(IllegalArgumentException)
+        def retrieveException = thrown(IllegalArgumentException)
+        retrieveException.message == "Key uses the reserved .metadata namespace: ${key}"
 
         when:
         operations.delete(key)
 
         then:
-        thrown(IllegalArgumentException)
+        def deleteException = thrown(IllegalArgumentException)
+        deleteException.message == "Key uses the reserved .metadata namespace: ${key}"
 
         when:
         operations.exists(key)
 
         then:
-        thrown(IllegalArgumentException)
+        def existsException = thrown(IllegalArgumentException)
+        existsException.message == "Key uses the reserved .metadata namespace: ${key}"
 
         when:
         operations.upload(UploadRequest.fromBytes('blocked'.bytes, key, 'text/plain'))
 
         then:
-        thrown(IllegalArgumentException)
+        def uploadException = thrown(IllegalArgumentException)
+        uploadException.message == "Key uses the reserved .metadata namespace: ${key}"
 
         where:
-        key << ['.metadata', '.metadata/nested.txt']
+        key << reservedKeys()
     }
 
     void 'listing never exposes the reserved metadata namespace'() {
@@ -75,5 +81,13 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.listObjects(new ListObjectsRequest(5, '.metadata')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.metadata/')).keys.empty
         operations.listObjects() == ['visible.txt'] as Set
+    }
+
+    private static List<String> reservedKeys() {
+        def keys = ['.metadata', '.metadata/nested.txt']
+        if (File.separatorChar != '/') {
+            keys << ".metadata${File.separator}nested.txt"
+        }
+        keys
     }
 }

@@ -301,10 +301,10 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private static void validateKey(String key) {
-        if (key.equals(METADATA_DIRECTORY)
+        if (METADATA_DIRECTORY.equals(key)
             || key.startsWith(METADATA_DIRECTORY + "/")
             || (File.separatorChar != '/' && key.startsWith(METADATA_DIRECTORY + File.separator))) {
-            throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace");
+            throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace: " + key);
         }
     }
 
