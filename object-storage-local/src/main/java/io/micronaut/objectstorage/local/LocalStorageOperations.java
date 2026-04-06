@@ -32,6 +32,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -87,9 +90,11 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
+    private final boolean supportsPosixPermissions;
 
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
         this.configuration = configuration;
+        this.supportsPosixPermissions = configuration.getPath().getFileSystem().supportedFileAttributeViews().contains("posix");
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
         boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
@@ -301,10 +306,17 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private boolean mkdirs(Path path) {
         try {
-            if (supportsPosixPermissions(path)) {
-                Files.createDirectories(path, DIRECTORY_PERMISSIONS_ATTRIBUTE);
-            } else {
+            if (!supportsPosixPermissions) {
                 Files.createDirectories(path);
+                return true;
+            }
+            Path bucketPath = configuration.getPath();
+            Files.createDirectories(bucketPath, DIRECTORY_PERMISSIONS_ATTRIBUTE);
+            Files.setPosixFilePermissions(bucketPath, DIRECTORY_PERMISSIONS);
+            Path current = bucketPath;
+            for (Path part : bucketPath.relativize(path.normalize())) {
+                current = current.resolve(part);
+                createOwnerOnlyDirectory(current);
             }
             return true;
         } catch (IOException e) {
@@ -313,19 +325,30 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private OutputStream newOutputStream(Path file) throws IOException {
-        if (supportsPosixPermissions(file)) {
-            if (Files.notExists(file)) {
-                Files.createFile(file, FILE_PERMISSIONS_ATTRIBUTE);
-            } else {
+        if (supportsPosixPermissions) {
+            try {
+                return Channels.newOutputStream(FileChannel.open(
+                    file,
+                    EnumSet.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
+                    FILE_PERMISSIONS_ATTRIBUTE
+                ));
+            } catch (FileAlreadyExistsException ignored) {
                 Files.setPosixFilePermissions(file, FILE_PERMISSIONS);
+                return Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
             }
-            return Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
         }
         return Files.newOutputStream(file);
     }
 
-    private boolean supportsPosixPermissions(Path path) {
-        return path.getFileSystem().supportedFileAttributeViews().contains("posix");
+    private static void createOwnerOnlyDirectory(Path directory) throws IOException {
+        try {
+            Files.createDirectory(directory, DIRECTORY_PERMISSIONS_ATTRIBUTE);
+        } catch (FileAlreadyExistsException ignored) {
+            if (!Files.isDirectory(directory)) {
+                throw ignored;
+            }
+        }
+        Files.setPosixFilePermissions(directory, DIRECTORY_PERMISSIONS);
     }
 
     private static Path resolveSafe(Path parent, String key) {

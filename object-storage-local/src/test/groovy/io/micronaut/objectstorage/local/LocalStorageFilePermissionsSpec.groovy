@@ -6,6 +6,7 @@ import spock.lang.Requires
 import spock.lang.Specification
 
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -23,7 +24,7 @@ class LocalStorageFilePermissionsSpec extends Specification {
         Path bucket = root.resolve("bucket")
         ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
         LocalStorageOperations operations = ctx.getBean(LocalStorageOperations)
-        UploadRequest request = UploadRequest.fromBytes('secret'.bytes, 'nested/object.txt', 'text/plain')
+        UploadRequest request = UploadRequest.fromBytes('secret'.getBytes(StandardCharsets.UTF_8), 'nested/deeper/object.txt', 'text/plain')
         request.metadata = [classification: 'internal']
 
         when:
@@ -33,9 +34,11 @@ class LocalStorageFilePermissionsSpec extends Specification {
         Files.getPosixFilePermissions(bucket) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested')) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(bucket.resolve('nested/object.txt')) == ownerOnlyFilePermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/object.txt')) == ownerOnlyFilePermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
 
         cleanup:
         ctx?.close()
