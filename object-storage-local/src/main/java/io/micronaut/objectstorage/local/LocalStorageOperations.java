@@ -352,11 +352,20 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private static Path resolveSafe(Path parent, String key) {
+        validateKey(key);
         Path file = parent.resolve(key).normalize();
         if (!file.startsWith(parent)) {
             throw new IllegalArgumentException("Path lies outside the configured bucket");
         }
         return file;
+    }
+
+    private static void validateKey(String key) {
+        if (METADATA_DIRECTORY.equals(key)
+            || key.startsWith(METADATA_DIRECTORY + "/")
+            || (File.separatorChar != '/' && key.startsWith(METADATA_DIRECTORY + File.separator))) {
+            throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace: " + key);
+        }
     }
 
     /**
