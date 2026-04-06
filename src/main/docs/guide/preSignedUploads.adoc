@@ -6,17 +6,6 @@ proxying the file bytes through the application.
 Use api:objectstorage.request.CreatePresignedUploadRequest[] to describe the object key and signing requirements, then
 call `createPresignedUpload(...)` on api:objectstorage.ObjectStorageOperations[].
 
-[source,java]
-----
-CreatePresignedUploadRequest request =
-    new CreatePresignedUploadRequest("profiles/" + userId + ".png", Duration.ofMinutes(5));
-request.setContentType("image/png");
-request.setMetadata(Map.of("owner", userId));
-
-PresignedUpload signedUpload = objectStorage.createPresignedUpload(request)
-    .orElseThrow(() -> new IllegalStateException("This provider does not support pre-signed uploads"));
-----
-
 The returned api:objectstorage.response.PresignedUpload[] includes:
 
 * the target URI

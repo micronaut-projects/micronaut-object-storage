@@ -16,15 +16,22 @@
 package io.micronaut.objectstorage
 
 import io.micronaut.objectstorage.bucket.BucketOperations
+import io.micronaut.objectstorage.request.CreatePresignedUploadRequest
 import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.objectstorage.response.ListObjectsResponse
+import io.micronaut.objectstorage.response.PresignedUpload
 import io.micronaut.objectstorage.response.UploadResponse
+import org.opentest4j.TestAbortedException
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
+import java.net.HttpURLConnection
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.Duration
+import java.util.concurrent.ThreadLocalRandom
 
 abstract class ObjectStorageOperationsSpecification extends Specification {
 
@@ -215,9 +222,58 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
         testFiles.each { storage.delete(it.uploadRequest.key) }
     }
 
+    void 'it can upload an object through a portable presigned request when supported'() {
+        given:
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        String key = "presigned-${Math.abs(ThreadLocalRandom.current().nextLong())}.txt"
+        if (!supportsPresignedUploadRoundTrip()) {
+            throw new TestAbortedException("Presigned upload round-trip is not enabled for this provider/environment")
+        }
+        byte[] payload = NEW_TEXT.getBytes(StandardCharsets.UTF_8)
+        CreatePresignedUploadRequest request = new CreatePresignedUploadRequest(key, Duration.ofMinutes(5))
+        request.contentType = CONTENT_TYPE
+        request.contentLength = payload.length
+        request.metadata = METADATA
+        PollingConditions conditions = new PollingConditions(timeout: 30)
+
+        when:
+        PresignedUpload presignedUpload = storage.createPresignedUpload(request)
+            .orElseThrow(() -> new AssertionError("Expected provider to create a presigned upload request"))
+        int statusCode = uploadViaPresignedRequest(presignedUpload, payload)
+
+        then:
+        statusCode >= 200
+        statusCode < 300
+        presignedUpload.method == "PUT"
+        presignedUpload.expiration.isAfter(java.time.Instant.now())
+        conditions.eventually {
+            assert storage.exists(key)
+            assert storage.retrieve(key).present
+        }
+
+        when:
+        ObjectStorageEntry<?> entry = storage.retrieve(key).orElseThrow()
+
+        then:
+        entry.inputStream.text == NEW_TEXT
+        if (emulatorSupportsMetadata()) {
+            assert entry.metadata == METADATA
+        }
+        entry.contentType == Optional.of(CONTENT_TYPE)
+
+        cleanup:
+        if (supportsPresignedUploadRoundTrip()) {
+            storage.delete(key)
+        }
+    }
+
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
 
     abstract BucketOperations<?> getBucketOperations()
+
+    boolean supportsPresignedUploadRoundTrip() {
+        false
+    }
 
     boolean emulatorSupportsMetadata() {
         true
@@ -251,6 +307,32 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     static TestFile createTestFileForKey(String key) {
         Path path = createTempFile()
         return new TestFile(path: path, uploadRequest: UploadRequest.fromBytes(TEXT.bytes, key, CONTENT_TYPE))
+    }
+
+    private static int uploadViaPresignedRequest(PresignedUpload presignedUpload, byte[] payload) {
+        HttpURLConnection connection = (HttpURLConnection) presignedUpload.uri.toURL().openConnection()
+        connection.requestMethod = presignedUpload.method
+        connection.doOutput = true
+        connection.instanceFollowRedirects = false
+        connection.connectTimeout = 10_000
+        connection.readTimeout = 30_000
+        connection.setFixedLengthStreamingMode(payload.length)
+        presignedUpload.headers.forEach { name, values ->
+            if (!name.equalsIgnoreCase("Content-Length") && !name.equalsIgnoreCase("Host")) {
+                values.each { value ->
+                    connection.addRequestProperty(name, value)
+                }
+            }
+        }
+        connection.outputStream.withCloseable { outputStream ->
+            outputStream.write(payload)
+        }
+        int responseCode = connection.responseCode
+        if (responseCode >= 400) {
+            String errorBody = connection.errorStream != null ? connection.errorStream.text : ""
+            throw new AssertionError("Presigned upload failed with HTTP ${responseCode}: ${errorBody}")
+        }
+        return responseCode
     }
 
     private static List<ListObjectsResponse> collectPages(ObjectStorageOperations<?, ?, ?> storage, ListObjectsRequest request) {

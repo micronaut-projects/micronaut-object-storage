@@ -19,4 +19,9 @@ class OracleCloudStorageCloudSpec extends AbstractOracleCloudStorageSpec {
     Map<String, String> getProperties() {
         super.getProperties() + [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.namespace'): System.getenv('ORACLE_CLOUD_TEST_NAMESPACE')]
     }
+
+    @Override
+    boolean supportsPresignedUploadRoundTrip() {
+        true
+    }
 }

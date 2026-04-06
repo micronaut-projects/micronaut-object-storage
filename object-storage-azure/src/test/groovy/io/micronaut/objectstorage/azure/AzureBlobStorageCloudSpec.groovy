@@ -20,4 +20,9 @@ class AzureBlobStorageCloudSpec extends AbstractAzureBlobStorageSpec {
         super.getProperties() + [
                 (PREFIX + '.' + OBJECT_STORAGE_NAME + '.endpoint'): System.getenv('AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT')]
     }
+
+    @Override
+    boolean supportsPresignedUploadRoundTrip() {
+        true
+    }
 }

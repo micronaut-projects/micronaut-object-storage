@@ -27,4 +27,9 @@ class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPro
                 'aws.services.s3.endpoint-override': localstack.getEndpoint().toString()
         ] as Map
     }
+
+    @Override
+    boolean supportsPresignedUploadRoundTrip() {
+        true
+    }
 }

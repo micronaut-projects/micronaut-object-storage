@@ -11,4 +11,10 @@ import spock.lang.Requires
         env.AWS_REGION &&
         !System.getProperty('os.arch', '').contains('aarch64')
 })
-class AwsS3OperationsCloudSpec extends AbstractAwsS3Spec implements TestPropertyProvider {}
+class AwsS3OperationsCloudSpec extends AbstractAwsS3Spec implements TestPropertyProvider {
+
+    @Override
+    boolean supportsPresignedUploadRoundTrip() {
+        true
+    }
+}

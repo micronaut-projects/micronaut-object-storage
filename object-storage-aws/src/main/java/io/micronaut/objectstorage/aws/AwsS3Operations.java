@@ -277,7 +277,16 @@ public class AwsS3Operations implements ObjectStorageOperations<
      */
     @NonNull
     protected S3Presigner createS3Presigner() {
-        return S3Presigner.builder().s3Client(s3Client).build();
+        var clientConfiguration = s3Client.serviceClientConfiguration();
+        S3Presigner.Builder builder = S3Presigner.builder().s3Client(s3Client);
+        if (clientConfiguration.region() != null) {
+            builder.region(clientConfiguration.region());
+        }
+        if (clientConfiguration.credentialsProvider() != null) {
+            builder.credentialsProvider(clientConfiguration.credentialsProvider());
+        }
+        clientConfiguration.endpointOverride().ifPresent(builder::endpointOverride);
+        return builder.build();
     }
 
     /**

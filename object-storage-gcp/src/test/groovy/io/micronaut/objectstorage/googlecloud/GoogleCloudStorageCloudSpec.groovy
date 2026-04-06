@@ -11,4 +11,9 @@ class GoogleCloudStorageCloudSpec extends AbstractGoogleCloudStorageSpec {
     Map<String, String> getProperties() {
         super.getProperties() + ['gcp.project-id': System.getenv('GCLOUD_TEST_PROJECT_ID')]
     }
+
+    @Override
+    boolean supportsPresignedUploadRoundTrip() {
+        true
+    }
 }
