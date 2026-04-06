@@ -15,15 +15,18 @@
  */
 package io.micronaut.objectstorage.azure;
 
-import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobContainerAsyncClient;
+import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.blob.models.BlobContainerProperties;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.objectstorage.internal.DefaultReactiveBucketOperations;
-import io.micronaut.scheduling.TaskExecutors;
-import jakarta.inject.Named;
+import io.micronaut.objectstorage.bucket.BucketEntry;
+import io.micronaut.objectstorage.bucket.ReactiveBucketOperations;
+import org.jspecify.annotations.NonNull;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
-import java.util.concurrent.ExecutorService;
+import java.util.Optional;
 
 /**
  * Reactive Azure bucket operations.
@@ -31,13 +34,86 @@ import java.util.concurrent.ExecutorService;
  * @since 3.0.0
  * @author Álvaro Sánchez-Mariscal
  */
-@EachBean(BlobServiceClient.class)
-@Requires(beans = BlobServiceClient.class)
-@Requires(beans = AzureBlobBucketOperations.class)
-public class AzureBlobReactiveBucketOperations extends DefaultReactiveBucketOperations<BlobContainerProperties> {
+@EachBean(BlobServiceAsyncClient.class)
+@Requires(beans = BlobServiceAsyncClient.class)
+public class AzureBlobReactiveBucketOperations implements ReactiveBucketOperations<BlobContainerProperties> {
 
-    public AzureBlobReactiveBucketOperations(AzureBlobBucketOperations operations,
-                                             @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
-        super(operations, blockingExecutor);
+    private final AzureAsyncBucketClient client;
+
+    public AzureBlobReactiveBucketOperations(BlobServiceAsyncClient blobServiceAsyncClient) {
+        this(new BlobServiceAzureAsyncBucketClient(blobServiceAsyncClient));
+    }
+
+    AzureBlobReactiveBucketOperations(AzureAsyncBucketClient client) {
+        this.client = client;
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Void> create(@NonNull String name) {
+        return client.create(name);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Optional<BucketEntry<BlobContainerProperties>>> retrieve(@NonNull String name) {
+        return client.retrieve(name);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Void> delete(@NonNull String name) {
+        return client.delete(name);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Boolean> exists(@NonNull String name) {
+        return client.exists(name);
+    }
+
+    interface AzureAsyncBucketClient {
+        Publisher<Void> create(@NonNull String name);
+
+        Publisher<Optional<BucketEntry<BlobContainerProperties>>> retrieve(@NonNull String name);
+
+        Publisher<Void> delete(@NonNull String name);
+
+        Publisher<Boolean> exists(@NonNull String name);
+    }
+
+    private static final class BlobServiceAzureAsyncBucketClient implements AzureAsyncBucketClient {
+        private final BlobServiceAsyncClient blobServiceAsyncClient;
+
+        private BlobServiceAzureAsyncBucketClient(BlobServiceAsyncClient blobServiceAsyncClient) {
+            this.blobServiceAsyncClient = blobServiceAsyncClient;
+        }
+
+        @Override
+        public Publisher<Void> create(@NonNull String name) {
+            return Mono.defer(() -> blobServiceAsyncClient.createBlobContainer(name).then());
+        }
+
+        @Override
+        public Publisher<Optional<BucketEntry<BlobContainerProperties>>> retrieve(@NonNull String name) {
+            return Mono.defer(() -> {
+                BlobContainerAsyncClient containerAsyncClient = blobServiceAsyncClient.getBlobContainerAsyncClient(name);
+                return containerAsyncClient.exists()
+                    .flatMap(exists -> exists
+                        ? containerAsyncClient.getProperties()
+                            .map(properties -> Optional.of(new BucketEntry<>(name, properties)))
+                        : Mono.just(Optional.empty()));
+            });
+        }
+
+        @Override
+        public Publisher<Void> delete(@NonNull String name) {
+            return Mono.defer(() -> blobServiceAsyncClient.getBlobContainerAsyncClient(name).delete());
+        }
+
+        @Override
+        public Publisher<Boolean> exists(@NonNull String name) {
+            return Mono.defer(() -> blobServiceAsyncClient.getBlobContainerAsyncClient(name).exists());
+        }
     }
 }

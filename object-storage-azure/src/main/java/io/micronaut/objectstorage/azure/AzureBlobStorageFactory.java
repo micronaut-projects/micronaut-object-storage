@@ -19,6 +19,7 @@ import com.azure.core.credential.TokenCredential;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
@@ -34,6 +35,7 @@ import org.jspecify.annotations.NonNull;
  * <ul>
  *     <li>For each {@link AzureBlobStorageConfiguration}, creates a {@link BlobServiceClientBuilder}.</li>
  *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceClient}</li>
+ *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceAsyncClient}</li>
  *     <li>For each {@link BlobServiceClient}, creates a {@link BlobContainerClient}</li>
  * </ul>
  *
@@ -91,6 +93,15 @@ public class AzureBlobStorageFactory {
     @EachBean(BlobServiceClientBuilder.class)
     public BlobServiceClient blobServiceClient(@NonNull BlobServiceClientBuilder builder) {
         return builder.buildClient();
+    }
+
+    /**
+     * @param builder the builder
+     * @return the {@link BlobServiceAsyncClient}
+     */
+    @EachBean(BlobServiceClientBuilder.class)
+    public BlobServiceAsyncClient blobServiceAsyncClient(@NonNull BlobServiceClientBuilder builder) {
+        return builder.buildAsyncClient();
     }
 
     /**

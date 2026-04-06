@@ -18,14 +18,22 @@ package io.micronaut.objectstorage.googlecloud;
 import com.google.cloud.storage.Bucket;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.objectstorage.bucket.BucketEntry;
+import io.micronaut.objectstorage.bucket.ReactiveBucketOperations;
 import io.micronaut.objectstorage.internal.DefaultReactiveBucketOperations;
 import io.micronaut.scheduling.TaskExecutors;
 import jakarta.inject.Named;
+import org.jspecify.annotations.NonNull;
+import org.reactivestreams.Publisher;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 /**
  * Reactive Google Cloud bucket operations.
+ *
+ * The Google Cloud Storage client used on this branch exposes blocking bucket lifecycle methods only,
+ * so this bean intentionally keeps the executor-backed bridge until the SDK offers a native async bucket API.
  *
  * @since 3.0.0
  * @author Álvaro Sánchez-Mariscal
@@ -33,10 +41,36 @@ import java.util.concurrent.ExecutorService;
 @EachBean(GoogleCloudStorageConfiguration.class)
 @Requires(beans = GoogleCloudStorageConfiguration.class)
 @Requires(beans = GoogleCloudBucketOperations.class)
-public class GoogleCloudReactiveBucketOperations extends DefaultReactiveBucketOperations<Bucket> {
+public class GoogleCloudReactiveBucketOperations implements ReactiveBucketOperations<Bucket> {
+
+    private final DefaultReactiveBucketOperations<Bucket> delegate;
 
     public GoogleCloudReactiveBucketOperations(GoogleCloudBucketOperations operations,
                                                @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
-        super(operations, blockingExecutor);
+        this.delegate = new DefaultReactiveBucketOperations<>(operations, blockingExecutor);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Void> create(@NonNull String name) {
+        return delegate.create(name);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Optional<BucketEntry<Bucket>>> retrieve(@NonNull String name) {
+        return delegate.retrieve(name);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Void> delete(@NonNull String name) {
+        return delegate.delete(name);
+    }
+
+    @Override
+    @NonNull
+    public Publisher<Boolean> exists(@NonNull String name) {
+        return delegate.exists(name);
     }
 }
