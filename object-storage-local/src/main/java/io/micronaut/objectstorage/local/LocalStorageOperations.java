@@ -29,14 +29,21 @@ import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -67,12 +74,27 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     public static final String METADATA_DIRECTORY = ".metadata";
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
+    private static final Set<PosixFilePermission> DIRECTORY_PERMISSIONS = EnumSet.of(
+        PosixFilePermission.OWNER_READ,
+        PosixFilePermission.OWNER_WRITE,
+        PosixFilePermission.OWNER_EXECUTE
+    );
+    private static final Set<PosixFilePermission> FILE_PERMISSIONS = EnumSet.of(
+        PosixFilePermission.OWNER_READ,
+        PosixFilePermission.OWNER_WRITE
+    );
+    private static final FileAttribute<Set<PosixFilePermission>> DIRECTORY_PERMISSIONS_ATTRIBUTE =
+        PosixFilePermissions.asFileAttribute(DIRECTORY_PERMISSIONS);
+    private static final FileAttribute<Set<PosixFilePermission>> FILE_PERMISSIONS_ATTRIBUTE =
+        PosixFilePermissions.asFileAttribute(FILE_PERMISSIONS);
 
     private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
+    private final boolean supportsPosixPermissions;
 
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
         this.configuration = configuration;
+        this.supportsPosixPermissions = configuration.getPath().getFileSystem().supportedFileAttributeViews().contains("posix");
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
         boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
@@ -258,7 +280,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private Path storeFile(String key, InputStream inputStream) {
         Path file = resolveSafe(configuration.getPath(), key);
         mkdirs(file.getParent());
-        try (OutputStream fileOut = Files.newOutputStream(file)) {
+        try (OutputStream fileOut = newOutputStream(file)) {
             inputStream.transferTo(fileOut);
             return file;
         } catch (IOException e) {
@@ -275,7 +297,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         metadataProperties.putAll(metadata);
         Path metadataFilePath = resolveSafe(metadataPath, key);
         mkdirs(metadataFilePath.getParent());
-        try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
+        try (OutputStream metadataOut = newOutputStream(metadataFilePath)) {
             metadataProperties.store(metadataOut, "Metadata for file: " + key);
         } catch (IOException e) {
             //no op
@@ -284,11 +306,49 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private boolean mkdirs(Path path) {
         try {
-            Files.createDirectories(path);
+            if (!supportsPosixPermissions) {
+                Files.createDirectories(path);
+                return true;
+            }
+            Path bucketPath = configuration.getPath();
+            Files.createDirectories(bucketPath, DIRECTORY_PERMISSIONS_ATTRIBUTE);
+            Files.setPosixFilePermissions(bucketPath, DIRECTORY_PERMISSIONS);
+            Path current = bucketPath;
+            for (Path part : bucketPath.relativize(path.normalize())) {
+                current = current.resolve(part);
+                createOwnerOnlyDirectory(current);
+            }
             return true;
         } catch (IOException e) {
             return false;
         }
+    }
+
+    private OutputStream newOutputStream(Path file) throws IOException {
+        if (supportsPosixPermissions) {
+            try {
+                return Channels.newOutputStream(FileChannel.open(
+                    file,
+                    EnumSet.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
+                    FILE_PERMISSIONS_ATTRIBUTE
+                ));
+            } catch (FileAlreadyExistsException ignored) {
+                Files.setPosixFilePermissions(file, FILE_PERMISSIONS);
+                return Files.newOutputStream(file, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+            }
+        }
+        return Files.newOutputStream(file);
+    }
+
+    private static void createOwnerOnlyDirectory(Path directory) throws IOException {
+        try {
+            Files.createDirectory(directory, DIRECTORY_PERMISSIONS_ATTRIBUTE);
+        } catch (FileAlreadyExistsException ignored) {
+            if (!Files.isDirectory(directory)) {
+                throw ignored;
+            }
+        }
+        Files.setPosixFilePermissions(directory, DIRECTORY_PERMISSIONS);
     }
 
     private static Path resolveSafe(Path parent, String key) {
