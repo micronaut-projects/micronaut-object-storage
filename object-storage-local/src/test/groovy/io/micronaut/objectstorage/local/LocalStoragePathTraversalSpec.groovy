@@ -124,4 +124,44 @@ class LocalStoragePathTraversalSpec extends Specification {
             }
         })
     }
+
+    def 'symlinked metadata directory is rejected during upload'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path metadataTarget = outside.resolve("metadata-target")
+        Files.createDirectory(metadataTarget)
+        Files.createSymbolicLink(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY), metadataTarget)
+
+        ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        UploadRequest request = UploadRequest.fromBytes("evil".bytes, "public", "text/plain")
+        request.setMetadata(["owner": "mallory"])
+
+        when:
+        ctx.getBean(LocalStorageOperations).upload(request)
+
+        then:
+        thrown IllegalArgumentException
+        !Files.exists(bucket.resolve("public"))
+        !Files.exists(metadataTarget.resolve("public"))
+
+        cleanup:
+        ctx.close()
+        Files.walkFileTree(tmp, new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file)
+                return FileVisitResult.CONTINUE
+            }
+
+            @Override
+            FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir)
+                return FileVisitResult.CONTINUE
+            }
+        })
+    }
 }

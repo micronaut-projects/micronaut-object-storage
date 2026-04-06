@@ -359,6 +359,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private static Path resolveSafe(Path parent, String key) {
         validateKey(key);
         Path normalizedParent = parent.normalize();
+        rejectSymbolicLink(normalizedParent);
         Path file = normalizedParent.resolve(key).normalize();
         if (!file.startsWith(normalizedParent)) {
             throw new IllegalArgumentException("Path lies outside the configured bucket");
@@ -368,6 +369,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return file;
     }
 
+<<<<<<< HEAD
     private static void validateKey(String key) {
         if (METADATA_DIRECTORY.equals(key)
             || key.startsWith(METADATA_DIRECTORY + "/")
@@ -376,6 +378,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
+=======
+>>>>>>> 44e991e (Harden local storage metadata symlink handling)
     private static void rejectSymbolicLink(Path path) {
         if (Files.isSymbolicLink(path)) {
             throw new IllegalArgumentException("Path contains symbolic links");
