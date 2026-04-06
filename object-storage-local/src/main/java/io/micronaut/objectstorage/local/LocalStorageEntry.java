@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +59,7 @@ public class LocalStorageEntry implements ObjectStorageEntry<Path> {
     @Override
     public InputStream getInputStream() {
         try {
-            return Files.newInputStream(file);
+            return Files.newInputStream(file, LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
             throw new ObjectStorageException("Error opening input stream for file: " + file, e);
         }

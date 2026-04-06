@@ -2,6 +2,7 @@ package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.objectstorage.request.ListObjectsRequest
+import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -41,6 +42,71 @@ class LocalStoragePathTraversalSpec extends Specification {
         then:
         listedKeys.keys.empty
         listedKeys.continuationToken.empty
+
+        cleanup:
+        ctx.close()
+        Files.walkFileTree(tmp, new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file)
+                return FileVisitResult.CONTINUE
+            }
+
+            @Override
+            FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir)
+                return FileVisitResult.CONTINUE
+            }
+        })
+    }
+
+    def 'symlink escapes are rejected for retrieve copy upload and delete'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path secret = outside.resolve("secret")
+        Files.writeString(secret, "bar")
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path publicEntry = bucket.resolve("public")
+        Files.writeString(publicEntry, "baz")
+        Files.createSymbolicLink(bucket.resolve("secret-link"), secret)
+        Files.createSymbolicLink(bucket.resolve("outside-link"), outside)
+
+        ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+
+        when:
+        ctx.getBean(LocalStorageOperations).retrieve("public")
+
+        then:
+        noExceptionThrown()
+
+        when:
+        ctx.getBean(LocalStorageOperations).retrieve("secret-link")
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        ctx.getBean(LocalStorageOperations).copy("outside-link/secret", "copied")
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        ctx.getBean(LocalStorageOperations).upload(UploadRequest.fromBytes("evil".bytes, "outside-link/created", "text/plain"))
+
+        then:
+        thrown IllegalArgumentException
+        !Files.exists(outside.resolve("created"))
+
+        when:
+        ctx.getBean(LocalStorageOperations).delete("secret-link")
+
+        then:
+        thrown IllegalArgumentException
+        Files.exists(secret)
 
         cleanup:
         ctx.close()
