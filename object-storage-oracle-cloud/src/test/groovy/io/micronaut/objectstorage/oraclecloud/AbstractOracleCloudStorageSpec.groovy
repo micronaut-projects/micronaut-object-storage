@@ -1,18 +1,16 @@
 package io.micronaut.objectstorage.oraclecloud
 
-import com.oracle.bmc.objectstorage.ObjectStorage
-import com.oracle.bmc.objectstorage.model.CreateBucketDetails
-import com.oracle.bmc.objectstorage.requests.CreateBucketRequest
-import com.oracle.bmc.objectstorage.requests.DeleteBucketRequest
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
+import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+import jakarta.inject.Named
 
 import java.util.stream.IntStream
 
@@ -27,10 +25,8 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     OracleCloudStorageOperations oracleCloudStorageOperations
 
     @Inject
-    OracleCloudStorageConfiguration configuration
-
-    @Inject
-    ObjectStorage client
+    @Named(OBJECT_STORAGE_NAME)
+    OracleCloudBucketOperations oracleCloudBucketOperations
 
     @Override
     Map<String, String> getProperties() {
@@ -44,17 +40,7 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     void setup() {
-        def builder = CreateBucketDetails.builder()
-                .compartmentId(System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID'))
-                .name(BUCKET_NAME)
-        if (System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID')) {
-            builder.compartmentId(System.getenv('ORACLE_CLOUD_TEST_COMPARTMENT_ID'))
-        }
-        client.createBucket(CreateBucketRequest.builder()
-                .namespaceName(configuration.getNamespace())
-                .createBucketDetails(builder.build())
-                .build())
-
+        oracleCloudBucketOperations.create(BUCKET_NAME)
     }
 
     def 'many bucket entries list'() {
@@ -77,9 +63,13 @@ abstract class AbstractOracleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     void cleanup() {
-        client.deleteBucket(DeleteBucketRequest.builder()
-                .namespaceName(configuration.getNamespace())
-                .bucketName(BUCKET_NAME)
-                .build())
+        if (oracleCloudBucketOperations.exists(BUCKET_NAME)) {
+            oracleCloudBucketOperations.delete(BUCKET_NAME)
+        }
+    }
+
+    @Override
+    BucketOperations<?> getBucketOperations() {
+        return oracleCloudBucketOperations
     }
 }

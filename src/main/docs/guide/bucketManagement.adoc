@@ -29,6 +29,18 @@ bucketOperations.delete("reports-archive");
 The provider-specific native metadata is exposed through `BucketEntry#nativeEntry()` for advanced use cases, while
 the portable API keeps the logical bucket or container name available via `BucketEntry#name()`.
 
+If you also need a non-blocking lifecycle API, inject `ReactiveBucketOperations` and subscribe to the returned
+`Publisher`s the same way you would with the reactive object-storage contract:
+
+[source,java]
+----
+import io.micronaut.objectstorage.bucket.ReactiveBucketOperations;
+import org.reactivestreams.Publisher;
+
+Publisher<Void> create = reactiveBucketOperations.create("reports-archive");
+Publisher<Boolean> exists = reactiveBucketOperations.exists("reports-archive");
+----
+
 NOTE: Creating or deleting a bucket or container does not retarget an already injected `ObjectStorageOperations` bean.
 Existing object-operation beans continue to use the configured default bucket or container for their named storage.
 

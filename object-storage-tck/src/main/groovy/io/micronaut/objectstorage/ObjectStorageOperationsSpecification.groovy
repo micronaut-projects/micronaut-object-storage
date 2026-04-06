@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage
 
+import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.objectstorage.response.ListObjectsResponse
@@ -215,6 +216,8 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
     }
 
     abstract ObjectStorageOperations<?, ?, ?> getObjectStorage()
+
+    abstract BucketOperations<?> getBucketOperations()
 
     boolean emulatorSupportsMetadata() {
         true
