@@ -16,6 +16,9 @@ micronaut:
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
 
+NOTE: The local storage implementation reserves the `.metadata` key namespace for per-object metadata files. User object
+keys cannot be `.metadata` or start with `.metadata/`.
+
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.local.LocalStorageConfiguration.adoc[]
