@@ -3,8 +3,10 @@ package io.micronaut.objectstorage.local
 import io.micronaut.context.ApplicationContext
 import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
+import org.opentest4j.TestAbortedException
 import spock.lang.Specification
 
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -16,6 +18,7 @@ class LocalStoragePathTraversalSpec extends Specification {
     def 'path traversal'() {
         given:
         Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
         Path secret = tmp.resolve("secret")
         Files.writeString(secret, "bar")
         Path bucket = tmp.resolve("foo")
@@ -23,7 +26,7 @@ class LocalStoragePathTraversalSpec extends Specification {
         Path pub = bucket.resolve("public")
         Files.writeString(pub, "baz")
 
-        ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
 
         when:
         def publicEntry = ctx.getBean(LocalStorageOperations).retrieve("public")
@@ -44,25 +47,14 @@ class LocalStoragePathTraversalSpec extends Specification {
         listedKeys.continuationToken.empty
 
         cleanup:
-        ctx.close()
-        Files.walkFileTree(tmp, new SimpleFileVisitor<Path>() {
-            @Override
-            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file)
-                return FileVisitResult.CONTINUE
-            }
-
-            @Override
-            FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir)
-                return FileVisitResult.CONTINUE
-            }
-        })
+        ctx?.close()
+        deleteRecursively(tmp)
     }
 
     def 'symlink escapes are rejected for retrieve copy upload and delete'() {
         given:
         Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
         Path outside = tmp.resolve("outside")
         Files.createDirectory(outside)
         Path secret = outside.resolve("secret")
@@ -71,10 +63,11 @@ class LocalStoragePathTraversalSpec extends Specification {
         Files.createDirectory(bucket)
         Path publicEntry = bucket.resolve("public")
         Files.writeString(publicEntry, "baz")
+        assumeSymbolicLinksSupported(tmp)
         Files.createSymbolicLink(bucket.resolve("secret-link"), secret)
         Files.createSymbolicLink(bucket.resolve("outside-link"), outside)
 
-        ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
 
         when:
         ctx.getBean(LocalStorageOperations).retrieve("public")
@@ -109,34 +102,24 @@ class LocalStoragePathTraversalSpec extends Specification {
         Files.exists(secret)
 
         cleanup:
-        ctx.close()
-        Files.walkFileTree(tmp, new SimpleFileVisitor<Path>() {
-            @Override
-            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file)
-                return FileVisitResult.CONTINUE
-            }
-
-            @Override
-            FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir)
-                return FileVisitResult.CONTINUE
-            }
-        })
+        ctx?.close()
+        deleteRecursively(tmp)
     }
 
     def 'symlinked metadata directory is rejected during upload'() {
         given:
         Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
         Path outside = tmp.resolve("outside")
         Files.createDirectory(outside)
         Path bucket = tmp.resolve("bucket")
         Files.createDirectory(bucket)
         Path metadataTarget = outside.resolve("metadata-target")
         Files.createDirectory(metadataTarget)
+        assumeSymbolicLinksSupported(tmp)
         Files.createSymbolicLink(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY), metadataTarget)
 
-        ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
         UploadRequest request = UploadRequest.fromBytes("evil".bytes, "public", "text/plain")
         request.setMetadata(["owner": "mallory"])
 
@@ -149,8 +132,33 @@ class LocalStoragePathTraversalSpec extends Specification {
         !Files.exists(metadataTarget.resolve("public"))
 
         cleanup:
-        ctx.close()
-        Files.walkFileTree(tmp, new SimpleFileVisitor<Path>() {
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    private static void assumeSymbolicLinksSupported(Path directory) {
+        Path target = directory.resolve("symlink-target-probe")
+        Path link = directory.resolve("symlink-link-probe")
+        try {
+            Files.writeString(target, "probe")
+            Files.createSymbolicLink(link, target.fileName)
+        } catch (UnsupportedOperationException | IOException | SecurityException ignored) {
+            throw new TestAbortedException("symbolic links are not supported in this environment")
+        } finally {
+            try {
+                Files.deleteIfExists(link)
+                Files.deleteIfExists(target)
+            } catch (IOException ignored) {
+                // no-op
+            }
+        }
+    }
+
+    private static void deleteRecursively(Path path) {
+        if (path == null || !Files.exists(path)) {
+            return
+        }
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Files.delete(file)

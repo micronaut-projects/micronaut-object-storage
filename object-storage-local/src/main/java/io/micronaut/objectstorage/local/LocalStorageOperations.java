@@ -364,12 +364,10 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         if (!file.startsWith(normalizedParent)) {
             throw new IllegalArgumentException("Path lies outside the configured bucket");
         }
-        rejectSymbolicLink(normalizedParent);
         rejectSymbolicLinks(normalizedParent, file);
         return file;
     }
 
-<<<<<<< HEAD
     private static void validateKey(String key) {
         if (METADATA_DIRECTORY.equals(key)
             || key.startsWith(METADATA_DIRECTORY + "/")
@@ -377,9 +375,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace: " + key);
         }
     }
-
-=======
->>>>>>> 44e991e (Harden local storage metadata symlink handling)
     private static void rejectSymbolicLink(Path path) {
         if (Files.isSymbolicLink(path)) {
             throw new IllegalArgumentException("Path contains symbolic links");
@@ -397,7 +392,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private static InputStream newInputStreamNoFollow(Path path) throws IOException {
         return Channels.newInputStream(Files.newByteChannel(path, Set.of(StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS)));
     }
-
     /**
      * A simple wrapper around a path.
      * @param path Where on disk the local storage provider has stored the actual data.
