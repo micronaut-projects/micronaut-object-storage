@@ -1782,6 +1782,11 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <div class="paragraph">
 <p>By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:</p>
 </div>
+<div class="paragraph">
+<p>On POSIX-capable file systems, configured bucket paths created by the local implementation use owner-only permissions for
+bucket subdirectories, stored objects, and <code>.metadata</code> files. On non-POSIX file systems, Micronaut cannot apply those
+permissions directly, so custom storage paths on shared hosts should be provisioned with restrictive ACLs by the caller.</p>
+</div>
 <a id="io.micronaut.objectstorage.local.LocalStorageConfiguration" href="#io.micronaut.objectstorage.local.LocalStorageConfiguration">&#128279;</a>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. Configuration Properties for <a href="../api/io/micronaut/objectstorage/local/LocalStorageConfiguration.html">LocalStorageConfiguration</a></caption>
