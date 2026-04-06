@@ -31,6 +31,7 @@ Portable contract:
 * Clients must preserve all required headers from the response.
 * Provider support is optional. Providers that do not support pre-signed uploads, or cannot sign in the current
   configuration, return `Optional.empty()`.
+* Oracle Cloud uses OCI pre-authenticated requests for this API and returns the upload URL as the portable signed request URI.
 * Local storage does not support this API because it has no HTTP endpoint to sign.
 
 The following controller example returns a JSON payload your frontend can use to upload directly to object storage:

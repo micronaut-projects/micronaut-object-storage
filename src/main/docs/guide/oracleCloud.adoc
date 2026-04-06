@@ -27,6 +27,9 @@ You can also resolve objects through Micronaut's `ResourceLoader` abstraction:
 The `os:` alias only resolves configured storages and must match the active OCI region together with the configured
 namespace and bucket.
 
+Oracle Cloud also supports `createPresignedUpload(...)` through OCI pre-authenticated requests, so applications can
+return a direct upload `PUT` URL plus any required headers without proxying file bytes.
+
 == Advanced configuration
 
 For configuration properties other than the specified above, you can add bean to your application that implements

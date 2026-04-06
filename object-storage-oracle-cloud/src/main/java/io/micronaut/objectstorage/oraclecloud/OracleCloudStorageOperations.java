@@ -18,9 +18,12 @@ package io.micronaut.objectstorage.oraclecloud;
 import com.oracle.bmc.auth.RegionProvider;
 import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
+import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails;
 import com.oracle.bmc.objectstorage.model.CopyObjectDetails;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
+import com.oracle.bmc.objectstorage.model.PreauthenticatedRequest;
 import com.oracle.bmc.objectstorage.requests.CopyObjectRequest;
+import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.HeadObjectRequest;
@@ -37,17 +40,25 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.CreatePresignedUploadRequest;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
+import io.micronaut.objectstorage.response.PresignedUpload;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.time.Instant;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -244,6 +255,38 @@ public class OracleCloudStorageOperations
         }
     }
 
+    @Override
+    @NonNull
+    public Optional<PresignedUpload> createPresignedUpload(@NonNull CreatePresignedUploadRequest request) {
+        try {
+            Instant expiration = Instant.now().plus(request.getExpiresIn());
+            var preauthenticatedRequest = client.createPreauthenticatedRequest(
+                CreatePreauthenticatedRequestRequest.builder()
+                    .namespaceName(configuration.getNamespace())
+                    .bucketName(configuration.getBucket())
+                    .createPreauthenticatedRequestDetails(CreatePreauthenticatedRequestDetails.builder()
+                        .name(getPreauthenticatedRequestName(request))
+                        .objectName(request.getKey())
+                        .accessType(CreatePreauthenticatedRequestDetails.AccessType.ObjectWrite)
+                        .timeExpires(Date.from(expiration))
+                        .build())
+                    .build())
+                .getPreauthenticatedRequest();
+            return Optional.of(new PresignedUpload(
+                getPreauthenticatedRequestUri(preauthenticatedRequest),
+                "PUT",
+                toPortableHeaders(request),
+                expiration
+            ));
+        } catch (RuntimeException e) {
+            String msg = String.format(
+                "Error when trying to create a pre-signed upload request with key [%s] in Oracle Cloud Storage",
+                request.getKey()
+            );
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
     /**
      *
      * @param request Upload Request
@@ -262,5 +305,44 @@ public class OracleCloudStorageOperations
             putObjectRequestBuilder.opcMeta(request.getMetadata());
         }
         return putObjectRequestBuilder;
+    }
+
+    /**
+     * @param request the pre-signed upload request
+     * @return the Oracle Cloud pre-authenticated request name
+     * @since 3.0.0
+     */
+    @NonNull
+    protected String getPreauthenticatedRequestName(@NonNull CreatePresignedUploadRequest request) {
+        return "micronaut-presigned-upload-" + request.getKey().replace('/', '-');
+    }
+
+    /**
+     * @param preauthenticatedRequest the Oracle Cloud pre-authenticated request
+     * @return the absolute request URI that clients should replay
+     * @since 3.0.0
+     */
+    @NonNull
+    protected URI getPreauthenticatedRequestUri(@NonNull PreauthenticatedRequest preauthenticatedRequest) {
+        String path = Optional.ofNullable(preauthenticatedRequest.getAccessUri())
+            .orElseGet(preauthenticatedRequest::getFullPath);
+        if (path == null || path.isBlank()) {
+            throw new IllegalStateException("Oracle Cloud pre-authenticated request did not include an access URI");
+        }
+        return URI.create(Objects.requireNonNull(client.getEndpoint(), "client endpoint")).resolve(path);
+    }
+
+    /**
+     * @param request the pre-signed upload request
+     * @return portable headers that callers should preserve on upload
+     * @since 3.0.0
+     */
+    @NonNull
+    protected Map<String, List<String>> toPortableHeaders(@NonNull CreatePresignedUploadRequest request) {
+        Map<String, List<String>> headers = new LinkedHashMap<>();
+        request.getContentType().ifPresent(contentType -> headers.put("Content-Type", List.of(contentType)));
+        request.getContentLength().ifPresent(contentLength -> headers.put("Content-Length", List.of(Long.toString(contentLength))));
+        request.getMetadata().forEach((key, value) -> headers.put("opc-meta-" + key, List.of(value)));
+        return headers;
     }
 }
