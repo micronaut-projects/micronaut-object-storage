@@ -35,7 +35,6 @@ import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Reactive AWS bucket operations.
