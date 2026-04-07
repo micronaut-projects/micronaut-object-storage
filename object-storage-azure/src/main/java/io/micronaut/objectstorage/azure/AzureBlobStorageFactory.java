@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.azure;
 
 import com.azure.core.credential.TokenCredential;
+import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -37,6 +38,7 @@ import org.jspecify.annotations.NonNull;
  *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceClient}</li>
  *     <li>For each {@link BlobServiceClientBuilder}, creates a {@link BlobServiceAsyncClient}</li>
  *     <li>For each {@link BlobServiceClient}, creates a {@link BlobContainerClient}</li>
+ *     <li>For each {@link BlobServiceAsyncClient}, creates a {@link BlobContainerAsyncClient}</li>
  * </ul>
  *
  * @author Pavol Gressa
@@ -105,7 +107,7 @@ public class AzureBlobStorageFactory {
     }
 
     /**
-     * @param name The configuration
+     * @param name          The configuration
      * @param serviceClient The service client
      * @return The {@link BlobContainerClient}
      */
@@ -114,5 +116,17 @@ public class AzureBlobStorageFactory {
                                                    @NonNull BlobServiceClient serviceClient) {
         final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
         return serviceClient.getBlobContainerClient(configuration.getContainer());
+    }
+
+    /**
+     * @param name               The configuration
+     * @param serviceAsyncClient The async service client
+     * @return The {@link BlobContainerAsyncClient}
+     */
+    @EachBean(BlobServiceAsyncClient.class)
+    public BlobContainerAsyncClient blobContainerAsyncClient(@Parameter String name,
+                                                             @NonNull BlobServiceAsyncClient serviceAsyncClient) {
+        final AzureBlobStorageConfiguration configuration = beanContext.getBean(AzureBlobStorageConfiguration.class, Qualifiers.byName(name));
+        return serviceAsyncClient.getBlobContainerAsyncClient(configuration.getContainer());
     }
 }

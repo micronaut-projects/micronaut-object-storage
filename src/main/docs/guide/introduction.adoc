@@ -8,3 +8,6 @@ Micronaut Object Storage provides a uniform API to create, read and delete objec
 There is also a <<local, local storage>> implementation for testing purposes.
 
 Using this API enables the creation of truly multi-cloud, portable applications.
+
+Micronaut Object Storage also provides a <<reactiveOperations, reactive companion API>> that mirrors the
+blocking contract with Reactive Streams `Publisher` return types.

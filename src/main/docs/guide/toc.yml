@@ -1,6 +1,7 @@
 introduction: Introduction
 releaseHistory: Release History
 quickStart: Quick Start
+reactiveOperations: Reactive Operations
 paginatedListing: Paginated Listing
 bucketManagement: Bucket and Container Management
 aws: Amazon S3
