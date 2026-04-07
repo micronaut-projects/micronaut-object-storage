@@ -87,12 +87,21 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
     }
 
     private static List<String> blockedKeys() {
-        def keys = ['.metadata', '.metadata/nested.txt']
-        keys.addAll(['foo/../.metadata/nested.txt', './.metadata/nested.txt'])
+        def keys = ['.metadata', '.Metadata', '.METADATA']
+                .collectMany { metadataDirectory ->
+                    [
+                            metadataDirectory,
+                            "${metadataDirectory}/nested.txt",
+                            "foo/../${metadataDirectory}/nested.txt",
+                            "./${metadataDirectory}/nested.txt"
+                    ]
+                }
         if (File.separatorChar != '/') {
-            keys << ".metadata${File.separator}nested.txt"
-            keys << "foo${File.separator}..${File.separator}.metadata${File.separator}nested.txt"
-            keys << ".${File.separator}.metadata${File.separator}nested.txt"
+            ['.metadata', '.Metadata', '.METADATA'].each { metadataDirectory ->
+                keys << "${metadataDirectory}${File.separator}nested.txt"
+                keys << "foo${File.separator}..${File.separator}${metadataDirectory}${File.separator}nested.txt"
+                keys << ".${File.separator}${metadataDirectory}${File.separator}nested.txt"
+            }
         }
         keys
     }

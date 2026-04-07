@@ -370,7 +370,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private static void validateKey(Path normalizedRelativePath, String key) {
         if (normalizedRelativePath.getNameCount() > 0
-            && METADATA_DIRECTORY.equals(normalizedRelativePath.getName(0).toString())) {
+            && METADATA_DIRECTORY.equalsIgnoreCase(normalizedRelativePath.getName(0).toString())) {
             throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace: " + key);
         }
     }
