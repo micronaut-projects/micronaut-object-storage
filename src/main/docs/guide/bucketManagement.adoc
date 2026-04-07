@@ -3,28 +3,11 @@
 The `BucketOperations` API adds provider-agnostic lifecycle management for object storage buckets and containers
 without changing the existing `ObjectStorageOperations` contract.
 
-[source,java]
-----
-import io.micronaut.objectstorage.bucket.BucketOperations;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-@Inject
-@Named("default")
-BucketOperations<?> bucketOperations;
-----
+snippet::example.BucketService[project-base="doc-examples/example", source="main", indent="0", tags="beginclass,endclass"]
 
 Use the injected bean to create, retrieve, and delete provider-managed buckets or containers by name:
 
-[source,java]
-----
-bucketOperations.create("reports-archive");
-boolean exists = bucketOperations.exists("reports-archive");
-bucketOperations.retrieve("reports-archive").ifPresent(bucket -> {
-    System.out.println(bucket.name());
-});
-bucketOperations.delete("reports-archive");
-----
+snippet::example.BucketService[project-base="doc-examples/example", source="main", indent="0", tags="bucket-operations"]
 
 The provider-specific native metadata is exposed through `BucketEntry#nativeEntry()` for advanced use cases, while
 the portable API keeps the logical bucket or container name available via `BucketEntry#name()`.
@@ -32,14 +15,7 @@ the portable API keeps the logical bucket or container name available via `Bucke
 If you also need a non-blocking lifecycle API, inject `ReactiveBucketOperations` and subscribe to the returned
 `Publisher`s the same way you would with the reactive object-storage contract:
 
-[source,java]
-----
-import io.micronaut.objectstorage.bucket.ReactiveBucketOperations;
-import org.reactivestreams.Publisher;
-
-Publisher<Void> create = reactiveBucketOperations.create("reports-archive");
-Publisher<Boolean> exists = reactiveBucketOperations.exists("reports-archive");
-----
+snippet::example.BucketService[project-base="doc-examples/example", source="main", indent="0", tags="reactive-bucket-operations"]
 
 NOTE: Creating or deleting a bucket or container does not retarget an already injected `ObjectStorageOperations` bean.
 Existing object-operation beans continue to use the configured default bucket or container for their named storage.
