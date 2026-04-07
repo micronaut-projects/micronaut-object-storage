@@ -22,8 +22,11 @@ import io.micronaut.objectstorage.ObjectStorageException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,7 +61,7 @@ public class LocalStorageEntry implements ObjectStorageEntry<Path> {
     @Override
     public InputStream getInputStream() {
         try {
-            return Files.newInputStream(file);
+            return Channels.newInputStream(Files.newByteChannel(file, StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS));
         } catch (IOException e) {
             throw new ObjectStorageException("Error opening input stream for file: " + file, e);
         }
