@@ -50,6 +50,7 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
 
     @NonNull
     private String namespace;
+    private String compartmentId;
 
     /**
      * Constructor.
@@ -92,6 +93,22 @@ public class OracleCloudStorageConfiguration extends AbstractObjectStorageConfig
      */
     public void setNamespace(@NonNull String namespace) {
         this.namespace = namespace;
+    }
+
+    /**
+     * The OCI compartment identifier used for bucket lifecycle operations.
+     *
+     * @return the OCI compartment identifier, or {@code null} if bucket lifecycle operations are not configured.
+     */
+    public String getCompartmentId() {
+        return compartmentId;
+    }
+
+    /**
+     * @param compartmentId the OCI compartment identifier used for bucket lifecycle operations.
+     */
+    public void setCompartmentId(String compartmentId) {
+        this.compartmentId = compartmentId;
     }
 
     /**

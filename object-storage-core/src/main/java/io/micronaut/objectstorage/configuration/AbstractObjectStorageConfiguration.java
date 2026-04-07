@@ -15,6 +15,7 @@
  */
 package io.micronaut.objectstorage.configuration;
 
+import io.micronaut.context.exceptions.ConfigurationException;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -24,11 +25,16 @@ import org.jspecify.annotations.NonNull;
  * @since 1.0
  */
 public abstract class AbstractObjectStorageConfiguration extends AbstractObjectStorageModuleConfiguration implements ObjectStorageConfiguration {
+    private static final String RESERVED_CONFIGURATION_NAME = "enabled";
+    private static final String RESERVED_CONFIGURATION_NAME_MESSAGE = "The object storage configuration name 'enabled' is reserved for the module-level enabled flag";
 
     @NonNull
     protected final String name;
 
     protected AbstractObjectStorageConfiguration(@NonNull String name) {
+        if (RESERVED_CONFIGURATION_NAME.equals(name)) {
+            throw new ConfigurationException(RESERVED_CONFIGURATION_NAME_MESSAGE);
+        }
         this.name = name;
     }
 

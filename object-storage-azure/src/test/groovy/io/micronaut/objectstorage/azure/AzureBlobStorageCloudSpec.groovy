@@ -17,6 +17,7 @@ class AzureBlobStorageCloudSpec extends AbstractAzureBlobStorageSpec {
 
     @Override
     Map<String, String> getProperties() {
-        super.getProperties() + [(PREFIX + '.' + OBJECT_STORAGE_NAME + '.endpoint'): System.getenv('AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT')]
+        super.getProperties() + [
+                (PREFIX + '.' + OBJECT_STORAGE_NAME + '.endpoint'): System.getenv('AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT')]
     }
 }

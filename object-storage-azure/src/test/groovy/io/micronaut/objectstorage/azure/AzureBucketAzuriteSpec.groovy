@@ -4,17 +4,16 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import spock.lang.AutoCleanup
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX
 
-@Ignore("The pinned Azurite image 3.35.0 does not support API version 2026-02-06 yet. Update the pinned image when Azurite adds support and retry.")
 @MicronautTest
 @IgnoreIf({ env.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT && env.AZURE_CLIENT_ID && env.AZURE_CLIENT_SECRET && env.AZURE_TENANT_ID })
-class AzureBlobStorageAzuriteSpec extends AbstractAzureBlobStorageSpec {
-    private static final DockerImageName AZURITE_IMAGE = DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.35.0@sha256:647c63a91102a9d8e8000aab803436e1fc85fbb285e7ce830a82ee5d6661cf37')
+class AzureBucketAzuriteSpec extends AbstractAzureBucketSpec {
+    private static final DockerImageName AZURITE_IMAGE = DockerImageName.parse('mcr.microsoft.com/azure-storage/azurite:3.30.0')
+
     @Shared
     @AutoCleanup
     GenericContainer azuriteContainer = new GenericContainer(AZURITE_IMAGE)

@@ -18,10 +18,10 @@ import spock.lang.Shared
 @IgnoreIf({ env.GCLOUD_TEST_PROJECT_ID })
 @MicronautTest
 @Property(name = 'spec.name', value = SPEC_NAME)
-class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec {
+class GoogleCloudBucketFakeGcsServerSpec extends AbstractGoogleCloudBucketSpec {
 
     public static final String TEST_PROJECT_ID = 'test-project'
-    public static final String SPEC_NAME = 'GoogleCloudStorageFakeGcsServerSpec'
+    public static final String SPEC_NAME = 'GoogleCloudBucketFakeGcsServerSpec'
     private static final DockerImageName FAKE_GCS_IMAGE = DockerImageName.parse('fsouza/fake-gcs-server:1.53.0')
 
     @Shared
@@ -32,6 +32,10 @@ class GoogleCloudStorageFakeGcsServerSpec extends AbstractGoogleCloudStorageSpec
                     "/bin/fake-gcs-server",
                     "-scheme", "http"
             ))
+
+    void setupSpec() {
+        fakeGcs.start()
+    }
 
     @Factory
     @Requires(property = 'spec.name', value = SPEC_NAME)
