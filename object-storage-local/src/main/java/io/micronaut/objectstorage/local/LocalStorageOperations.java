@@ -29,14 +29,24 @@ import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -67,12 +77,27 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     public static final String METADATA_DIRECTORY = ".metadata";
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
+    private static final Set<PosixFilePermission> DIRECTORY_PERMISSIONS = EnumSet.of(
+        PosixFilePermission.OWNER_READ,
+        PosixFilePermission.OWNER_WRITE,
+        PosixFilePermission.OWNER_EXECUTE
+    );
+    private static final Set<PosixFilePermission> FILE_PERMISSIONS = EnumSet.of(
+        PosixFilePermission.OWNER_READ,
+        PosixFilePermission.OWNER_WRITE
+    );
+    private static final FileAttribute<Set<PosixFilePermission>> DIRECTORY_PERMISSIONS_ATTRIBUTE =
+        PosixFilePermissions.asFileAttribute(DIRECTORY_PERMISSIONS);
+    private static final FileAttribute<Set<PosixFilePermission>> FILE_PERMISSIONS_ATTRIBUTE =
+        PosixFilePermissions.asFileAttribute(FILE_PERMISSIONS);
 
     private final LocalStorageConfiguration configuration;
     private final Path metadataPath;
+    private final boolean supportsPosixPermissions;
 
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
         this.configuration = configuration;
+        this.supportsPosixPermissions = configuration.getPath().getFileSystem().supportedFileAttributeViews().contains("posix");
         this.metadataPath = configuration.getPath().resolve(METADATA_DIRECTORY);
         boolean metadataDirectoryCreated = mkdirs(metadataPath);
         if (!metadataDirectoryCreated) {
@@ -90,8 +115,10 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @NonNull
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request,
                                                    @NonNull Consumer<LocalStorageFile> requestConsumer) {
-        Path file = storeFile(request);
-        storeMetadata(request);
+        Path file = resolveSafe(configuration.getPath(), request.getKey());
+        Path metadataFile = resolveSafe(metadataPath, request.getKey());
+        storeFile(file, request.getInputStream());
+        storeMetadata(metadataFile, request.getKey(), request.getMetadata());
         LocalStorageFile localFile = new LocalStorageFile(file);
         requestConsumer.accept(localFile);
         return UploadResponse.of(request.getKey(), UUID.randomUUID().toString(), localFile);
@@ -195,9 +222,11 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @Override
     public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
         retrieveFile(sourceKey).ifPresent(source -> {
-            try (InputStream in = Files.newInputStream(source)) {
-                storeFile(destinationKey, in);
-                storeMetadata(destinationKey, retrieveMetadata(sourceKey));
+            Path destinationFile = resolveSafe(configuration.getPath(), destinationKey);
+            Path destinationMetadata = resolveSafe(metadataPath, destinationKey);
+            try (InputStream in = newInputStreamNoFollow(source)) {
+                storeFile(destinationFile, in);
+                storeMetadata(destinationMetadata, destinationKey, retrieveMetadata(sourceKey));
             } catch (IOException e) {
                 throw new ObjectStorageException("Error copying file: " + source, e);
             }
@@ -206,7 +235,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private Optional<Path> retrieveFile(String key) {
         Path file = resolveSafe(configuration.getPath(), key);
-        if (Files.exists(file)) {
+        if (Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
             return Optional.of(file);
         } else {
             return Optional.empty();
@@ -216,8 +245,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private Map<String, String> retrieveMetadata(String key) {
         Properties metadataProperties = new Properties();
         Path metadata = resolveSafe(metadataPath, key).normalize();
-        if (Files.exists(metadata)) {
-            try (InputStream metadataIn = Files.newInputStream(metadata)) {
+        if (Files.exists(metadata, LinkOption.NOFOLLOW_LINKS)) {
+            try (InputStream metadataIn = newInputStreamNoFollow(metadata)) {
                 metadataProperties.load(metadataIn);
             } catch (IOException e) {
                 //no op
@@ -242,7 +271,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private void deleteMetadata(String key) {
         Path metadata = resolveSafe(metadataPath, key);
-        if (Files.exists(metadata)) {
+        if (Files.exists(metadata, LinkOption.NOFOLLOW_LINKS)) {
             try {
                 Files.delete(metadata);
             } catch (IOException e) {
@@ -251,14 +280,9 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
-    private Path storeFile(UploadRequest request) {
-        return storeFile(request.getKey(), request.getInputStream());
-    }
-
-    private Path storeFile(String key, InputStream inputStream) {
-        Path file = resolveSafe(configuration.getPath(), key);
+    private Path storeFile(Path file, InputStream inputStream) {
         mkdirs(file.getParent());
-        try (OutputStream fileOut = Files.newOutputStream(file)) {
+        try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
             inputStream.transferTo(fileOut);
             return file;
         } catch (IOException e) {
@@ -266,16 +290,11 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
-    private void storeMetadata(UploadRequest request) {
-        storeMetadata(request.getKey(), request.getMetadata());
-    }
-
-    private void storeMetadata(String key, Map<String, String> metadata) {
+    private void storeMetadata(Path metadataFilePath, String key, Map<String, String> metadata) {
         Properties metadataProperties = new Properties();
         metadataProperties.putAll(metadata);
-        Path metadataFilePath = resolveSafe(metadataPath, key);
         mkdirs(metadataFilePath.getParent());
-        try (OutputStream metadataOut = new FileOutputStream(metadataFilePath.toFile())) {
+        try (OutputStream metadataOut = newOutputStreamNoFollow(metadataFilePath)) {
             metadataProperties.store(metadataOut, "Metadata for file: " + key);
         } catch (IOException e) {
             //no op
@@ -284,19 +303,95 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private boolean mkdirs(Path path) {
         try {
-            Files.createDirectories(path);
+            if (!supportsPosixPermissions) {
+                Files.createDirectories(path);
+                return true;
+            }
+            Path bucketPath = configuration.getPath();
+            Files.createDirectories(bucketPath, DIRECTORY_PERMISSIONS_ATTRIBUTE);
+            Files.setPosixFilePermissions(bucketPath, DIRECTORY_PERMISSIONS);
+            Path current = bucketPath;
+            for (Path part : bucketPath.relativize(path.normalize())) {
+                current = current.resolve(part);
+                createOwnerOnlyDirectory(current);
+            }
             return true;
         } catch (IOException e) {
             return false;
         }
     }
 
+    private OutputStream newOutputStreamNoFollow(Path file) throws IOException {
+        if (supportsPosixPermissions) {
+            try {
+                Set<OpenOption> createOptions = new HashSet<>();
+                createOptions.add(StandardOpenOption.WRITE);
+                createOptions.add(StandardOpenOption.CREATE_NEW);
+                createOptions.add(LinkOption.NOFOLLOW_LINKS);
+                return Channels.newOutputStream(FileChannel.open(file, createOptions, FILE_PERMISSIONS_ATTRIBUTE));
+            } catch (FileAlreadyExistsException ignored) {
+                Files.setPosixFilePermissions(file, FILE_PERMISSIONS);
+                return Channels.newOutputStream(FileChannel.open(
+                    file,
+                    Set.of(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS)
+                ));
+            }
+        }
+        return Channels.newOutputStream(Files.newByteChannel(file, Set.of(
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING,
+            StandardOpenOption.WRITE,
+            LinkOption.NOFOLLOW_LINKS
+        )));
+    }
+
+    private static void createOwnerOnlyDirectory(Path directory) throws IOException {
+        try {
+            Files.createDirectory(directory, DIRECTORY_PERMISSIONS_ATTRIBUTE);
+        } catch (FileAlreadyExistsException ignored) {
+            if (!Files.isDirectory(directory)) {
+                throw ignored;
+            }
+        }
+        Files.setPosixFilePermissions(directory, DIRECTORY_PERMISSIONS);
+    }
+
     private static Path resolveSafe(Path parent, String key) {
-        Path file = parent.resolve(key).normalize();
-        if (!file.startsWith(parent)) {
+        validateKey(key);
+        Path normalizedParent = parent.normalize();
+        rejectSymbolicLink(normalizedParent);
+        Path file = normalizedParent.resolve(key).normalize();
+        if (!file.startsWith(normalizedParent)) {
             throw new IllegalArgumentException("Path lies outside the configured bucket");
         }
+        rejectSymbolicLinks(normalizedParent, file);
         return file;
+    }
+
+    private static void validateKey(String key) {
+        if (METADATA_DIRECTORY.equals(key)
+            || key.startsWith(METADATA_DIRECTORY + "/")
+            || (File.separatorChar != '/' && key.startsWith(METADATA_DIRECTORY + File.separator))) {
+            throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace: " + key);
+        }
+    }
+
+    private static void rejectSymbolicLink(Path path) {
+        if (Files.isSymbolicLink(path)) {
+            throw new IllegalArgumentException("Path contains symbolic links");
+        }
+    }
+
+    private static void rejectSymbolicLinks(Path parent, Path file) {
+        Path current = parent;
+        for (Path segment : parent.relativize(file)) {
+            current = current.resolve(segment);
+            rejectSymbolicLink(current);
+        }
+    }
+
+    private static InputStream newInputStreamNoFollow(Path path) throws IOException {
+        return Channels.newInputStream(Files.newByteChannel(path, Set.of(StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS)));
     }
 
     /**

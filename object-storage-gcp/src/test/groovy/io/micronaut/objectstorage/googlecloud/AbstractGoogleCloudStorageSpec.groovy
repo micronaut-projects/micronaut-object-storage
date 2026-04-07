@@ -2,12 +2,12 @@ package io.micronaut.objectstorage.googlecloud
 
 import com.google.cloud.storage.Blob
 import com.google.cloud.storage.BlobInfo
-import com.google.cloud.storage.BucketInfo
-import com.google.cloud.storage.Storage
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
+import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+import jakarta.inject.Named
 import spock.lang.Shared
 
 import static io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.PREFIX
@@ -21,9 +21,10 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
     @Inject
     GoogleCloudStorageOperations cloudObjectStorage
 
-    @Shared
     @Inject
-    Storage storage
+    @Named(OBJECT_STORAGE_NAME)
+    @Shared
+    GoogleCloudBucketOperations googleCloudBucketOperations
 
     @Override
     Map<String, String> getProperties() {
@@ -35,10 +36,17 @@ abstract class AbstractGoogleCloudStorageSpec extends ObjectStorageOperationsSpe
     }
 
     void setupSpec() {
-        storage.create(BucketInfo.newBuilder(BUCKET_NAME).build())
+        googleCloudBucketOperations.create(BUCKET_NAME)
     }
 
     void cleanupSpec() {
-        storage.get(BUCKET_NAME).delete()
+        if (googleCloudBucketOperations.exists(BUCKET_NAME)) {
+            googleCloudBucketOperations.delete(BUCKET_NAME)
+        }
+    }
+
+    @Override
+    BucketOperations<?> getBucketOperations() {
+        return googleCloudBucketOperations
     }
 }

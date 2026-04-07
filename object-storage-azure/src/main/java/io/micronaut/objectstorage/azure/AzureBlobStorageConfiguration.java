@@ -17,8 +17,10 @@ package io.micronaut.objectstorage.azure;
 
 import io.micronaut.context.annotation.EachProperty;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import org.jspecify.annotations.NonNull;
 import io.micronaut.objectstorage.configuration.AbstractObjectStorageConfiguration;
+import io.micronaut.objectstorage.configuration.EachPropertyContainsEntriesCondition;
 import io.micronaut.objectstorage.configuration.ObjectStorageConfiguration;
 
 import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PREFIX;
@@ -30,6 +32,7 @@ import static io.micronaut.objectstorage.azure.AzureBlobStorageConfiguration.PRE
  * @since 1.0
  */
 @EachProperty(PREFIX)
+@Requires(condition = EachPropertyContainsEntriesCondition.class)
 public class AzureBlobStorageConfiguration extends AbstractObjectStorageConfiguration {
 
     public static final String NAME = "azure";

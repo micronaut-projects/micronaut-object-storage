@@ -19,6 +19,14 @@ include::doc-examples/example-java/src/test/resources/application-oraclecloud.ym
 
 The concrete implementation of `ObjectStorageOperations` is api:objectstorage.oraclecloud.OracleCloudStorageOperations[]
 
+You can also resolve objects through Micronaut's `ResourceLoader` abstraction:
+
+* Named storage URI: `pictures://avatars/logo.png`
+* Oracle Cloud alias URI: `os:us-ashburn-1:my-namespace://pictures-bucket/avatars/logo.png`
+
+The `os:` alias only resolves configured storages and must match the active OCI region together with the configured
+namespace and bucket.
+
 == Advanced configuration
 
 For configuration properties other than the specified above, you can add bean to your application that implements

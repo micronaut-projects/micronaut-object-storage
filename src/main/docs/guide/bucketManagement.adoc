@@ -1,0 +1,33 @@
+== Bucket and Container Management
+
+The `BucketOperations` API adds provider-agnostic lifecycle management for object storage buckets and containers
+without changing the existing `ObjectStorageOperations` contract.
+
+snippet::example.BucketService[project-base="doc-examples/example", source="main", indent="0", tags="beginclass,endclass"]
+
+Use the injected bean to create, retrieve, and delete provider-managed buckets or containers by name:
+
+snippet::example.BucketService[project-base="doc-examples/example", source="main", indent="0", tags="bucket-operations"]
+
+The provider-specific native metadata is exposed through `BucketEntry#nativeEntry()` for advanced use cases, while
+the portable API keeps the logical bucket or container name available via `BucketEntry#name()`.
+
+If you also need a non-blocking lifecycle API, inject `ReactiveBucketOperations` and subscribe to the returned
+`Publisher`s the same way you would with the reactive object-storage contract:
+
+snippet::example.BucketService[project-base="doc-examples/example", source="main", indent="0", tags="reactive-bucket-operations"]
+
+NOTE: Creating or deleting a bucket or container does not retarget an already injected `ObjectStorageOperations` bean.
+Existing object-operation beans continue to use the configured default bucket or container for their named storage.
+
+Provider notes:
+
+- AWS and Oracle Cloud use native async SDK clients for `ReactiveBucketOperations`.
+- Google Cloud Storage uses bucket terminology, but the `google-cloud-storage` client on `3.0.x`
+  does not expose a native async bucket API, so `ReactiveBucketOperations` bridges the blocking client on the
+  Micronaut blocking executor for that provider.
+- Azure Blob Storage uses container terminology, but the same `BucketOperations` API is exposed for portability.
+- Azure Blob Storage uses the SDK's async container client for `ReactiveBucketOperations`.
+- Local storage maps bucket names to sibling directories under the configured local storage root.
+- Oracle Cloud bucket lifecycle operations require `micronaut.object-storage.oracle-cloud.<name>.compartment-id`
+  in addition to the existing `bucket` and `namespace` configuration.

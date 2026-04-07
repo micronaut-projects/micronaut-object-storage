@@ -3,6 +3,7 @@ package io.micronaut.objectstorage.aws
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.annotation.Requires
+import io.micronaut.objectstorage.InputStreamMapper
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.ObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.request.UploadRequest
@@ -20,7 +21,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import software.amazon.awssdk.services.s3.model.S3Exception
 import spock.lang.Specification
 
+import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.nio.file.Path
+import java.util.Optional
 
 @Property(name = "micronaut.object-storage.aws.default.bucket", value = "profile-pictures-bucket")
 @Property(name = "spec.name", value = SPEC_NAME)
@@ -34,6 +38,14 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
 
     @Inject
     S3ClientReplacement s3ClientReplacement
+
+    @Inject
+    InputStreamMapperReplacement inputStreamMapperReplacement
+
+    void setup() {
+        s3ClientReplacement.reset()
+        inputStreamMapperReplacement.reset()
+    }
 
     void "consumer accept is invoked"() {
         given:
@@ -50,16 +62,56 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         ObjectCannedACL.PUBLIC_READ == s3ClientReplacement.request.acl()
     }
 
+    void "known-length uploads use the streaming AWS request body path"() {
+        given:
+        byte[] bytes = "stream-body".bytes
+        UploadRequest uploadRequest = new StubUploadRequest("stream.txt", bytes, true)
+
+        when:
+        objectStorage.upload(uploadRequest)
+
+        then:
+        inputStreamMapperReplacement.invocationCount == 0
+        s3ClientReplacement.requestBody
+        s3ClientReplacement.requestBody.optionalContentLength().present
+        s3ClientReplacement.requestBody.contentLength() == bytes.length
+        s3ClientReplacement.requestBody.contentStreamProvider().newStream().bytes == bytes
+    }
+
+    void "unknown-length uploads keep the byte-array fallback"() {
+        given:
+        byte[] bytes = "fallback-body".bytes
+        UploadRequest uploadRequest = new StubUploadRequest("fallback.txt", bytes, false)
+
+        when:
+        objectStorage.upload(uploadRequest)
+
+        then:
+        inputStreamMapperReplacement.invocationCount == 1
+        inputStreamMapperReplacement.lastBytes == bytes
+        s3ClientReplacement.requestBody
+        s3ClientReplacement.requestBody.optionalContentLength().present
+        s3ClientReplacement.requestBody.contentLength() == bytes.length
+        s3ClientReplacement.requestBody.contentStreamProvider().newStream().bytes == bytes
+    }
+
     @Requires(property = "spec.name", value = SPEC_NAME)
     @Replaces(S3Client)
     @Singleton
     static class S3ClientReplacement implements S3Client {
         PutObjectRequest request
+        RequestBody requestBody
+
+        void reset() {
+            request = null
+            requestBody = null
+        }
 
         @Override
         PutObjectResponse putObject(PutObjectRequest putObjectRequest, RequestBody requestBody)
                 throws AwsServiceException, SdkClientException, S3Exception {
             this.request = putObjectRequest
+            this.requestBody = requestBody
             return PutObjectResponse.builder().eTag("eTag").build()
         }
 
@@ -69,5 +121,57 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         }
         @Override
         void close() {}
+    }
+
+    @Requires(property = "spec.name", value = SPEC_NAME)
+    @Replaces(InputStreamMapper)
+    @Singleton
+    static class InputStreamMapperReplacement implements InputStreamMapper {
+        int invocationCount
+        byte[] lastBytes
+
+        void reset() {
+            invocationCount = 0
+            lastBytes = null
+        }
+
+        @Override
+        byte[] toByteArray(InputStream inputStream) {
+            invocationCount++
+            lastBytes = inputStream.bytes
+            return lastBytes
+        }
+    }
+
+    private static final class StubUploadRequest implements UploadRequest {
+        private final String key
+        private final byte[] bytes
+        private final boolean knownLength
+
+        StubUploadRequest(String key, byte[] bytes, boolean knownLength) {
+            this.key = key
+            this.bytes = bytes
+            this.knownLength = knownLength
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            return Optional.of("text/plain")
+        }
+
+        @Override
+        String getKey() {
+            return key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            return knownLength ? Optional.of(bytes.length as long) : Optional.empty()
+        }
+
+        @Override
+        InputStream getInputStream() {
+            return new ByteArrayInputStream(bytes)
+        }
     }
 }

@@ -18,9 +18,9 @@ package io.micronaut.objectstorage.azure;
 import com.azure.core.credential.TokenCredential;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
@@ -28,8 +28,8 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.exceptions.DisabledBeanException;
-import org.jspecify.annotations.NonNull;
 import io.micronaut.inject.qualifiers.Qualifiers;
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>Creates beans of the following types:</p>
@@ -64,7 +64,7 @@ public class AzureBlobStorageFactory {
     public BlobServiceClientBuilder blobServiceClientBuilderWithTokenCredential(AzureBlobStorageConfiguration configuration,
                                                                                 @NonNull TokenCredential tokenCredential) {
         if (!configuration.isEnabled()) {
-            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
+            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + " is disabled");
         }
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())
@@ -81,7 +81,7 @@ public class AzureBlobStorageFactory {
     public BlobServiceClientBuilder blobServiceClientBuilderWithSharedKeyCredential(AzureBlobStorageConfiguration configuration,
                                                                                     @NonNull StorageSharedKeyCredential sharedKeyCredential) {
         if (!configuration.isEnabled()) {
-            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + "is disabled");
+            throw new DisabledBeanException("azure object-storage-configuration " + configuration.getName() + " is disabled");
         }
         return new BlobServiceClientBuilder()
             .endpoint(configuration.getEndpoint())

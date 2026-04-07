@@ -19,6 +19,13 @@ include::doc-examples/example-java/src/test/resources/application-ec2.yml[]
 
 The concrete implementation of `ObjectStorageOperations` is api:objectstorage.aws.AwsS3Operations[].
 
+You can also resolve objects through Micronaut's `ResourceLoader` abstraction:
+
+* Named storage URI: `pictures://avatars/logo.png`
+* AWS alias URI: `s3://pictures-bucket/avatars/logo.png`
+
+The `s3:` alias only resolves buckets that are already configured under `micronaut.object-storage.aws`.
+
 == Advanced configuration
 
 For configuration properties other than the specified above, you can add bean to your application that implements

@@ -16,7 +16,14 @@ micronaut:
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
 
+NOTE: The local storage implementation reserves the `.metadata` key namespace for per-object metadata files. User object
+keys cannot be `.metadata` or start with `.metadata/` (or `.metadata\` on platforms where the file separator is `\`).
+
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
+
+On POSIX-capable file systems, configured bucket paths created by the local implementation use owner-only permissions for
+bucket subdirectories, stored objects, and `.metadata` files. On non-POSIX file systems, Micronaut cannot apply those
+permissions directly, so custom storage paths on shared hosts should be provisioned with restrictive ACLs by the caller.
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.local.LocalStorageConfiguration.adoc[]
 

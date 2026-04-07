@@ -8,6 +8,7 @@ on:
       - 'object-storage-oracle-cloud/**'
       - 'object-storage-core/**'
       - 'object-storage-tck/**'
+  workflow_dispatch:
   pull_request:
     branches:
       - master
@@ -26,7 +27,6 @@ jobs:
         java: ['25']
     permissions:
       contents: 'read'
-      id-token: 'write'
     steps:
        # https://github.com/actions/virtual-environments/issues/709
       - name: Free disk space
@@ -35,27 +35,24 @@ jobs:
          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
          sudo apt-get clean
          df -h
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.0
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.0.0
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
+      - name: Build with Gradle (trusted events)
+        if: github.event_name != 'pull_request'
         run: |
           ./gradlew :micronaut-object-storage-oracle-cloud:test --no-daemon --parallel --continue
         env:
            TESTCONTAINERS_RYUK_DISABLED: true
-           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
-           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
-           PREDICTIVE_TEST_SELECTION: "${{ github.event_name == 'pull_request' && 'true' || 'false' }}"
            OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
            OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
            OCI_REGION: ${{ secrets.OCI_REGION }}
@@ -63,9 +60,20 @@ jobs:
            OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
            ORACLE_CLOUD_TEST_NAMESPACE: ${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}
            ORACLE_CLOUD_TEST_COMPARTMENT_ID: ${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}
+           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+           PREDICTIVE_TEST_SELECTION: "false"
+      - name: Build with Gradle (pull requests)
+        if: github.event_name == 'pull_request'
+        run: |
+          ./gradlew :micronaut-object-storage-oracle-cloud:test --no-daemon --parallel --continue
+        env:
+           TESTCONTAINERS_RYUK_DISABLED: true
+           PREDICTIVE_TEST_SELECTION: "true"
       - name: Publish Test Report
         if: always()
-        uses: mikepenz/action-junit-report@v6.2.0
+        uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386 # v6.4.0
         with:
           check_name: Java CI / Test Report (${{ matrix.java }})
           report_paths: '**/build/test-results/test/TEST-*.xml'

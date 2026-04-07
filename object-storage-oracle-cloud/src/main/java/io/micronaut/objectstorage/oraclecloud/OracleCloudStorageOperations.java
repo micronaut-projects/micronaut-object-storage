@@ -28,6 +28,8 @@ import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse;
+import com.oracle.bmc.objectstorage.transfer.UploadConfiguration;
+import com.oracle.bmc.objectstorage.transfer.UploadManager;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
@@ -49,6 +51,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Oracle Cloud implementation of {@link ObjectStorageOperations}.
@@ -68,6 +71,7 @@ public class OracleCloudStorageOperations
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
     private final RegionProvider regionProvider;
+    private final UploadManager uploadManager;
 
     /**
      * @param configuration Oracle Cloud Storage Configuration
@@ -76,20 +80,23 @@ public class OracleCloudStorageOperations
      */
     public OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
                                         ObjectStorage client, RegionProvider regionProvider) {
+        this(configuration, client, regionProvider, () -> new UploadManager(client, UploadConfiguration.builder().build()));
+    }
+
+    OracleCloudStorageOperations(@Parameter OracleCloudStorageConfiguration configuration,
+                                 ObjectStorage client,
+                                 RegionProvider regionProvider,
+                                 Supplier<UploadManager> uploadManagerSupplier) {
         this.configuration = configuration;
         this.client = client;
         this.regionProvider = regionProvider;
+        this.uploadManager = uploadManagerSupplier.get();
     }
 
     @Override
     @NonNull
     public UploadResponse<PutObjectResponse> upload(@NonNull UploadRequest request) {
-        try {
-            PutObjectResponse response = client.putObject(getRequestBuilder(request).build());
-            return UploadResponse.of(request.getKey(), response.getETag(), response);
-        } catch (BmcException e) {
-            throw new ObjectStorageException("Error when trying to upload an object to Oracle Cloud Storage", e);
-        }
+        return upload(request, builder -> { });
     }
 
     @Override
@@ -99,11 +106,32 @@ public class OracleCloudStorageOperations
         PutObjectRequest.Builder builder = getRequestBuilder(request);
         requestConsumer.accept(builder);
         try {
-            PutObjectResponse response = client.putObject(builder.build());
+            PutObjectRequest putObjectRequest = builder.build();
+            Long contentLength = putObjectRequest.getContentLength();
+            PutObjectResponse response = Optional.ofNullable(contentLength)
+                .map(length -> uploadWithManager(putObjectRequest, length))
+                .orElseGet(() -> client.putObject(putObjectRequest));
             return UploadResponse.of(request.getKey(), response.getETag(), response);
         } catch (BmcException e) {
             throw new ObjectStorageException("Error when trying to upload an object to Oracle Cloud Storage", e);
         }
+    }
+
+    @NonNull
+    private PutObjectResponse uploadWithManager(@NonNull PutObjectRequest putObjectRequest, long contentSize) {
+        UploadManager.UploadResponse response = uploadManager.upload(
+            UploadManager.UploadRequest.builder(putObjectRequest.getPutObjectBody(), contentSize)
+                .build(putObjectRequest)
+        );
+        return PutObjectResponse.builder()
+            .eTag(response.getETag())
+            .opcClientRequestId(response.getOpcClientRequestId())
+            .opcRequestId(response.getOpcRequestId())
+            .opcContentMd5(response.getContentMd5())
+            .opcContentCrc32c(response.getContentCrc32c())
+            .opcContentSha256(response.getContentSha256())
+            .opcContentSha384(response.getContentSha384())
+            .build();
     }
 
     @NonNull
