@@ -64,6 +64,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#listObjects()" tabindex="0">listObjects()</a></li>
 <li><a href="#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" tabindex="0">listObjects(ListObjectsRequest)</a></li>
 <li><a href="#copy(java.lang.String,java.lang.String)" tabindex="0">copy(String, String)</a></li>
+<li><a href="#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" tabindex="0">createPresignedUpload(CreatePresignedUploadRequest)</a></li>
 </ol>
 </li>
 </ol>
@@ -116,40 +117,45 @@ loadScripts(document, 'script');</script>
 <div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
 same object storage (bucket/container).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="#type-param-D" title="type parameter in ObjectStorageOperations">D</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#delete(java.lang.String)" class="member-name-link">delete</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload</a><wbr>(@NonNull <a href="request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a>&nbsp;request)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Creates a pre-signed upload request for a single object key.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="#type-param-D" title="type parameter in ObjectStorageOperations">D</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#delete(java.lang.String)" class="member-name-link">delete</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Deletes an object from the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#exists(java.lang.String)" class="member-name-link">exists</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#exists(java.lang.String)" class="member-name-link">exists</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Checks whether an entry with the given key exists in the object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Lists the objects that exist in the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="response/ListObjectsResponse.html" title="class in io.micronaut.objectstorage.response">ListObjectsResponse</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects</a><wbr>(@NonNull <a href="request/ListObjectsRequest.html" title="class in io.micronaut.objectstorage.request">ListObjectsRequest</a>&nbsp;request)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @NonNull <a href="response/ListObjectsResponse.html" title="class in io.micronaut.objectstorage.response">ListObjectsResponse</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects</a><wbr>(@NonNull <a href="request/ListObjectsRequest.html" title="class in io.micronaut.objectstorage.request">ListObjectsRequest</a>&nbsp;request)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Lists a page of objects that exist in the object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;E extends <a href="ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;?&gt;&gt;<br>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;E extends <a href="ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a>&lt;?&gt;&gt;<br>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Gets the object from object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;<a href="#type-param-O" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;<a href="#type-param-O" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload</a><wbr>(@NonNull <a href="request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;<a href="#type-param-O" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>@NonNull <a href="response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;<a href="#type-param-O" title="type parameter in ObjectStorageOperations">O</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;request,
  @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="#type-param-I" title="type parameter in ObjectStorageOperations">I</a>&gt;&nbsp;requestConsumer)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
 </div>
@@ -302,6 +308,23 @@ same object storage (bucket/container). If the destination exists, it will be ov
 <dd><code>destinationKey</code> - the key of the destination object</dd>
 <dt>Since:</dt>
 <dd>1.1.0</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)">
+<h3>createPresignedUpload</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a>&gt;</span>&nbsp;<span class="element-name">createPresignedUpload</span><wbr><span class="parameters">(@NonNull <a href="request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a>&nbsp;request)</span></div>
+<div class="block">Creates a pre-signed upload request for a single object key.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>request</code> - the pre-signed upload request parameters</dd>
+<dt>Returns:</dt>
+<dd>the signed upload request, if the provider supports it in the current configuration</dd>
+<dt>Since:</dt>
+<dd>3.0.0</dd>
 </dl>
 </div>
 </section>

@@ -186,7 +186,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Azure implementation of <a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a>.</div>
 </dd>
-<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient)" class="member-name-link">AzureBlobStorageOperations(BlobContainerClient)</a> - Constructor for class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient,com.azure.storage.common.StorageSharedKeyCredential)" class="member-name-link">AzureBlobStorageOperations(BlobContainerClient, StorageSharedKeyCredential)</a> - Constructor for class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a> - Class in <a href="io/micronaut/objectstorage/azure/package-summary.html">io.micronaut.objectstorage.azure</a></dt>
 <dd>
@@ -326,7 +326,29 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudReactiveBucketOperations.html#create(java.lang.String)" class="member-name-link">create(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#createBlobInfoBuilder(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createBlobInfoBuilder(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#createBlobInfoBuilder(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">createBlobInfoBuilder(UploadRequest)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload(CreatePresignedUploadRequest)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Creates a pre-signed upload request for a single object key.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" class="type-name-link" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a> - Class in <a href="io/micronaut/objectstorage/request/package-summary.html">io.micronaut.objectstorage.request</a></dt>
+<dd>
+<div class="block">Request to create a pre-signed upload for a single object key.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#%3Cinit%3E(java.lang.String,java.time.Duration)" class="member-name-link">CreatePresignedUploadRequest(String, Duration)</a> - Constructor for class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#createS3Presigner()" class="member-name-link">createS3Presigner()</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:D">D</h2>
@@ -566,6 +588,8 @@ same object storage (bucket/container).</div>
 <dd>
 <div class="block">The blob container name.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#getContentLength()" class="member-name-link">getContentLength()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/BytesUploadRequest.html#getContentSize()" class="member-name-link">getContentSize()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/BytesUploadRequest.html" title="class in io.micronaut.objectstorage.request">BytesUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getContentSize()" class="member-name-link">getContentSize()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></dt>
@@ -592,6 +616,8 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/FileUploadRequest.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html#getContentType()" class="member-name-link">getContentType()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></dt>
@@ -610,7 +636,13 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/response/UploadResponse.html#getETag()" class="member-name-link">getETag()</a> - Method in interface io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/response/PresignedUpload.html#getExpiration()" class="member-name-link">getExpiration()</a> - Method in class io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#getExpiresIn()" class="member-name-link">getExpiresIn()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/FileUploadRequest.html#getFile()" class="member-name-link">getFile()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/response/PresignedUpload.html#getHeaders()" class="member-name-link">getHeaders()</a> - Method in class io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html#getInputStream()" class="member-name-link">getInputStream()</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ObjectStorageEntry.html" title="class in io.micronaut.objectstorage.aws">AwsS3ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
@@ -652,6 +684,8 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/FileUploadRequest.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html#getKey()" class="member-name-link">getKey()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></dt>
@@ -680,9 +714,13 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/UploadRequest.html#getMetadata()" class="member-name-link">getMetadata()</a> - Method in interface io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/response/PresignedUpload.html#getMethod()" class="member-name-link">getMethod()</a> - Method in class io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/configuration/AbstractObjectStorageConfiguration.html#getName()" class="member-name-link">getName()</a> - Method in class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/AbstractObjectStorageConfiguration.html" title="class in io.micronaut.objectstorage.configuration">AbstractObjectStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
@@ -714,7 +752,13 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/request/FileUploadRequest.html#getPath()" class="member-name-link">getPath()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/FileUploadRequest.html" title="class in io.micronaut.objectstorage.request">FileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#getPreauthenticatedRequestName(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">getPreauthenticatedRequestName(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#getPreauthenticatedRequestUri(com.oracle.bmc.objectstorage.model.PreauthenticatedRequest)" class="member-name-link">getPreauthenticatedRequestUri(PreauthenticatedRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/ListObjectsRequest.html#getPrefix()" class="member-name-link">getPrefix()</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/ListObjectsRequest.html" title="class in io.micronaut.objectstorage.request">ListObjectsRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#getPresignedUploadRequestBuilder(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">getPresignedUploadRequestBuilder(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#getRequestBody(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">getRequestBody(UploadRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
@@ -729,6 +773,8 @@ same object storage (bucket/container).</div>
 <dt><a href="io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.html#getResources(java.lang.String)" class="member-name-link">getResources(String)</a> - Method in class io.micronaut.objectstorage.resource.<a href="io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.html" title="class in io.micronaut.objectstorage.resource">AbstractObjectStorageResourceLoader</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#getUploadOptions(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">getUploadOptions(UploadRequest)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/response/PresignedUpload.html#getUri()" class="member-name-link">getUri()</a> - Method in class io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudBucketOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudBucketOperations</a> - Class in <a href="io/micronaut/objectstorage/googlecloud/package-summary.html">io.micronaut.objectstorage.googlecloud</a></dt>
 <dd>
@@ -1290,6 +1336,12 @@ same object storage (bucket/container).</div>
 <dd>
 <div class="block">Configuration Prefix.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/response/PresignedUpload.html" class="type-name-link" title="class in io.micronaut.objectstorage.response">PresignedUpload</a> - Class in <a href="io/micronaut/objectstorage/response/package-summary.html">io.micronaut.objectstorage.response</a></dt>
+<dd>
+<div class="block">A complete pre-signed HTTP request that can upload a single object.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/response/PresignedUpload.html#%3Cinit%3E(java.net.URI,java.lang.String,java.util.Map,java.time.Instant)" class="member-name-link">PresignedUpload(URI, String, Map, Instant)</a> - Constructor for class io.micronaut.objectstorage.response.<a href="io/micronaut/objectstorage/response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:R">R</h2>
 <dl class="index">
@@ -1392,7 +1444,11 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html#setContainer(java.lang.String)" class="member-name-link">setContainer(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageConfiguration.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageConfiguration</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#setContentLength(long)" class="member-name-link">setContentLength(long)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html#setContentType(java.lang.String)" class="member-name-link">setContentType(String)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#setContentType(java.lang.String)" class="member-name-link">setContentType(String)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/UploadRequest.html#setContentType(java.lang.String)" class="member-name-link">setContentType(String)</a> - Method in interface io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a></dt>
 <dd>&nbsp;</dd>
@@ -1403,6 +1459,8 @@ same object storage (bucket/container).</div>
 <dt><a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html#setMetadata(java.util.Map)" class="member-name-link">setMetadata(Map)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/AbstractUploadRequest.html" title="class in io.micronaut.objectstorage.request">AbstractUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html#setMetadata(java.util.Map)" class="member-name-link">setMetadata(Map)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CompletedFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">CompletedFileUploadRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html#setMetadata(java.util.Map)" class="member-name-link">setMetadata(Map)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html#setMetadata(java.util.Map)" class="member-name-link">setMetadata(Map)</a> - Method in class io.micronaut.objectstorage.request.<a href="io/micronaut/objectstorage/request/StreamingFileUploadRequest.html" title="class in io.micronaut.objectstorage.request">StreamingFileUploadRequest</a></dt>
 <dd>&nbsp;</dd>
@@ -1446,6 +1504,8 @@ same object storage (bucket/container).</div>
 <div class="block">Condition to check whether a bean should be enabled based on <code>Toggleable</code> configuration.</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html#%3Cinit%3E()" class="member-name-link">ToggeableCondition()</a> - Constructor for class io.micronaut.objectstorage.configuration.<a href="io/micronaut/objectstorage/configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#toPortableHeaders(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">toPortableHeaders(CreatePresignedUploadRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageEntry.html#toStreamedFile()" class="member-name-link">toStreamedFile()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageEntry.html" title="interface in io.micronaut.objectstorage">ObjectStorageEntry</a></dt>
 <dd>&nbsp;</dd>
