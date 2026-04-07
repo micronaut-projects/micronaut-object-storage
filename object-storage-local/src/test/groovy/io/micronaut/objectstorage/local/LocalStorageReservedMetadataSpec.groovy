@@ -31,13 +31,16 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.upload(request)
 
         when:
-        operations.upload(UploadRequest.fromBytes('attacker'.bytes, '.metadata/foo.txt', 'text/plain'))
+        operations.upload(UploadRequest.fromBytes('attacker'.bytes, key, 'text/plain'))
 
         then:
         def ex = thrown(IllegalArgumentException)
-        ex.message == 'Key uses the reserved .metadata namespace: .metadata/foo.txt'
+        ex.message == "Key uses the reserved .metadata namespace: ${key}"
         operations.listObjects() == ['foo.txt'] as Set
         operations.retrieve('foo.txt').get().metadata == [owner: 'safe']
+
+        where:
+        key << blockedKeys()
     }
 
     void 'reserved metadata keys are rejected for direct object operations'() {
@@ -70,7 +73,7 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         uploadException.message == "Key uses the reserved .metadata namespace: ${key}"
 
         where:
-        key << reservedKeys()
+        key << blockedKeys()
     }
 
     void 'listing never exposes the reserved metadata namespace'() {
@@ -83,10 +86,13 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.listObjects() == ['visible.txt'] as Set
     }
 
-    private static List<String> reservedKeys() {
+    private static List<String> blockedKeys() {
         def keys = ['.metadata', '.metadata/nested.txt']
+        keys.addAll(['foo/../.metadata/nested.txt', './.metadata/nested.txt'])
         if (File.separatorChar != '/') {
             keys << ".metadata${File.separator}nested.txt"
+            keys << "foo${File.separator}..${File.separator}.metadata${File.separator}nested.txt"
+            keys << ".${File.separator}.metadata${File.separator}nested.txt"
         }
         keys
     }
