@@ -126,6 +126,12 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html#%3Cinit%3E(software.amazon.awssdk.services.s3.S3AsyncClient)" class="member-name-link">AwsS3ReactiveBucketOperations(S3AsyncClient)</a> - Constructor for class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a> - Class in <a href="io/micronaut/objectstorage/aws/package-summary.html">io.micronaut.objectstorage.aws</a></dt>
+<dd>
+<div class="block">Reactive AWS S3 object storage operations backed by the native async SDK client.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#%3Cinit%3E(io.micronaut.objectstorage.aws.AwsS3Configuration,software.amazon.awssdk.services.s3.S3AsyncClient,java.util.concurrent.ExecutorService)" class="member-name-link">AwsS3ReactiveOperations(AwsS3Configuration, S3AsyncClient, ExecutorService)</a> - Constructor for class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ResourceLoaderFactory.html" class="type-name-link" title="class in io.micronaut.objectstorage.aws">AwsS3ResourceLoaderFactory</a> - Class in <a href="io/micronaut/objectstorage/aws/package-summary.html">io.micronaut.objectstorage.aws</a></dt>
 <dd>
 <div class="block">Registers the <code>s3:</code> resource loader.</div>
@@ -182,6 +188,12 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerClient)" class="member-name-link">AzureBlobStorageOperations(BlobContainerClient)</a> - Constructor for class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a> - Class in <a href="io/micronaut/objectstorage/azure/package-summary.html">io.micronaut.objectstorage.azure</a></dt>
+<dd>
+<div class="block">Reactive Azure Blob Storage operations backed by Azure async blob clients.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#%3Cinit%3E(com.azure.storage.blob.BlobContainerAsyncClient)" class="member-name-link">AzureBlobStorageReactiveOperations(BlobContainerAsyncClient)</a> - Constructor for class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageResourceLoaderFactory.html" class="type-name-link" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageResourceLoaderFactory</a> - Class in <a href="io/micronaut/objectstorage/azure/package-summary.html">io.micronaut.objectstorage.azure</a></dt>
 <dd>
 <div class="block">Registers the <code>azb:</code> resource loader.</div>
@@ -195,6 +207,8 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:B">B</h2>
 <dl class="index">
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html#blobContainerAsyncClient(java.lang.String,com.azure.storage.blob.BlobServiceAsyncClient)" class="member-name-link">blobContainerAsyncClient(String, BlobServiceAsyncClient)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageFactory</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html#blobContainerClient(java.lang.String,com.azure.storage.blob.BlobServiceClient)" class="member-name-link">blobContainerClient(String, BlobServiceClient)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageFactory</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html#blobServiceAsyncClient(com.azure.storage.blob.BlobServiceClientBuilder)" class="member-name-link">blobServiceAsyncClient(BlobServiceClientBuilder)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageFactory.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageFactory</a></dt>
@@ -262,9 +276,15 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
@@ -275,6 +295,13 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#copy(java.lang.String,java.lang.String)" class="member-name-link">copy(String, String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
+same object storage (bucket/container).</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3BucketOperations.html#create(java.lang.String)" class="member-name-link">create(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3BucketOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3BucketOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html#create(java.lang.String)" class="member-name-link">create(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveBucketOperations</a></dt>
@@ -316,6 +343,12 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html#%3Cinit%3E(io.micronaut.objectstorage.bucket.BucketOperations,java.util.concurrent.ExecutorService)" class="member-name-link">DefaultReactiveBucketOperations(BucketOperations, ExecutorService)</a> - Constructor for class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations&lt;I,<wbr>O,<wbr>D&gt;</a> - Class in <a href="io/micronaut/objectstorage/internal/package-summary.html">io.micronaut.objectstorage.internal</a></dt>
+<dd>
+<div class="block">Executor-backed reactive adapter for the blocking object storage contract.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.ObjectStorageOperations,java.util.concurrent.ExecutorService)" class="member-name-link">DefaultReactiveObjectStorageOperations(ObjectStorageOperations, ExecutorService)</a> - Constructor for class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/response/DefaultUploadResponse.html" class="type-name-link" title="class in io.micronaut.objectstorage.response">DefaultUploadResponse&lt;R&gt;</a> - Class in <a href="io/micronaut/objectstorage/response/package-summary.html">io.micronaut.objectstorage.response</a></dt>
 <dd>
 <div class="block">Default implementation of <a href="io/micronaut/objectstorage/response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response"><code>UploadResponse</code></a>.</div>
@@ -328,11 +361,15 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobBucketOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobBucketOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobBucketOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobReactiveBucketOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/bucket/BucketOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in interface io.micronaut.objectstorage.bucket.<a href="io/micronaut/objectstorage/bucket/BucketOperations.html" title="interface in io.micronaut.objectstorage.bucket">BucketOperations</a></dt>
 <dd>
@@ -350,6 +387,8 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
@@ -360,6 +399,12 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#delete(java.lang.String)" class="member-name-link">delete(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Deletes an object from the object storage.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
@@ -411,9 +456,13 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobReactiveBucketOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/bucket/BucketOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in interface io.micronaut.objectstorage.bucket.<a href="io/micronaut/objectstorage/bucket/BucketOperations.html" title="interface in io.micronaut.objectstorage.bucket">BucketOperations</a></dt>
 <dd>
@@ -429,6 +478,8 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
@@ -439,6 +490,12 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#exists(java.lang.String)" class="member-name-link">exists(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Checks whether an entry with the given key exists in the object storage.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.ResolvedObjectStorageResource.html#externalForm()" class="member-name-link">externalForm()</a> - Method in record class io.micronaut.objectstorage.resource.<a href="io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.ResolvedObjectStorageResource.html" title="class in io.micronaut.objectstorage.resource">AbstractObjectStorageResourceLoader.ResolvedObjectStorageResource</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.ResolvedObjectStorageResource.html#param-externalForm"><code>externalForm</code></a> record component.</div>
@@ -715,6 +772,12 @@ same object storage (bucket/container).</div>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageReactiveOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageReactiveOperations</a> - Class in <a href="io/micronaut/objectstorage/googlecloud/package-summary.html">io.micronaut.objectstorage.googlecloud</a></dt>
+<dd>
+<div class="block">Reactive Google Cloud Storage operations.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageReactiveOperations.html#%3Cinit%3E(io.micronaut.objectstorage.googlecloud.GoogleCloudStorageOperations,java.util.concurrent.ExecutorService)" class="member-name-link">GoogleCloudStorageReactiveOperations(GoogleCloudStorageOperations, ExecutorService)</a> - Constructor for class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageResourceLoaderFactory.html" class="type-name-link" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageResourceLoaderFactory</a> - Class in <a href="io/micronaut/objectstorage/googlecloud/package-summary.html">io.micronaut.objectstorage.googlecloud</a></dt>
 <dd>
 <div class="block">Registers the <code>gs:</code> resource loader.</div>
@@ -885,9 +948,15 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
@@ -897,11 +966,23 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#listObjects()" class="member-name-link">listObjects()</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Lists the objects that exist in the object storage.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
@@ -911,6 +992,12 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)" class="member-name-link">listObjects(ListObjectsRequest)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Lists a page of objects that exist in the object storage.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/request/ListObjectsRequest.html" class="type-name-link" title="class in io.micronaut.objectstorage.request">ListObjectsRequest</a> - Class in <a href="io/micronaut/objectstorage/request/package-summary.html">io.micronaut.objectstorage.request</a></dt>
 <dd>
 <div class="block">Paginated object listing request.</div>
@@ -968,6 +1055,12 @@ same object storage (bucket/container).</div>
 <div class="block">Reactive local bucket operations.</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageReactiveBucketOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageBucketOperations,java.util.concurrent.ExecutorService)" class="member-name-link">LocalStorageReactiveBucketOperations(LocalStorageBucketOperations, ExecutorService)</a> - Constructor for class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageReactiveBucketOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageReactiveOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.local">LocalStorageReactiveOperations</a> - Class in <a href="io/micronaut/objectstorage/local/package-summary.html">io.micronaut.objectstorage.local</a></dt>
+<dd>
+<div class="block">Reactive local storage operations.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/local/LocalStorageReactiveOperations.html#%3Cinit%3E(io.micronaut.objectstorage.local.LocalStorageOperations,java.util.concurrent.ExecutorService)" class="member-name-link">LocalStorageReactiveOperations(LocalStorageOperations, ExecutorService)</a> - Constructor for class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:M">M</h2>
@@ -1148,6 +1241,12 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#%3Cinit%3E(io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration,com.oracle.bmc.objectstorage.ObjectStorage,com.oracle.bmc.auth.RegionProvider)" class="member-name-link">OracleCloudStorageOperations(OracleCloudStorageConfiguration, ObjectStorage, RegionProvider)</a> - Constructor for class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" class="type-name-link" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a> - Class in <a href="io/micronaut/objectstorage/oraclecloud/package-summary.html">io.micronaut.objectstorage.oraclecloud</a></dt>
+<dd>
+<div class="block">Reactive Oracle Cloud object storage operations.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#%3Cinit%3E(io.micronaut.objectstorage.oraclecloud.OracleCloudStorageConfiguration,com.oracle.bmc.objectstorage.ObjectStorageAsyncClient,com.oracle.bmc.auth.RegionProvider)" class="member-name-link">OracleCloudStorageReactiveOperations(OracleCloudStorageConfiguration, ObjectStorageAsyncClient, RegionProvider)</a> - Constructor for class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageResourceLoaderFactory.html" class="type-name-link" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageResourceLoaderFactory</a> - Class in <a href="io/micronaut/objectstorage/oraclecloud/package-summary.html">io.micronaut.objectstorage.oraclecloud</a></dt>
 <dd>
 <div class="block">Registers the <code>os:</code> resource loader.</div>
@@ -1198,6 +1297,10 @@ same object storage (bucket/container).</div>
 <dd>
 <div class="block">Reactive companion API for bucket/container lifecycle management.</div>
 </dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" class="type-name-link" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations&lt;I,<wbr>O,<wbr>D&gt;</a> - Interface in <a href="io/micronaut/objectstorage/package-summary.html">io.micronaut.objectstorage</a></dt>
+<dd>
+<div class="block">Reactive companion interface for object storage operations.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/resource/ObjectStorageResourceParser.OracleCloudStorageUri.html#region()" class="member-name-link">region()</a> - Method in record class io.micronaut.objectstorage.resource.<a href="io/micronaut/objectstorage/resource/ObjectStorageResourceParser.OracleCloudStorageUri.html" title="class in io.micronaut.objectstorage.resource">ObjectStorageResourceParser.OracleCloudStorageUri</a></dt>
 <dd>
 <div class="block">Returns the value of the <code>region</code> record component.</div>
@@ -1224,11 +1327,15 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobBucketOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobBucketOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobBucketOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobReactiveBucketOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/bucket/BucketOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in interface io.micronaut.objectstorage.bucket.<a href="io/micronaut/objectstorage/bucket/BucketOperations.html" title="interface in io.micronaut.objectstorage.bucket">BucketOperations</a></dt>
 <dd>
@@ -1246,6 +1353,8 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveBucketOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveBucketOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
@@ -1256,6 +1365,12 @@ same object storage (bucket/container).</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#retrieve(java.lang.String)" class="member-name-link">retrieve(String)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Gets the object from object storage.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.html#retrieveEntry(io.micronaut.objectstorage.resource.AbstractObjectStorageResourceLoader.ResolvedObjectStorageResource)" class="member-name-link">retrieveEntry(AbstractObjectStorageResourceLoader.ResolvedObjectStorageResource)</a> - Method in class io.micronaut.objectstorage.resource.<a href="io/micronaut/objectstorage/resource/AbstractObjectStorageResourceLoader.html" title="class in io.micronaut.objectstorage.resource">AbstractObjectStorageResourceLoader</a></dt>
 <dd>&nbsp;</dd>
 </dl>
@@ -1373,9 +1488,15 @@ same object storage (bucket/container).</div>
 <dl class="index">
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
@@ -1385,19 +1506,37 @@ same object storage (bucket/container).</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">upload(UploadRequest)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Uploads an object to the object storage.</div>
+</dd>
 <dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.azure.<a href="io/micronaut/objectstorage/azure/AzureBlobStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.azure">AzureBlobStorageReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.googlecloud.<a href="io/micronaut/objectstorage/googlecloud/GoogleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageOperations</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.oraclecloud.<a href="io/micronaut/objectstorage/oraclecloud/OracleCloudStorageReactiveOperations.html" title="class in io.micronaut.objectstorage.oraclecloud">OracleCloudStorageReactiveOperations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.internal.<a href="io/micronaut/objectstorage/internal/DefaultReactiveObjectStorageOperations.html" title="class in io.micronaut.objectstorage.internal">DefaultReactiveObjectStorageOperations</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a></dt>
+<dd>
+<div class="block">Uploads an object to the object storage.</div>
+</dd>
+<dt><a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in interface io.micronaut.objectstorage.<a href="io/micronaut/objectstorage/ReactiveObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ReactiveObjectStorageOperations</a></dt>
 <dd>
 <div class="block">Uploads an object to the object storage.</div>
 </dd>
 <dt><a href="io/micronaut/objectstorage/local/LocalStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.local.<a href="io/micronaut/objectstorage/local/LocalStorageOperations.html" title="class in io.micronaut.objectstorage.local">LocalStorageOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/aws/AwsS3Operations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3Operations.html" title="class in io.micronaut.objectstorage.aws">AwsS3Operations</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload(UploadRequest, Consumer)</a> - Method in class io.micronaut.objectstorage.aws.<a href="io/micronaut/objectstorage/aws/AwsS3ReactiveOperations.html" title="class in io.micronaut.objectstorage.aws">AwsS3ReactiveOperations</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/objectstorage/request/UploadRequest.html" class="type-name-link" title="interface in io.micronaut.objectstorage.request">UploadRequest</a> - Interface in <a href="io/micronaut/objectstorage/request/package-summary.html">io.micronaut.objectstorage.request</a></dt>
 <dd>
