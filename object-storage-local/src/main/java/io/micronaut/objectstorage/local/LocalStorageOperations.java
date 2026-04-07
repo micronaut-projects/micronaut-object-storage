@@ -375,6 +375,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             throw new IllegalArgumentException("Key uses the reserved " + METADATA_DIRECTORY + " namespace: " + key);
         }
     }
+
     private static void rejectSymbolicLink(Path path) {
         if (Files.isSymbolicLink(path)) {
             throw new IllegalArgumentException("Path contains symbolic links");
@@ -392,6 +393,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private static InputStream newInputStreamNoFollow(Path path) throws IOException {
         return Channels.newInputStream(Files.newByteChannel(path, Set.of(StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS)));
     }
+
     /**
      * A simple wrapper around a path.
      * @param path Where on disk the local storage provider has stored the actual data.
