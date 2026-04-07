@@ -17,9 +17,11 @@ package io.micronaut.objectstorage;
 
 import io.micronaut.core.annotation.Blocking;
 import org.jspecify.annotations.NonNull;
+import io.micronaut.objectstorage.request.CreatePresignedUploadRequest;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
+import io.micronaut.objectstorage.response.PresignedUpload;
 import io.micronaut.objectstorage.response.UploadResponse;
 
 import java.util.Collections;
@@ -150,5 +152,18 @@ public interface ObjectStorageOperations<I, O, D> {
      */
     @Blocking
     default void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
+    }
+
+    /**
+     * Creates a pre-signed upload request for a single object key.
+     *
+     * @param request the pre-signed upload request parameters
+     * @return the signed upload request, if the provider supports it in the current configuration
+     * @since 3.0.0
+     */
+    @Blocking
+    @NonNull
+    default Optional<PresignedUpload> createPresignedUpload(@NonNull CreatePresignedUploadRequest request) {
+        return Optional.empty();
     }
 }

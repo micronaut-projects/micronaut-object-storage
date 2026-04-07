@@ -29,26 +29,38 @@ import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.blob.models.ListBlobsOptions;
 import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import com.azure.storage.blob.options.BlockBlobSimpleUploadOptions;
+import com.azure.storage.blob.sas.BlobSasPermission;
+import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
+import com.azure.storage.common.StorageSharedKeyCredential;
+import com.azure.storage.common.sas.SasProtocol;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
+import io.micronaut.objectstorage.request.CreatePresignedUploadRequest;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
+import io.micronaut.objectstorage.response.PresignedUpload;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -71,9 +83,13 @@ public class AzureBlobStorageOperations
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
     private final BlobContainerClient blobContainerClient;
+    @Nullable
+    private final StorageSharedKeyCredential sharedKeyCredential;
 
-    public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient) {
+    public AzureBlobStorageOperations(@Parameter BlobContainerClient blobContainerClient,
+                                      @Nullable StorageSharedKeyCredential sharedKeyCredential) {
         this.blobContainerClient = blobContainerClient;
+        this.sharedKeyCredential = sharedKeyCredential;
     }
 
     @Override
@@ -181,6 +197,37 @@ public class AzureBlobStorageOperations
         destinationBlobClient.copyFromUrl(sourceBlobClient.getBlobUrl());
     }
 
+    @Override
+    @NonNull
+    public Optional<PresignedUpload> createPresignedUpload(@NonNull CreatePresignedUploadRequest request) {
+        if (sharedKeyCredential == null) {
+            return Optional.empty();
+        }
+        BlobClient blobClient = blobContainerClient.getBlobClient(request.getKey());
+        try {
+            Instant expiration = Instant.now().plus(request.getExpiresIn());
+            BlobServiceSasSignatureValues signatureValues = new BlobServiceSasSignatureValues(
+                OffsetDateTime.ofInstant(expiration, ZoneOffset.UTC),
+                new BlobSasPermission()
+                    .setCreatePermission(true)
+                    .setWritePermission(true)
+            ).setProtocol(SasProtocol.HTTPS_ONLY);
+            String sas = blobClient.generateSas(signatureValues);
+            return Optional.of(new PresignedUpload(
+                java.net.URI.create(blobClient.getBlobUrl() + separator(blobClient.getBlobUrl()) + sas),
+                "PUT",
+                toPortableHeaders(request),
+                expiration
+            ));
+        } catch (RuntimeException e) {
+            String msg = String.format(
+                "Error when trying to create a pre-signed upload request with key [%s] in Azure Blob Storage",
+                request.getKey()
+            );
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
     /**
      * @param request the upload request
      * @return An Azure's {@link BlobParallelUploadOptions} from a Micronaut's {@link UploadRequest}.
@@ -262,6 +309,21 @@ public class AzureBlobStorageOperations
             || requestConditions.getIfUnmodifiedSince() != null
             || requestConditions.getLeaseId() != null
             || requestConditions.getTagsConditions() != null;
+    }
+
+    @NonNull
+    private Map<String, List<String>> toPortableHeaders(@NonNull CreatePresignedUploadRequest request) {
+        Map<String, List<String>> headers = new LinkedHashMap<>();
+        headers.put("x-ms-blob-type", List.of("BlockBlob"));
+        request.getContentType().ifPresent(contentType -> headers.put("x-ms-blob-content-type", List.of(contentType)));
+        request.getContentLength().ifPresent(length -> headers.put("Content-Length", List.of(Long.toString(length))));
+        request.getMetadata().forEach((key, value) -> headers.put("x-ms-meta-" + key, List.of(value)));
+        return headers;
+    }
+
+    @NonNull
+    private String separator(@NonNull String url) {
+        return url.contains("?") ? "&" : "?";
     }
 
 }

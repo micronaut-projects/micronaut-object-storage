@@ -98,4 +98,6 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 
 <1> The delete operation returns the cloud vendor-specific delete response object in case you need it.
 
+See the dedicated <<preSignedUploads,Pre-Signed Uploads>> section for portable, time-limited client upload requests.
+
 See the dedicated <<paginatedListing,Paginated Listing>> section for provider-agnostic page-by-page object listing.
