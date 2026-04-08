@@ -29,6 +29,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -72,7 +74,11 @@ public abstract class AbstractObjectStorageResourceLoader implements ResourceLoa
 
     @Override
     public boolean supportsPrefix(String path) {
-        if (resolveRelative(path).isPresent()) {
+        try {
+            if (resolveRelative(path).isPresent()) {
+                return true;
+            }
+        } catch (IllegalArgumentException e) {
             return true;
         }
         if (!hasRecognizedPrefix(path)) {
@@ -111,9 +117,10 @@ public abstract class AbstractObjectStorageResourceLoader implements ResourceLoa
         if (relativeBase == null || hasRecognizedPrefix(path) || !ObjectStorageResourceParser.isRelativePath(path)) {
             return Optional.empty();
         }
+        String normalizedRelativePath = normalizeRelativeLookupPath(path);
         return Optional.of(new ResolvedObjectStorageResource(
-            relativeBase.keyPrefix() + path,
-            relativeBase.externalPrefix() + path,
+            relativeBase.keyPrefix() + normalizedRelativePath,
+            relativeBase.externalPrefix() + normalizedRelativePath,
             relativeBase.operations()
         ));
     }
@@ -141,6 +148,54 @@ public abstract class AbstractObjectStorageResourceLoader implements ResourceLoa
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Invalid object storage URL: " + externalForm, e);
         }
+    }
+
+    private static String normalizeRelativeLookupPath(String path) {
+        boolean leadingSlash = path.startsWith("/");
+        boolean trailingSlash = path.endsWith("/") && !path.isEmpty();
+        String candidate = trimRelativeLookupCandidate(path, leadingSlash, trailingSlash);
+        String normalized = normalizeRelativeLookupCandidate(candidate, path);
+        return restoreRelativeLookupDecorators(normalized, leadingSlash, trailingSlash);
+    }
+
+    private static String trimRelativeLookupCandidate(String path, boolean leadingSlash, boolean trailingSlash) {
+        String candidate = leadingSlash ? path.substring(1) : path;
+        if (trailingSlash && !candidate.isEmpty()) {
+            return candidate.substring(0, candidate.length() - 1);
+        }
+        return candidate;
+    }
+
+    private static String normalizeRelativeLookupCandidate(String candidate, String path) {
+        Deque<String> segments = new ArrayDeque<>();
+        for (String segment : candidate.split("/", -1)) {
+            applyRelativeLookupSegment(segments, segment, path);
+        }
+        return String.join("/", segments);
+    }
+
+    private static void applyRelativeLookupSegment(Deque<String> segments, String segment, String path) {
+        if (segment.isEmpty() || ".".equals(segment)) {
+            return;
+        }
+        if ("..".equals(segment)) {
+            if (segments.isEmpty()) {
+                throw new IllegalArgumentException("Relative resource path escapes the configured base path: " + path);
+            }
+            segments.removeLast();
+            return;
+        }
+        segments.addLast(segment);
+    }
+
+    private static String restoreRelativeLookupDecorators(String normalized, boolean leadingSlash, boolean trailingSlash) {
+        if (leadingSlash) {
+            normalized = "/" + normalized;
+        }
+        if (trailingSlash && (normalized.isEmpty() || normalized.charAt(normalized.length() - 1) != '/')) {
+            normalized = normalized + '/';
+        }
+        return normalized;
     }
 
     /**

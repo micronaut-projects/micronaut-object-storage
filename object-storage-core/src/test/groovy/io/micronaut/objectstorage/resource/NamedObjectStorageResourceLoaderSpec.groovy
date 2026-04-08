@@ -15,7 +15,9 @@ class NamedObjectStorageResourceLoaderSpec extends Specification {
         given:
         def operations = new TestObjectStorageOperations([
             'avatars/logo.txt': 'logo-bytes',
-            'avatars/logo:v2.txt': 'logo-v2-bytes'
+            'avatars/logo:v2.txt': 'logo-v2-bytes',
+            'avatars/nested/logo.txt': 'nested-logo-bytes',
+            'avatars/nested/': 'nested-dir-bytes'
         ])
         def loader = new NamedObjectStorageResourceLoader('public-images', operations)
 
@@ -31,8 +33,39 @@ class NamedObjectStorageResourceLoaderSpec extends Specification {
         then:
         rebased.supportsPrefix('logo.txt')
         rebased.getResourceAsStream('logo.txt').get().text == 'logo-bytes'
+        rebased.getResourceAsStream('./logo.txt').get().text == 'logo-bytes'
         rebased.supportsPrefix('logo:v2.txt')
         rebased.getResourceAsStream('logo:v2.txt').get().text == 'logo-v2-bytes'
+        rebased.getResourceAsStream('nested/./logo.txt').get().text == 'nested-logo-bytes'
+        rebased.getResourceAsStream('nested/../logo.txt').get().text == 'logo-bytes'
+        rebased.getResourceAsStream('nested/').get().text == 'nested-dir-bytes'
+    }
+
+    void 'it rejects relative lookups that escape the rebased prefix'() {
+        given:
+        def operations = new TestObjectStorageOperations([
+            'avatars/logo.txt': 'logo-bytes',
+            'secret.txt': 'secret-bytes'
+        ])
+        def rebased = new NamedObjectStorageResourceLoader('public-images', operations)
+            .forBase('public-images://avatars/')
+
+        expect:
+        rebased.supportsPrefix('../secret.txt')
+
+        when:
+        rebased.getResourceAsStream('../secret.txt')
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message.contains('escapes the configured base path')
+
+        when:
+        rebased.getResourceAsStream('nested//../../secret.txt')
+
+        then:
+        def e2 = thrown(IllegalArgumentException)
+        e2.message.contains('escapes the configured base path')
     }
 
     void 'it returns empty for missing objects'() {

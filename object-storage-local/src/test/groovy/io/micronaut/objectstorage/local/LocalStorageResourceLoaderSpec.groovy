@@ -36,4 +36,33 @@ class LocalStorageResourceLoaderSpec extends Specification {
         cleanup:
         context.close()
     }
+
+    void 'it rejects rebased relative lookups that escape the configured base path'() {
+        given:
+        ApplicationContext context = ApplicationContext.run(
+            [
+                (PREFIX + '.public-images.path'): tempDir.toString()
+            ]
+        )
+        def operations = context.getBean(ObjectStorageOperations, Qualifiers.byName('public-images'))
+        operations.upload(UploadRequest.fromBytes('hello-loader'.bytes, 'avatars/logo.txt'))
+        operations.upload(UploadRequest.fromBytes('top-secret'.bytes, 'secret.txt'))
+        def rebased = new ResourceResolver(context.getBeansOfType(ResourceLoader).toList())
+            .getLoaderForBasePath('public-images://avatars/')
+            .get()
+
+        expect:
+        rebased.getResourceAsStream('nested/../logo.txt').get().text == 'hello-loader'
+        rebased.supportsPrefix('../secret.txt')
+
+        when:
+        rebased.getResourceAsStream('../secret.txt')
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message.contains('escapes the configured base path')
+
+        cleanup:
+        context.close()
+    }
 }
