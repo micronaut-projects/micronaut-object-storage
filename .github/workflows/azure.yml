@@ -25,6 +25,8 @@ jobs:
     strategy:
       matrix:
         java: ['25']
+    permissions:
+      contents: 'read'
     steps:
        # https://github.com/actions/virtual-environments/issues/709
       - name: Free disk space
