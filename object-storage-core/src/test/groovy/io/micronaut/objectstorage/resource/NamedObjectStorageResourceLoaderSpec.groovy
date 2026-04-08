@@ -33,6 +33,27 @@ class NamedObjectStorageResourceLoaderSpec extends Specification {
         rebased.getResourceAsStream('logo.txt').get().text == 'logo-bytes'
         rebased.supportsPrefix('logo:v2.txt')
         rebased.getResourceAsStream('logo:v2.txt').get().text == 'logo-v2-bytes'
+        rebased.getResourceAsStream('nested/../logo.txt').get().text == 'logo-bytes'
+    }
+
+    void 'it rejects relative lookups that escape the rebased prefix'() {
+        given:
+        def operations = new TestObjectStorageOperations([
+            'avatars/logo.txt': 'logo-bytes',
+            'secret.txt': 'secret-bytes'
+        ])
+        def rebased = new NamedObjectStorageResourceLoader('public-images', operations)
+            .forBase('public-images://avatars/')
+
+        expect:
+        rebased.supportsPrefix('../secret.txt')
+
+        when:
+        rebased.getResourceAsStream('../secret.txt')
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message.contains('escapes the configured base path')
     }
 
     void 'it returns empty for missing objects'() {
