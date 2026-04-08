@@ -153,29 +153,42 @@ public abstract class AbstractObjectStorageResourceLoader implements ResourceLoa
     private static String normalizeRelativeLookupPath(String path) {
         boolean leadingSlash = path.startsWith("/");
         boolean trailingSlash = path.endsWith("/") && !path.isEmpty();
+        String candidate = trimRelativeLookupCandidate(path, leadingSlash, trailingSlash);
+        String normalized = normalizeRelativeLookupCandidate(candidate, path);
+        return restoreRelativeLookupDecorators(normalized, leadingSlash, trailingSlash);
+    }
+
+    private static String trimRelativeLookupCandidate(String path, boolean leadingSlash, boolean trailingSlash) {
         String candidate = leadingSlash ? path.substring(1) : path;
         if (trailingSlash && !candidate.isEmpty()) {
-            candidate = candidate.substring(0, candidate.length() - 1);
+            return candidate.substring(0, candidate.length() - 1);
         }
+        return candidate;
+    }
 
+    private static String normalizeRelativeLookupCandidate(String candidate, String path) {
         Deque<String> segments = new ArrayDeque<>();
-        if (!candidate.isEmpty()) {
-            for (String segment : candidate.split("/", -1)) {
-                if (".".equals(segment)) {
-                    continue;
-                }
-                if ("..".equals(segment)) {
-                    if (segments.isEmpty()) {
-                        throw new IllegalArgumentException("Relative resource path escapes the configured base path: " + path);
-                    }
-                    segments.removeLast();
-                    continue;
-                }
-                segments.addLast(segment);
-            }
+        for (String segment : candidate.split("/", -1)) {
+            applyRelativeLookupSegment(segments, segment, path);
         }
+        return String.join("/", segments);
+    }
 
-        String normalized = String.join("/", segments);
+    private static void applyRelativeLookupSegment(Deque<String> segments, String segment, String path) {
+        if (segment.isEmpty() || ".".equals(segment)) {
+            return;
+        }
+        if ("..".equals(segment)) {
+            if (segments.isEmpty()) {
+                throw new IllegalArgumentException("Relative resource path escapes the configured base path: " + path);
+            }
+            segments.removeLast();
+            return;
+        }
+        segments.addLast(segment);
+    }
+
+    private static String restoreRelativeLookupDecorators(String normalized, boolean leadingSlash, boolean trailingSlash) {
         if (leadingSlash) {
             normalized = "/" + normalized;
         }
