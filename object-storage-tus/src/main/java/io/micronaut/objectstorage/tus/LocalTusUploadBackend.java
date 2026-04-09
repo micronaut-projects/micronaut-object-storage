@@ -17,7 +17,9 @@ package io.micronaut.objectstorage.tus;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.objectstorage.request.FileUploadRequest;
 import io.micronaut.objectstorage.local.LocalStorageConfiguration;
 import io.micronaut.objectstorage.local.LocalStorageOperations;
@@ -30,6 +32,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -43,10 +49,12 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @EachBean(LocalStorageConfiguration.class)
+@Requires(property = TusModuleConfiguration.PREFIX + ".enabled", value = StringUtils.TRUE)
 @Singleton
 @Internal
 public class LocalTusUploadBackend implements TusUploadBackend {
 
+    private static final System.Logger LOGGER = System.getLogger(LocalTusUploadBackend.class.getName());
     private static final String STATUS = "status";
     private static final String KEY = "key";
     private static final String LENGTH = "length";
@@ -58,6 +66,7 @@ public class LocalTusUploadBackend implements TusUploadBackend {
     private final LocalStorageOperations operations;
     private final Path sessionsPath;
     private final Path stagingPath;
+    private final ConcurrentMap<String, ReentrantLock> uploadLocks = new ConcurrentHashMap<>();
 
     public LocalTusUploadBackend(@Parameter String name,
                                  LocalStorageConfiguration configuration,
@@ -108,58 +117,59 @@ public class LocalTusUploadBackend implements TusUploadBackend {
     @Override
     @NonNull
     public TusUpload append(@NonNull String uploadId, long expectedOffset, byte[] chunk) {
-        TusUpload upload = find(uploadId).orElseThrow(() -> new IllegalArgumentException("Unknown upload: " + uploadId));
-        if (upload.completed() || upload.aborted()) {
-            throw new TusGoneException("Upload is no longer writable: " + uploadId);
-        }
-        if (expectedOffset != upload.offset()) {
-            throw new TusConflictException("Upload-Offset does not match the committed offset");
-        }
-        long nextOffset = upload.offset() + chunk.length;
-        if (nextOffset > upload.uploadLength()) {
-            throw new IllegalArgumentException("Chunk exceeds declared Upload-Length");
-        }
-
-        Path stagingFile = stagingFile(uploadId);
-        try {
-            mkdirs(stagingFile.getParent());
-            try (OutputStream outputStream = Files.newOutputStream(stagingFile,
-                java.nio.file.StandardOpenOption.CREATE,
-                java.nio.file.StandardOpenOption.APPEND)) {
-                outputStream.write(chunk);
+        return withUploadLock(uploadId, () -> {
+            TusUpload upload = find(uploadId).orElseThrow(() -> new IllegalArgumentException("Unknown upload: " + uploadId));
+            if (upload.completed() || upload.aborted()) {
+                throw new TusGoneException("Upload is no longer writable: " + uploadId);
             }
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to persist tus upload chunk", e);
-        }
+            if (expectedOffset != upload.offset()) {
+                throw new TusConflictException("Upload-Offset does not match the committed offset");
+            }
+            long nextOffset = upload.offset() + chunk.length;
+            if (nextOffset > upload.uploadLength()) {
+                throw new IllegalArgumentException("Chunk exceeds declared Upload-Length");
+            }
 
-        TusUpload updated = new TusUpload(
-            upload.id(),
-            upload.key(),
-            upload.uploadLength(),
-            nextOffset,
-            upload.getContentType().orElse(null),
-            upload.metadata(),
-            TusUploadStatus.IN_PROGRESS
-        );
-        save(updated);
-        if (nextOffset == upload.uploadLength()) {
-            return finalizeUpload(updated);
-        }
-        return updated;
+            Path stagingFile = stagingFile(uploadId);
+            try {
+                mkdirs(stagingFile.getParent());
+                try (OutputStream outputStream = Files.newOutputStream(stagingFile,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.APPEND)) {
+                    outputStream.write(chunk);
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to persist tus upload chunk", e);
+            }
+
+            TusUpload updated = new TusUpload(
+                upload.id(),
+                upload.key(),
+                upload.uploadLength(),
+                nextOffset,
+                upload.getContentType().orElse(null),
+                upload.metadata(),
+                TusUploadStatus.IN_PROGRESS
+            );
+            save(updated);
+            if (nextOffset == upload.uploadLength()) {
+                return finalizeUpload(updated);
+            }
+            return updated;
+        });
     }
 
     @Override
     public void abort(@NonNull String uploadId) {
-        TusUpload upload = find(uploadId).orElseThrow(() -> new IllegalArgumentException("Unknown upload: " + uploadId));
-        if (upload.completed() || upload.aborted()) {
-            throw new TusGoneException("Upload is no longer abortable: " + uploadId);
-        }
-        try {
-            Files.deleteIfExists(stagingFile(uploadId));
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to delete staged tus upload data", e);
-        }
-        save(new TusUpload(upload.id(), upload.key(), upload.uploadLength(), upload.offset(), upload.getContentType().orElse(null), upload.metadata(), TusUploadStatus.ABORTED));
+        withUploadLock(uploadId, () -> {
+            TusUpload upload = find(uploadId).orElseThrow(() -> new IllegalArgumentException("Unknown upload: " + uploadId));
+            if (upload.completed() || upload.aborted()) {
+                throw new TusGoneException("Upload is no longer abortable: " + uploadId);
+            }
+            save(new TusUpload(upload.id(), upload.key(), upload.uploadLength(), upload.offset(), upload.getContentType().orElse(null), upload.metadata(), TusUploadStatus.ABORTED));
+            deleteStagingBestEffort(stagingFile(uploadId));
+            return null;
+        });
     }
 
     private TusUpload finalizeUpload(TusUpload upload) {
@@ -174,13 +184,9 @@ public class LocalTusUploadBackend implements TusUploadBackend {
         }
         FileUploadRequest uploadRequest = new FileUploadRequest(upload.key(), upload.getContentType().orElse(null), stagingFile, upload.metadata());
         operations.upload(uploadRequest);
-        try {
-            Files.deleteIfExists(stagingFile);
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to clean staged tus upload data", e);
-        }
         TusUpload completed = new TusUpload(upload.id(), upload.key(), upload.uploadLength(), upload.uploadLength(), upload.getContentType().orElse(null), upload.metadata(), TusUploadStatus.COMPLETED);
         save(completed);
+        deleteStagingBestEffort(stagingFile);
         return completed;
     }
 
@@ -233,6 +239,29 @@ public class LocalTusUploadBackend implements TusUploadBackend {
 
     private Path stagingFile(String uploadId) {
         return stagingPath.resolve(uploadId + ".bin");
+    }
+
+    private <T> T withUploadLock(String uploadId, Supplier<T> supplier) {
+        ReentrantLock lock = uploadLocks.computeIfAbsent(uploadId, ignored -> new ReentrantLock());
+        lock.lock();
+        try {
+            return supplier.get();
+        } finally {
+            lock.unlock();
+            if (!lock.hasQueuedThreads()) {
+                uploadLocks.remove(uploadId, lock);
+            }
+        }
+    }
+
+    private static void deleteStagingBestEffort(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            LOGGER.log(System.Logger.Level.WARNING,
+                "Unable to clean staged tus upload data: " + path,
+                e);
+        }
     }
 
     private static void mkdirs(Path path) {

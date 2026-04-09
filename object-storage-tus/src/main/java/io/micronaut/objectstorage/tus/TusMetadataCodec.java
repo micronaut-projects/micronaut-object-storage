@@ -48,8 +48,12 @@ public final class TusMetadataCodec {
                 continue;
             }
             String[] parts = trimmed.split(" ", 2);
-            if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
+            if (parts[0].isBlank()) {
                 throw new IllegalArgumentException("Invalid Upload-Metadata entry: " + trimmed);
+            }
+            if (parts.length == 1 || parts[1].isEmpty()) {
+                metadata.put(parts[0], "");
+                continue;
             }
             byte[] decoded = Base64.getDecoder().decode(parts[1]);
             metadata.put(parts[0], new String(decoded, StandardCharsets.UTF_8));

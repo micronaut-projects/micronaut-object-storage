@@ -43,7 +43,7 @@ class TusControllerSpec extends Specification implements TestPropertyProvider {
             ]))
 
         when:
-        def createResponse = controller.create('default', 11, createRequest.headers.get(TusHeaders.METADATA))
+        def createResponse = controller.create('default', TusHeaders.VERSION, 11, createRequest.headers.get(TusHeaders.METADATA))
         String location = createResponse.header('Location')
         String uploadId = location.tokenize('/').last()
 
@@ -53,9 +53,9 @@ class TusControllerSpec extends Specification implements TestPropertyProvider {
         location == '/tus/default/' + uploadId
 
         when:
-        def firstPatch = controller.patch('default', uploadId, 0L, 'hello'.bytes)
-        def head = controller.head('default', uploadId)
-        def secondPatch = controller.patch('default', uploadId, 5L, ' world'.bytes)
+        def firstPatch = controller.patch('default', uploadId, TusHeaders.VERSION, 0L, 'hello'.bytes)
+        def head = controller.head('default', uploadId, TusHeaders.VERSION)
+        def secondPatch = controller.patch('default', uploadId, TusHeaders.VERSION, 5L, ' world'.bytes)
 
         then:
         firstPatch.status() == HttpStatus.NO_CONTENT
@@ -73,15 +73,15 @@ class TusControllerSpec extends Specification implements TestPropertyProvider {
         given:
         String location = createUpload('photos/stale.txt', 8)
         String uploadId = location.tokenize('/').last()
-        controller.patch('default', uploadId, 0L, 'abcd'.bytes)
+        controller.patch('default', uploadId, TusHeaders.VERSION, 0L, 'abcd'.bytes)
 
         when:
-        controller.patch('default', uploadId, 0L, 'efgh'.bytes)
+        controller.patch('default', uploadId, TusHeaders.VERSION, 0L, 'efgh'.bytes)
 
         then:
         def e = thrown(HttpStatusException)
         e.status == HttpStatus.CONFLICT
-        controller.head('default', uploadId).header(TusHeaders.OFFSET) == '4'
+        controller.head('default', uploadId, TusHeaders.VERSION).header(TusHeaders.OFFSET) == '4'
         !operations.retrieve('photos/stale.txt').present
     }
 
@@ -91,8 +91,8 @@ class TusControllerSpec extends Specification implements TestPropertyProvider {
         String uploadId = location.tokenize('/').last()
 
         when:
-        def deleteResponse = controller.delete('default', uploadId)
-        def headResponse = controller.head('default', uploadId)
+        def deleteResponse = controller.delete('default', uploadId, TusHeaders.VERSION)
+        def headResponse = controller.head('default', uploadId, TusHeaders.VERSION)
 
         then:
         deleteResponse.status() == HttpStatus.NO_CONTENT
@@ -100,8 +100,50 @@ class TusControllerSpec extends Specification implements TestPropertyProvider {
         !operations.retrieve('photos/abort.txt').present
     }
 
+    void 'it rejects missing or unsupported Tus-Resumable headers'() {
+        given:
+        String uploadId = createUpload('photos/versioned.txt', 4).tokenize('/').last()
+
+        when:
+        controller.create('default', null, 1, TusMetadataCodec.encode([key: 'photos/missing.txt']))
+
+        then:
+        def createException = thrown(HttpStatusException)
+        createException.status == HttpStatus.PRECONDITION_FAILED
+
+        when:
+        controller.head('default', uploadId, '0.2.2')
+
+        then:
+        def headException = thrown(HttpStatusException)
+        headException.status == HttpStatus.PRECONDITION_FAILED
+
+        when:
+        controller.patch('default', uploadId, null, 0L, 'ab'.bytes)
+
+        then:
+        def patchException = thrown(HttpStatusException)
+        patchException.status == HttpStatus.PRECONDITION_FAILED
+
+        when:
+        controller.delete('default', uploadId, null)
+
+        then:
+        def deleteException = thrown(HttpStatusException)
+        deleteException.status == HttpStatus.PRECONDITION_FAILED
+    }
+
+    void 'it decodes empty Upload-Metadata values'() {
+        expect:
+        TusMetadataCodec.decode('filename Zm9vLnR4dA==,flag,empty ') == [
+            filename: 'foo.txt',
+            flag    : '',
+            empty   : ''
+        ]
+    }
+
     private String createUpload(String key, int length) {
-        controller.create('default', length, TusMetadataCodec.encode([key: key]))
+        controller.create('default', TusHeaders.VERSION, length, TusMetadataCodec.encode([key: key]))
             .header('Location')
     }
 }

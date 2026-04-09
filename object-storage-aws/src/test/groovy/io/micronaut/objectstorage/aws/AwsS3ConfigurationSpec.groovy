@@ -7,6 +7,8 @@ import io.micronaut.context.annotation.Requires
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.inject.qualifiers.Qualifiers
 import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.tus.TusModuleConfiguration
+import io.micronaut.objectstorage.tus.TusUploadBackend
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -55,6 +57,23 @@ class AwsS3ConfigurationSpec extends Specification {
         context.containsBean(AwsS3Configuration, Qualifiers.byName("default"))
         !context.containsBean(ObjectStorageOperations, Qualifiers.byName("enabled"))
         !context.containsBean(AwsS3Configuration, Qualifiers.byName("enabled"))
+
+        cleanup:
+        context.close()
+    }
+
+    void "aws tus backend stays disabled until the tus module is enabled"() {
+        given:
+        def context = ApplicationContext.run([
+            'micronaut.object-storage.aws.default.bucket': 'pictures-bucket',
+            (TusModuleConfiguration.PREFIX + '.enabled') : false,
+            'aws.region'                                : 'us-east-1',
+            'aws.accessKeyId'                           : 'test',
+            'aws.secretKey'                             : 'test'
+        ])
+
+        expect:
+        context.getBeansOfType(TusUploadBackend).isEmpty()
 
         cleanup:
         context.close()

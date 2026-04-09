@@ -74,8 +74,10 @@ public final class TusController {
 
     @Post(uri = "/{storageName}")
     public MutableHttpResponse<?> create(@PathVariable String storageName,
+                                         @Header(TusHeaders.RESUMABLE) @Nullable String tusResumable,
                                          @Header(TusHeaders.LENGTH) long uploadLength,
                                          @Header(TusHeaders.METADATA) @Nullable String encodedMetadata) {
+        validateTusResumable(tusResumable);
         if (uploadLength < 0L) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Upload-Length must be zero or greater");
         }
@@ -94,7 +96,9 @@ public final class TusController {
 
     @Head(uri = "/{storageName}/{uploadId}")
     public MutableHttpResponse<?> head(@PathVariable String storageName,
-                                       @PathVariable String uploadId) {
+                                       @PathVariable String uploadId,
+                                       @Header(TusHeaders.RESUMABLE) @Nullable String tusResumable) {
+        validateTusResumable(tusResumable);
         TusUpload upload = getUpload(storageName, uploadId);
         if (upload.aborted()) {
             return tus(HttpResponse.status(HttpStatus.GONE));
@@ -108,8 +112,10 @@ public final class TusController {
     @Patch(uri = "/{storageName}/{uploadId}", consumes = "application/offset+octet-stream")
     public MutableHttpResponse<?> patch(@PathVariable String storageName,
                                         @PathVariable String uploadId,
+                                        @Header(TusHeaders.RESUMABLE) @Nullable String tusResumable,
                                         @Header(TusHeaders.OFFSET) long uploadOffset,
                                         @Body byte[] body) {
+        validateTusResumable(tusResumable);
         if (body.length > configuration.getMaxChunkSize()) {
             throw new HttpStatusException(HttpStatus.REQUEST_ENTITY_TOO_LARGE, "Chunk exceeds configured tus max chunk size");
         }
@@ -129,7 +135,9 @@ public final class TusController {
 
     @Delete(uri = "/{storageName}/{uploadId}")
     public MutableHttpResponse<?> delete(@PathVariable String storageName,
-                                         @PathVariable String uploadId) {
+                                         @PathVariable String uploadId,
+                                         @Header(TusHeaders.RESUMABLE) @Nullable String tusResumable) {
+        validateTusResumable(tusResumable);
         try {
             backend(storageName).abort(uploadId);
             return tus(HttpResponse.noContent());
@@ -170,6 +178,13 @@ public final class TusController {
         upload.getContentType().ifPresent(contentType -> metadata.put("contentType", contentType));
         metadata.putAll(upload.metadata());
         return TusMetadataCodec.encode(metadata);
+    }
+
+    private static void validateTusResumable(@Nullable String tusResumable) {
+        if (!TusHeaders.VERSION.equals(tusResumable)) {
+            throw new HttpStatusException(HttpStatus.PRECONDITION_FAILED,
+                "Tus-Resumable must be " + TusHeaders.VERSION);
+        }
     }
 
     private static MutableHttpResponse<?> tus(MutableHttpResponse<?> response) {

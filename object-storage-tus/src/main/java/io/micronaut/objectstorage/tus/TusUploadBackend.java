@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.tus;
 
 import io.micronaut.core.naming.Named;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public interface TusUploadBackend extends Named {
     @NonNull
     TusUpload create(@NonNull String key,
                      long uploadLength,
-                     String contentType,
+                     @Nullable String contentType,
                      @NonNull Map<String, String> metadata);
 
     @NonNull

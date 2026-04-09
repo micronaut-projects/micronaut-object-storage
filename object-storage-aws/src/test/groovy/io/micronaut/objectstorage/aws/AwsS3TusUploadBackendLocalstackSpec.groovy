@@ -17,6 +17,7 @@ import spock.lang.Specification
 
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.Arrays
 
 import static io.micronaut.objectstorage.test.ObjectStorageTestConstants.LOCAL_STACK_DOCKER_IMAGE
@@ -78,43 +79,53 @@ class AwsS3TusUploadBackendLocalstackSpec extends Specification implements TestP
         byte[] third = repeated((byte) 'c', 2 * 1024 * 1024)
         byte[] expected = joined(first, second, third)
 
-        String location = controller.create(OBJECT_STORAGE_NAME, expected.length, TusMetadataCodec.encode([
+        String location = controller.create(OBJECT_STORAGE_NAME, TusHeaders.VERSION, expected.length, TusMetadataCodec.encode([
             key        : 'videos/demo.bin',
             contentType: 'application/octet-stream',
             owner      : 'micronaut'
         ])).header('Location')
         String uploadId = location.tokenize('/').last()
+        Path stagedFile = workingDirectory.toPath()
+            .resolve('aws')
+            .resolve(OBJECT_STORAGE_NAME)
+            .resolve('staging')
+            .resolve(uploadId + '.bin')
 
         when:
-        def firstPatch = controller.patch(OBJECT_STORAGE_NAME, uploadId, 0L, first)
-        def secondPatch = controller.patch(OBJECT_STORAGE_NAME, uploadId, first.length, second)
-        def headResponse = controller.head(OBJECT_STORAGE_NAME, uploadId)
-        def thirdPatch = controller.patch(OBJECT_STORAGE_NAME, uploadId, first.length + second.length, third)
+        def firstPatch = controller.patch(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION, 0L, first)
+        long stagedBytesAfterFirstPatch = stagedBytes(stagedFile)
+        def secondPatch = controller.patch(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION, first.length, second)
+        long stagedBytesAfterSecondPatch = stagedBytes(stagedFile)
+        def headResponse = controller.head(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION)
+        def thirdPatch = controller.patch(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION, first.length + second.length, third)
         def stored = operations.retrieve('videos/demo.bin').orElseThrow()
 
         then:
         firstPatch.status() == HttpStatus.NO_CONTENT
         firstPatch.header(TusHeaders.OFFSET) == Integer.toString(first.length)
+        stagedBytesAfterFirstPatch == first.length
         secondPatch.status() == HttpStatus.NO_CONTENT
         secondPatch.header(TusHeaders.OFFSET) == Integer.toString(first.length + second.length)
+        stagedBytesAfterSecondPatch == 0L
         headResponse.status() == HttpStatus.NO_CONTENT
         headResponse.header(TusHeaders.OFFSET) == Integer.toString(first.length + second.length)
         thirdPatch.status() == HttpStatus.NO_CONTENT
         thirdPatch.header(TusHeaders.OFFSET) == Integer.toString(expected.length)
+        !Files.exists(stagedFile)
         stored.inputStream.bytes == expected
         stored.metadata == [owner: 'micronaut']
     }
 
     void 'it aborts an in-progress AWS tus upload without creating an object'() {
         given:
-        String uploadId = controller.create(OBJECT_STORAGE_NAME, 4, TusMetadataCodec.encode([
+        String uploadId = controller.create(OBJECT_STORAGE_NAME, TusHeaders.VERSION, 4, TusMetadataCodec.encode([
             key: 'videos/abort.bin'
         ])).header('Location').tokenize('/').last()
-        controller.patch(OBJECT_STORAGE_NAME, uploadId, 0L, 'ab'.bytes)
+        controller.patch(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION, 0L, 'ab'.bytes)
 
         when:
-        def deleteResponse = controller.delete(OBJECT_STORAGE_NAME, uploadId)
-        def headResponse = controller.head(OBJECT_STORAGE_NAME, uploadId)
+        def deleteResponse = controller.delete(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION)
+        def headResponse = controller.head(OBJECT_STORAGE_NAME, uploadId, TusHeaders.VERSION)
 
         then:
         deleteResponse.status() == HttpStatus.NO_CONTENT
@@ -132,5 +143,9 @@ class AwsS3TusUploadBackendLocalstackSpec extends Specification implements TestP
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
         chunks.each(outputStream::write)
         outputStream.toByteArray()
+    }
+
+    private static long stagedBytes(Path stagedFile) {
+        Files.exists(stagedFile) ? Files.size(stagedFile) : 0L
     }
 }

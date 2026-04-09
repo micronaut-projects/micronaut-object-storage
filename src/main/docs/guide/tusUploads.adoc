@@ -25,6 +25,7 @@ The current backends are:
 The module supports the following protocol behavior across those backends:
 
 - `OPTIONS` advertises tus version `1.0.0` plus the `creation` and `termination` extensions.
+- `POST`, `HEAD`, `PATCH`, and `DELETE` require `Tus-Resumable: 1.0.0`; unsupported or missing versions are rejected with `412 Precondition Failed`.
 - `POST` creates a resumable upload and requires `Upload-Length` plus `Upload-Metadata` containing a base64-encoded `key`.
 - `HEAD` returns the authoritative `Upload-Offset`.
 - `PATCH` appends bytes at the exact `Upload-Offset` and finalizes the object automatically when the declared length is reached.

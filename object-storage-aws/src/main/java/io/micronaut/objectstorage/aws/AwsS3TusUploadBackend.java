@@ -19,6 +19,7 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.tus.TusConflictException;
 import io.micronaut.objectstorage.tus.TusGoneException;
@@ -49,13 +50,19 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 /**
  * AWS S3 multipart-backed tus upload backend.
@@ -65,10 +72,12 @@ import java.util.UUID;
  */
 @EachBean(AwsS3Configuration.class)
 @Requires(beans = TusModuleConfiguration.class)
+@Requires(property = TusModuleConfiguration.PREFIX + ".enabled", value = StringUtils.TRUE)
 @Singleton
 @Internal
 final class AwsS3TusUploadBackend implements TusUploadBackend {
 
+    private static final System.Logger LOGGER = System.getLogger(AwsS3TusUploadBackend.class.getName());
     private static final long MIN_PART_SIZE = 5L * 1024L * 1024L;
     private static final String STATUS = "status";
     private static final String KEY = "key";
@@ -86,6 +95,7 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
     private final S3Client s3Client;
     private final Path sessionsPath;
     private final Path stagingPath;
+    private final ConcurrentMap<String, ReentrantLock> uploadLocks = new ConcurrentHashMap<>();
 
     AwsS3TusUploadBackend(@Parameter String name,
                           AwsS3Configuration configuration,
@@ -144,7 +154,11 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
             }
             CreateMultipartUploadResponse response = s3Client.createMultipartUpload(requestBuilder.build());
             AwsTusSession session = new AwsTusSession(upload, response.uploadId(), 0L, 1, List.of());
-            save(session);
+            try {
+                save(session);
+            } catch (RuntimeException e) {
+                abortMultipartUploadAfterCreateFailure(key, response.uploadId(), e);
+            }
             return upload;
         } catch (AwsServiceException e) {
             throw new ObjectStorageException("Unable to create AWS S3 multipart upload for tus resource", e);
@@ -164,48 +178,53 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
     @Override
     @NonNull
     public TusUpload append(@NonNull String uploadId, long expectedOffset, byte[] chunk) {
-        AwsTusSession session = readRequired(uploadId);
-        TusUpload upload = session.upload();
-        if (!upload.inProgress()) {
-            throw new TusGoneException("Upload is no longer writable: " + uploadId);
-        }
-        if (expectedOffset != upload.offset()) {
-            throw new TusConflictException("Upload-Offset does not match the committed offset");
-        }
-        long nextOffset = upload.offset() + chunk.length;
-        if (nextOffset > upload.uploadLength()) {
-            throw new IllegalArgumentException("Chunk exceeds declared Upload-Length");
-        }
+        return withUploadLock(uploadId, () -> {
+            AwsTusSession session = readRequired(uploadId);
+            TusUpload upload = session.upload();
+            if (!upload.inProgress()) {
+                throw new TusGoneException("Upload is no longer writable: " + uploadId);
+            }
+            if (expectedOffset != upload.offset()) {
+                throw new TusConflictException("Upload-Offset does not match the committed offset");
+            }
+            long nextOffset = upload.offset() + chunk.length;
+            if (nextOffset > upload.uploadLength()) {
+                throw new IllegalArgumentException("Chunk exceeds declared Upload-Length");
+            }
 
-        appendToStaging(uploadId, chunk);
-        session = session.withUpload(upload.withStatus(upload.status(), nextOffset));
-        save(session);
+            appendToStaging(uploadId, chunk);
+            session = session.withUpload(upload.withStatus(upload.status(), nextOffset));
+            save(session);
 
-        if (nextOffset == upload.uploadLength()) {
-            return finalizeUpload(session).upload();
-        }
-        return flushReadyParts(session).upload();
+            if (nextOffset == upload.uploadLength()) {
+                return finalizeUpload(session).upload();
+            }
+            return flushReadyParts(session).upload();
+        });
     }
 
     @Override
     public void abort(@NonNull String uploadId) {
-        AwsTusSession session = readRequired(uploadId);
-        if (!session.upload().inProgress()) {
-            throw new TusGoneException("Upload is no longer abortable: " + uploadId);
-        }
-        if (session.multipartUploadId() != null) {
-            try {
-                s3Client.abortMultipartUpload(AbortMultipartUploadRequest.builder()
-                    .bucket(configuration.getBucket())
-                    .key(session.upload().key())
-                    .uploadId(session.multipartUploadId())
-                    .build());
-            } catch (S3Exception e) {
-                throw new ObjectStorageException("Unable to abort AWS S3 multipart upload for tus resource", e);
+        withUploadLock(uploadId, () -> {
+            AwsTusSession session = readRequired(uploadId);
+            if (!session.upload().inProgress()) {
+                throw new TusGoneException("Upload is no longer abortable: " + uploadId);
             }
-        }
-        deleteQuietly(stagingFile(uploadId));
-        save(session.withUpload(session.upload().withStatus(TusUploadStatus.ABORTED, session.upload().offset())));
+            if (session.multipartUploadId() != null) {
+                try {
+                    s3Client.abortMultipartUpload(AbortMultipartUploadRequest.builder()
+                        .bucket(configuration.getBucket())
+                        .key(session.upload().key())
+                        .uploadId(session.multipartUploadId())
+                        .build());
+                } catch (S3Exception e) {
+                    throw new ObjectStorageException("Unable to abort AWS S3 multipart upload for tus resource", e);
+                }
+            }
+            save(session.withUpload(session.upload().withStatus(TusUploadStatus.ABORTED, session.upload().offset())));
+            deleteQuietly(stagingFile(uploadId));
+            return null;
+        });
     }
 
     private AwsTusSession finalizeUpload(AwsTusSession session) {
@@ -228,9 +247,9 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
                 throw new ObjectStorageException("Unable to complete AWS S3 multipart upload for tus resource", e);
             }
         }
-        deleteQuietly(stagingFile(session.upload().id()));
         AwsTusSession completed = session.withUpload(session.upload().withStatus(TusUploadStatus.COMPLETED, session.upload().uploadLength()));
         save(completed);
+        deleteQuietly(stagingFile(session.upload().id()));
         return completed;
     }
 
@@ -243,7 +262,8 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
     }
 
     private AwsTusSession uploadPart(AwsTusSession session, long partSize) {
-        byte[] bytes = readBytes(stagingFile(session.upload().id()), session.uploadedOffset(), partSize);
+        Path stagingFile = stagingFile(session.upload().id());
+        byte[] bytes = readBytes(stagingFile, 0L, partSize);
         try {
             UploadPartResponse response = s3Client.uploadPart(
                 UploadPartRequest.builder()
@@ -267,7 +287,13 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
                 session.nextPartNumber() + 1,
                 completedParts
             );
-            save(updated);
+            Path backupFile = compactStagingPrefix(stagingFile, bytes.length);
+            try {
+                save(updated);
+            } catch (RuntimeException e) {
+                restoreCompactedStaging(stagingFile, backupFile, e);
+            }
+            deleteBackupQuietly(backupFile);
             return updated;
         } catch (AwsServiceException e) {
             throw new ObjectStorageException("Unable to upload AWS S3 multipart tus chunk", e);
@@ -356,7 +382,7 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
                     .build());
             }
         }
-        completedParts.sort(java.util.Comparator.comparingInt(CompletedPart::partNumber));
+        completedParts.sort(Comparator.comparingInt(CompletedPart::partNumber));
 
         String uploadId = sessionFile.getFileName().toString().replaceFirst("\\.properties$", "");
         TusUpload upload = new TusUpload(
@@ -400,11 +426,98 @@ final class AwsS3TusUploadBackend implements TusUploadBackend {
         }
     }
 
+    private <T> T withUploadLock(String uploadId, Supplier<T> supplier) {
+        ReentrantLock lock = uploadLocks.computeIfAbsent(uploadId, ignored -> new ReentrantLock());
+        lock.lock();
+        try {
+            return supplier.get();
+        } finally {
+            lock.unlock();
+            if (!lock.hasQueuedThreads()) {
+                uploadLocks.remove(uploadId, lock);
+            }
+        }
+    }
+
+    private void abortMultipartUploadAfterCreateFailure(String key, String multipartUploadId, RuntimeException original) {
+        try {
+            s3Client.abortMultipartUpload(AbortMultipartUploadRequest.builder()
+                .bucket(configuration.getBucket())
+                .key(key)
+                .uploadId(multipartUploadId)
+                .build());
+        } catch (RuntimeException cleanupFailure) {
+            original.addSuppressed(cleanupFailure);
+        }
+        throw original;
+    }
+
+    private static Path compactStagingPrefix(Path stagingFile, long bytesToDiscard) {
+        if (bytesToDiscard <= 0L || !Files.exists(stagingFile)) {
+            return null;
+        }
+        Path tempFile = stagingFile.resolveSibling(stagingFile.getFileName() + ".tmp");
+        Path backupFile = stagingFile.resolveSibling(stagingFile.getFileName() + ".bak");
+        try (InputStream inputStream = Files.newInputStream(stagingFile);
+             OutputStream outputStream = Files.newOutputStream(tempFile)) {
+            inputStream.skipNBytes(bytesToDiscard);
+            inputStream.transferTo(outputStream);
+            moveReplacing(stagingFile, backupFile);
+            try {
+                moveReplacing(tempFile, stagingFile);
+            } catch (IOException e) {
+                moveReplacing(backupFile, stagingFile);
+                throw e;
+            }
+            return backupFile;
+        } catch (IOException e) {
+            deleteIfExistsQuietly(tempFile);
+            deleteIfExistsQuietly(backupFile);
+            throw new IllegalStateException("Unable to compact staged AWS tus upload data", e);
+        }
+    }
+
+    private static void restoreCompactedStaging(Path stagingFile, @Nullable Path backupFile, RuntimeException original) {
+        if (backupFile == null || !Files.exists(backupFile)) {
+            throw original;
+        }
+        try {
+            moveReplacing(backupFile, stagingFile);
+        } catch (IOException restoreFailure) {
+            original.addSuppressed(restoreFailure);
+        }
+        throw original;
+    }
+
+    private static void deleteBackupQuietly(@Nullable Path backupFile) {
+        if (backupFile != null) {
+            deleteIfExistsQuietly(backupFile);
+        }
+    }
+
     private static void deleteQuietly(Path path) {
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to clean staged AWS tus upload data", e);
+            LOGGER.log(System.Logger.Level.WARNING,
+                "Unable to clean staged AWS tus upload data: " + path,
+                e);
+        }
+    }
+
+    private static void deleteIfExistsQuietly(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignored) {
+            // best effort cleanup
+        }
+    }
+
+    private static void moveReplacing(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException e) {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
