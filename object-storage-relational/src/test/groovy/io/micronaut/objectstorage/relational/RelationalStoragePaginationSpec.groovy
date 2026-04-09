@@ -73,4 +73,32 @@ class RelationalStoragePaginationSpec extends spock.lang.Specification implement
             'tools/axe.txt',
         ]
     }
+
+    void 'prefix filtering treats SQL wildcard characters literally'() {
+        given:
+        operations.upload(UploadRequest.fromBytes('wild'.bytes, 'animals/%-literal.txt', 'text/plain'))
+        operations.upload(UploadRequest.fromBytes('wild'.bytes, 'animals/_-literal.txt', 'text/plain'))
+
+        when:
+        def percentPage = operations.listObjects(new ListObjectsRequest(10, 'animals/%'))
+        def underscorePage = operations.listObjects(new ListObjectsRequest(10, 'animals/_'))
+
+        then:
+        percentPage.keys == ['animals/%-literal.txt']
+        underscorePage.keys == ['animals/_-literal.txt']
+    }
+
+    void 'page size at integer max returns visible keys without overflowing internal limits'() {
+        when:
+        def page = operations.listObjects(new ListObjectsRequest(Integer.MAX_VALUE, 'animals/'))
+
+        then:
+        page.keys == [
+            'animals/cat.txt',
+            'animals/dog.txt',
+            'animals/mammals/fox.txt',
+            'animals/zebra.txt',
+        ]
+        page.continuationToken.empty
+    }
 }

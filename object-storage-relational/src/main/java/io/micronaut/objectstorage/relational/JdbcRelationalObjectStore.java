@@ -143,22 +143,23 @@ final class JdbcRelationalObjectStore {
         List<Object> arguments = new ArrayList<>(3);
         String prefix = toStoredPrefix(request.getPrefix().orElse(null));
         if (prefix != null) {
-            sql.append(" AND object_key LIKE ?");
-            arguments.add(prefix + '%');
+            sql.append(" AND object_key LIKE ? ESCAPE '\\'");
+            arguments.add(toLikePattern(prefix));
         }
         String continuationToken = request.getContinuationToken().map(this::toStoredKey).orElse(null);
         if (continuationToken != null) {
             sql.append(" AND object_key > ?");
             arguments.add(continuationToken);
         }
+        int fetchLimit = fetchLimit(request.getPageSize());
         sql.append(" ORDER BY object_key ASC LIMIT ?");
-        arguments.add(request.getPageSize() + 1);
+        arguments.add(fetchLimit);
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql.toString())) {
             bindArguments(statement, arguments);
             try (ResultSet resultSet = statement.executeQuery()) {
-                List<String> storedKeys = new ArrayList<>(request.getPageSize() + 1);
+                List<String> storedKeys = new ArrayList<>();
                 while (resultSet.next()) {
                     storedKeys.add(resultSet.getString(1));
                 }
@@ -192,27 +193,32 @@ final class JdbcRelationalObjectStore {
     @NonNull
     InputStream openInputStream(@NonNull String key) {
         String sql = "SELECT object_content FROM " + qualifiedTableName + " WHERE object_key = ?";
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
             statement.setString(1, toStoredKey(key));
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             if (!resultSet.next()) {
-                closeQuietly(resultSet);
-                closeQuietly(statement);
-                closeQuietly(connection);
                 throw new ObjectStorageException("No relational object found for key [" + key + "]");
             }
             InputStream inputStream = resultSet.getBinaryStream(1);
             if (inputStream == null) {
-                closeQuietly(resultSet);
-                closeQuietly(statement);
-                closeQuietly(connection);
                 throw new ObjectStorageException("No relational payload stream available for key [" + key + "]");
             }
-            return new ManagedJdbcInputStream(inputStream, resultSet, statement, connection);
+            ManagedJdbcInputStream managedInputStream = new ManagedJdbcInputStream(inputStream, resultSet, statement, connection);
+            resultSet = null;
+            statement = null;
+            connection = null;
+            return managedInputStream;
         } catch (SQLException e) {
             throw new ObjectStorageException("Error opening relational object stream for key [" + key + "]", e);
+        } finally {
+            closeQuietly(resultSet);
+            closeQuietly(statement);
+            closeQuietly(connection);
         }
     }
 
@@ -382,6 +388,23 @@ final class JdbcRelationalObjectStore {
         for (int index = 0; index < arguments.size(); index++) {
             statement.setObject(index + 1, arguments.get(index));
         }
+    }
+
+    @NonNull
+    private static String toLikePattern(@NonNull String prefix) {
+        return escapeLikePattern(prefix) + '%';
+    }
+
+    @NonNull
+    private static String escapeLikePattern(@NonNull String value) {
+        return value
+            .replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+    }
+
+    private static int fetchLimit(int pageSize) {
+        return pageSize == Integer.MAX_VALUE ? Integer.MAX_VALUE : pageSize + 1;
     }
 
     @Nullable
