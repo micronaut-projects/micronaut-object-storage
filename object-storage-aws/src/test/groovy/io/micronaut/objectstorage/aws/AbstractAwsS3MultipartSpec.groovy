@@ -3,6 +3,7 @@ package io.micronaut.objectstorage.aws
 import io.micronaut.objectstorage.MultipartObjectStorageOperations
 import io.micronaut.objectstorage.MultipartObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.bucket.BucketOperations
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import jakarta.inject.Named
@@ -27,6 +28,10 @@ abstract class AbstractAwsS3MultipartSpec extends MultipartObjectStorageOperatio
     @Named(OBJECT_STORAGE_NAME)
     AwsS3Operations awsS3Bucket
 
+    @Inject
+    @Named(OBJECT_STORAGE_NAME)
+    AwsS3BucketOperations awsS3BucketOperations
+
     void setup() {
         s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
     }
@@ -38,6 +43,11 @@ abstract class AbstractAwsS3MultipartSpec extends MultipartObjectStorageOperatio
     @Override
     ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> getObjectStorage() {
         return awsS3Bucket
+    }
+
+    @Override
+    BucketOperations<?> getBucketOperations() {
+        return awsS3BucketOperations
     }
 
     @Override
