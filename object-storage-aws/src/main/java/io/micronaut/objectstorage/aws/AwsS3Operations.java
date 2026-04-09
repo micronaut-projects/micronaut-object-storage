@@ -505,8 +505,11 @@ public class AwsS3Operations implements ObjectStorageOperations<
             BytesUploadRequest request = (BytesUploadRequest) uploadRequest;
             return new RequestBodyWithSize(RequestBody.fromBytes(request.getBytes()), request.getBytes().length);
         } else {
-            byte[] inputBytes = inputStreamMapper.toByteArray(uploadRequest.getInputStream());
-            return new RequestBodyWithSize(RequestBody.fromBytes(inputBytes), inputBytes.length);
+            long size = uploadRequest.getContentSize()
+                .orElseThrow(() -> new ObjectStorageException(
+                    "Multipart uploads require UploadRequest#getContentSize() for streaming requests"
+                ));
+            return new RequestBodyWithSize(RequestBody.fromInputStream(uploadRequest.getInputStream(), size), size);
         }
     }
 
