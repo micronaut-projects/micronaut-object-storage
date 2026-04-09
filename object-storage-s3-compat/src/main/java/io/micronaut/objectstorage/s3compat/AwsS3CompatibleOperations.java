@@ -16,43 +16,52 @@
 package io.micronaut.objectstorage.s3compat;
 
 import io.micronaut.objectstorage.ObjectStorageException;
-import io.micronaut.objectstorage.local.LocalStorageEntry;
-import io.micronaut.objectstorage.local.LocalStorageOperations;
+import io.micronaut.objectstorage.aws.AwsS3Configuration;
+import io.micronaut.objectstorage.aws.AwsS3ObjectStorageEntry;
+import io.micronaut.objectstorage.aws.AwsS3Operations;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Local storage bridge for the S3-compatible transport layer.
+ * AWS S3 bridge for the S3-compatible transport layer.
  *
  * @author Álvaro Sánchez-Mariscal
  * @since 3.0.0
  */
-public final class LocalStorageS3CompatibleOperations extends AbstractS3CompatibleOperations {
+public final class AwsS3CompatibleOperations extends AbstractS3CompatibleOperations {
 
-    private final LocalStorageOperations operations;
+    private final AwsS3Configuration awsConfiguration;
+    private final AwsS3Operations operations;
+    private final S3Client s3Client;
 
-    LocalStorageS3CompatibleOperations(@NonNull S3CompatibilityConfiguration configuration,
-                                       @NonNull LocalStorageOperations operations) {
+    AwsS3CompatibleOperations(@NonNull S3CompatibilityConfiguration configuration,
+                              @NonNull AwsS3Configuration awsConfiguration,
+                              @NonNull AwsS3Operations operations,
+                              @NonNull S3Client s3Client) {
         super(configuration);
+        this.awsConfiguration = awsConfiguration;
         this.operations = operations;
+        this.s3Client = s3Client;
     }
 
     @Override
     @NonNull
     public Optional<S3Object> getObject(@NonNull String key) {
         return operations.retrieve(resolveStorageKey(key))
-            .map(entry -> new S3Object(stripBasePath(entry.getKey()), entry, size(entry.getNativeEntry()), lastModified(entry.getNativeEntry())));
+            .map(entry -> toObject(stripBasePath(entry.getKey()), entry));
     }
 
     @Override
@@ -96,32 +105,35 @@ public final class LocalStorageS3CompatibleOperations extends AbstractS3Compatib
     }
 
     @NonNull
-    private S3ObjectSummary toObjectSummary(@NonNull String storageKey) {
-        Path path = operations.retrieve(storageKey)
-            .map(LocalStorageEntry::getNativeEntry)
-            .orElse(null);
-        return new S3ObjectSummary(
-            stripBasePath(storageKey),
-            path == null ? null : size(path),
-            path == null ? null : lastModified(path)
+    private S3Object toObject(@NonNull String key, @NonNull AwsS3ObjectStorageEntry entry) {
+        return new S3Object(
+            key,
+            entry,
+            entry.getNativeEntry().contentLength(),
+            entry.getNativeEntry().lastModified()
         );
     }
 
-    @Nullable
-    private static Long size(@NonNull Path path) {
+    @NonNull
+    private S3ObjectSummary toObjectSummary(@NonNull String storageKey) {
+        HeadObjectResponse response = headObject(storageKey);
+        return new S3ObjectSummary(
+            stripBasePath(storageKey),
+            response.contentLength(),
+            response.lastModified()
+        );
+    }
+
+    @NonNull
+    private HeadObjectResponse headObject(@NonNull String storageKey) {
         try {
-            return Files.size(path);
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error reading local object size: " + path, e);
+            return s3Client.headObject(HeadObjectRequest.builder()
+                .bucket(awsConfiguration.getBucket())
+                .key(storageKey)
+                .build());
+        } catch (AwsServiceException | SdkClientException e) {
+            throw new ObjectStorageException("Error reading object metadata from Amazon S3 for key [" + storageKey + ']', e);
         }
     }
 
-    @Nullable
-    private static Instant lastModified(@NonNull Path path) {
-        try {
-            return Files.getLastModifiedTime(path).toInstant();
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error reading local object timestamp: " + path, e);
-        }
-    }
 }

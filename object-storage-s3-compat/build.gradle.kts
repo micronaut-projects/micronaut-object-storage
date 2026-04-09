@@ -11,6 +11,7 @@ dependencies {
     implementation(mn.micronaut.jackson.databind)
     implementation(mn.micronaut.http.server)
     implementation(mnValidation.micronaut.validation)
+    implementation(projects.micronautObjectStorageAws)
     implementation(projects.micronautObjectStorageLocal)
 
     testImplementation(platform(mnAws.micronaut.aws.bom))
@@ -19,6 +20,12 @@ dependencies {
     testImplementation(mn.micronaut.http.client)
     testImplementation(mn.micronaut.http.server.netty)
     testImplementation(mnValidation.micronaut.validation.processor)
+    testImplementation(mnTestResources.testcontainers.localstack)
+    testImplementation(project(":test-suite-utils"))
+
+    testImplementation(libs.amazon.awssdk.v1) {
+        because("it is required by testcontainers-localstack")
+    }
 }
 
 micronautBuild {

@@ -41,7 +41,9 @@ Current limitations:
 
 * this is a focused compatibility subset, not a full Amazon S3 replacement
 * multipart upload routes are not exposed yet
-* the included bridge targets Micronaut Local Storage; additional providers can add dedicated `S3CompatibleOperations` adapters later
+* the included bridge supports Micronaut Local Storage and AWS S3
+
+If the same `storage` bean name exists in multiple providers, set `micronaut.object-storage.s3-compat.<bucket>.storage-provider` to `local` or `aws` to disambiguate the backing adapter explicitly.
 
 For local development you can disable request signing entirely with `micronaut.object-storage.s3-compat.auth-mode=none`, but SigV4 should be the default compatibility story for real S3 client integrations.
 

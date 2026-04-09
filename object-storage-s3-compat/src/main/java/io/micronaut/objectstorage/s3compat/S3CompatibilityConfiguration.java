@@ -52,6 +52,9 @@ public class S3CompatibilityConfiguration extends AbstractObjectStorageConfigura
     private String storage;
 
     @Nullable
+    private S3CompatibilityStorageProvider storageProvider;
+
+    @Nullable
     private String basePath;
 
     public S3CompatibilityConfiguration(@Parameter String name) {
@@ -71,6 +74,21 @@ public class S3CompatibilityConfiguration extends AbstractObjectStorageConfigura
      */
     public void setStorage(@NonNull String storage) {
         this.storage = storage;
+    }
+
+    /**
+     * @return The optional backing provider hint used when multiple providers share the same storage bean name.
+     */
+    @NonNull
+    public Optional<S3CompatibilityStorageProvider> getStorageProvider() {
+        return Optional.ofNullable(storageProvider);
+    }
+
+    /**
+     * @param storageProvider The optional backing provider hint.
+     */
+    public void setStorageProvider(@Nullable S3CompatibilityStorageProvider storageProvider) {
+        this.storageProvider = storageProvider;
     }
 
     /**
