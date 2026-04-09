@@ -1,0 +1,79 @@
+Multipart uploads are available through api:objectstorage.MultipartObjectStorageOperations[].
+This contract is additive to api:objectstorage.ObjectStorageOperations[] so existing single-object upload code does not change.
+
+The multipart lifecycle uses the following portable request and response types:
+
+- api:objectstorage.request.CreateMultipartUploadRequest[]
+- api:objectstorage.request.UploadPartRequest[]
+- api:objectstorage.request.ListMultipartPartsRequest[]
+- api:objectstorage.request.CompleteMultipartUploadRequest[]
+- api:objectstorage.request.AbortMultipartUploadRequest[]
+- api:objectstorage.MultipartUploadHandle[]
+- api:objectstorage.MultipartPart[]
+
+== Support Matrix
+
+[cols="1,1"]
+|===
+| Backend | Multipart lifecycle support
+
+| Amazon S3
+| Supported
+
+| Azure Blob Storage
+| Not yet supported
+
+| Google Cloud Storage
+| Not yet supported
+
+| Oracle Cloud Infrastructure Object Storage
+| Not yet supported
+
+| Local Storage
+| Not yet supported
+|===
+
+== Lifecycle Rules
+
+- `createMultipartUpload` returns an opaque upload id and does not imply any background cleanup guarantee.
+- In-progress multipart uploads remain caller-owned resources until they are completed or aborted.
+- `uploadPart` associates a numbered part with a previously created upload handle.
+- `listParts` is read-only and exposes provider pagination through opaque continuation tokens.
+- `completeMultipartUpload` requires a strictly ordered part manifest.
+- Retrying `completeMultipartUpload` is only safe when reusing the same upload id and exact part manifest.
+- `abortMultipartUpload` is safe to retry.
+
+== Example
+
+[source,java]
+----
+import io.micronaut.objectstorage.MultipartObjectStorageOperations;
+import io.micronaut.objectstorage.request.AbortMultipartUploadRequest;
+import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest;
+import io.micronaut.objectstorage.request.CreateMultipartUploadRequest;
+import io.micronaut.objectstorage.request.UploadPartRequest;
+import io.micronaut.objectstorage.request.UploadRequest;
+
+MultipartObjectStorageOperations<?, ?, ?> multipart = ...
+
+var createResponse = multipart.createMultipartUpload(
+    new CreateMultipartUploadRequest("videos/demo.mp4", "video/mp4")
+);
+var upload = createResponse.getUpload();
+
+var firstPart = multipart.uploadPart(
+    new UploadPartRequest(upload, 1, UploadRequest.fromBytes(chunkOne, upload.getKey(), "video/mp4"))
+);
+var secondPart = multipart.uploadPart(
+    new UploadPartRequest(upload, 2, UploadRequest.fromBytes(chunkTwo, upload.getKey(), "video/mp4"))
+);
+
+try {
+    multipart.completeMultipartUpload(
+        new CompleteMultipartUploadRequest(upload, List.of(firstPart.getPart(), secondPart.getPart()))
+    );
+} catch (RuntimeException e) {
+    multipart.abortMultipartUpload(new AbortMultipartUploadRequest(upload));
+    throw e;
+}
+----
