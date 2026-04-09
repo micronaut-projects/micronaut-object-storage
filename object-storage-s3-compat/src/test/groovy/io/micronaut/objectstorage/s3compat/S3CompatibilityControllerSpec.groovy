@@ -26,11 +26,11 @@ class S3CompatibilityControllerSpec extends Specification {
             HttpRequest.PUT('/assets/docs/hello.txt', body).contentType(MediaType.TEXT_PLAIN_TYPE),
             new ByteArrayInputStream(body)
         )
-        def headResponse = controller.headObject('assets', 'docs/hello.txt')
-        def getResponse = controller.getObject('assets', 'docs/hello.txt')
-        def listResponse = controller.listObjectsV2('assets', 2, 'docs/', null, 1000)
-        def deleteResponse = controller.deleteObject('assets', 'docs/hello.txt')
-        def missingResponse = controller.getObject('assets', 'docs/hello.txt')
+        def headResponse = controller.headObject('assets', 'docs/hello.txt', HttpRequest.HEAD('/assets/docs/hello.txt'))
+        def getResponse = controller.getObject('assets', 'docs/hello.txt', HttpRequest.GET('/assets/docs/hello.txt'))
+        def listResponse = controller.listObjectsV2('assets', 2, 'docs/', null, 1000, HttpRequest.GET('/assets?list-type=2&prefix=docs/&max-keys=1000'))
+        def deleteResponse = controller.deleteObject('assets', 'docs/hello.txt', HttpRequest.DELETE('/assets/docs/hello.txt'))
+        def missingResponse = controller.getObject('assets', 'docs/hello.txt', HttpRequest.GET('/assets/docs/hello.txt'))
 
         then:
         putResponse.status() == HttpStatus.OK
@@ -68,8 +68,8 @@ class S3CompatibilityControllerSpec extends Specification {
         S3CompatibilityController controller = context.getBean(S3CompatibilityController)
 
         when:
-        def missingBucket = controller.getObject('missing', 'docs/hello.txt')
-        def missingKey = controller.getObject('assets', 'docs/hello.txt')
+        def missingBucket = controller.getObject('missing', 'docs/hello.txt', HttpRequest.GET('/missing/docs/hello.txt'))
+        def missingKey = controller.getObject('assets', 'docs/hello.txt', HttpRequest.GET('/assets/docs/hello.txt'))
 
         then:
         missingBucket.status() == HttpStatus.NOT_FOUND
@@ -97,7 +97,7 @@ class S3CompatibilityControllerSpec extends Specification {
         S3CompatibilityController controller = context.getBean(S3CompatibilityController)
 
         when:
-        def response = controller.listObjectsV2('assets', 1, null, null, 1000)
+        def response = controller.listObjectsV2('assets', 1, null, null, 1000, HttpRequest.GET('/assets?list-type=1&max-keys=1000'))
 
         then:
         response.status() == HttpStatus.BAD_REQUEST

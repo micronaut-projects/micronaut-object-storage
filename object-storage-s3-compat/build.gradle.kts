@@ -13,6 +13,9 @@ dependencies {
     implementation(mnValidation.micronaut.validation)
     implementation(projects.micronautObjectStorageLocal)
 
+    testImplementation(platform(mnAws.micronaut.aws.bom))
+    testImplementation(mnAws.micronaut.aws.sdk.v2)
+    testImplementation(libs.amazon.awssdk.s3)
     testImplementation(mn.micronaut.http.client)
     testImplementation(mn.micronaut.http.server.netty)
     testImplementation(mnValidation.micronaut.validation.processor)

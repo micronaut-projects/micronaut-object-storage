@@ -30,10 +30,13 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
+import java.util.Optional;
 
 /**
  * Minimal path-style S3-compatible controller backed by configured object-storage beans.
@@ -42,21 +45,29 @@ import java.time.ZoneOffset;
  * @since 3.0.0
  */
 @Controller
+@ExecuteOn(TaskExecutors.BLOCKING)
 public final class S3CompatibilityController {
 
     private static final DateTimeFormatter RFC_1123 = DateTimeFormatter.RFC_1123_DATE_TIME;
 
     private final S3CompatibilityBucketResolver bucketResolver;
+    private final S3CompatibilityRequestValidator requestValidator;
 
-    public S3CompatibilityController(S3CompatibilityBucketResolver bucketResolver) {
+    public S3CompatibilityController(S3CompatibilityBucketResolver bucketResolver,
+                                     S3CompatibilityRequestValidator requestValidator) {
         this.bucketResolver = bucketResolver;
+        this.requestValidator = requestValidator;
     }
 
-    @Put(uri = "/{bucket}/{+key}")
+    @Put(uri = "/{bucket}/{+key}", consumes = MediaType.ALL)
     public HttpResponse<?> putObject(@PathVariable String bucket,
                                      @PathVariable String key,
                                      HttpRequest<?> request,
                                      @Body InputStream body) {
+        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
+        if (validation.isPresent()) {
+            return validation.get();
+        }
         var resolved = bucketResolver.resolve(bucket);
         if (resolved.isEmpty()) {
             return noSuchBucket(bucket);
@@ -73,9 +84,14 @@ public final class S3CompatibilityController {
         return HttpResponse.ok().header(HttpHeaders.ETAG, response.getETag());
     }
 
-    @Get(uri = "/{bucket}/{+key}")
+    @Get(uri = "/{bucket}/{+key}", headRoute = false)
     public HttpResponse<?> getObject(@PathVariable String bucket,
-                                     @PathVariable String key) {
+                                     @PathVariable String key,
+                                     HttpRequest<?> request) {
+        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
+        if (validation.isPresent()) {
+            return validation.get();
+        }
         var resolved = bucketResolver.resolve(bucket);
         if (resolved.isEmpty()) {
             return noSuchBucket(bucket);
@@ -87,7 +103,12 @@ public final class S3CompatibilityController {
 
     @Head(uri = "/{bucket}/{+key}")
     public HttpResponse<?> headObject(@PathVariable String bucket,
-                                      @PathVariable String key) {
+                                      @PathVariable String key,
+                                      HttpRequest<?> request) {
+        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
+        if (validation.isPresent()) {
+            return validation.get();
+        }
         var resolved = bucketResolver.resolve(bucket);
         if (resolved.isEmpty()) {
             return noSuchBucket(bucket);
@@ -99,7 +120,12 @@ public final class S3CompatibilityController {
 
     @Delete(uri = "/{bucket}/{+key}")
     public HttpResponse<?> deleteObject(@PathVariable String bucket,
-                                        @PathVariable String key) {
+                                        @PathVariable String key,
+                                        HttpRequest<?> request) {
+        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
+        if (validation.isPresent()) {
+            return validation.get();
+        }
         var resolved = bucketResolver.resolve(bucket);
         if (resolved.isEmpty()) {
             return noSuchBucket(bucket);
@@ -108,12 +134,17 @@ public final class S3CompatibilityController {
         return HttpResponse.noContent();
     }
 
-    @Get(uri = "/{bucket}", produces = MediaType.APPLICATION_XML)
+    @Get(uri = "/{bucket}", produces = MediaType.APPLICATION_XML, headRoute = false)
     public HttpResponse<String> listObjectsV2(@PathVariable String bucket,
                                               @QueryValue("list-type") int listType,
                                               @Nullable @QueryValue String prefix,
                                               @Nullable @QueryValue("continuation-token") String continuationToken,
-                                              @QueryValue(value = "max-keys", defaultValue = "1000") int maxKeys) {
+                                              @QueryValue(value = "max-keys", defaultValue = "1000") int maxKeys,
+                                              HttpRequest<?> request) {
+        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
+        if (validation.isPresent()) {
+            return validation.get();
+        }
         if (listType != 2) {
             return error(
                 io.micronaut.http.HttpStatus.BAD_REQUEST,

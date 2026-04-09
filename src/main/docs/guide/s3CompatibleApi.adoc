@@ -17,6 +17,10 @@ micronaut:
         enabled: true
     s3-compat:
       enabled: true
+      auth-mode: sigv4
+      access-key-id: local-s3-access-key
+      secret-access-key: local-s3-secret-key
+      region: us-east-1
       assets:
         enabled: true
         storage: default
@@ -30,14 +34,16 @@ The current implementation is intentionally narrow:
 * path-style routing only (`/{bucket}/{key}`)
 * one configured bucket mapping per entry under `micronaut.object-storage.s3-compat`
 * object upload, download, head, delete, and `ListObjectsV2`
+* SigV4 request validation for AWS SDK / CLI compatible clients
 * S3-style XML error payloads for missing buckets, missing keys, and invalid list requests
 
 Current limitations:
 
 * this is a focused compatibility subset, not a full Amazon S3 replacement
-* SigV4 request verification is not implemented yet
 * multipart upload routes are not exposed yet
 * the included bridge targets Micronaut Local Storage; additional providers can add dedicated `S3CompatibleOperations` adapters later
+
+For local development you can disable request signing entirely with `micronaut.object-storage.s3-compat.auth-mode=none`, but SigV4 should be the default compatibility story for real S3 client integrations.
 
 Configuration references:
 
