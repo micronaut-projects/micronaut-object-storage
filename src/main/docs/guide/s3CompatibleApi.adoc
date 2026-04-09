@@ -1,0 +1,46 @@
+== S3-Compatible API
+
+The `micronaut-object-storage-s3-compat` module adds an opt-in HTTP surface that exposes a focused, path-style subset of Amazon S3 semantics on top of Micronaut Object Storage.
+
+Add the dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-s3-compat[]
+
+Enable the module and map one exposed S3 bucket to one configured Micronaut object storage bean:
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    local:
+      default:
+        enabled: true
+    s3-compat:
+      enabled: true
+      assets:
+        enabled: true
+        storage: default
+        base-path: exports/public
+----
+
+The configuration above exposes the logical S3 bucket `assets` while storing the actual objects under the `exports/public/` prefix in the backing Micronaut storage bean.
+
+The current implementation is intentionally narrow:
+
+* path-style routing only (`/{bucket}/{key}`)
+* one configured bucket mapping per entry under `micronaut.object-storage.s3-compat`
+* object upload, download, head, delete, and `ListObjectsV2`
+* S3-style XML error payloads for missing buckets, missing keys, and invalid list requests
+
+Current limitations:
+
+* this is a focused compatibility subset, not a full Amazon S3 replacement
+* SigV4 request verification is not implemented yet
+* multipart upload routes are not exposed yet
+* the included bridge targets Micronaut Local Storage; additional providers can add dedicated `S3CompatibleOperations` adapters later
+
+Configuration references:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.s3compat.S3CompatibilityModuleConfiguration.adoc[]
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.s3compat.S3CompatibilityConfiguration.adoc[]

@@ -24,7 +24,7 @@ class S3CompatibilityControllerSpec extends Specification {
             'assets',
             'docs/hello.txt',
             HttpRequest.PUT('/assets/docs/hello.txt', body).contentType(MediaType.TEXT_PLAIN_TYPE),
-            body
+            new ByteArrayInputStream(body)
         )
         def headResponse = controller.headObject('assets', 'docs/hello.txt')
         def getResponse = controller.getObject('assets', 'docs/hello.txt')
@@ -53,6 +53,57 @@ class S3CompatibilityControllerSpec extends Specification {
         and:
         deleteResponse.status() == HttpStatus.NO_CONTENT
         missingResponse.status() == HttpStatus.NOT_FOUND
+
+        cleanup:
+        context.close()
+    }
+
+    void 'it returns s3 xml errors for missing buckets and keys'() {
+        given:
+        ApplicationContext context = ApplicationContext.run([
+            'micronaut.object-storage.local.default.enabled'    : 'true',
+            'micronaut.object-storage.s3-compat.assets.storage' : 'default',
+            'micronaut.object-storage.s3-compat.assets.enabled' : 'true',
+        ])
+        S3CompatibilityController controller = context.getBean(S3CompatibilityController)
+
+        when:
+        def missingBucket = controller.getObject('missing', 'docs/hello.txt')
+        def missingKey = controller.getObject('assets', 'docs/hello.txt')
+
+        then:
+        missingBucket.status() == HttpStatus.NOT_FOUND
+        missingBucket.contentType.get() == MediaType.APPLICATION_XML_TYPE
+        missingBucket.body().contains('<Code>NoSuchBucket</Code>')
+        missingBucket.body().contains('<BucketName>missing</BucketName>')
+
+        and:
+        missingKey.status() == HttpStatus.NOT_FOUND
+        missingKey.contentType.get() == MediaType.APPLICATION_XML_TYPE
+        missingKey.body().contains('<Code>NoSuchKey</Code>')
+        missingKey.body().contains('<Key>docs/hello.txt</Key>')
+
+        cleanup:
+        context.close()
+    }
+
+    void 'it returns an xml invalid request error for unsupported list variants'() {
+        given:
+        ApplicationContext context = ApplicationContext.run([
+            'micronaut.object-storage.local.default.enabled'    : 'true',
+            'micronaut.object-storage.s3-compat.assets.storage' : 'default',
+            'micronaut.object-storage.s3-compat.assets.enabled' : 'true',
+        ])
+        S3CompatibilityController controller = context.getBean(S3CompatibilityController)
+
+        when:
+        def response = controller.listObjectsV2('assets', 1, null, null, 1000)
+
+        then:
+        response.status() == HttpStatus.BAD_REQUEST
+        response.contentType.get() == MediaType.APPLICATION_XML_TYPE
+        response.body().contains('<Code>InvalidRequest</Code>')
+        response.body().contains('list-type=2')
 
         cleanup:
         context.close()

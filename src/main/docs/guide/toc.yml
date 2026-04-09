@@ -4,6 +4,7 @@ quickStart: Quick Start
 reactiveOperations: Reactive Operations
 preSignedUploads: Pre-Signed Uploads
 paginatedListing: Paginated Listing
+s3CompatibleApi: S3-Compatible API
 bucketManagement: Bucket and Container Management
 aws: Amazon S3
 azure: Azure Blob Storage

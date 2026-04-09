@@ -31,8 +31,9 @@ import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 
-import java.time.ZoneOffset;
+import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 
 /**
  * Minimal path-style S3-compatible controller backed by configured object-storage beans.
@@ -55,17 +56,17 @@ public final class S3CompatibilityController {
     public HttpResponse<?> putObject(@PathVariable String bucket,
                                      @PathVariable String key,
                                      HttpRequest<?> request,
-                                     @Body byte[] body) {
+                                     @Body InputStream body) {
         var resolved = bucketResolver.resolve(bucket);
         if (resolved.isEmpty()) {
-            return HttpResponse.notFound();
+            return noSuchBucket(bucket);
         }
         Long contentLength = request.getHeaders().contentLength().isPresent()
             ? request.getHeaders().contentLength().getAsLong()
             : null;
         var response = resolved.get().operations().putObject(
             key,
-            new java.io.ByteArrayInputStream(body),
+            body,
             contentLength,
             request.getContentType().map(MediaType::toString).orElse(null)
         );
@@ -75,28 +76,36 @@ public final class S3CompatibilityController {
     @Get(uri = "/{bucket}/{+key}")
     public HttpResponse<?> getObject(@PathVariable String bucket,
                                      @PathVariable String key) {
-        return bucketResolver.resolve(bucket)
-            .flatMap(resolved -> resolved.operations().getObject(key).map(this::ok))
-            .orElseGet(HttpResponse::notFound);
+        var resolved = bucketResolver.resolve(bucket);
+        if (resolved.isEmpty()) {
+            return noSuchBucket(bucket);
+        }
+        return resolved.get().operations().getObject(key)
+            .<HttpResponse<?>>map(this::ok)
+            .orElseGet(() -> noSuchKey(bucket, key));
     }
 
     @Head(uri = "/{bucket}/{+key}")
     public HttpResponse<?> headObject(@PathVariable String bucket,
                                       @PathVariable String key) {
-        return bucketResolver.resolve(bucket)
-            .flatMap(resolved -> resolved.operations().getObject(key).map(this::head))
-            .orElseGet(HttpResponse::notFound);
+        var resolved = bucketResolver.resolve(bucket);
+        if (resolved.isEmpty()) {
+            return noSuchBucket(bucket);
+        }
+        return resolved.get().operations().getObject(key)
+            .<HttpResponse<?>>map(this::head)
+            .orElseGet(() -> noSuchKey(bucket, key));
     }
 
     @Delete(uri = "/{bucket}/{+key}")
     public HttpResponse<?> deleteObject(@PathVariable String bucket,
                                         @PathVariable String key) {
-        return bucketResolver.resolve(bucket)
-            .map(resolved -> {
-                resolved.operations().deleteObject(key);
-                return HttpResponse.noContent();
-            })
-            .orElseGet(HttpResponse::notFound);
+        var resolved = bucketResolver.resolve(bucket);
+        if (resolved.isEmpty()) {
+            return noSuchBucket(bucket);
+        }
+        resolved.get().operations().deleteObject(key);
+        return HttpResponse.noContent();
     }
 
     @Get(uri = "/{bucket}", produces = MediaType.APPLICATION_XML)
@@ -106,16 +115,26 @@ public final class S3CompatibilityController {
                                               @Nullable @QueryValue("continuation-token") String continuationToken,
                                               @QueryValue(value = "max-keys", defaultValue = "1000") int maxKeys) {
         if (listType != 2) {
-            return HttpResponse.notFound();
+            return error(
+                io.micronaut.http.HttpStatus.BAD_REQUEST,
+                "InvalidRequest",
+                "This endpoint only supports list-type=2",
+                bucket,
+                null
+            );
         }
-        return bucketResolver.resolve(bucket)
-            .map(resolved -> {
-                S3ListResponse response = resolved.operations()
-                    .listObjects(new ListObjectsRequest(maxKeys, prefix, continuationToken));
-                return HttpResponse.ok(renderListObjectsV2(bucket, prefix, maxKeys, continuationToken, response))
-                    .contentType(MediaType.APPLICATION_XML_TYPE);
-            })
-            .orElseGet(HttpResponse::notFound);
+        var resolved = bucketResolver.resolve(bucket);
+        if (resolved.isEmpty()) {
+            return noSuchBucket(bucket);
+        }
+        try {
+            S3ListResponse response = resolved.get().operations()
+                .listObjects(new ListObjectsRequest(maxKeys, prefix, continuationToken));
+            return HttpResponse.ok(renderListObjectsV2(bucket, prefix, maxKeys, continuationToken, response))
+                .contentType(MediaType.APPLICATION_XML_TYPE);
+        } catch (IllegalArgumentException e) {
+            return error(io.micronaut.http.HttpStatus.BAD_REQUEST, "InvalidArgument", e.getMessage(), bucket, null);
+        }
     }
 
     private MutableHttpResponse<?> ok(S3Object object) {
@@ -169,5 +188,50 @@ public final class S3CompatibilityController {
             .replace(">", "&gt;")
             .replace("\"", "&quot;")
             .replace("'", "&apos;");
+    }
+
+    private HttpResponse<String> noSuchBucket(String bucket) {
+        return error(
+            io.micronaut.http.HttpStatus.NOT_FOUND,
+            "NoSuchBucket",
+            "The specified bucket does not exist",
+            bucket,
+            null
+        );
+    }
+
+    private HttpResponse<String> noSuchKey(String bucket, String key) {
+        return error(
+            io.micronaut.http.HttpStatus.NOT_FOUND,
+            "NoSuchKey",
+            "The specified key does not exist",
+            bucket,
+            key
+        );
+    }
+
+    private HttpResponse<String> error(io.micronaut.http.HttpStatus status,
+                                       String code,
+                                       String message,
+                                       @Nullable String bucket,
+                                       @Nullable String key) {
+        StringBuilder xml = new StringBuilder(192);
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        xml.append("<Error>");
+        xml.append("<Code>").append(escapeXml(code)).append("</Code>");
+        xml.append("<Message>").append(escapeXml(message)).append("</Message>");
+        if (bucket != null && !bucket.isEmpty()) {
+            xml.append("<BucketName>").append(escapeXml(bucket)).append("</BucketName>");
+        }
+        if (key != null && !key.isEmpty()) {
+            xml.append("<Key>").append(escapeXml(key)).append("</Key>");
+            xml.append("<Resource>").append(escapeXml('/' + bucket + '/' + key)).append("</Resource>");
+        } else if (bucket != null && !bucket.isEmpty()) {
+            xml.append("<Resource>").append(escapeXml('/' + bucket)).append("</Resource>");
+        }
+        xml.append("</Error>");
+        return HttpResponse.status(status)
+            .contentType(MediaType.APPLICATION_XML_TYPE)
+            .body(xml.toString());
     }
 }
