@@ -1,0 +1,36 @@
+The `object-storage-tus` module adds an opt-in tus 1.0 resumable upload endpoint for Micronaut Object Storage.
+
+Enable the module and configure at least one local object storage backend:
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    tus:
+      enabled: true
+      base-path: /tus
+    local:
+      default:
+        enabled: true
+----
+
+Requests use the route pattern `/tus/{storageName}` and `/tus/{storageName}/{uploadId}`.
+
+The initial reference implementation is backed by `LocalStorageOperations`:
+
+- `OPTIONS` advertises tus version `1.0.0` plus the `creation` and `termination` extensions.
+- `POST` creates a resumable upload and requires `Upload-Length` plus `Upload-Metadata` containing a base64-encoded `key`.
+- `HEAD` returns the authoritative `Upload-Offset`.
+- `PATCH` appends bytes at the exact `Upload-Offset` and finalizes the object automatically when the declared length is reached.
+- `DELETE` aborts an in-progress upload.
+
+Example `Upload-Metadata` header:
+
+[source,text]
+----
+Upload-Metadata: key cGhvdG9zL3Byb2ZpbGUucG5n,contentType aW1hZ2UvcG5n
+----
+
+Additional metadata entries are persisted with the completed object.
+
+The local backend stores temporary tus session state under the local storage metadata directory so incomplete uploads do not appear in normal object listings.

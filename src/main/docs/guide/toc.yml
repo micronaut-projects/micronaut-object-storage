@@ -5,6 +5,7 @@ reactiveOperations: Reactive Operations
 preSignedUploads: Pre-Signed Uploads
 paginatedListing: Paginated Listing
 bucketManagement: Bucket and Container Management
+tusUploads: tus Resumable Uploads
 aws: Amazon S3
 azure: Azure Blob Storage
 gcp: Google Cloud Storage
