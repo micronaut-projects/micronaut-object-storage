@@ -57,4 +57,29 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         then:
         thrown IllegalArgumentException
     }
+
+    void 'it rejects reserved bucket names'() {
+        when:
+        getBucketOperations().create('.metadata')
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message == 'Bucket name uses the reserved .metadata namespace: .metadata'
+    }
+
+    void 'failed bucket delete preserves metadata sidecars'() {
+        given:
+        Path bucket = rootDirectory.resolve('stuck')
+        Files.writeString(bucket, 'not-a-directory')
+        Path metadataFile = rootDirectory.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets').resolve('stuck')
+        Files.createDirectories(metadataFile.parent)
+        Files.writeString(metadataFile, 'owner=cliponaut')
+
+        when:
+        getBucketOperations().delete('stuck')
+
+        then:
+        thrown IllegalStateException
+        Files.exists(metadataFile)
+    }
 }

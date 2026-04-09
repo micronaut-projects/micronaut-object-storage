@@ -31,6 +31,8 @@ import java.util.Properties;
 
 final class LocalStorageMetadataSupport {
 
+    private static final String FORMAT_MARKER_KEY = "micronaut.local.metadata.format";
+    private static final String STRUCTURED_FORMAT_VERSION = "structured-v1";
     private static final String METADATA_PREFIX = "metadata.";
     private static final String ATTRIBUTE_PREFIX = "attribute.";
     private static final String SYSTEM_PREFIX = "system.";
@@ -70,6 +72,7 @@ final class LocalStorageMetadataSupport {
 
     static Properties toProperties(ObjectMetadataWrite write) {
         Properties properties = new Properties();
+        properties.setProperty(FORMAT_MARKER_KEY, STRUCTURED_FORMAT_VERSION);
         putPrefixed(properties, METADATA_PREFIX, write.metadata());
         putPrefixed(properties, ATTRIBUTE_PREFIX, write.attributes());
         putIfPresent(properties, CONTENT_TYPE_KEY, write.contentType());
@@ -81,6 +84,7 @@ final class LocalStorageMetadataSupport {
 
     static Properties toProperties(BucketMetadataWrite write) {
         Properties properties = new Properties();
+        properties.setProperty(FORMAT_MARKER_KEY, STRUCTURED_FORMAT_VERSION);
         putPrefixed(properties, METADATA_PREFIX, write.metadata());
         putPrefixed(properties, ATTRIBUTE_PREFIX, write.attributes());
         return properties;
@@ -95,9 +99,7 @@ final class LocalStorageMetadataSupport {
     }
 
     private static boolean isStructured(Properties properties) {
-        return properties.stringPropertyNames().stream().anyMatch(name ->
-            name.startsWith(METADATA_PREFIX) || name.startsWith(ATTRIBUTE_PREFIX) || name.startsWith(SYSTEM_PREFIX)
-        );
+        return STRUCTURED_FORMAT_VERSION.equals(properties.getProperty(FORMAT_MARKER_KEY));
     }
 
     private static Map<String, String> readLegacyMetadata(Properties properties) {

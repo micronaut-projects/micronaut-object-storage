@@ -44,4 +44,21 @@ class LocalStorageBucketMetadataOperationsSpec extends BucketMetadataOperationsS
     ObjectStorageOperations<?, ?, ?> getObjectStorage() {
         ctx.getBean(LocalStorageOperations)
     }
+
+    void 'it rejects invalid bucket metadata names consistently'() {
+        when:
+        getBucketMetadataOperations().retrieve(name)
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        getBucketMetadataOperations().delete(name)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        name << ['..', 'foo/bar', '.metadata']
+    }
 }

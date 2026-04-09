@@ -52,9 +52,10 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
         if (rootDirectory == null) {
             throw new IllegalArgumentException("Local storage bucket metadata operations require a bucket path with a parent directory");
         }
-        this.metadataRoot = rootDirectory.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve(BUCKETS_DIRECTORY);
+        Path metadataDirectory = rootDirectory.resolve(LocalStorageOperations.METADATA_DIRECTORY);
+        this.metadataRoot = metadataDirectory.resolve(BUCKETS_DIRECTORY);
         this.supportsPosixPermissions = rootDirectory.getFileSystem().supportedFileAttributeViews().contains("posix");
-        if (!LocalStorageIoSupport.mkdirs(metadataRoot, metadataRoot, supportsPosixPermissions)) {
+        if (!LocalStorageIoSupport.mkdirs(metadataDirectory, metadataRoot, supportsPosixPermissions)) {
             throw new ObjectStorageException("Error creating bucket metadata directory: " + metadataRoot);
         }
     }
@@ -104,6 +105,7 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
     }
 
     private Path metadataFilePath(String name) {
+        LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
         return LocalStorageIoSupport.resolveSafe(metadataRoot, name);
     }
 }

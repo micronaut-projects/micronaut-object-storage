@@ -74,9 +74,9 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
     @Override
     public void delete(@NonNull String name) {
         Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
-        bucketMetadataOperations.delete(name);
         try {
             deleteRecursively(path);
+            bucketMetadataOperations.delete(name);
         } catch (NoSuchFileException ignored) {
             // Deleting a missing bucket is a no-op.
         } catch (IOException e) {

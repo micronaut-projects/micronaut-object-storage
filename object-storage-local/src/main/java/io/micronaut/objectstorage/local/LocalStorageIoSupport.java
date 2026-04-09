@@ -120,6 +120,9 @@ final class LocalStorageIoSupport {
             !path.getFileName().toString().equals(name)) {
             throw new IllegalArgumentException("Bucket name must not contain filesystem special characters");
         }
+        if (LocalStorageOperations.METADATA_DIRECTORY.equalsIgnoreCase(name)) {
+            throw new IllegalArgumentException("Bucket name uses the reserved " + LocalStorageOperations.METADATA_DIRECTORY + " namespace: " + name);
+        }
         rejectSymbolicLinks(rootDirectory, path);
         return path;
     }
