@@ -12,6 +12,7 @@ micronaut-logging = "2.0.0-M2"
 
 gcp-libraries = '26.79.0'
 bytebuddy = '1.18.8'
+h2 = "2.3.232"
 
 # Gradle plugins
 micronaut-gradle-plugin = "4.6.2"
@@ -47,6 +48,7 @@ micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", ver
 micronaut-core-reactive = { module = "io.micronaut:micronaut-core-reactive" }
 
 bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
 
 # Plugins
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }

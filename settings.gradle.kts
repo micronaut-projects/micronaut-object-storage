@@ -24,6 +24,7 @@ include("object-storage-azure")
 include("object-storage-gcp")
 include("object-storage-oracle-cloud")
 include("object-storage-local")
+include("object-storage-relational")
 include("test-suite-graal")
 
 include("doc-examples:example-java")

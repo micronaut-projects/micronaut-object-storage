@@ -1,0 +1,42 @@
+To use the relational backend, add the following dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-relational[]
+
+Then configure at least one datasource bean together with one relational object storage:
+
+[configuration]
+----
+datasources:
+  default:
+    url: jdbc:h2:mem:object-storage;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''
+
+micronaut:
+  object-storage:
+    relational:
+      default:
+        enabled: true
+        table-name: micronaut_object_storage_object
+----
+
+The first relational implementation keeps the existing api:objectstorage.ObjectStorageOperations[] API intact:
+
+- payload bytes are written to a BLOB column
+- metadata, content type, content length, and ETag are stored in relational columns
+- paginated listing uses deterministic key ordering and the existing continuation-token contract
+
+Optional namespacing is available through `key-prefix`, and you can point each storage bean at a specific datasource bean with `datasource`.
+
+The relational module creates its schema and table on startup when they do not already exist.
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.relational.RelationalStorageConfiguration.adoc[]
+
+The current scope is intentionally narrow:
+
+- one datasource per storage bean
+- one table per storage bean
+- CRUD, copy, existence checks, and paginated listing
+
+Multipart uploads and advanced metadata-query APIs remain out of scope for this first relational backend slice.
