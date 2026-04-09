@@ -292,6 +292,8 @@ final class JdbcRelationalObjectStore {
     private void initializeSchema() {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
+            String metadataColumnType = metadataColumnType(connection);
+            String payloadColumnType = payloadColumnType(connection);
             if (configuration.getSchema().isPresent()) {
                 statement.execute("CREATE SCHEMA IF NOT EXISTS " + configuration.getSchema().orElseThrow());
             }
@@ -301,13 +303,28 @@ final class JdbcRelationalObjectStore {
                     + "etag VARCHAR(128) NOT NULL, "
                     + "content_length BIGINT NOT NULL, "
                     + "content_type VARCHAR(255), "
-                    + "metadata CHARACTER LARGE OBJECT, "
-                    + "object_content BINARY LARGE OBJECT NOT NULL, "
+                    + "metadata " + metadataColumnType + ", "
+                    + "object_content " + payloadColumnType + " NOT NULL, "
                     + "updated_at TIMESTAMP NOT NULL)"
             );
         } catch (SQLException e) {
             throw new ObjectStorageException("Error initializing relational object storage schema", e);
         }
+    }
+
+    @NonNull
+    private static String metadataColumnType(@NonNull Connection connection) throws SQLException {
+        return usesPostgreSqlLargeObjectTypes(connection) ? "TEXT" : "CLOB";
+    }
+
+    @NonNull
+    private static String payloadColumnType(@NonNull Connection connection) throws SQLException {
+        return usesPostgreSqlLargeObjectTypes(connection) ? "BYTEA" : "BLOB";
+    }
+
+    private static boolean usesPostgreSqlLargeObjectTypes(@NonNull Connection connection) throws SQLException {
+        String databaseProductName = connection.getMetaData().getDatabaseProductName();
+        return "PostgreSQL".equalsIgnoreCase(databaseProductName) || "H2".equalsIgnoreCase(databaseProductName);
     }
 
     @NonNull
