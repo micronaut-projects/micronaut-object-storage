@@ -17,6 +17,9 @@ package io.micronaut.objectstorage.tus;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * tus module configuration.
  *
@@ -31,6 +34,7 @@ public final class TusModuleConfiguration {
     private boolean enabled;
     private String basePath = "/tus";
     private long maxChunkSize = 16L * 1024L * 1024L;
+    private Path storageDirectory = Paths.get(System.getProperty("java.io.tmpdir"), "micronaut-object-storage-tus");
 
     public boolean isEnabled() {
         return enabled;
@@ -54,5 +58,13 @@ public final class TusModuleConfiguration {
 
     public void setMaxChunkSize(long maxChunkSize) {
         this.maxChunkSize = maxChunkSize;
+    }
+
+    public Path getStorageDirectory() {
+        return storageDirectory;
+    }
+
+    public void setStorageDirectory(Path storageDirectory) {
+        this.storageDirectory = storageDirectory;
     }
 }

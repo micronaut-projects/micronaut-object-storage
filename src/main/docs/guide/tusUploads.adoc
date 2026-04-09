@@ -1,6 +1,6 @@
 The `object-storage-tus` module adds an opt-in tus 1.0 resumable upload endpoint for Micronaut Object Storage.
 
-Enable the module and configure at least one local object storage backend:
+Enable the module and configure at least one supported object storage backend:
 
 [configuration]
 ----
@@ -9,14 +9,20 @@ micronaut:
     tus:
       enabled: true
       base-path: /tus
-    local:
+      storage-directory: /var/lib/object-storage-tus
+    aws:
       default:
-        enabled: true
+        bucket: uploads
 ----
 
 Requests use the route pattern `/tus/{storageName}` and `/tus/{storageName}/{uploadId}`.
 
-The initial reference implementation is backed by `LocalStorageOperations`:
+The current backends are:
+
+- Local storage, which persists incomplete uploads under the local provider metadata directory before moving them into the configured object key on completion.
+- AWS S3, which creates a multipart upload immediately, persists tus session state under `micronaut.object-storage.tus.storage-directory`, uploads 5 MiB parts as data accumulates, and completes or aborts the multipart upload when the tus resource finishes.
+
+The module supports the following protocol behavior across those backends:
 
 - `OPTIONS` advertises tus version `1.0.0` plus the `creation` and `termination` extensions.
 - `POST` creates a resumable upload and requires `Upload-Length` plus `Upload-Metadata` containing a base64-encoded `key`.
@@ -33,4 +39,4 @@ Upload-Metadata: key cGhvdG9zL3Byb2ZpbGUucG5n,contentType aW1hZ2UvcG5n
 
 Additional metadata entries are persisted with the completed object.
 
-The local backend stores temporary tus session state under the local storage metadata directory so incomplete uploads do not appear in normal object listings.
+Incomplete uploads never appear in normal object listings. Local temporary state lives beside the local provider metadata, while AWS-backed uploads use the configured tus storage directory for session records and staged chunk data.

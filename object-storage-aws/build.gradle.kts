@@ -8,6 +8,7 @@ dependencies {
     api(libs.amazon.awssdk.s3)
 
     implementation(platform(mnAws.micronaut.aws.bom))
+    implementation(projects.micronautObjectStorageTus)
     annotationProcessor(mnValidation.micronaut.validation.processor)
     implementation(mnValidation.micronaut.validation)
 

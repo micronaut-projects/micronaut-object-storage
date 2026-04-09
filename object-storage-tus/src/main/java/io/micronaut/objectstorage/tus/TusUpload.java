@@ -43,6 +43,11 @@ public record TusUpload(
     @NonNull Map<String, String> metadata,
     @NonNull TusUploadStatus status
 ) {
+    @NonNull
+    public TusUpload withStatus(@NonNull TusUploadStatus nextStatus, long nextOffset) {
+        return new TusUpload(id, key, uploadLength, nextOffset, contentType, metadata, nextStatus);
+    }
+
     public boolean inProgress() {
         return status == TusUploadStatus.IN_PROGRESS;
     }
