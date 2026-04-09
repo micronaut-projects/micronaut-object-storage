@@ -1,0 +1,41 @@
+= Metadata Persistence SPI
+
+Micronaut Object Storage now exposes additive metadata contracts for implementations that need to persist
+bucket/container metadata or object metadata separately from raw object bytes:
+
+- api:objectstorage.metadata.ObjectMetadataOperations[]
+- api:objectstorage.metadata.ReactiveObjectMetadataOperations[]
+- api:objectstorage.metadata.BucketMetadataOperations[]
+- api:objectstorage.metadata.ReactiveBucketMetadataOperations[]
+
+The portable write models use replace/upsert semantics:
+
+- api:objectstorage.metadata.ObjectMetadataWrite[]
+- api:objectstorage.metadata.BucketMetadataWrite[]
+
+The corresponding read models expose the stored metadata snapshot plus any provider-native metadata handle:
+
+- api:objectstorage.metadata.ObjectMetadataEntry[]
+- api:objectstorage.metadata.BucketMetadataEntry[]
+
+This SPI is intentionally separate from api:objectstorage.ObjectStorageOperations[] and
+api:objectstorage.bucket.BucketOperations[].
+
+That keeps the existing upload, retrieve, and bucket lifecycle contracts source- and binary-compatible while still
+allowing new implementations to compose metadata and content storage differently.
+
+Version `3.0.x` keeps the first release deliberately narrow:
+
+- CRUD-style metadata persistence is supported.
+- Updating metadata without rewriting object bytes is supported.
+- Portable metadata and attributes are string maps.
+- Querying, indexing, and attribute-based search are out of scope.
+
+Current provider support:
+
+- Local storage implements both object and bucket metadata contracts as the first reference implementation.
+
+Consistency note:
+
+- When an implementation stores metadata separately from content, Micronaut does not guarantee distributed transaction
+  semantics between those stores. Providers should document their own consistency model.

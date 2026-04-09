@@ -19,6 +19,11 @@ api:objectstorage.ObjectStorageOperations[].
 NOTE: The local storage implementation reserves the `.metadata` key namespace for per-object metadata files. User object
 keys cannot be `.metadata` or start with `.metadata/` (or `.metadata\` on platforms where the file separator is `\`).
 
+The local implementation is also the reference provider for
+api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[].
+Object metadata sidecars live under the configured bucket's `.metadata` tree, while bucket metadata sidecars live under
+the sibling `.metadata/buckets` tree managed by the local bucket lifecycle API.
+
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 
 On POSIX-capable file systems, configured bucket paths created by the local implementation use owner-only permissions for
