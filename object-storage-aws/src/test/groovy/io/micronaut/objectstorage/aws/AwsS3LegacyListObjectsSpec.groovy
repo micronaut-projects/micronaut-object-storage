@@ -16,7 +16,7 @@ class AwsS3LegacyListObjectsSpec extends AbstractAwsS3Spec implements TestProper
 
     @Shared
     @AutoCleanup
-    LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
+    LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE).asCompatibleSubstituteFor("localstack/localstack"))
         .withServices("s3")
 
     @Override

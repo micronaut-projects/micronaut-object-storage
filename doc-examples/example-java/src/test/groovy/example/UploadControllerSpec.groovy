@@ -30,7 +30,7 @@ class UploadControllerSpec extends Specification implements TestPropertyProvider
 
     @Shared
     @AutoCleanup
-    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
+    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE).asCompatibleSubstituteFor("localstack/localstack"))
             .withServices("s3")
 
     @Inject

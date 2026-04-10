@@ -16,7 +16,7 @@ class AwsS3PaginationSpec extends AbstractAwsS3Spec implements TestPropertyProvi
 
     @Shared
     @AutoCleanup
-    LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
+    LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE).asCompatibleSubstituteFor("localstack/localstack"))
         .withServices("s3")
 
     @Override

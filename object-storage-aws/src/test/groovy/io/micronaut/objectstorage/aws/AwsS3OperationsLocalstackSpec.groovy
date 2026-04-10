@@ -14,7 +14,7 @@ class AwsS3OperationsLocalstackSpec extends AbstractAwsS3Spec implements TestPro
 
     @Shared
     @AutoCleanup
-    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE))
+    public LocalStackContainer localstack = new LocalStackContainer(DockerImageName.parse(LOCAL_STACK_DOCKER_IMAGE).asCompatibleSubstituteFor("localstack/localstack"))
             .withServices("s3")
 
     @Override
