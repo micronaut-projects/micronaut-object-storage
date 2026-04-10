@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -70,4 +71,84 @@ public interface S3CompatibleOperations {
      */
     @NonNull
     S3ListResponse listObjects(@NonNull ListObjectsRequest request);
+
+    /**
+     * @return Whether the backing storage can expose S3 multipart routes.
+     */
+    default boolean supportsMultipart() {
+        return false;
+    }
+
+    /**
+     * Starts a new multipart upload.
+     *
+     * @param key the exposed object key
+     * @param contentType the requested content type if known
+     * @return the initiated multipart upload
+     */
+    @NonNull
+    default S3MultipartUpload createMultipartUpload(@NonNull String key, @Nullable String contentType) {
+        throw new UnsupportedOperationException("Multipart uploads are not supported by this bucket");
+    }
+
+    /**
+     * Stores one multipart upload part.
+     *
+     * @param key the exposed object key
+     * @param uploadId the multipart upload identifier
+     * @param partNumber the S3 part number
+     * @param inputStream the part bytes
+     * @param contentLength the part length if known
+     * @return the uploaded part metadata
+     */
+    @NonNull
+    default S3MultipartPart uploadPart(@NonNull String key,
+                                       @NonNull String uploadId,
+                                       int partNumber,
+                                       @NonNull InputStream inputStream,
+                                       @Nullable Long contentLength) {
+        throw new UnsupportedOperationException("Multipart uploads are not supported by this bucket");
+    }
+
+    /**
+     * Lists the current uploaded multipart parts.
+     *
+     * @param key the exposed object key
+     * @param uploadId the multipart upload identifier
+     * @param partNumberMarker the optional part number cursor
+     * @param maxParts the page size
+     * @return the multipart listing response
+     */
+    @NonNull
+    default S3MultipartListPartsResponse listParts(@NonNull String key,
+                                                   @NonNull String uploadId,
+                                                   @Nullable Integer partNumberMarker,
+                                                   int maxParts) {
+        throw new UnsupportedOperationException("Multipart uploads are not supported by this bucket");
+    }
+
+    /**
+     * Completes a multipart upload.
+     *
+     * @param key the exposed object key
+     * @param uploadId the multipart upload identifier
+     * @param completedParts the uploaded parts in completion order
+     * @return the completion response
+     */
+    @NonNull
+    default S3MultipartCompletedUpload completeMultipartUpload(@NonNull String key,
+                                                               @NonNull String uploadId,
+                                                               @NonNull List<S3CompletedPart> completedParts) {
+        throw new UnsupportedOperationException("Multipart uploads are not supported by this bucket");
+    }
+
+    /**
+     * Aborts a multipart upload.
+     *
+     * @param key the exposed object key
+     * @param uploadId the multipart upload identifier
+     */
+    default void abortMultipartUpload(@NonNull String key, @NonNull String uploadId) {
+        throw new UnsupportedOperationException("Multipart uploads are not supported by this bucket");
+    }
 }

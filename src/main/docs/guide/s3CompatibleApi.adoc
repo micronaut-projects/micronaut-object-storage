@@ -34,14 +34,15 @@ The current implementation is intentionally narrow:
 * path-style routing only (`/{bucket}/{key}`)
 * one configured bucket mapping per entry under `micronaut.object-storage.s3-compat`
 * object upload, download, head, delete, and `ListObjectsV2`
+* multipart create/upload/list/complete/abort for AWS-backed buckets
 * SigV4 request validation for AWS SDK / CLI compatible clients
 * S3-style XML error payloads for missing buckets, missing keys, and invalid list requests
 
 Current limitations:
 
 * this is a focused compatibility subset, not a full Amazon S3 replacement
-* multipart upload routes are not exposed yet
-* the included bridge supports Micronaut Local Storage and AWS S3
+* multipart support is currently limited to buckets backed by Micronaut AWS S3 storage
+* the included bridges support Micronaut Local Storage and AWS S3
 
 If the same `storage` bean name exists in multiple providers, set `micronaut.object-storage.s3-compat.<bucket>.storage-provider` to `local` or `aws` to disambiguate the backing adapter explicitly.
 

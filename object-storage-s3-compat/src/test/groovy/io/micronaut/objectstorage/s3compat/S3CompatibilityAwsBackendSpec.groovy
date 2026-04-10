@@ -15,7 +15,9 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectResponse
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
+import software.amazon.awssdk.services.s3.model.S3Exception
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.CompletedPart
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
@@ -83,6 +85,111 @@ class S3CompatibilityAwsBackendSpec extends Specification {
 
         then:
         emptyListing.contents().isEmpty()
+
+        cleanup:
+        client?.close()
+        server?.close()
+        backendClient?.close()
+    }
+
+    void 'aws-backed buckets support multipart upload routes through the compatibility endpoint'() {
+        given:
+        localstack.start()
+        String backingBucket = "mn-s3compat-multipart-${System.currentTimeMillis()}"
+        S3Client backendClient = localstackClient()
+        backendClient.createBucket { it.bucket(backingBucket) }
+        EmbeddedServer server = ApplicationContext.run(EmbeddedServer, [
+            'micronaut.object-storage.aws.default.enabled'                  : 'true',
+            'micronaut.object-storage.aws.default.bucket'                   : backingBucket,
+            'aws.accessKeyId'                                               : localstack.accessKey,
+            'aws.secretKey'                                                 : localstack.secretKey,
+            'aws.region'                                                    : localstack.region,
+            'aws.services.s3.endpoint-override'                             : localstack.getEndpoint().toString(),
+            'micronaut.object-storage.s3-compat.enabled'                    : 'true',
+            'micronaut.object-storage.s3-compat.auth-mode'                  : 'sigv4',
+            'micronaut.object-storage.s3-compat.access-key-id'              : 'test-access-key',
+            'micronaut.object-storage.s3-compat.secret-access-key'          : 'test-secret-key',
+            'micronaut.object-storage.s3-compat.region'                     : localstack.region,
+            'micronaut.object-storage.s3-compat.assets.enabled'             : 'true',
+            'micronaut.object-storage.s3-compat.assets.storage'             : 'default',
+            'micronaut.object-storage.s3-compat.assets.storage-provider'    : 'aws',
+            'micronaut.object-storage.s3-compat.assets.base-path'           : 'exports/public',
+        ])
+        S3Client client = s3Client(server.URI, 'test-access-key', 'test-secret-key', localstack.region)
+        byte[] partBytes = 'hello multipart world'.bytes
+
+        when:
+        def initiated = client.createMultipartUpload {
+            it.bucket('assets')
+                .key('docs/multipart.txt')
+                .contentType('text/plain')
+        }
+        def part = client.uploadPart(
+            {
+                it.bucket('assets')
+                    .key('docs/multipart.txt')
+                    .uploadId(initiated.uploadId())
+                    .partNumber(1)
+            },
+            RequestBody.fromBytes(partBytes)
+        )
+        def listedParts = client.listParts {
+            it.bucket('assets')
+                .key('docs/multipart.txt')
+                .uploadId(initiated.uploadId())
+        }
+        client.completeMultipartUpload {
+            it.bucket('assets')
+                .key('docs/multipart.txt')
+                .uploadId(initiated.uploadId())
+                .multipartUpload { upload ->
+                    upload.parts(
+                        CompletedPart.builder()
+                            .partNumber(1)
+                            .eTag(part.eTag())
+                            .build()
+                    )
+                }
+        }
+        ResponseBytes<GetObjectResponse> object = client.getObjectAsBytes(GetObjectRequest.builder().bucket('assets').key('docs/multipart.txt').build())
+        ResponseBytes<GetObjectResponse> backendObject = backendClient.getObjectAsBytes(GetObjectRequest.builder().bucket(backingBucket).key('exports/public/docs/multipart.txt').build())
+
+        then:
+        listedParts.parts().size() == 1
+        listedParts.parts().first().partNumber() == 1
+        listedParts.parts().first().size() == partBytes.length
+        object.asByteArray() == partBytes
+        backendObject.asByteArray() == partBytes
+
+        when:
+        def aborted = client.createMultipartUpload {
+            it.bucket('assets')
+                .key('docs/aborted.txt')
+        }
+        client.uploadPart(
+            {
+                it.bucket('assets')
+                    .key('docs/aborted.txt')
+                    .uploadId(aborted.uploadId())
+                    .partNumber(1)
+            },
+            RequestBody.fromBytes('bye'.bytes)
+        )
+        client.abortMultipartUpload {
+            it.bucket('assets')
+                .key('docs/aborted.txt')
+                .uploadId(aborted.uploadId())
+        }
+        client.listParts {
+            it.bucket('assets')
+                .key('docs/aborted.txt')
+                .uploadId(aborted.uploadId())
+        }
+
+        then:
+        def e = thrown(S3Exception)
+        e.statusCode() == 404
+        e.awsErrorDetails().errorCode() == 'NoSuchUpload'
 
         cleanup:
         client?.close()
