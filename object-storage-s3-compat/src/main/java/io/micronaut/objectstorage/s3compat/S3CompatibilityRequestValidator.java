@@ -27,6 +27,9 @@ import jakarta.inject.Singleton;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URI;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -53,6 +56,10 @@ public final class S3CompatibilityRequestValidator {
     private static final String SERVICE = "s3";
     private static final String TERMINAL = "aws4_request";
     private static final String HMAC_SHA_256 = "HmacSHA256";
+    private static final String UNSIGNED_PAYLOAD = "UNSIGNED-PAYLOAD";
+    private static final String EMPTY_PAYLOAD_SHA_256 = "e3b0c44298fc1c149afbf4c8996fb924"
+        + "27ae41e4649b934ca495991b7852b855";
+    private static final DateTimeFormatter AMZ_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX");
 
     private final S3CompatibilityModuleConfiguration configuration;
 
@@ -65,6 +72,15 @@ public final class S3CompatibilityRequestValidator {
      * @return An error response if the request is invalid for the configured auth mode.
      */
     public Optional<HttpResponse<String>> validate(HttpRequest<?> request) {
+        return validate(request, EMPTY_PAYLOAD_SHA_256);
+    }
+
+    /**
+     * @param request Incoming HTTP request.
+     * @param actualPayloadHash The SHA-256 of the received request payload.
+     * @return An error response if the request is invalid for the configured auth mode.
+     */
+    public Optional<HttpResponse<String>> validate(HttpRequest<?> request, @Nullable String actualPayloadHash) {
         if (configuration.getAuthMode() == S3CompatibilityAuthMode.NONE) {
             return Optional.empty();
         }
@@ -76,10 +92,13 @@ public final class S3CompatibilityRequestValidator {
                 null
             ));
         }
-        return validateSigV4(request, configuration.getAccessKeyId().get(), configuration.getSecretAccessKey().get());
+        return validateSigV4(request, configuration.getAccessKeyId().get(), configuration.getSecretAccessKey().get(), actualPayloadHash);
     }
 
-    private Optional<HttpResponse<String>> validateSigV4(HttpRequest<?> request, String accessKeyId, String secretAccessKey) {
+    private Optional<HttpResponse<String>> validateSigV4(HttpRequest<?> request,
+                                                         String accessKeyId,
+                                                         String secretAccessKey,
+                                                         @Nullable String actualPayloadHash) {
         String authorization = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
         if (authorization == null || authorization.isBlank()) {
             return Optional.of(error(HttpStatus.FORBIDDEN, "AccessDenied", "Missing Authorization header", request));
@@ -90,6 +109,9 @@ public final class S3CompatibilityRequestValidator {
         String signedAt = request.getHeaders().get("x-amz-date");
         if (signedAt == null || signedAt.isBlank()) {
             return Optional.of(error(HttpStatus.FORBIDDEN, "AccessDenied", "Missing x-amz-date header", request));
+        }
+        if (!isValidAmzDate(signedAt)) {
+            return Optional.of(error(HttpStatus.FORBIDDEN, "AccessDenied", "Malformed x-amz-date header", request));
         }
         String payloadHash = request.getHeaders().get("x-amz-content-sha256");
         if (payloadHash == null || payloadHash.isBlank()) {
@@ -118,16 +140,31 @@ public final class S3CompatibilityRequestValidator {
             return Optional.of(error(HttpStatus.FORBIDDEN, "AuthorizationHeaderMalformed", "Credential scope does not match the configured S3-compatible service", request));
         }
 
-        String canonicalRequest = request.getMethodName() + '\n'
-            + canonicalUri(request.getUri()) + '\n'
-            + canonicalQueryString(request.getUri()) + '\n'
-            + canonicalHeaders(request, signedHeaders) + '\n'
-            + signedHeaders + '\n'
-            + payloadHash;
-        String stringToSign = ALGORITHM + '\n'
-            + signedAt + '\n'
-            + credentialScope[1] + '/' + credentialScope[2] + '/' + credentialScope[3] + '/' + credentialScope[4] + '\n'
-            + sha256Hex(canonicalRequest);
+        if (!UNSIGNED_PAYLOAD.equals(payloadHash)
+            && actualPayloadHash != null
+            && !MessageDigest.isEqual(
+            actualPayloadHash.getBytes(StandardCharsets.US_ASCII),
+            payloadHash.getBytes(StandardCharsets.US_ASCII)
+        )) {
+            return Optional.of(error(HttpStatus.FORBIDDEN, "SignatureDoesNotMatch", "The provided x-amz-content-sha256 does not match the received payload", request));
+        }
+
+        String canonicalRequest;
+        String stringToSign;
+        try {
+            canonicalRequest = request.getMethodName() + '\n'
+                + canonicalUri(request.getUri()) + '\n'
+                + canonicalQueryString(request.getUri()) + '\n'
+                + canonicalHeaders(request, signedHeaders) + '\n'
+                + signedHeaders + '\n'
+                + payloadHash;
+            stringToSign = ALGORITHM + '\n'
+                + signedAt + '\n'
+                + credentialScope[1] + '/' + credentialScope[2] + '/' + credentialScope[3] + '/' + credentialScope[4] + '\n'
+                + sha256Hex(canonicalRequest);
+        } catch (IllegalArgumentException e) {
+            return Optional.of(error(HttpStatus.BAD_REQUEST, "InvalidRequest", e.getMessage(), request));
+        }
         String expectedSignature = toHex(
             hmacSha256(
                 signingKey(secretAccessKey, credentialScope[1], credentialScope[2], credentialScope[3]),
@@ -138,6 +175,15 @@ public final class S3CompatibilityRequestValidator {
             return Optional.of(error(HttpStatus.FORBIDDEN, "SignatureDoesNotMatch", "The request signature we calculated does not match the signature you provided", request));
         }
         return Optional.empty();
+    }
+
+    private static boolean isValidAmzDate(String signedAt) {
+        try {
+            Instant.from(AMZ_DATE_FORMATTER.parse(signedAt));
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
 
     private static Map<String, String> parseAuthorizationAttributes(String authorization) {
@@ -242,7 +288,11 @@ public final class S3CompatibilityRequestValidator {
         for (int i = 0; i < value.length(); i++) {
             char current = value.charAt(i);
             if (current == '%' && i + 2 < value.length()) {
-                bytes[length++] = (byte) Integer.parseInt(value.substring(i + 1, i + 3), 16);
+                try {
+                    bytes[length++] = (byte) Integer.parseInt(value.substring(i + 1, i + 3), 16);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Malformed query parameter encoding", e);
+                }
                 i += 2;
             } else {
                 bytes[length++] = (byte) current;

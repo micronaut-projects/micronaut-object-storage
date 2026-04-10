@@ -21,7 +21,6 @@ import io.micronaut.objectstorage.aws.AwsS3ObjectStorageEntry;
 import io.micronaut.objectstorage.aws.AwsS3Operations;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
-import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -79,15 +78,12 @@ public final class AwsS3CompatibleOperations extends AbstractS3CompatibleOperati
                                        @NonNull InputStream inputStream,
                                        @Nullable Long contentLength,
                                        @Nullable String contentType) {
-        try {
-            UploadRequest request = UploadRequest.fromBytes(inputStream.readAllBytes(), resolveStorageKey(key));
-            if (contentType != null && !contentType.isBlank()) {
-                request.setContentType(contentType);
-            }
-            return operations.upload(request);
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error reading request body for S3-compatible upload", e);
-        }
+        return operations.upload(new S3CompatibilityUploadRequest(
+            inputStream,
+            resolveStorageKey(key),
+            contentLength,
+            contentType
+        ));
     }
 
     @Override
@@ -101,7 +97,7 @@ public final class AwsS3CompatibleOperations extends AbstractS3CompatibleOperati
         ListObjectsRequest storageRequest = new ListObjectsRequest(
             request.getPageSize(),
             resolveListPrefix(request.getPrefix().orElse(null)),
-            request.getContinuationToken().map(this::resolveStorageKey).orElse(null)
+            request.getContinuationToken().orElse(null)
         );
         io.micronaut.objectstorage.response.ListObjectsResponse response = operations.listObjects(storageRequest);
         List<S3ObjectSummary> objects = response.getKeys().stream()

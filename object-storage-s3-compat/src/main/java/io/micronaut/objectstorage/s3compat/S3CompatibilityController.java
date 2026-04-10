@@ -35,8 +35,14 @@ import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -74,41 +80,47 @@ public final class S3CompatibilityController {
                                      @Nullable @QueryValue String uploadId,
                                      HttpRequest<?> request,
                                      @Body InputStream body) {
-        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
-        if (validation.isPresent()) {
-            return validation.get();
-        }
-        var resolved = bucketResolver.resolve(bucket);
-        if (resolved.isEmpty()) {
-            return noSuchBucket(bucket);
-        }
-        if (uploadId != null || partNumber != null) {
-            if (uploadId == null || partNumber == null) {
-                return error(HttpStatus.BAD_REQUEST, "InvalidRequest", "Multipart uploads require both uploadId and partNumber", bucket, key);
+        try (StagedPayload payload = stagePayload(body)) {
+            Optional<HttpResponse<String>> validation = requestValidator.validate(request, payload.payloadHash());
+            if (validation.isPresent()) {
+                return validation.get();
             }
-            if (!resolved.get().operations().supportsMultipart()) {
-                return multipartNotImplemented(bucket, key);
+            var resolved = bucketResolver.resolve(bucket);
+            if (resolved.isEmpty()) {
+                return noSuchBucket(bucket);
             }
-            Long contentLength = request.getHeaders().contentLength().isPresent()
-                ? request.getHeaders().contentLength().getAsLong()
-                : null;
-            try {
-                S3MultipartPart part = resolved.get().operations().uploadPart(key, uploadId, partNumber, body, contentLength);
-                return HttpResponse.ok().header(HttpHeaders.ETAG, part.eTag());
-            } catch (S3CompatibilityException e) {
-                return error(e.getStatus(), e.getCode(), e.getMessage(), bucket, key);
+            if (uploadId != null || partNumber != null) {
+                if (uploadId == null || partNumber == null) {
+                    return error(HttpStatus.BAD_REQUEST, "InvalidRequest", "Multipart uploads require both uploadId and partNumber", bucket, key);
+                }
+                if (!resolved.get().operations().supportsMultipart()) {
+                    return multipartNotImplemented(bucket, key);
+                }
+                try (InputStream payloadStream = payload.openStream()) {
+                    S3MultipartPart part = resolved.get().operations().uploadPart(
+                        key,
+                        uploadId,
+                        partNumber,
+                        payloadStream,
+                        payload.contentLength()
+                    );
+                    return HttpResponse.ok().header(HttpHeaders.ETAG, part.eTag());
+                } catch (S3CompatibilityException e) {
+                    return error(e.getStatus(), e.getCode(), e.getMessage(), bucket, key);
+                }
             }
+            try (InputStream payloadStream = payload.openStream()) {
+                var response = resolved.get().operations().putObject(
+                    key,
+                    payloadStream,
+                    payload.contentLength(),
+                    request.getContentType().map(MediaType::toString).orElse(null)
+                );
+                return HttpResponse.ok().header(HttpHeaders.ETAG, response.getETag());
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to stage request payload for S3-compatible upload", e);
         }
-        Long contentLength = request.getHeaders().contentLength().isPresent()
-            ? request.getHeaders().contentLength().getAsLong()
-            : null;
-        var response = resolved.get().operations().putObject(
-            key,
-            body,
-            contentLength,
-            request.getContentType().map(MediaType::toString).orElse(null)
-        );
-        return HttpResponse.ok().header(HttpHeaders.ETAG, response.getETag());
     }
 
     @Get(uri = "/{bucket}/{+key}", headRoute = false)
@@ -194,7 +206,10 @@ public final class S3CompatibilityController {
                                            @Nullable @QueryValue String uploadId,
                                            HttpRequest<?> request,
                                            @Nullable @Body String body) {
-        Optional<HttpResponse<String>> validation = requestValidator.validate(request);
+        Optional<HttpResponse<String>> validation = requestValidator.validate(
+            request,
+            sha256Hex(body == null ? new byte[0] : body.getBytes(StandardCharsets.UTF_8))
+        );
         if (validation.isPresent()) {
             return validation.get();
         }
@@ -391,9 +406,14 @@ public final class S3CompatibilityController {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             factory.setNamespaceAware(true);
+            factory.setXIncludeAware(false);
+            factory.setExpandEntityReferences(false);
             var builder = factory.newDocumentBuilder();
             var document = builder.parse(new InputSource(new StringReader(body)));
             var partNodes = document.getElementsByTagNameNS("*", "Part");
@@ -436,6 +456,48 @@ public final class S3CompatibilityController {
             .replace(">", "&gt;")
             .replace("\"", "&quot;")
             .replace("'", "&apos;");
+    }
+
+    private static StagedPayload stagePayload(InputStream body) throws IOException {
+        Path path = Files.createTempFile("mn-object-storage-s3compat-", ".payload");
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            long length = 0;
+            try (InputStream input = body;
+                 var output = Files.newOutputStream(path)) {
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = input.read(buffer)) != -1) {
+                    digest.update(buffer, 0, read);
+                    output.write(buffer, 0, read);
+                    length += read;
+                }
+            }
+            return new StagedPayload(path, length, toHex(digest.digest()));
+        } catch (IOException | RuntimeException e) {
+            Files.deleteIfExists(path);
+            throw e;
+        } catch (NoSuchAlgorithmException e) {
+            Files.deleteIfExists(path);
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
+    }
+
+    private static String sha256Hex(byte[] bytes) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return toHex(digest.digest(bytes));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
+    }
+
+    private static String toHex(byte[] bytes) {
+        StringBuilder builder = new StringBuilder(bytes.length * 2);
+        for (byte current : bytes) {
+            builder.append(String.format("%02x", current));
+        }
+        return builder.toString();
     }
 
     private HttpResponse<String> noSuchBucket(String bucket) {
@@ -481,5 +543,16 @@ public final class S3CompatibilityController {
         return HttpResponse.status(status)
             .contentType(MediaType.APPLICATION_XML_TYPE)
             .body(xml.toString());
+    }
+
+    private record StagedPayload(Path path, long contentLength, String payloadHash) implements AutoCloseable {
+        private InputStream openStream() throws IOException {
+            return Files.newInputStream(path);
+        }
+
+        @Override
+        public void close() throws IOException {
+            Files.deleteIfExists(path);
+        }
     }
 }

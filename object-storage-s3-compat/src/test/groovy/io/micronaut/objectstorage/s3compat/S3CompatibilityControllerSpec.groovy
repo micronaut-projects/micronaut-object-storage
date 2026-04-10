@@ -132,4 +132,28 @@ class S3CompatibilityControllerSpec extends Specification {
         cleanup:
         context.close()
     }
+
+    void 'it rejects complete-multipart xml bodies that declare a doctype'() {
+        given:
+        def method = S3CompatibilityController.getDeclaredMethod('parseCompletedParts', String)
+        method.accessible = true
+        String body = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE CompleteMultipartUpload [
+<!ENTITY xxe SYSTEM "file:///etc/passwd">
+]>
+<CompleteMultipartUpload>
+  <Part>
+    <PartNumber>1</PartNumber>
+    <ETag>&xxe;</ETag>
+  </Part>
+</CompleteMultipartUpload>'''
+
+        when:
+        method.invoke(null, body)
+
+        then:
+        def e = thrown(java.lang.reflect.InvocationTargetException)
+        e.cause instanceof IllegalArgumentException
+        e.cause.message == 'Unable to parse the CompleteMultipartUpload request body'
+    }
 }

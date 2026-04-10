@@ -92,6 +92,67 @@ class S3CompatibilityAwsBackendSpec extends Specification {
         backendClient?.close()
     }
 
+    void 'aws-backed buckets preserve opaque continuation tokens across paginated listings'() {
+        given:
+        localstack.start()
+        String backingBucket = "mn-s3compat-listing-${System.currentTimeMillis()}"
+        S3Client backendClient = localstackClient()
+        backendClient.createBucket { it.bucket(backingBucket) }
+        EmbeddedServer server = ApplicationContext.run(EmbeddedServer, [
+            'micronaut.object-storage.aws.default.enabled'                  : 'true',
+            'micronaut.object-storage.aws.default.bucket'                   : backingBucket,
+            'aws.accessKeyId'                                               : localstack.accessKey,
+            'aws.secretKey'                                                 : localstack.secretKey,
+            'aws.region'                                                    : localstack.region,
+            'aws.services.s3.endpoint-override'                             : localstack.getEndpoint().toString(),
+            'micronaut.object-storage.s3-compat.enabled'                    : 'true',
+            'micronaut.object-storage.s3-compat.auth-mode'                  : 'sigv4',
+            'micronaut.object-storage.s3-compat.access-key-id'              : 'test-access-key',
+            'micronaut.object-storage.s3-compat.secret-access-key'          : 'test-secret-key',
+            'micronaut.object-storage.s3-compat.region'                     : localstack.region,
+            'micronaut.object-storage.s3-compat.assets.enabled'             : 'true',
+            'micronaut.object-storage.s3-compat.assets.storage'             : 'default',
+            'micronaut.object-storage.s3-compat.assets.storage-provider'    : 'aws',
+            'micronaut.object-storage.s3-compat.assets.base-path'           : 'exports/public',
+        ])
+        S3Client client = s3Client(server.URI, 'test-access-key', 'test-secret-key', localstack.region)
+
+        when:
+        client.putObject(
+            PutObjectRequest.builder().bucket('assets').key('docs/a.txt').build(),
+            RequestBody.fromString('a')
+        )
+        client.putObject(
+            PutObjectRequest.builder().bucket('assets').key('docs/b.txt').build(),
+            RequestBody.fromString('b')
+        )
+        def firstPage = client.listObjectsV2(
+            ListObjectsV2Request.builder()
+                .bucket('assets')
+                .prefix('docs/')
+                .maxKeys(1)
+                .build()
+        )
+        def secondPage = client.listObjectsV2(
+            ListObjectsV2Request.builder()
+                .bucket('assets')
+                .prefix('docs/')
+                .maxKeys(1)
+                .continuationToken(firstPage.nextContinuationToken())
+                .build()
+        )
+
+        then:
+        firstPage.contents()*.key() == ['docs/a.txt']
+        firstPage.nextContinuationToken()
+        secondPage.contents()*.key() == ['docs/b.txt']
+
+        cleanup:
+        client?.close()
+        server?.close()
+        backendClient?.close()
+    }
+
     void 'aws-backed buckets support multipart upload routes through the compatibility endpoint'() {
         given:
         localstack.start()

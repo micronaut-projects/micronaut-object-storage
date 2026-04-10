@@ -19,7 +19,6 @@ import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.local.LocalStorageEntry;
 import io.micronaut.objectstorage.local.LocalStorageOperations;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
-import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -61,15 +60,12 @@ public final class LocalStorageS3CompatibleOperations extends AbstractS3Compatib
                                        @NonNull InputStream inputStream,
                                        @Nullable Long contentLength,
                                        @Nullable String contentType) {
-        try {
-            UploadRequest request = UploadRequest.fromBytes(inputStream.readAllBytes(), resolveStorageKey(key));
-            if (contentType != null && !contentType.isBlank()) {
-                request.setContentType(contentType);
-            }
-            return operations.upload(request);
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error reading request body for S3-compatible upload", e);
-        }
+        return operations.upload(new S3CompatibilityUploadRequest(
+            inputStream,
+            resolveStorageKey(key),
+            contentLength,
+            contentType
+        ));
     }
 
     @Override
