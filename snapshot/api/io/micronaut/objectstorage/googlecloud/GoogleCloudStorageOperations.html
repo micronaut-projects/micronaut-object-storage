@@ -82,21 +82,21 @@ loadScripts(document, 'script');</script>
 <div class="header">
 <h1 title="Class GoogleCloudStorageOperations" class="title">Class GoogleCloudStorageOperations</h1>
 </div>
-<div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
+<div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance">io.micronaut.objectstorage.googlecloud.GoogleCloudStorageOperations</div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="annotations">@EachBean(<a href="GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a>.class)
 @Requires(condition=<a href="../configuration/ToggeableCondition.html" title="class in io.micronaut.objectstorage.configuration">ToggeableCondition</a>.class) @Requires(beans=<a href="GoogleCloudStorageConfiguration.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageConfiguration</a>.class)
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">GoogleCloudStorageOperations</span>
-<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</span></div>
+<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
+implements <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</span></div>
 <div class="block">Google Cloud implementation of <a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage"><code>ObjectStorageOperations</code></a>.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -136,8 +136,8 @@ implements <a href="../ObjectStorageOperations.html" title="interface in io.micr
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#copy(java.lang.String,java.lang.String)" class="member-name-link">copy</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;sourceKey,
- @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;destinationKey)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#copy(java.lang.String,java.lang.String)" class="member-name-link">copy</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;sourceKey,
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;destinationKey)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
 same object storage (bucket/container).</div>
@@ -148,22 +148,22 @@ same object storage (bucket/container).</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected @NonNull com.google.cloud.storage.BlobInfo.Builder</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createBlobInfoBuilder(io.micronaut.objectstorage.request.UploadRequest)" class="member-name-link">createBlobInfoBuilder</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="../response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a>&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="../response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)" class="member-name-link">createPresignedUpload</a><wbr>(@NonNull <a href="../request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a>&nbsp;request)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Creates a pre-signed upload request for a single object key.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#delete(java.lang.String)" class="member-name-link">delete</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#delete(java.lang.String)" class="member-name-link">delete</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Deletes an object from the object storage.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exists(java.lang.String)" class="member-name-link">exists</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exists(java.lang.String)" class="member-name-link">exists</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks whether an entry with the given key exists in the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#listObjects()" class="member-name-link">listObjects</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Lists the objects that exist in the object storage.</div>
@@ -173,8 +173,8 @@ same object storage (bucket/container).</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Lists a page of objects that exist in the object storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#retrieve(java.lang.String)" class="member-name-link">retrieve</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the object from object storage.</div>
 </div>
@@ -185,7 +185,7 @@ same object storage (bucket/container).</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a><wbr>&lt;com.google.cloud.storage.Blob&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)" class="member-name-link">upload</a><wbr>(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest,
- @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;com.google.cloud.storage.BlobInfo.Builder&gt;&nbsp;uploadRequestBuilder)</code></div>
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;com.google.cloud.storage.BlobInfo.Builder&gt;&nbsp;uploadRequestBuilder)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads an object to the object storage.</div>
 </div>
@@ -193,8 +193,8 @@ same object storage (bucket/container).</div>
 </div>
 </div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
-<code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
+<h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
+<code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 </section>
 </li>
 </ul>
@@ -239,7 +239,7 @@ same object storage (bucket/container).</div>
 <div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>uploadRequest</code> - the upload request</dd>
 <dt>Returns:</dt>
@@ -253,12 +253,12 @@ same object storage (bucket/container).</div>
 <h3>upload</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="../response/UploadResponse.html" title="interface in io.micronaut.objectstorage.response">UploadResponse</a>&lt;com.google.cloud.storage.Blob&gt;</span>&nbsp;<span class="element-name">upload</span><wbr><span class="parameters">(@NonNull <a href="../request/UploadRequest.html" title="interface in io.micronaut.objectstorage.request">UploadRequest</a>&nbsp;uploadRequest,
- @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;com.google.cloud.storage.BlobInfo.Builder&gt;&nbsp;uploadRequestBuilder)</span></div>
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;com.google.cloud.storage.BlobInfo.Builder&gt;&nbsp;uploadRequestBuilder)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Uploads an object to the object storage. If there is an existing entry, it will be updated.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#upload(io.micronaut.objectstorage.request.UploadRequest,java.util.function.Consumer)">upload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>uploadRequest</code> - the upload request</dd>
 <dd><code>uploadRequestBuilder</code> - Upload request builder consumer</dd>
@@ -272,12 +272,12 @@ same object storage (bucket/container).</div>
 <section class="detail" id="retrieve(java.lang.String)">
 <h3>retrieve</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a>&gt;</span>&nbsp;<span class="element-name">retrieve</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="GoogleCloudStorageEntry.html" title="class in io.micronaut.objectstorage.googlecloud">GoogleCloudStorageEntry</a>&gt;</span>&nbsp;<span class="element-name">retrieve</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#retrieve(java.lang.String)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Gets the object from object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#retrieve(java.lang.String)">retrieve</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#retrieve(java.lang.String)">retrieve</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>key</code> - the object path in the format <code>/foo/bar/file</code></dd>
 <dt>Returns:</dt>
@@ -290,12 +290,12 @@ same object storage (bucket/container).</div>
 <section class="detail" id="delete(java.lang.String)">
 <h3>delete</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a></span>&nbsp;<span class="element-name">delete</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a></span>&nbsp;<span class="element-name">delete</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#delete(java.lang.String)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Deletes an object from the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#delete(java.lang.String)">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#delete(java.lang.String)">delete</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt>Returns:</dt>
@@ -308,12 +308,12 @@ same object storage (bucket/container).</div>
 <section class="detail" id="exists(java.lang.String)">
 <h3>exists</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">exists</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">exists</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#exists(java.lang.String)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Checks whether an entry with the given key exists in the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#exists(java.lang.String)">exists</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#exists(java.lang.String)">exists</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>key</code> - object path in the format <code>/foo/bar/file</code></dd>
 <dt>Returns:</dt>
@@ -326,12 +326,12 @@ same object storage (bucket/container).</div>
 <section class="detail" id="listObjects()">
 <h3>listObjects</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">listObjects</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">listObjects</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#listObjects()">ObjectStorageOperations</a></code></span></div>
 <div class="block">Lists the objects that exist in the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#listObjects()">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#listObjects()">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>a list of keys (paths) of the existing objects, if any, or an empty list otherwise.</dd>
 </dl>
@@ -347,7 +347,7 @@ same object storage (bucket/container).</div>
 <div class="block">Lists a page of objects that exist in the object storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#listObjects(io.micronaut.objectstorage.request.ListObjectsRequest)">listObjects</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - the paginated listing request</dd>
 <dt>Returns:</dt>
@@ -360,14 +360,14 @@ same object storage (bucket/container).</div>
 <section class="detail" id="copy(java.lang.String,java.lang.String)">
 <h3>copy</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">copy</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;sourceKey,
- @NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;destinationKey)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">copy</span><wbr><span class="parameters">(@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;sourceKey,
+ @NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;destinationKey)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#copy(java.lang.String,java.lang.String)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Copies an object stored at <code>sourceKey</code> to <code>destinationKey</code>, within the
 same object storage (bucket/container). If the destination exists, it will be overwritten.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#copy(java.lang.String,java.lang.String)">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#copy(java.lang.String,java.lang.String)">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>sourceKey</code> - the key of the source object</dd>
 <dd><code>destinationKey</code> - the key of the destination object</dd>
@@ -379,12 +379,12 @@ same object storage (bucket/container). If the destination exists, it will be ov
 <section class="detail" id="createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)">
 <h3>createPresignedUpload</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="../response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a>&gt;</span>&nbsp;<span class="element-name">createPresignedUpload</span><wbr><span class="parameters">(@NonNull <a href="../request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a>&nbsp;request)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="../response/PresignedUpload.html" title="class in io.micronaut.objectstorage.response">PresignedUpload</a>&gt;</span>&nbsp;<span class="element-name">createPresignedUpload</span><wbr><span class="parameters">(@NonNull <a href="../request/CreatePresignedUploadRequest.html" title="class in io.micronaut.objectstorage.request">CreatePresignedUploadRequest</a>&nbsp;request)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../ObjectStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)">ObjectStorageOperations</a></code></span></div>
 <div class="block">Creates a pre-signed upload request for a single object key.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../ObjectStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)">createPresignedUpload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
+<dd><code><a href="../ObjectStorageOperations.html#createPresignedUpload(io.micronaut.objectstorage.request.CreatePresignedUploadRequest)">createPresignedUpload</a></code>&nbsp;in interface&nbsp;<code><a href="../ObjectStorageOperations.html" title="interface in io.micronaut.objectstorage">ObjectStorageOperations</a>&lt;com.google.cloud.storage.BlobInfo.Builder, com.google.cloud.storage.Blob, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>request</code> - the pre-signed upload request parameters</dd>
 <dt>Returns:</dt>
