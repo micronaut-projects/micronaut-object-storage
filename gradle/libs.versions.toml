@@ -1,5 +1,5 @@
 [versions]
-micronaut-platform = "5.0.0-M3"
+micronaut-platform = "5.0.0-RC1"
 micronaut = "5.0.0-RC2"
 micronaut-test = "5.0.0-RC1"
 micronaut-aws = "5.0.0-M3"
