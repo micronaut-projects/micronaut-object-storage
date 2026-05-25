@@ -37,16 +37,18 @@ class LocalStorageFilePermissionsSpec extends Specification {
 
         then:
         Files.getPosixFilePermissions(bucket) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets')) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets/reports')) == ownerOnlyFilePermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets/reports')) == ownerOnlyFilePermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested')) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested')) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
 
         cleanup:
         ctx?.close()

@@ -16,19 +16,22 @@ micronaut:
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
 
-NOTE: The local storage implementation reserves the `.metadata` key namespace for per-object metadata files. User object
-keys cannot be `.metadata` or start with `.metadata/` (or `.metadata\` on platforms where the file separator is `\`).
+NOTE: The local storage implementation reserves the `.mn-storage` key namespace for provider-managed metadata and
+temporary rollback files. User object keys cannot be `.mn-storage` or start with `.mn-storage/` (or the equivalent
+platform file separator).
 
 The local implementation is also the reference provider for
 api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[].
-Object metadata sidecars live under the configured bucket's `.metadata` tree, while bucket metadata sidecars live under
-the sibling `.metadata/buckets` tree managed by the local bucket lifecycle API.
+Object metadata sidecars live under the configured bucket's `.mn-storage/metadata` tree, while bucket metadata sidecars
+live under the sibling `.mn-storage/metadata/buckets` tree managed by the local bucket lifecycle API. Temporary local
+file rollback snapshots live under `.mn-storage/snapshots`.
 
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 
 On POSIX-capable file systems, configured bucket paths created by the local implementation use owner-only permissions for
-bucket subdirectories, stored objects, and `.metadata` files. On non-POSIX file systems, Micronaut cannot apply those
-permissions directly, so custom storage paths on shared hosts should be provisioned with restrictive ACLs by the caller.
+bucket subdirectories, stored objects, and provider-managed `.mn-storage` files. On non-POSIX file systems,
+Micronaut cannot apply those permissions directly, so custom storage paths on shared hosts should be provisioned with
+restrictive ACLs by the caller.
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.local.LocalStorageConfiguration.adoc[]
 

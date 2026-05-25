@@ -23,6 +23,7 @@ import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
 import io.micronaut.objectstorage.metadata.ObjectMetadataEntry;
+import io.micronaut.objectstorage.metadata.ObjectMetadataOperations;
 import io.micronaut.objectstorage.metadata.ObjectMetadataWrite;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
@@ -34,9 +35,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -65,15 +69,17 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     LocalStorageOperations.LocalStorageFile,
     LocalStorageOperations.LocalStorageFile> {
 
-    public static final String METADATA_DIRECTORY = ".metadata";
+    static final String INTERNAL_DIRECTORY = ".mn-storage";
+    static final String METADATA_DIRECTORY = "metadata";
+    static final String SNAPSHOT_DIRECTORY = "snapshots";
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
     private final LocalStorageConfiguration configuration;
-    private final LocalStorageObjectMetadataOperations objectMetadataOperations;
+    private final ObjectMetadataOperations<Path> objectMetadataOperations;
     private final boolean supportsPosixPermissions;
 
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
-                                  LocalStorageObjectMetadataOperations objectMetadataOperations) {
+                                  ObjectMetadataOperations<Path> objectMetadataOperations) {
         this.configuration = configuration;
         this.objectMetadataOperations = objectMetadataOperations;
         this.supportsPosixPermissions = configuration.getPath().getFileSystem().supportedFileAttributeViews().contains("posix");
@@ -90,17 +96,26 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request,
                                                    @NonNull Consumer<LocalStorageFile> requestConsumer) {
         Path file = LocalStorageIoSupport.resolveSafe(configuration.getPath(), request.getKey());
-        objectMetadataOperations.prepareMetadataTarget(request.getKey());
-        storeFile(file, request.getInputStream());
-        objectMetadataOperations.save(new ObjectMetadataWrite(
-            request.getKey(),
-            request.getMetadata(),
-            Map.of(),
-            request.getContentType().orElse(null),
-            request.getContentSize().orElse(null),
-            null,
-            null
-        ));
+        StoredFileSnapshot snapshot = snapshotStoredFile(file);
+        RuntimeException failure = null;
+        try {
+            storeFile(file, request.getInputStream());
+            objectMetadataOperations.save(new ObjectMetadataWrite(
+                request.getKey(),
+                request.getMetadata(),
+                Map.of(),
+                request.getContentType().orElse(null),
+                request.getContentSize().orElse(null),
+                null,
+                null
+            ));
+        } catch (RuntimeException e) {
+            failure = e;
+            restoreStoredFileAfterFailure(file, snapshot, e);
+            throw e;
+        } finally {
+            deleteSnapshot(snapshot, failure);
+        }
         LocalStorageFile localFile = new LocalStorageFile(file);
         requestConsumer.accept(localFile);
         return UploadResponse.of(request.getKey(), UUID.randomUUID().toString(), localFile);
@@ -122,8 +137,24 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @NonNull
     public LocalStorageFile delete(@NonNull String key) {
         Optional<Path> file = retrieveFile(key);
-        deleteFile(key);
-        objectMetadataOperations.delete(key);
+        if (file.isEmpty()) {
+            objectMetadataOperations.delete(key);
+            return new LocalStorageFile(null);
+        }
+        file.ifPresent(path -> {
+            StoredFileSnapshot snapshot = snapshotStoredFile(path);
+            RuntimeException failure = null;
+            try {
+                deleteFile(path);
+                objectMetadataOperations.delete(key);
+            } catch (RuntimeException e) {
+                failure = e;
+                restoreStoredFileAfterFailure(path, snapshot, e);
+                throw e;
+            } finally {
+                deleteSnapshot(snapshot, failure);
+            }
+        });
         return new LocalStorageFile(file.orElse(null));
     }
 
@@ -161,7 +192,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 if (File.separatorChar != '/') {
                     key = key.replace(File.separatorChar, '/');
                 }
-                if (key.startsWith(METADATA_DIRECTORY)) {
+                if (isReservedLocalStorageKey(key)) {
                     return;
                 }
                 if (prefix != null && !key.startsWith(prefix)) {
@@ -209,23 +240,35 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
         retrieveFile(sourceKey).ifPresent(source -> {
             Path destinationFile = LocalStorageIoSupport.resolveSafe(configuration.getPath(), destinationKey);
-            objectMetadataOperations.prepareMetadataTarget(destinationKey);
+            StoredFileSnapshot snapshot = snapshotStoredFile(destinationFile);
+            RuntimeException failure = null;
             try (InputStream in = newInputStreamNoFollow(source)) {
-                storeFile(destinationFile, in);
-                objectMetadataOperations.retrieve(sourceKey).ifPresentOrElse(entry ->
-                    objectMetadataOperations.save(new ObjectMetadataWrite(
-                        destinationKey,
-                        entry.metadata(),
-                        entry.attributes(),
-                        entry.contentType(),
-                        entry.contentLength(),
-                        entry.etag(),
-                        entry.lastModified()
-                    )),
-                    () -> objectMetadataOperations.delete(destinationKey)
-                );
+                try {
+                    storeFile(destinationFile, in);
+                    objectMetadataOperations.retrieve(sourceKey).ifPresentOrElse(entry ->
+                        objectMetadataOperations.save(new ObjectMetadataWrite(
+                            destinationKey,
+                            entry.metadata(),
+                            entry.attributes(),
+                            entry.contentType(),
+                            entry.contentLength(),
+                            entry.etag(),
+                            entry.lastModified()
+                        )),
+                        () -> objectMetadataOperations.delete(destinationKey)
+                    );
+                } catch (RuntimeException e) {
+                    failure = e;
+                    restoreStoredFileAfterFailure(destinationFile, snapshot, e);
+                    throw e;
+                }
             } catch (IOException e) {
-                throw new ObjectStorageException("Error copying file: " + source, e);
+                ObjectStorageException objectStorageException = new ObjectStorageException("Error copying file: " + source, e);
+                failure = objectStorageException;
+                restoreStoredFileAfterFailure(destinationFile, snapshot, objectStorageException);
+                throw objectStorageException;
+            } finally {
+                deleteSnapshot(snapshot, failure);
             }
         });
     }
@@ -239,14 +282,129 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
-    private void deleteFile(String key) {
-        retrieveFile(key).ifPresent(path -> {
-            try {
-                Files.delete(path);
-            } catch (IOException e) {
-                throw new ObjectStorageException("Error deleting file: " + path, e);
+    private void deleteFile(Path path) {
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new ObjectStorageException("Error deleting file: " + path, e);
+        }
+    }
+
+    private StoredFileSnapshot snapshotStoredFile(Path file) {
+        if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+            return StoredFileSnapshot.empty();
+        }
+        Path snapshotDirectory = snapshotDirectory();
+        List<Path> cleanupDirectories = snapshotCleanupDirectories(snapshotDirectory);
+        Path snapshot = null;
+        try {
+            LocalStorageIoSupport.rejectSymbolicLinks(configuration.getPath().normalize(), snapshotDirectory.normalize());
+            mkdirs(snapshotDirectory);
+            LocalStorageIoSupport.rejectSymbolicLinks(configuration.getPath().normalize(), snapshotDirectory.normalize());
+            snapshot = LocalStorageIoSupport.createTempFile(
+                snapshotDirectory,
+                "micronaut-object-storage-local",
+                ".snapshot",
+                supportsPosixPermissions
+            );
+            try (InputStream in = newInputStreamNoFollow(file);
+                 OutputStream out = Files.newOutputStream(snapshot)) {
+                in.transferTo(out);
             }
-        });
+            return new StoredFileSnapshot(snapshot, cleanupDirectories);
+        } catch (IOException e) {
+            if (snapshot != null) {
+                try {
+                    Files.deleteIfExists(snapshot);
+                } catch (IOException cleanupFailure) {
+                    e.addSuppressed(cleanupFailure);
+                }
+            }
+            deleteEmptySnapshotDirectories(cleanupDirectories, e);
+            throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
+        }
+    }
+
+    private void restoreStoredFileAfterFailure(Path file, StoredFileSnapshot snapshot, RuntimeException failure) {
+        try {
+            // Restore only the local file state; metadata-store transactionality belongs to the metadata implementation.
+            if (snapshot.exists()) {
+                moveSnapshotReplacing(snapshot.path(), file);
+            } else {
+                Files.deleteIfExists(file);
+            }
+        } catch (IOException | RuntimeException e) {
+            failure.addSuppressed(e);
+        }
+    }
+
+    private void moveSnapshotReplacing(Path snapshot, Path file) throws IOException {
+        try {
+            Files.move(snapshot, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException e) {
+            try {
+                Files.move(snapshot, file, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException fallbackFailure) {
+                fallbackFailure.addSuppressed(e);
+                throw fallbackFailure;
+            }
+        }
+    }
+
+    private void deleteSnapshot(StoredFileSnapshot snapshot, RuntimeException failure) {
+        if (snapshot.exists()) {
+            try {
+                Files.deleteIfExists(snapshot.path());
+            } catch (IOException e) {
+                if (failure != null) {
+                    failure.addSuppressed(e);
+                } else {
+                    throw new ObjectStorageException("Error deleting temporary file snapshot: " + snapshot.path(), e);
+                }
+            }
+        }
+        deleteEmptySnapshotDirectories(snapshot.cleanupDirectories(), failure);
+    }
+
+    private Path snapshotDirectory() {
+        return internalDirectory().resolve(SNAPSHOT_DIRECTORY);
+    }
+
+    private List<Path> snapshotCleanupDirectories(Path snapshotDirectory) {
+        return List.of(snapshotDirectory, internalDirectory());
+    }
+
+    private Path internalDirectory() {
+        return configuration.getPath().resolve(INTERNAL_DIRECTORY);
+    }
+
+    static Optional<String> reservedLocalStorageNamespace(String name) {
+        if (INTERNAL_DIRECTORY.equalsIgnoreCase(name)) {
+            return Optional.of(INTERNAL_DIRECTORY);
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isReservedLocalStorageKey(String key) {
+        int separator = key.indexOf('/');
+        String firstSegment = separator >= 0 ? key.substring(0, separator) : key;
+        return reservedLocalStorageNamespace(firstSegment).isPresent();
+    }
+
+    private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
+        for (Path directory : directories) {
+            try {
+                Files.deleteIfExists(directory);
+            } catch (DirectoryNotEmptyException ignored) {
+                // Another temporary snapshot still uses this directory.
+            } catch (IOException e) {
+                if (failure != null) {
+                    failure.addSuppressed(e);
+                } else {
+                    throw new ObjectStorageException("Error deleting temporary snapshot directory: " + directory, e);
+                }
+            }
+        }
     }
 
     private Path storeFile(Path file, InputStream inputStream) {
@@ -276,4 +434,14 @@ public class LocalStorageOperations implements ObjectStorageOperations<
      * @param path Where on disk the local storage provider has stored the actual data.
      */
     public record LocalStorageFile(Path path) { }
+
+    private record StoredFileSnapshot(Path path, List<Path> cleanupDirectories) {
+        static StoredFileSnapshot empty() {
+            return new StoredFileSnapshot(null, List.of());
+        }
+
+        boolean exists() {
+            return path != null;
+        }
+    }
 }

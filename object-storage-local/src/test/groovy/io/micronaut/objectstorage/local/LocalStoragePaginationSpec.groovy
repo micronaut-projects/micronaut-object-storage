@@ -50,9 +50,9 @@ class LocalStoragePaginationSpec extends spock.lang.Specification implements Tes
         secondPage.continuationToken.empty
         replayedTerminalPage.keys.empty
         replayedTerminalPage.continuationToken.empty
-        !firstPage.keys.any { it.startsWith('.metadata') }
-        !secondPage.keys.any { it.startsWith('.metadata') }
-        !replayedTerminalPage.keys.any { it.startsWith('.metadata') }
+        !firstPage.keys.any { it.startsWith('.mn-storage') }
+        !secondPage.keys.any { it.startsWith('.mn-storage') }
+        !replayedTerminalPage.keys.any { it.startsWith('.mn-storage') }
     }
 
     void 'continuation token is a strict lower bound and malicious prefixes stay inside the bucket'() {
@@ -60,7 +60,7 @@ class LocalStoragePaginationSpec extends spock.lang.Specification implements Tes
         def page = operations.listObjects(new ListObjectsRequest(2, null, 'animals/dog.txt'))
         def allKeys = operations.listObjects() as List
         def maliciousPrefixPage = operations.listObjects(new ListObjectsRequest(5, '../'))
-        def metadataPrefixPage = operations.listObjects(new ListObjectsRequest(5, '.metadata'))
+        def metadataPrefixPage = operations.listObjects(new ListObjectsRequest(5, '.mn-storage'))
 
         then:
         page.keys == ['animals/mammals/fox.txt', 'animals/zebra.txt']

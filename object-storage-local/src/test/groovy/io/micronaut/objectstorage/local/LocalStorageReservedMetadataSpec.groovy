@@ -8,6 +8,8 @@ import jakarta.inject.Inject
 import spock.lang.Specification
 
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 
 @MicronautTest
 class LocalStorageReservedMetadataSpec extends Specification implements TestPropertyProvider {
@@ -24,7 +26,7 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.listObjects().each { operations.delete(it) }
     }
 
-    void 'reserved metadata keys are rejected for upload without corrupting stored metadata'() {
+    void 'reserved local storage keys are rejected for upload without corrupting stored metadata'() {
         given:
         def request = UploadRequest.fromBytes('safe'.bytes, 'foo.txt', 'text/plain')
         request.metadata = [owner: 'safe']
@@ -35,7 +37,7 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
 
         then:
         def ex = thrown(IllegalArgumentException)
-        ex.message == "Key uses the reserved .metadata namespace: ${key}"
+        ex.message == "Key uses the reserved ${reservedNamespace(key)} namespace: ${key}"
         operations.listObjects() == ['foo.txt'] as Set
         operations.retrieve('foo.txt').get().metadata == [owner: 'safe']
 
@@ -43,66 +45,85 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         key << blockedKeys()
     }
 
-    void 'reserved metadata keys are rejected for direct object operations'() {
+    void 'reserved local storage keys are rejected for direct object operations'() {
         when:
         operations.retrieve(key)
 
         then:
         def retrieveException = thrown(IllegalArgumentException)
-        retrieveException.message == "Key uses the reserved .metadata namespace: ${key}"
+        retrieveException.message == "Key uses the reserved ${reservedNamespace(key)} namespace: ${key}"
 
         when:
         operations.delete(key)
 
         then:
         def deleteException = thrown(IllegalArgumentException)
-        deleteException.message == "Key uses the reserved .metadata namespace: ${key}"
+        deleteException.message == "Key uses the reserved ${reservedNamespace(key)} namespace: ${key}"
 
         when:
         operations.exists(key)
 
         then:
         def existsException = thrown(IllegalArgumentException)
-        existsException.message == "Key uses the reserved .metadata namespace: ${key}"
+        existsException.message == "Key uses the reserved ${reservedNamespace(key)} namespace: ${key}"
 
         when:
         operations.upload(UploadRequest.fromBytes('blocked'.bytes, key, 'text/plain'))
 
         then:
         def uploadException = thrown(IllegalArgumentException)
-        uploadException.message == "Key uses the reserved .metadata namespace: ${key}"
+        uploadException.message == "Key uses the reserved ${reservedNamespace(key)} namespace: ${key}"
 
         where:
         key << blockedKeys()
     }
 
-    void 'listing never exposes the reserved metadata namespace'() {
+    void 'listing never exposes reserved local storage namespaces'() {
         given:
         operations.upload(UploadRequest.fromBytes('visible'.bytes, 'visible.txt', 'text/plain'))
+        def bucketPath = operations.retrieve('visible.txt').get().nativeEntry.parent
+        Path internalDirectory = bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+        Path snapshotDirectory = internalDirectory.resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
+        Files.createDirectories(snapshotDirectory)
+        Files.writeString(snapshotDirectory.resolve('temporary'), 'hidden')
 
         expect:
-        operations.listObjects(new ListObjectsRequest(5, '.metadata')).keys.empty
-        operations.listObjects(new ListObjectsRequest(5, '.metadata/')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.mn-storage')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.mn-storage/')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.mn-storage/metadata')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.mn-storage/snapshots')).keys.empty
         operations.listObjects() == ['visible.txt'] as Set
+
+        cleanup:
+        Files.deleteIfExists(snapshotDirectory.resolve('temporary'))
+        Files.deleteIfExists(snapshotDirectory)
     }
 
     private static List<String> blockedKeys() {
-        def keys = ['.metadata', '.Metadata', '.METADATA']
-                .collectMany { metadataDirectory ->
+        def keys = reservedNamespaces()
+                .collectMany { reservedNamespace ->
                     [
-                            metadataDirectory,
-                            "${metadataDirectory}/nested.txt",
-                            "foo/../${metadataDirectory}/nested.txt",
-                            "./${metadataDirectory}/nested.txt"
+                            reservedNamespace,
+                            "${reservedNamespace}/nested.txt",
+                            "foo/../${reservedNamespace}/nested.txt",
+                            "./${reservedNamespace}/nested.txt"
                     ]
                 }
         if (File.separatorChar != '/') {
-            ['.metadata', '.Metadata', '.METADATA'].each { metadataDirectory ->
-                keys << "${metadataDirectory}${File.separator}nested.txt"
-                keys << "foo${File.separator}..${File.separator}${metadataDirectory}${File.separator}nested.txt"
-                keys << ".${File.separator}${metadataDirectory}${File.separator}nested.txt"
+            reservedNamespaces().each { reservedNamespace ->
+                keys << "${reservedNamespace}${File.separator}nested.txt"
+                keys << "foo${File.separator}..${File.separator}${reservedNamespace}${File.separator}nested.txt"
+                keys << ".${File.separator}${reservedNamespace}${File.separator}nested.txt"
             }
         }
         keys
+    }
+
+    private static List<String> reservedNamespaces() {
+        ['.mn-storage', '.Mn-Storage', '.MN-STORAGE']
+    }
+
+    private static String reservedNamespace(String key) {
+        '.mn-storage'
     }
 }

@@ -19,6 +19,7 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.objectstorage.bucket.BucketEntry;
 import io.micronaut.objectstorage.bucket.BucketOperations;
+import io.micronaut.objectstorage.metadata.BucketMetadataOperations;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -40,10 +41,10 @@ import java.util.Optional;
 @EachBean(LocalStorageConfiguration.class)
 final class LocalStorageBucketOperations implements BucketOperations<Path> {
     private final Path rootDirectory;
-    private final LocalStorageBucketMetadataOperations bucketMetadataOperations;
+    private final BucketMetadataOperations<Path> bucketMetadataOperations;
 
     LocalStorageBucketOperations(@Parameter LocalStorageConfiguration configuration,
-                                 LocalStorageBucketMetadataOperations bucketMetadataOperations) {
+                                 BucketMetadataOperations<Path> bucketMetadataOperations) {
         this.rootDirectory = configuration.getPath().toAbsolutePath().normalize().getParent();
         this.bucketMetadataOperations = bucketMetadataOperations;
         if (rootDirectory == null) {

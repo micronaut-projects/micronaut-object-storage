@@ -33,7 +33,9 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
     void 'legacy sidecars without a marker stay in legacy mode even for structured-looking keys'() {
         given:
         ctx.getBean(LocalStorageOperations).upload(UploadRequest.fromBytes('hello'.bytes, 'legacy.txt', 'text/plain'))
-        Path legacyFile = bucketPath.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('legacy.txt')
+        Path legacyFile = bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.METADATA_DIRECTORY)
+            .resolve('legacy.txt')
         Files.createDirectories(legacyFile.parent)
         Properties legacy = new Properties()
         legacy.setProperty('metadata.owner', 'ops')
@@ -75,7 +77,9 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
             null
         ))
         Properties stored = new Properties()
-        Files.newInputStream(bucketPath.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('structured.txt')).withCloseable {
+        Files.newInputStream(bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.METADATA_DIRECTORY)
+            .resolve('structured.txt')).withCloseable {
             stored.load(it)
         }
         def entry = metadataOperations.retrieve('structured.txt').get()

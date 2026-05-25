@@ -17,6 +17,7 @@ package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Secondary;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.metadata.ObjectMetadataEntry;
 import io.micronaut.objectstorage.metadata.ObjectMetadataOperations;
@@ -39,6 +40,7 @@ import java.util.Properties;
  * @author Álvaro Sánchez-Mariscal
  */
 @EachBean(LocalStorageConfiguration.class)
+@Secondary
 final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperations<Path> {
 
     private final Path bucketPath;
@@ -47,11 +49,10 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
 
     LocalStorageObjectMetadataOperations(@Parameter LocalStorageConfiguration configuration) {
         this.bucketPath = configuration.getPath();
-        this.metadataRoot = bucketPath.resolve(LocalStorageOperations.METADATA_DIRECTORY);
+        this.metadataRoot = bucketPath
+            .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.METADATA_DIRECTORY);
         this.supportsPosixPermissions = bucketPath.getFileSystem().supportedFileAttributeViews().contains("posix");
-        if (!LocalStorageIoSupport.mkdirs(bucketPath, metadataRoot, supportsPosixPermissions)) {
-            throw new ObjectStorageException("Error creating metadata directory: " + metadataRoot);
-        }
     }
 
     @Override
@@ -97,10 +98,11 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
     }
 
     private Path metadataFilePath(String key) {
+        LocalStorageIoSupport.rejectSymbolicLinks(bucketPath, metadataRoot);
         return LocalStorageIoSupport.resolveSafe(metadataRoot, key);
     }
 
-    Path prepareMetadataTarget(String key) {
+    private Path prepareMetadataTarget(String key) {
         Path metadataFile = metadataFilePath(key);
         if (!LocalStorageIoSupport.mkdirs(metadataRoot, metadataFile.getParent(), supportsPosixPermissions)) {
             throw new ObjectStorageException("Error creating metadata directories for object: " + key);

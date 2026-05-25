@@ -97,6 +97,13 @@ final class LocalStorageIoSupport {
         )));
     }
 
+    static Path createTempFile(Path directory, String prefix, String suffix, boolean supportsPosixPermissions) throws IOException {
+        if (supportsPosixPermissions) {
+            return Files.createTempFile(directory, prefix, suffix, FILE_PERMISSIONS_ATTRIBUTE);
+        }
+        return Files.createTempFile(directory, prefix, suffix);
+    }
+
     static InputStream newInputStreamNoFollow(Path path) throws IOException {
         return Channels.newInputStream(Files.newByteChannel(path, Set.of(StandardOpenOption.READ, LinkOption.NOFOLLOW_LINKS)));
     }
@@ -120,8 +127,9 @@ final class LocalStorageIoSupport {
             !path.getFileName().toString().equals(name)) {
             throw new IllegalArgumentException("Bucket name must not contain filesystem special characters");
         }
-        if (LocalStorageOperations.METADATA_DIRECTORY.equalsIgnoreCase(name)) {
-            throw new IllegalArgumentException("Bucket name uses the reserved " + LocalStorageOperations.METADATA_DIRECTORY + " namespace: " + name);
+        String reservedNamespace = LocalStorageOperations.reservedLocalStorageNamespace(name).orElse(null);
+        if (reservedNamespace != null) {
+            throw new IllegalArgumentException("Bucket name uses the reserved " + reservedNamespace + " namespace: " + name);
         }
         rejectSymbolicLinks(rootDirectory, path);
         return path;
@@ -139,9 +147,11 @@ final class LocalStorageIoSupport {
     }
 
     private static void validateKey(Path normalizedRelativePath, String key) {
-        if (normalizedRelativePath.getNameCount() > 0
-            && LocalStorageOperations.METADATA_DIRECTORY.equalsIgnoreCase(normalizedRelativePath.getName(0).toString())) {
-            throw new IllegalArgumentException("Key uses the reserved " + LocalStorageOperations.METADATA_DIRECTORY + " namespace: " + key);
+        if (normalizedRelativePath.getNameCount() > 0) {
+            String reservedNamespace = LocalStorageOperations.reservedLocalStorageNamespace(normalizedRelativePath.getName(0).toString()).orElse(null);
+            if (reservedNamespace != null) {
+                throw new IllegalArgumentException("Key uses the reserved " + reservedNamespace + " namespace: " + key);
+            }
         }
     }
 
@@ -151,7 +161,7 @@ final class LocalStorageIoSupport {
         }
     }
 
-    private static void rejectSymbolicLinks(Path parent, Path file) {
+    static void rejectSymbolicLinks(Path parent, Path file) {
         Path current = parent;
         for (Path segment : parent.relativize(file)) {
             current = current.resolve(segment);

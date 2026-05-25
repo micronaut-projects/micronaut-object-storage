@@ -18,6 +18,7 @@ package io.micronaut.objectstorage.local;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.internal.DefaultReactiveObjectMetadataOperations;
+import io.micronaut.objectstorage.metadata.ObjectMetadataOperations;
 import io.micronaut.scheduling.TaskExecutors;
 import jakarta.inject.Named;
 
@@ -32,10 +33,10 @@ import java.util.concurrent.ExecutorService;
  */
 @EachBean(LocalStorageConfiguration.class)
 @Requires(beans = LocalStorageConfiguration.class)
-@Requires(beans = LocalStorageObjectMetadataOperations.class)
+@Requires(beans = ObjectMetadataOperations.class)
 public class LocalStorageReactiveObjectMetadataOperations extends DefaultReactiveObjectMetadataOperations<Path> {
 
-    public LocalStorageReactiveObjectMetadataOperations(LocalStorageObjectMetadataOperations operations,
+    public LocalStorageReactiveObjectMetadataOperations(ObjectMetadataOperations<Path> operations,
                                                         @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         super(operations, blockingExecutor);
     }

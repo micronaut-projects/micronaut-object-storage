@@ -117,7 +117,7 @@ class LocalStoragePathTraversalSpec extends Specification {
         Path metadataTarget = outside.resolve("metadata-target")
         Files.createDirectory(metadataTarget)
         assumeSymbolicLinksSupported(tmp)
-        Files.createSymbolicLink(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY), metadataTarget)
+        Files.createSymbolicLink(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY), metadataTarget)
 
         ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
         UploadRequest request = UploadRequest.fromBytes("evil".bytes, "public", "text/plain")
@@ -129,7 +129,7 @@ class LocalStoragePathTraversalSpec extends Specification {
         then:
         thrown IllegalArgumentException
         !Files.exists(bucket.resolve("public"))
-        !Files.exists(metadataTarget.resolve("public"))
+        !Files.exists(metadataTarget.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve("public"))
 
         cleanup:
         ctx?.close()
