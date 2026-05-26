@@ -27,6 +27,8 @@ import java.util.UUID
 
 abstract class BucketMetadataOperationsSpecification extends Specification {
 
+    private static final String OWNER = "cliponaut"
+
     void 'it can save retrieve update and delete bucket metadata'() {
         given:
         BucketOperations<?> bucketOperations = getBucketOperations()
@@ -42,12 +44,12 @@ abstract class BucketMetadataOperationsSpecification extends Specification {
         }
 
         when:
-        metadataOperations.save(new BucketMetadataWrite(bucketName, [region: "test"], [owner: "cliponaut"]))
+        metadataOperations.save(new BucketMetadataWrite(bucketName, [region: "test"], [owner: OWNER]))
 
         then:
         metadataOperations.retrieve(bucketName).present
         metadataOperations.retrieve(bucketName).get().metadata == [region: "test"]
-        metadataOperations.retrieve(bucketName).get().attributes == [owner: "cliponaut"]
+        metadataOperations.retrieve(bucketName).get().attributes == [owner: OWNER]
 
         when:
         metadataOperations.save(new BucketMetadataWrite(bucketName, [region: "prod"], [owner: "core"]))
@@ -81,7 +83,7 @@ abstract class BucketMetadataOperationsSpecification extends Specification {
         when:
         storage.upload(UploadRequest.fromBytes("foo".bytes, key))
         bucketOperations.create(bucketName)
-        metadataOperations.save(new BucketMetadataWrite(bucketName, [region: "test"], [owner: "cliponaut"]))
+        metadataOperations.save(new BucketMetadataWrite(bucketName, [region: "test"], [owner: OWNER]))
 
         then:
         conditions.eventually {

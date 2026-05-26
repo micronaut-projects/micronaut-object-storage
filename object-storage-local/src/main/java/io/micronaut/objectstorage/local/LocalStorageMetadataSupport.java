@@ -103,7 +103,7 @@ final class LocalStorageMetadataSupport {
     }
 
     private static Map<String, String> readLegacyMetadata(Properties properties) {
-        Map<String, String> metadata = new HashMap<>(properties.size());
+        Map<String, String> metadata = HashMap.newHashMap(properties.size());
         for (String name : properties.stringPropertyNames()) {
             metadata.put(name, properties.getProperty(name));
         }

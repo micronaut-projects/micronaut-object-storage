@@ -25,12 +25,16 @@ import java.util.UUID
 
 abstract class ObjectMetadataOperationsSpecification extends Specification {
 
+    private static final String INITIAL_CONTENT = "micronaut"
+    private static final String UPDATED_PROJECT = "updated"
+    private static final String OWNER = "cliponaut"
+
     void 'it can save retrieve update and delete object metadata without rewriting object bytes'() {
         given:
         ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
         ObjectMetadataOperations<?> metadataOperations = getObjectMetadataOperations()
         String key = "metadata-${UUID.randomUUID()}.txt"
-        UploadRequest request = UploadRequest.fromBytes("micronaut".bytes, key, "text/plain")
+        UploadRequest request = UploadRequest.fromBytes(INITIAL_CONTENT.bytes, key, "text/plain")
         request.metadata = [project: "initial"]
         storage.upload(request)
 
@@ -45,8 +49,8 @@ abstract class ObjectMetadataOperationsSpecification extends Specification {
         when:
         metadataOperations.save(new ObjectMetadataWrite(
             key,
-            [project: "updated"],
-            [owner: "cliponaut"],
+            [project: UPDATED_PROJECT],
+            [owner: OWNER],
             initial.get().contentType(),
             initial.get().contentLength(),
             initial.get().etag(),
@@ -54,10 +58,10 @@ abstract class ObjectMetadataOperationsSpecification extends Specification {
         ))
 
         then:
-        metadataOperations.retrieve(key).get().metadata == [project: "updated"]
-        metadataOperations.retrieve(key).get().attributes == [owner: "cliponaut"]
-        storage.retrieve(key).get().metadata == [project: "updated"]
-        new String(storage.retrieve(key).get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "micronaut"
+        metadataOperations.retrieve(key).get().metadata == [project: UPDATED_PROJECT]
+        metadataOperations.retrieve(key).get().attributes == [owner: OWNER]
+        storage.retrieve(key).get().metadata == [project: UPDATED_PROJECT]
+        new String(storage.retrieve(key).get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == INITIAL_CONTENT
 
         when:
         metadataOperations.delete(key)
@@ -66,7 +70,7 @@ abstract class ObjectMetadataOperationsSpecification extends Specification {
         !metadataOperations.retrieve(key).present
         storage.retrieve(key).present
         storage.retrieve(key).get().metadata == [:]
-        new String(storage.retrieve(key).get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == "micronaut"
+        new String(storage.retrieve(key).get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == INITIAL_CONTENT
 
         cleanup:
         if (storage.exists(key)) {

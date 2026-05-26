@@ -238,39 +238,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     @Override
     public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
-        retrieveFile(sourceKey).ifPresent(source -> {
-            Path destinationFile = LocalStorageIoSupport.resolveSafe(configuration.getPath(), destinationKey);
-            StoredFileSnapshot snapshot = snapshotStoredFile(destinationFile);
-            RuntimeException failure = null;
-            try (InputStream in = newInputStreamNoFollow(source)) {
-                try {
-                    storeFile(destinationFile, in);
-                    objectMetadataOperations.retrieve(sourceKey).ifPresentOrElse(entry ->
-                        objectMetadataOperations.save(new ObjectMetadataWrite(
-                            destinationKey,
-                            entry.metadata(),
-                            entry.attributes(),
-                            entry.contentType(),
-                            entry.contentLength(),
-                            entry.etag(),
-                            entry.lastModified()
-                        )),
-                        () -> objectMetadataOperations.delete(destinationKey)
-                    );
-                } catch (RuntimeException e) {
-                    failure = e;
-                    restoreStoredFileAfterFailure(destinationFile, snapshot, e);
-                    throw e;
-                }
-            } catch (IOException e) {
-                ObjectStorageException objectStorageException = new ObjectStorageException("Error copying file: " + source, e);
-                failure = objectStorageException;
-                restoreStoredFileAfterFailure(destinationFile, snapshot, objectStorageException);
-                throw objectStorageException;
-            } finally {
-                deleteSnapshot(snapshot, failure);
-            }
-        });
+        retrieveFile(sourceKey).ifPresent(source -> copyStoredFile(sourceKey, source, destinationKey));
     }
 
     private Optional<Path> retrieveFile(String key) {
@@ -290,39 +258,78 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
+    private void copyStoredFile(String sourceKey, Path source, String destinationKey) {
+        Path destinationFile = LocalStorageIoSupport.resolveSafe(configuration.getPath(), destinationKey);
+        StoredFileSnapshot snapshot = snapshotStoredFile(destinationFile);
+        RuntimeException failure = null;
+        try (InputStream in = newInputStreamNoFollow(source)) {
+            storeFile(destinationFile, in);
+            copyObjectMetadata(sourceKey, destinationKey);
+        } catch (IOException e) {
+            ObjectStorageException objectStorageException = new ObjectStorageException("Error copying file: " + source, e);
+            failure = objectStorageException;
+            restoreStoredFileAfterFailure(destinationFile, snapshot, objectStorageException);
+            throw objectStorageException;
+        } catch (RuntimeException e) {
+            failure = e;
+            restoreStoredFileAfterFailure(destinationFile, snapshot, e);
+            throw e;
+        } finally {
+            deleteSnapshot(snapshot, failure);
+        }
+    }
+
+    private void copyObjectMetadata(String sourceKey, String destinationKey) {
+        objectMetadataOperations.retrieve(sourceKey).ifPresentOrElse(entry ->
+            objectMetadataOperations.save(new ObjectMetadataWrite(
+                destinationKey,
+                entry.metadata(),
+                entry.attributes(),
+                entry.contentType(),
+                entry.contentLength(),
+                entry.etag(),
+                entry.lastModified()
+            )),
+            () -> objectMetadataOperations.delete(destinationKey)
+        );
+    }
+
     private StoredFileSnapshot snapshotStoredFile(Path file) {
         if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
             return StoredFileSnapshot.empty();
         }
         Path snapshotDirectory = snapshotDirectory();
         List<Path> cleanupDirectories = snapshotCleanupDirectories(snapshotDirectory);
-        Path snapshot = null;
         try {
             LocalStorageIoSupport.rejectSymbolicLinks(configuration.getPath().normalize(), snapshotDirectory.normalize());
             mkdirs(snapshotDirectory);
             LocalStorageIoSupport.rejectSymbolicLinks(configuration.getPath().normalize(), snapshotDirectory.normalize());
-            snapshot = LocalStorageIoSupport.createTempFile(
+            Path snapshot = LocalStorageIoSupport.createTempFile(
                 snapshotDirectory,
                 "micronaut-object-storage-local",
                 ".snapshot",
                 supportsPosixPermissions
             );
-            try (InputStream in = newInputStreamNoFollow(file);
-                 OutputStream out = Files.newOutputStream(snapshot)) {
-                in.transferTo(out);
-            }
-            return new StoredFileSnapshot(snapshot, cleanupDirectories);
+            return copyStoredFileToSnapshot(file, snapshot, cleanupDirectories);
         } catch (IOException e) {
-            if (snapshot != null) {
-                try {
-                    Files.deleteIfExists(snapshot);
-                } catch (IOException cleanupFailure) {
-                    e.addSuppressed(cleanupFailure);
-                }
-            }
             deleteEmptySnapshotDirectories(cleanupDirectories, e);
             throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         }
+    }
+
+    private StoredFileSnapshot copyStoredFileToSnapshot(Path file, Path snapshot, List<Path> cleanupDirectories) throws IOException {
+        try (InputStream in = newInputStreamNoFollow(file);
+             OutputStream out = Files.newOutputStream(snapshot)) {
+            in.transferTo(out);
+        } catch (IOException e) {
+            try {
+                Files.deleteIfExists(snapshot);
+            } catch (IOException cleanupFailure) {
+                e.addSuppressed(cleanupFailure);
+            }
+            throw e;
+        }
+        return new StoredFileSnapshot(snapshot, cleanupDirectories);
     }
 
     private void restoreStoredFileAfterFailure(Path file, StoredFileSnapshot snapshot, RuntimeException failure) {
