@@ -2,6 +2,7 @@ package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.annotation.Factory
+import io.micronaut.context.annotation.Primary
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import io.micronaut.objectstorage.metadata.BucketMetadataEntry
@@ -229,12 +230,14 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
 
         @Singleton
         @Named("default")
+        @Primary
         CustomObjectMetadataOperations objectMetadataOperations() {
             new CustomObjectMetadataOperations()
         }
 
         @Singleton
         @Named("default")
+        @Primary
         CustomBucketMetadataOperations bucketMetadataOperations() {
             new CustomBucketMetadataOperations()
         }

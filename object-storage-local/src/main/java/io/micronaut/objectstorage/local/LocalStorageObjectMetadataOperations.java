@@ -17,7 +17,6 @@ package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.context.annotation.Secondary;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.metadata.ObjectMetadataEntry;
 import io.micronaut.objectstorage.metadata.ObjectMetadataOperations;
@@ -40,7 +39,6 @@ import java.util.Properties;
  * @author Álvaro Sánchez-Mariscal
  */
 @EachBean(LocalStorageConfiguration.class)
-@Secondary
 final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperations<Path> {
 
     private final Path bucketPath;
