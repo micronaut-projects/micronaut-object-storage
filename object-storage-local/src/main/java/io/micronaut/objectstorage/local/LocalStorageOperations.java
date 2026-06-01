@@ -29,6 +29,7 @@ import io.micronaut.objectstorage.request.ListObjectsRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
+import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 
 import java.io.File;
@@ -78,6 +79,20 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private final ObjectMetadataOperations<Path> objectMetadataOperations;
     private final boolean supportsPosixPermissions;
 
+    /**
+     * Create local storage operations.
+     *
+     * @param configuration The local storage configuration.
+     * @param objectMetadataOperations The local object metadata operations.
+     * @deprecated Use {@link #LocalStorageOperations(LocalStorageConfiguration, ObjectMetadataOperations)} instead.
+     */
+    @Deprecated(since = "3.0.0")
+    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
+                                  LocalStorageObjectMetadataOperations objectMetadataOperations) {
+        this(configuration, (ObjectMetadataOperations<Path>) objectMetadataOperations);
+    }
+
+    @Inject
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
                                   ObjectMetadataOperations<Path> objectMetadataOperations) {
         this.configuration = configuration;
