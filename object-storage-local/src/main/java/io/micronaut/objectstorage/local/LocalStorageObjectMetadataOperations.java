@@ -53,6 +53,9 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
             .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageOperations.METADATA_DIRECTORY);
         this.supportsPosixPermissions = bucketPath.getFileSystem().supportedFileAttributeViews().contains("posix");
+        if (!LocalStorageIoSupport.mkdirs(bucketPath, metadataRoot, supportsPosixPermissions)) {
+            throw new ObjectStorageException("Error creating metadata directory: " + metadataRoot);
+        }
     }
 
     @Override

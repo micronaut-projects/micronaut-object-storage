@@ -211,8 +211,6 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         ])
         context.getBean(LocalStorageOperations)
         context.getBean(LocalStorageBucketOperations)
-        context.getBean(LocalStorageObjectMetadataOperations)
-        context.getBean(LocalStorageBucketMetadataOperations)
 
         then:
         !Files.exists(bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
