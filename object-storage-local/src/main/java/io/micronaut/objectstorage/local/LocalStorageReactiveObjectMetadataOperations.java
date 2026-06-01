@@ -20,6 +20,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.internal.DefaultReactiveObjectMetadataOperations;
 import io.micronaut.objectstorage.metadata.ObjectMetadataOperations;
 import io.micronaut.scheduling.TaskExecutors;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.nio.file.Path;
@@ -36,6 +37,20 @@ import java.util.concurrent.ExecutorService;
 @Requires(beans = ObjectMetadataOperations.class)
 public class LocalStorageReactiveObjectMetadataOperations extends DefaultReactiveObjectMetadataOperations<Path> {
 
+    /**
+     * Create reactive local object metadata operations.
+     *
+     * @param operations The local object metadata operations.
+     * @param blockingExecutor The blocking executor.
+     * @deprecated Use {@link #LocalStorageReactiveObjectMetadataOperations(ObjectMetadataOperations, ExecutorService)} instead.
+     */
+    @Deprecated(since = "3.0.0")
+    public LocalStorageReactiveObjectMetadataOperations(LocalStorageObjectMetadataOperations operations,
+                                                        @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
+        this((ObjectMetadataOperations<Path>) operations, blockingExecutor);
+    }
+
+    @Inject
     public LocalStorageReactiveObjectMetadataOperations(ObjectMetadataOperations<Path> operations,
                                                         @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         super(operations, blockingExecutor);

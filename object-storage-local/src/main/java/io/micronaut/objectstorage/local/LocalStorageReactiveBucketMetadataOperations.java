@@ -20,6 +20,7 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.internal.DefaultReactiveBucketMetadataOperations;
 import io.micronaut.objectstorage.metadata.BucketMetadataOperations;
 import io.micronaut.scheduling.TaskExecutors;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.nio.file.Path;
@@ -36,6 +37,20 @@ import java.util.concurrent.ExecutorService;
 @Requires(beans = BucketMetadataOperations.class)
 public class LocalStorageReactiveBucketMetadataOperations extends DefaultReactiveBucketMetadataOperations<Path> {
 
+    /**
+     * Create reactive local bucket metadata operations.
+     *
+     * @param operations The local bucket metadata operations.
+     * @param blockingExecutor The blocking executor.
+     * @deprecated Use {@link #LocalStorageReactiveBucketMetadataOperations(BucketMetadataOperations, ExecutorService)} instead.
+     */
+    @Deprecated(since = "3.0.0")
+    public LocalStorageReactiveBucketMetadataOperations(LocalStorageBucketMetadataOperations operations,
+                                                        @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
+        this((BucketMetadataOperations<Path>) operations, blockingExecutor);
+    }
+
+    @Inject
     public LocalStorageReactiveBucketMetadataOperations(BucketMetadataOperations<Path> operations,
                                                         @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         super(operations, blockingExecutor);
