@@ -1,6 +1,7 @@
 package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.objectstorage.metadata.BucketMetadataWrite
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Requires
 import spock.lang.Specification
@@ -24,21 +25,30 @@ class LocalStorageFilePermissionsSpec extends Specification {
         Path bucket = root.resolve("bucket")
         ApplicationContext ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
         LocalStorageOperations operations = ctx.getBean(LocalStorageOperations)
+        LocalStorageBucketOperations bucketOperations = ctx.getBean(LocalStorageBucketOperations)
+        LocalStorageBucketMetadataOperations bucketMetadataOperations = ctx.getBean(LocalStorageBucketMetadataOperations)
         UploadRequest request = UploadRequest.fromBytes('secret'.getBytes(StandardCharsets.UTF_8), 'nested/deeper/object.txt', 'text/plain')
         request.metadata = [classification: 'internal']
 
         when:
+        bucketOperations.create('reports')
+        bucketMetadataOperations.save(new BucketMetadataWrite('reports', [region: 'internal'], [:]))
         operations.upload(request)
 
         then:
         Files.getPosixFilePermissions(bucket) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(root.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('buckets/reports')) == ownerOnlyFilePermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY)) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested')) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested')) == ownerOnlyDirectoryPermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested')) == ownerOnlyDirectoryPermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper')) == ownerOnlyDirectoryPermissions()
         Files.getPosixFilePermissions(bucket.resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
-        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
+        Files.getPosixFilePermissions(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve('nested/deeper/object.txt')) == ownerOnlyFilePermissions()
 
         cleanup:
         ctx?.close()

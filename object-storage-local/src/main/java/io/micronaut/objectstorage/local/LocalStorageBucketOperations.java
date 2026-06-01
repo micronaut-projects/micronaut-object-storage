@@ -17,8 +17,9 @@ package io.micronaut.objectstorage.local;
 
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
-import io.micronaut.objectstorage.bucket.BucketOperations;
 import io.micronaut.objectstorage.bucket.BucketEntry;
+import io.micronaut.objectstorage.bucket.BucketOperations;
+import io.micronaut.objectstorage.metadata.BucketMetadataOperations;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -40,9 +41,12 @@ import java.util.Optional;
 @EachBean(LocalStorageConfiguration.class)
 final class LocalStorageBucketOperations implements BucketOperations<Path> {
     private final Path rootDirectory;
+    private final BucketMetadataOperations<Path> bucketMetadataOperations;
 
-    LocalStorageBucketOperations(@Parameter LocalStorageConfiguration configuration) {
+    LocalStorageBucketOperations(@Parameter LocalStorageConfiguration configuration,
+                                 BucketMetadataOperations<Path> bucketMetadataOperations) {
         this.rootDirectory = configuration.getPath().toAbsolutePath().normalize().getParent();
+        this.bucketMetadataOperations = bucketMetadataOperations;
         if (rootDirectory == null) {
             throw new IllegalArgumentException("Local storage bucket operations require a bucket path with a parent directory");
         }
@@ -50,7 +54,7 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
 
     @Override
     public void create(@NonNull String name) {
-        Path path = resolveDynamicBucketPath(name);
+        Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
@@ -58,19 +62,10 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
         }
     }
 
-    private Path resolveDynamicBucketPath(String name) {
-        Path path = rootDirectory.resolve(name).normalize();
-        if (!path.getParent().equals(rootDirectory) ||
-            !path.getFileName().toString().equals(name)) {
-            throw new IllegalArgumentException("Bucket name must not contain filesystem special characters");
-        }
-        return path;
-    }
-
     @Override
     @NonNull
     public Optional<BucketEntry<Path>> retrieve(@NonNull String name) {
-        Path path = resolveDynamicBucketPath(name);
+        Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
         if (!Files.isDirectory(path)) {
             return Optional.empty();
         }
@@ -79,9 +74,10 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
 
     @Override
     public void delete(@NonNull String name) {
-        Path path = resolveDynamicBucketPath(name);
+        Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
         try {
             deleteRecursively(path);
+            bucketMetadataOperations.delete(name);
         } catch (NoSuchFileException ignored) {
             // Deleting a missing bucket is a no-op.
         } catch (IOException e) {
