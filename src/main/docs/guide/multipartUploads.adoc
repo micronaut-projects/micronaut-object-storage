@@ -27,7 +27,7 @@ The multipart lifecycle uses the following portable request and response types:
 | Not yet supported
 
 | Oracle Cloud Infrastructure Object Storage
-| Not yet supported
+| Supported
 
 | Local Storage
 | Not yet supported
@@ -83,5 +83,5 @@ try {
 ----
 
 When uploading multipart parts from a stream-backed request instead of a file or byte array, provide
-the content size up front so providers such as Amazon S3 can stream the part without buffering it
+the content size up front so providers such as Amazon S3 and Oracle Cloud Infrastructure Object Storage can stream the part without buffering it
 fully in memory.

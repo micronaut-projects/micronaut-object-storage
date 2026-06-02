@@ -18,11 +18,16 @@ package io.micronaut.objectstorage.oraclecloud;
 import com.oracle.bmc.auth.RegionProvider;
 import com.oracle.bmc.model.BmcException;
 import com.oracle.bmc.objectstorage.ObjectStorage;
+import com.oracle.bmc.objectstorage.model.CommitMultipartUploadDetails;
+import com.oracle.bmc.objectstorage.model.CommitMultipartUploadPartDetails;
 import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails;
+import com.oracle.bmc.objectstorage.model.CreateMultipartUploadDetails;
 import com.oracle.bmc.objectstorage.model.CopyObjectDetails;
+import com.oracle.bmc.objectstorage.model.MultipartUploadPartSummary;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
 import com.oracle.bmc.objectstorage.model.PreauthenticatedRequest;
 import com.oracle.bmc.objectstorage.requests.CopyObjectRequest;
+import com.oracle.bmc.objectstorage.requests.CommitMultipartUploadRequest;
 import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest;
 import com.oracle.bmc.objectstorage.requests.DeleteObjectRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
@@ -37,19 +42,32 @@ import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.objectstorage.MultipartObjectStorageOperations;
+import io.micronaut.objectstorage.MultipartPart;
+import io.micronaut.objectstorage.MultipartUploadHandle;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.ObjectStorageOperations;
 import io.micronaut.objectstorage.configuration.ToggeableCondition;
+import io.micronaut.objectstorage.request.AbortMultipartUploadRequest;
+import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest;
+import io.micronaut.objectstorage.request.CreateMultipartUploadRequest;
 import io.micronaut.objectstorage.request.CreatePresignedUploadRequest;
+import io.micronaut.objectstorage.request.ListMultipartPartsRequest;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
+import io.micronaut.objectstorage.request.UploadPartRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.response.CompleteMultipartUploadResponse;
+import io.micronaut.objectstorage.response.CreateMultipartUploadResponse;
+import io.micronaut.objectstorage.response.ListMultipartPartsResponse;
 import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.PresignedUpload;
+import io.micronaut.objectstorage.response.UploadPartResponse;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Date;
@@ -74,7 +92,11 @@ import java.util.function.Supplier;
 @Requires(condition = ToggeableCondition.class)
 @Requires(beans = OracleCloudStorageConfiguration.class)
 public class OracleCloudStorageOperations
-    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse> {
+    implements ObjectStorageOperations<PutObjectRequest.Builder, PutObjectResponse, DeleteObjectResponse>,
+    MultipartObjectStorageOperations<
+        com.oracle.bmc.objectstorage.responses.CreateMultipartUploadResponse,
+        com.oracle.bmc.objectstorage.responses.UploadPartResponse,
+        com.oracle.bmc.objectstorage.responses.CommitMultipartUploadResponse> {
 
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
     private static final Logger LOG = LoggerFactory.getLogger(OracleCloudStorageOperations.class);
@@ -287,6 +309,145 @@ public class OracleCloudStorageOperations
         }
     }
 
+    @Override
+    @NonNull
+    public CreateMultipartUploadResponse<com.oracle.bmc.objectstorage.responses.CreateMultipartUploadResponse> createMultipartUpload(
+        @NonNull CreateMultipartUploadRequest request) {
+        CreateMultipartUploadDetails.Builder detailsBuilder = CreateMultipartUploadDetails.builder()
+            .object(request.getKey());
+        request.getContentType().ifPresent(detailsBuilder::contentType);
+        if (CollectionUtils.isNotEmpty(request.getMetadata())) {
+            detailsBuilder.metadata(request.getMetadata());
+        }
+        try {
+            com.oracle.bmc.objectstorage.responses.CreateMultipartUploadResponse response = client.createMultipartUpload(
+                com.oracle.bmc.objectstorage.requests.CreateMultipartUploadRequest.builder()
+                    .namespaceName(configuration.getNamespace())
+                    .bucketName(configuration.getBucket())
+                    .createMultipartUploadDetails(detailsBuilder.build())
+                    .build()
+            );
+            return CreateMultipartUploadResponse.of(
+                new MultipartUploadHandle(request.getKey(), response.getMultipartUpload().getUploadId()),
+                response
+            );
+        } catch (BmcException e) {
+            String msg = String.format("Error when trying to create a multipart upload with key [%s] in Oracle Cloud Storage", request.getKey());
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    @NonNull
+    public UploadPartResponse<com.oracle.bmc.objectstorage.responses.UploadPartResponse> uploadPart(@NonNull UploadPartRequest request) {
+        MultipartUploadHandle upload = request.getUpload();
+        InputStreamWithSize requestBody = getMultipartRequestBody(request.getUploadRequest());
+        try {
+            com.oracle.bmc.objectstorage.responses.UploadPartResponse response = client.uploadPart(
+                com.oracle.bmc.objectstorage.requests.UploadPartRequest.builder()
+                    .namespaceName(configuration.getNamespace())
+                    .bucketName(configuration.getBucket())
+                    .objectName(upload.getKey())
+                    .uploadId(upload.getUploadId())
+                    .uploadPartNum(request.getPartNumber())
+                    .contentLength(requestBody.size())
+                    .uploadPartBody(requestBody.inputStream())
+                    .build()
+            );
+            MultipartPart part = new MultipartPart(
+                request.getPartNumber(),
+                response.getETag(),
+                requestBody.size(),
+                firstNonEmpty(response.getOpcContentCrc32c(), response.getOpcContentSha256(), response.getOpcContentSha384(), response.getOpcContentMd5())
+            );
+            return UploadPartResponse.of(part, response);
+        } catch (BmcException e) {
+            String msg = String.format(
+                "Error when trying to upload part [%d] for multipart upload [%s] in Oracle Cloud Storage",
+                request.getPartNumber(),
+                upload.getUploadId()
+            );
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    @NonNull
+    public ListMultipartPartsResponse listParts(@NonNull ListMultipartPartsRequest request) {
+        MultipartUploadHandle upload = request.getUpload();
+        try {
+            com.oracle.bmc.objectstorage.responses.ListMultipartUploadPartsResponse response = client.listMultipartUploadParts(
+                com.oracle.bmc.objectstorage.requests.ListMultipartUploadPartsRequest.builder()
+                    .namespaceName(configuration.getNamespace())
+                    .bucketName(configuration.getBucket())
+                    .objectName(upload.getKey())
+                    .uploadId(upload.getUploadId())
+                    .limit(request.getPageSize())
+                    .page(request.getContinuationToken().orElse(null))
+                    .build()
+            );
+            List<MultipartPart> parts = Optional.ofNullable(response.getItems())
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(this::toMultipartPart)
+                .toList();
+            return new ListMultipartPartsResponse(parts, response.getOpcNextPage());
+        } catch (BmcException e) {
+            String msg = String.format("Error when trying to list parts for multipart upload [%s] in Oracle Cloud Storage", upload.getUploadId());
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    @NonNull
+    public CompleteMultipartUploadResponse<com.oracle.bmc.objectstorage.responses.CommitMultipartUploadResponse> completeMultipartUpload(
+        @NonNull CompleteMultipartUploadRequest request) {
+        MultipartUploadHandle upload = request.getUpload();
+        CommitMultipartUploadDetails details = CommitMultipartUploadDetails.builder()
+            .partsToCommit(request.getParts().stream()
+                .map(part -> CommitMultipartUploadPartDetails.builder()
+                    .partNum(part.getPartNumber())
+                    .etag(part.getETag())
+                    .build())
+                .toList())
+            .build();
+        try {
+            com.oracle.bmc.objectstorage.responses.CommitMultipartUploadResponse response = client.commitMultipartUpload(
+                CommitMultipartUploadRequest.builder()
+                    .namespaceName(configuration.getNamespace())
+                    .bucketName(configuration.getBucket())
+                    .objectName(upload.getKey())
+                    .uploadId(upload.getUploadId())
+                    .commitMultipartUploadDetails(details)
+                    .build()
+            );
+            return CompleteMultipartUploadResponse.of(upload, response.getETag(), response);
+        } catch (BmcException e) {
+            String msg = String.format("Error when trying to complete multipart upload [%s] in Oracle Cloud Storage", upload.getUploadId());
+            throw new ObjectStorageException(msg, e);
+        }
+    }
+
+    @Override
+    public void abortMultipartUpload(@NonNull AbortMultipartUploadRequest request) {
+        MultipartUploadHandle upload = request.getUpload();
+        try {
+            client.abortMultipartUpload(
+                com.oracle.bmc.objectstorage.requests.AbortMultipartUploadRequest.builder()
+                    .namespaceName(configuration.getNamespace())
+                    .bucketName(configuration.getBucket())
+                    .objectName(upload.getKey())
+                    .uploadId(upload.getUploadId())
+                    .build()
+            );
+        } catch (BmcException e) {
+            if (e.getStatusCode() != 404) {
+                String msg = String.format("Error when trying to abort multipart upload [%s] in Oracle Cloud Storage", upload.getUploadId());
+                throw new ObjectStorageException(msg, e);
+            }
+        }
+    }
+
     /**
      *
      * @param request Upload Request
@@ -305,6 +466,15 @@ public class OracleCloudStorageOperations
             putObjectRequestBuilder.opcMeta(request.getMetadata());
         }
         return putObjectRequestBuilder;
+    }
+
+    @NonNull
+    private InputStreamWithSize getMultipartRequestBody(@NonNull UploadRequest uploadRequest) {
+        long size = uploadRequest.getContentSize()
+            .orElseThrow(() -> new ObjectStorageException(
+                "Multipart uploads require UploadRequest#getContentSize() for streaming requests"
+            ));
+        return new InputStreamWithSize(uploadRequest.getInputStream(), size);
     }
 
     /**
@@ -344,5 +514,26 @@ public class OracleCloudStorageOperations
         request.getContentLength().ifPresent(contentLength -> headers.put("Content-Length", List.of(Long.toString(contentLength))));
         request.getMetadata().forEach((key, value) -> headers.put("opc-meta-" + key, List.of(value)));
         return headers;
+    }
+
+    private MultipartPart toMultipartPart(MultipartUploadPartSummary part) {
+        return new MultipartPart(
+            part.getPartNumber(),
+            part.getEtag(),
+            part.getSize(),
+            part.getMd5()
+        );
+    }
+
+    private String firstNonEmpty(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isEmpty()) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private record InputStreamWithSize(InputStream inputStream, long size) {
     }
 }
