@@ -4,6 +4,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.objectstorage.BucketOperationsSpecification
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.bucket.BucketOperations
+import io.micronaut.objectstorage.request.UploadRequest
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -70,6 +71,8 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         name          | reservedNamespace
         '.mn-storage' | '.mn-storage'
         '.Mn-Storage' | '.mn-storage'
+        '.metadata'   | '.metadata'
+        '.Metadata'   | '.metadata'
     }
 
     void 'failed bucket delete preserves metadata sidecars'() {
@@ -77,7 +80,7 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         Path bucket = rootDirectory.resolve('stuck')
         Files.writeString(bucket, 'not-a-directory')
         Path metadataFile = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.METADATA_DIRECTORY)
+            .resolve(LocalStorageLayout.METADATA_DIRECTORY)
             .resolve('buckets')
             .resolve('stuck')
         Files.createDirectories(metadataFile.parent)
@@ -89,5 +92,32 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         then:
         thrown IllegalStateException
         Files.exists(metadataFile)
+    }
+
+    void 'bucket delete removes provider managed object metadata and snapshots'() {
+        given:
+        Path objectMetadataDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.METADATA_DIRECTORY)
+            .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
+            .resolve('default')
+        Path snapshotDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
+            .resolve('default')
+        getObjectStorage().upload(UploadRequest.fromBytes('hello'.bytes, 'delete-me.txt', 'text/plain'))
+        Files.createDirectories(snapshotDirectory)
+        Files.writeString(snapshotDirectory.resolve('temporary'), 'snapshot')
+
+        expect:
+        Files.exists(objectMetadataDirectory.resolve('delete-me.txt'))
+        Files.exists(snapshotDirectory.resolve('temporary'))
+
+        when:
+        getBucketOperations().delete('default')
+
+        then:
+        !Files.exists(defaultBucketPath)
+        !Files.exists(objectMetadataDirectory)
+        !Files.exists(snapshotDirectory)
+        !ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('delete-me.txt').present
     }
 }

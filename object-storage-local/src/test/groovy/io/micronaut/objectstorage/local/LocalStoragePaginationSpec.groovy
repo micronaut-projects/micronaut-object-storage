@@ -6,6 +6,9 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 
+import java.nio.file.Files
+import java.nio.file.Path
+
 @MicronautTest
 class LocalStoragePaginationSpec extends spock.lang.Specification implements TestPropertyProvider {
 
@@ -38,6 +41,13 @@ class LocalStoragePaginationSpec extends spock.lang.Specification implements Tes
     }
 
     void 'paginated listing is bounded prefix filtered and excludes metadata artifacts'() {
+        given:
+        Path objectPath = operations.retrieve(SEEDED_KEYS.first()).get().nativeEntry
+        Path bucketPath = objectPath.parent.parent
+        Path legacyMetadataDirectory = bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY)
+        Files.createDirectories(legacyMetadataDirectory)
+        Files.writeString(legacyMetadataDirectory.resolve('legacy-sidecar.txt'), 'hidden=true')
+
         when:
         def firstPage = operations.listObjects(new ListObjectsRequest(2, 'animals/'))
         def secondPage = operations.listObjects(new ListObjectsRequest(2, 'animals/', firstPage.continuationToken.orElse(null)))
@@ -53,6 +63,11 @@ class LocalStoragePaginationSpec extends spock.lang.Specification implements Tes
         !firstPage.keys.any { it.startsWith('.mn-storage') }
         !secondPage.keys.any { it.startsWith('.mn-storage') }
         !replayedTerminalPage.keys.any { it.startsWith('.mn-storage') }
+        !operations.listObjects().any { it.startsWith('.metadata') }
+
+        cleanup:
+        Files.deleteIfExists(legacyMetadataDirectory.resolve('legacy-sidecar.txt'))
+        Files.deleteIfExists(legacyMetadataDirectory)
     }
 
     void 'continuation token is a strict lower bound and malicious prefixes stay inside the bucket'() {
@@ -61,6 +76,7 @@ class LocalStoragePaginationSpec extends spock.lang.Specification implements Tes
         def allKeys = operations.listObjects() as List
         def maliciousPrefixPage = operations.listObjects(new ListObjectsRequest(5, '../'))
         def metadataPrefixPage = operations.listObjects(new ListObjectsRequest(5, '.mn-storage'))
+        def legacyMetadataPrefixPage = operations.listObjects(new ListObjectsRequest(5, '.metadata'))
 
         then:
         page.keys == ['animals/mammals/fox.txt', 'animals/zebra.txt']
@@ -78,5 +94,7 @@ class LocalStoragePaginationSpec extends spock.lang.Specification implements Tes
         maliciousPrefixPage.continuationToken.empty
         metadataPrefixPage.keys.empty
         metadataPrefixPage.continuationToken.empty
+        legacyMetadataPrefixPage.keys.empty
+        legacyMetadataPrefixPage.continuationToken.empty
     }
 }

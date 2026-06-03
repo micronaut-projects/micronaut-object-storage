@@ -70,14 +70,31 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     LocalStorageOperations.LocalStorageFile,
     LocalStorageOperations.LocalStorageFile> {
 
-    static final String INTERNAL_DIRECTORY = ".mn-storage";
-    static final String METADATA_DIRECTORY = "metadata";
-    static final String SNAPSHOT_DIRECTORY = "snapshots";
+    /**
+     * Legacy local metadata sidecar directory.
+     */
+    public static final String METADATA_DIRECTORY = LocalStorageLayout.LEGACY_METADATA_DIRECTORY;
+    static final String INTERNAL_DIRECTORY = LocalStorageLayout.INTERNAL_DIRECTORY;
+    static final String LEGACY_METADATA_DIRECTORY = LocalStorageLayout.LEGACY_METADATA_DIRECTORY;
+    static final String OBJECTS_DIRECTORY = LocalStorageLayout.OBJECTS_DIRECTORY;
+    static final String SNAPSHOT_DIRECTORY = LocalStorageLayout.SNAPSHOT_DIRECTORY;
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
     private final LocalStorageConfiguration configuration;
+    private final LocalStorageLayout layout;
     private final ObjectMetadataOperations<Path> objectMetadataOperations;
     private final boolean supportsPosixPermissions;
+
+    /**
+     * Create local storage operations.
+     *
+     * @param configuration The local storage configuration.
+     * @deprecated Use {@link #LocalStorageOperations(LocalStorageConfiguration, ObjectMetadataOperations)} instead.
+     */
+    @Deprecated(since = "3.0.0")
+    public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration) {
+        this(configuration, new LocalStorageObjectMetadataOperations(configuration));
+    }
 
     /**
      * Create local storage operations.
@@ -96,6 +113,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
                                   ObjectMetadataOperations<Path> objectMetadataOperations) {
         this.configuration = configuration;
+        this.layout = new LocalStorageLayout(configuration);
         this.objectMetadataOperations = objectMetadataOperations;
         this.supportsPosixPermissions = configuration.getPath().getFileSystem().supportedFileAttributeViews().contains("posix");
     }
@@ -110,7 +128,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @NonNull
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request,
                                                    @NonNull Consumer<LocalStorageFile> requestConsumer) {
-        Path file = LocalStorageIoSupport.resolveSafe(configuration.getPath(), request.getKey());
+        Path file = layout.objectPath(request.getKey());
         StoredFileSnapshot snapshot = snapshotStoredFile(file);
         RuntimeException failure = null;
         try {
@@ -257,7 +275,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private Optional<Path> retrieveFile(String key) {
-        Path file = LocalStorageIoSupport.resolveSafe(configuration.getPath(), key);
+        Path file = layout.objectPath(key);
         if (Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
             return Optional.of(file);
         } else {
@@ -274,7 +292,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void copyStoredFile(String sourceKey, Path source, String destinationKey) {
-        Path destinationFile = LocalStorageIoSupport.resolveSafe(configuration.getPath(), destinationKey);
+        Path destinationFile = layout.objectPath(destinationKey);
         StoredFileSnapshot snapshot = snapshotStoredFile(destinationFile);
         RuntimeException failure = null;
         try (InputStream in = newInputStreamNoFollow(source)) {
@@ -313,12 +331,12 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
             return StoredFileSnapshot.empty();
         }
-        Path snapshotDirectory = snapshotDirectory();
-        List<Path> cleanupDirectories = snapshotCleanupDirectories(snapshotDirectory);
+        Path snapshotDirectory = layout.snapshotBucketDirectory();
+        List<Path> cleanupDirectories = layout.snapshotCleanupDirectories();
         try {
-            LocalStorageIoSupport.rejectSymbolicLinks(configuration.getPath().normalize(), snapshotDirectory.normalize());
-            mkdirs(snapshotDirectory);
-            LocalStorageIoSupport.rejectSymbolicLinks(configuration.getPath().normalize(), snapshotDirectory.normalize());
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), snapshotDirectory);
+            mkdirs(layout.rootInternalDirectory(), snapshotDirectory);
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), snapshotDirectory);
             Path snapshot = LocalStorageIoSupport.createTempFile(
                 snapshotDirectory,
                 "micronaut-object-storage-local",
@@ -388,29 +406,12 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         deleteEmptySnapshotDirectories(snapshot.cleanupDirectories(), failure);
     }
 
-    private Path snapshotDirectory() {
-        return internalDirectory().resolve(SNAPSHOT_DIRECTORY);
-    }
-
-    private List<Path> snapshotCleanupDirectories(Path snapshotDirectory) {
-        return List.of(snapshotDirectory, internalDirectory());
-    }
-
-    private Path internalDirectory() {
-        return configuration.getPath().resolve(INTERNAL_DIRECTORY);
-    }
-
     static Optional<String> reservedLocalStorageNamespace(String name) {
-        if (INTERNAL_DIRECTORY.equalsIgnoreCase(name)) {
-            return Optional.of(INTERNAL_DIRECTORY);
-        }
-        return Optional.empty();
+        return LocalStorageLayout.reservedLocalStorageNamespace(name);
     }
 
     private static boolean isReservedLocalStorageKey(String key) {
-        int separator = key.indexOf('/');
-        String firstSegment = separator >= 0 ? key.substring(0, separator) : key;
-        return reservedLocalStorageNamespace(firstSegment).isPresent();
+        return LocalStorageLayout.isReservedLocalStorageKey(key);
     }
 
     private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
@@ -430,7 +431,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private Path storeFile(Path file, InputStream inputStream) {
-        mkdirs(file.getParent());
+        mkdirs(configuration.getPath(), file.getParent());
         try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
             inputStream.transferTo(fileOut);
             return file;
@@ -439,8 +440,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
-    private boolean mkdirs(Path path) {
-        return LocalStorageIoSupport.mkdirs(configuration.getPath(), path, supportsPosixPermissions);
+    private boolean mkdirs(Path rootPath, Path path) {
+        return LocalStorageIoSupport.mkdirs(rootPath, path, supportsPosixPermissions);
     }
 
     private OutputStream newOutputStreamNoFollow(Path file) throws IOException {
