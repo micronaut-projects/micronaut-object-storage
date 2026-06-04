@@ -21,6 +21,7 @@ abstract class AbstractOracleCloudMultipartSpec extends MultipartObjectStorageOp
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
+    private static final int OCI_NON_FINAL_MULTIPART_PART_SIZE_BYTES = 11 * 1024 * 1024
 
     @Inject
     ObjectStorage client
@@ -69,6 +70,11 @@ abstract class AbstractOracleCloudMultipartSpec extends MultipartObjectStorageOp
     @Override
     MultipartObjectStorageOperations<?, ?, ?> getMultipartObjectStorage() {
         return oracleCloudStorageOperations
+    }
+
+    @Override
+    protected int nonFinalMultipartPartSizeBytes() {
+        OCI_NON_FINAL_MULTIPART_PART_SIZE_BYTES
     }
 
     @Override

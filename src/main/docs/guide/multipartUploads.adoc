@@ -39,8 +39,9 @@ The multipart lifecycle uses the following portable request and response types:
 - In-progress multipart uploads remain caller-owned resources until they are completed or aborted.
 - `uploadPart` associates a numbered part with a previously created upload handle.
 - Object metadata and content type are set when creating the multipart upload, not on each individual part.
-- Providers may enforce their own part-size limits. For example, Amazon S3 requires each part except the final
-  part to be at least 5 MiB.
+- Providers may enforce their own part-size limits. Amazon S3 requires each non-final part to be at least
+  5 MiB. Oracle Cloud Infrastructure Object Storage requires stricter non-final chunks; use chunks greater
+  than 10 MiB, for example 11 MiB. The final part may be smaller.
 - `listParts` is read-only and exposes provider pagination through opaque continuation tokens.
 - `completeMultipartUpload` requires a strictly ordered part manifest.
 - Retrying `completeMultipartUpload` is only safe when reusing the same upload id and exact part manifest.
@@ -81,6 +82,9 @@ try {
     throw e;
 }
 ----
+
+In this example, `chunkOne` is non-final and must satisfy the selected provider's minimum part size. The final
+chunk may be smaller when the provider allows final-part size waivers.
 
 When uploading multipart parts from a stream-backed request instead of a file or byte array, provide
 the content size up front so providers such as Amazon S3 and Oracle Cloud Infrastructure Object Storage can stream the part without buffering it

@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets
 
 abstract class MultipartObjectStorageOperationsSpecification extends ObjectStorageOperationsSpecification {
 
-    private static final byte[] LARGE_FIRST_PART = ('a' * (5 * 1024 * 1024)).bytes
     private static final String PART_ONE_TEXT = 'micro'
     private static final String PART_TWO_TEXT = 'naut'
     private static final String PART_THREE_TEXT = '-framework'
@@ -42,10 +41,11 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         String key = "multipart/${System.nanoTime()}/combined.txt"
         MultipartUploadHandle upload = null
         boolean completed = false
+        byte[] nonFinalPartBytes = nonFinalMultipartPartBytes()
 
         when:
         upload = storage.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE, METADATA)).upload
-        UploadPartResponse<?> firstPart = storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(LARGE_FIRST_PART, key, CONTENT_TYPE)))
+        UploadPartResponse<?> firstPart = storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(nonFinalPartBytes, key, CONTENT_TYPE)))
         UploadPartResponse<?> secondPart = storage.uploadPart(new UploadPartRequest(upload, 2, UploadRequest.fromBytes(PART_TWO_TEXT.bytes, key, CONTENT_TYPE)))
         def response = storage.completeMultipartUpload(new CompleteMultipartUploadRequest(upload, [firstPart.part, secondPart.part]))
         completed = true
@@ -57,10 +57,10 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         }
         ObjectStorageEntry<?> objectStorageEntry = objectStorage.retrieve(key).get()
         byte[] objectBytes = objectStorageEntry.inputStream.bytes
-        objectBytes.length == LARGE_FIRST_PART.length + PART_TWO_TEXT.bytes.length
+        objectBytes.length == nonFinalPartBytes.length + PART_TWO_TEXT.bytes.length
         objectBytes[0] == (byte) 'a'
-        objectBytes[LARGE_FIRST_PART.length - 1] == (byte) 'a'
-        new String(objectBytes, LARGE_FIRST_PART.length, PART_TWO_TEXT.bytes.length, StandardCharsets.UTF_8) == PART_TWO_TEXT
+        objectBytes[nonFinalPartBytes.length - 1] == (byte) 'a'
+        new String(objectBytes, nonFinalPartBytes.length, PART_TWO_TEXT.bytes.length, StandardCharsets.UTF_8) == PART_TWO_TEXT
         if (emulatorSupportsMetadata()) {
             assert objectStorageEntry.metadata == METADATA
         }
@@ -154,7 +154,7 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         MultipartObjectStorageOperations<?, ?, ?> storage = getMultipartObjectStorage()
         String key = "multipart/${System.nanoTime()}/missing-part.txt"
         def upload = storage.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE)).upload
-        UploadPartResponse<?> uploadedPart = storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(LARGE_FIRST_PART, key, CONTENT_TYPE)))
+        UploadPartResponse<?> uploadedPart = storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(nonFinalMultipartPartBytes(), key, CONTENT_TYPE)))
         MultipartPart missingPart = new MultipartPart(2, 'missing-etag', PART_TWO_TEXT.bytes.length)
 
         when:
@@ -168,6 +168,12 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
     }
 
     abstract MultipartObjectStorageOperations<?, ?, ?> getMultipartObjectStorage()
+
+    protected abstract int nonFinalMultipartPartSizeBytes()
+
+    private byte[] nonFinalMultipartPartBytes() {
+        ('a' * nonFinalMultipartPartSizeBytes()).bytes
+    }
 
     private static List<ListMultipartPartsResponse> collectMultipartPages(MultipartObjectStorageOperations<?, ?, ?> storage,
                                                                          ListMultipartPartsRequest request) {

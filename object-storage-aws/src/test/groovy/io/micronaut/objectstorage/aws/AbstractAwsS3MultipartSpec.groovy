@@ -20,6 +20,7 @@ abstract class AbstractAwsS3MultipartSpec extends MultipartObjectStorageOperatio
 
     public static final String BUCKET_NAME = System.currentTimeMillis()
     public static final String OBJECT_STORAGE_NAME = 'default'
+    private static final int AWS_NON_FINAL_MULTIPART_PART_SIZE_BYTES = 5 * 1024 * 1024
 
     @Inject
     S3Client s3
@@ -53,6 +54,11 @@ abstract class AbstractAwsS3MultipartSpec extends MultipartObjectStorageOperatio
     @Override
     MultipartObjectStorageOperations<?, ?, ?> getMultipartObjectStorage() {
         return awsS3Bucket
+    }
+
+    @Override
+    protected int nonFinalMultipartPartSizeBytes() {
+        AWS_NON_FINAL_MULTIPART_PART_SIZE_BYTES
     }
 
     @Override
