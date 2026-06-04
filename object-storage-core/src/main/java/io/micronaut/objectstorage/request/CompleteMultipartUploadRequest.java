@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Multipart upload completion request.
  *
- * @since 3.0.0
+ * @since 3.0.1
  */
 public final class CompleteMultipartUploadRequest {
 

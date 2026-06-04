@@ -24,7 +24,7 @@ import java.util.Optional;
 /**
  * Portable multipart upload part metadata.
  *
- * @since 3.0.0
+ * @since 3.0.1
  */
 public final class MultipartPart {
 

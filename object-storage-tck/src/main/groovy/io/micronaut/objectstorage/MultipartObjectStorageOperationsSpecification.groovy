@@ -40,25 +40,36 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         ObjectStorageOperations<?, ?, ?> objectStorage = getObjectStorage()
         PollingConditions conditions = new PollingConditions(timeout: 10)
         String key = "multipart/${System.nanoTime()}/combined.txt"
+        MultipartUploadHandle upload = null
+        boolean completed = false
 
         when:
-        def upload = storage.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE, METADATA)).upload
+        upload = storage.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE, METADATA)).upload
         UploadPartResponse<?> firstPart = storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(LARGE_FIRST_PART, key, CONTENT_TYPE)))
         UploadPartResponse<?> secondPart = storage.uploadPart(new UploadPartRequest(upload, 2, UploadRequest.fromBytes(PART_TWO_TEXT.bytes, key, CONTENT_TYPE)))
         def response = storage.completeMultipartUpload(new CompleteMultipartUploadRequest(upload, [firstPart.part, secondPart.part]))
+        completed = true
 
         then:
         response.ETag
         conditions.eventually {
             assert objectStorage.retrieve(key).present
         }
-        byte[] objectBytes = objectStorage.retrieve(key).get().inputStream.bytes
+        ObjectStorageEntry<?> objectStorageEntry = objectStorage.retrieve(key).get()
+        byte[] objectBytes = objectStorageEntry.inputStream.bytes
         objectBytes.length == LARGE_FIRST_PART.length + PART_TWO_TEXT.bytes.length
         objectBytes[0] == (byte) 'a'
         objectBytes[LARGE_FIRST_PART.length - 1] == (byte) 'a'
         new String(objectBytes, LARGE_FIRST_PART.length, PART_TWO_TEXT.bytes.length, StandardCharsets.UTF_8) == PART_TWO_TEXT
+        if (emulatorSupportsMetadata()) {
+            assert objectStorageEntry.metadata == METADATA
+        }
+        objectStorageEntry.contentType == Optional.of(CONTENT_TYPE)
 
         cleanup:
+        if (upload != null && !completed) {
+            storage.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        }
         if (objectStorage.exists(key)) {
             objectStorage.delete(key)
         }

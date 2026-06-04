@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * Default implementation of {@link CreateMultipartUploadResponse}.
  *
  * @param <R> Cloud vendor-specific create multipart upload response
+ * @since 3.0.1
  */
 public class DefaultCreateMultipartUploadResponse<R> implements CreateMultipartUploadResponse<R> {
 

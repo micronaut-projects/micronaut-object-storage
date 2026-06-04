@@ -363,7 +363,10 @@ public class AwsS3Operations implements ObjectStorageOperations<
 
             software.amazon.awssdk.services.s3.model.ListPartsResponse response = s3Client.listParts(builder.build());
             List<MultipartPart> parts = response.parts().stream().map(this::toMultipartPart).toList();
-            return new ListMultipartPartsResponse(parts, encodeMultipartContinuationToken(response.nextPartNumberMarker()));
+            return new ListMultipartPartsResponse(
+                parts,
+                encodeMultipartContinuationToken(request, response.nextPartNumberMarker())
+            );
         } catch (AwsServiceException | SdkClientException e) {
             String msg = String.format("Error when trying to list parts for multipart upload [%s] in Amazon S3", upload.getUploadId());
             throw new ObjectStorageException(msg, e);
@@ -589,25 +592,50 @@ public class AwsS3Operations implements ObjectStorageOperations<
             return Optional.empty();
         }
         try {
-            String rawToken = continuationToken;
-            if (continuationToken.startsWith(MULTIPART_CONTINUATION_TOKEN_PREFIX)) {
-                rawToken = new String(
-                    Base64.getUrlDecoder().decode(continuationToken.substring(MULTIPART_CONTINUATION_TOKEN_PREFIX.length())),
-                    StandardCharsets.UTF_8
-                );
+            if (!continuationToken.startsWith(MULTIPART_CONTINUATION_TOKEN_PREFIX)) {
+                throw new ObjectStorageException("Invalid AWS S3 multipart continuation token");
             }
-            return Optional.of(Integer.parseInt(rawToken));
+            String decodedToken = new String(
+                Base64.getUrlDecoder().decode(continuationToken.substring(MULTIPART_CONTINUATION_TOKEN_PREFIX.length())),
+                StandardCharsets.UTF_8
+            );
+            String[] parts = decodedToken.split("\n", -1);
+            if (parts.length != 4) {
+                throw new ObjectStorageException("Invalid AWS S3 multipart continuation token");
+            }
+            MultipartUploadHandle upload = request.getUpload();
+            String key = decodeTokenPart(parts[0]);
+            String uploadId = decodeTokenPart(parts[1]);
+            String pageSize = decodeTokenPart(parts[2]);
+            String partNumberMarker = decodeTokenPart(parts[3]);
+            if (!upload.getKey().equals(key)
+                || !upload.getUploadId().equals(uploadId)
+                || !Integer.toString(request.getPageSize()).equals(pageSize)) {
+                throw new ObjectStorageException("AWS S3 multipart continuation token does not match the current request");
+            }
+            int marker = Integer.parseInt(partNumberMarker);
+            if (marker <= 0) {
+                throw new ObjectStorageException("Invalid AWS S3 multipart continuation token");
+            }
+            return Optional.of(marker);
         } catch (IllegalArgumentException e) {
             throw new ObjectStorageException("Invalid AWS S3 multipart continuation token", e);
         }
     }
 
-    private String encodeMultipartContinuationToken(Integer nextPartNumberMarker) {
+    private String encodeMultipartContinuationToken(ListMultipartPartsRequest request, Integer nextPartNumberMarker) {
         if (nextPartNumberMarker == null || nextPartNumberMarker <= 0) {
             return null;
         }
+        MultipartUploadHandle upload = request.getUpload();
+        String payload = new StringJoiner("\n")
+            .add(encodeTokenPart(upload.getKey()))
+            .add(encodeTokenPart(upload.getUploadId()))
+            .add(encodeTokenPart(Integer.toString(request.getPageSize())))
+            .add(encodeTokenPart(Integer.toString(nextPartNumberMarker)))
+            .toString();
         return MULTIPART_CONTINUATION_TOKEN_PREFIX + Base64.getUrlEncoder().withoutPadding()
-            .encodeToString(Integer.toString(nextPartNumberMarker).getBytes(StandardCharsets.UTF_8));
+            .encodeToString(payload.getBytes(StandardCharsets.UTF_8));
     }
 
     private MultipartPart toMultipartPart(Part part) {

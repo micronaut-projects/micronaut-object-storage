@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * Multipart part listing request.
  *
- * @since 3.0.0
+ * @since 3.0.1
  */
 public final class ListMultipartPartsRequest {
 

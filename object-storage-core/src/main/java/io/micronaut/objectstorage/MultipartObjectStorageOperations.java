@@ -41,7 +41,7 @@ import org.jspecify.annotations.NonNull;
  * @param <C> Cloud vendor-specific create multipart upload response
  * @param <U> Cloud vendor-specific upload part response
  * @param <COMP> Cloud vendor-specific complete multipart upload response
- * @since 3.0.0
+ * @since 3.0.1
  */
 public interface MultipartObjectStorageOperations<C, U, COMP> {
 

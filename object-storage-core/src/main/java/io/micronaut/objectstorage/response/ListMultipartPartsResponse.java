@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * Paginated multipart part listing response.
  *
- * @since 3.0.0
+ * @since 3.0.1
  */
 public final class ListMultipartPartsResponse {
 

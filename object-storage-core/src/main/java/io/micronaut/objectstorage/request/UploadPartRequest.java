@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * <p>The supplied {@link UploadRequest} must target the same key as the multipart upload handle.</p>
  *
- * @since 3.0.0
+ * @since 3.0.1
  */
 public final class UploadPartRequest {
 

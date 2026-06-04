@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  * Multipart part upload response.
  *
  * @param <R> Cloud vendor-specific upload part response
- * @since 3.0.0
+ * @since 3.0.1
  */
 @DefaultImplementation(DefaultUploadPartResponse.class)
 public interface UploadPartResponse<R> {

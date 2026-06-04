@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * Default implementation of {@link UploadPartResponse}.
  *
  * @param <R> Cloud vendor-specific upload part response
+ * @since 3.0.1
  */
 public class DefaultUploadPartResponse<R> implements UploadPartResponse<R> {
 
