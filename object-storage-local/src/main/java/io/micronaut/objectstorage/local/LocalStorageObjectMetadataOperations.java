@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -55,11 +56,11 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
     @NonNull
     public Optional<ObjectMetadataEntry<Path>> retrieve(@NonNull String key) {
         for (Path metadataFile : layout.objectMetadataReadPaths(key)) {
-            if (!Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
-                continue;
-            }
             try {
                 return Optional.of(LocalStorageMetadataSupport.readObjectMetadata(metadataFile, key));
+            } catch (NoSuchFileException e) {
+                // Missing metadata is the only absence signal. Other I/O failures must not fall through to stale sidecars.
+                continue;
             } catch (IOException e) {
                 throw new ObjectStorageException("Error reading metadata for object: " + key, e);
             }
@@ -87,11 +88,11 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
     public void delete(@NonNull String key) {
         List<IOException> failures = new ArrayList<>();
         for (Path metadataFile : layout.objectMetadataDeletePaths(key)) {
-            if (!Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
-                continue;
-            }
             try {
                 Files.delete(metadataFile);
+            } catch (NoSuchFileException e) {
+                // Missing metadata is the only absence signal. Other I/O failures must be reported.
+                continue;
             } catch (IOException e) {
                 failures.add(e);
             }

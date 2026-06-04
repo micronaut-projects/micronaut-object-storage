@@ -1,12 +1,17 @@
 package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.metadata.ObjectMetadataWrite
 import io.micronaut.objectstorage.request.UploadRequest
+import spock.lang.Requires
 import spock.lang.Specification
 
+import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission
 import java.util.Properties
 
 class LocalStorageMetadataCompatibilitySpec extends Specification {
@@ -110,6 +115,54 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         !Files.exists(legacyFile)
     }
 
+    @Requires({ FileSystems.default.supportedFileAttributeViews().contains('posix') })
+    void 'object metadata retrieve reports canonical read errors instead of falling back to legacy sidecars'() {
+        given:
+        Files.createDirectories(bucketPath)
+        Files.writeString(bucketPath.resolve('blocked-read.txt'), 'hello')
+        Path rootFile = rootObjectMetadataFile('blocked-read.txt')
+        Path legacyFile = legacyObjectMetadataFile('blocked-read.txt')
+        writeLegacyProperties(rootFile)
+        writeLegacyProperties(legacyFile)
+        Path blockedDirectory = rootFile.parent
+        Set<PosixFilePermission> originalPermissions = Files.getPosixFilePermissions(blockedDirectory)
+        Files.setPosixFilePermissions(blockedDirectory, [] as Set<PosixFilePermission>)
+
+        when:
+        ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('blocked-read.txt')
+
+        then:
+        def e = thrown(ObjectStorageException)
+        e.message == 'Error reading metadata for object: blocked-read.txt'
+
+        cleanup:
+        restorePermissions(blockedDirectory, originalPermissions)
+    }
+
+    @Requires({ FileSystems.default.supportedFileAttributeViews().contains('posix') })
+    void 'object metadata delete reports canonical delete errors instead of treating them as absent'() {
+        given:
+        Files.createDirectories(bucketPath)
+        Files.writeString(bucketPath.resolve('blocked-delete.txt'), 'hello')
+        Path rootFile = rootObjectMetadataFile('blocked-delete.txt')
+        Path legacyFile = legacyObjectMetadataFile('blocked-delete.txt')
+        writeLegacyProperties(rootFile)
+        writeLegacyProperties(legacyFile)
+        Path blockedDirectory = rootFile.parent
+        Set<PosixFilePermission> originalPermissions = Files.getPosixFilePermissions(blockedDirectory)
+        Files.setPosixFilePermissions(blockedDirectory, [] as Set<PosixFilePermission>)
+
+        when:
+        ctx.getBean(LocalStorageObjectMetadataOperations).delete('blocked-delete.txt')
+
+        then:
+        def e = thrown(ObjectStorageException)
+        e.message == 'Error deleting metadata for object: blocked-delete.txt'
+
+        cleanup:
+        restorePermissions(blockedDirectory, originalPermissions)
+    }
+
     private Path rootObjectMetadataFile(String key) {
         rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageLayout.METADATA_DIRECTORY)
@@ -131,6 +184,12 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         legacy.setProperty('system.contentType', 'text/plain')
         Files.newOutputStream(path).withCloseable {
             legacy.store(it, 'legacy metadata')
+        }
+    }
+
+    private static void restorePermissions(Path directory, Set<PosixFilePermission> permissions) {
+        if (directory != null && permissions != null && Files.exists(directory, LinkOption.NOFOLLOW_LINKS)) {
+            Files.setPosixFilePermissions(directory, permissions)
         }
     }
 }
