@@ -8,6 +8,7 @@ io.micronaut.objectstorage.info
 io.micronaut.objectstorage.internal
 io.micronaut.objectstorage.local
 io.micronaut.objectstorage.metadata
+io.micronaut.objectstorage.multipart
 io.micronaut.objectstorage.oraclecloud
 io.micronaut.objectstorage.request
 io.micronaut.objectstorage.resource
