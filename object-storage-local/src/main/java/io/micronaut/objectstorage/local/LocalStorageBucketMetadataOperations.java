@@ -40,27 +40,13 @@ import java.util.Properties;
 @EachBean(LocalStorageConfiguration.class)
 final class LocalStorageBucketMetadataOperations implements BucketMetadataOperations<Path> {
 
-    private static final String BUCKETS_DIRECTORY = "buckets";
-
-    private final Path rootDirectory;
-    private final Path metadataDirectory;
-    private final Path metadataRoot;
+    private final LocalStorageLayout layout;
     private final boolean supportsPosixPermissions;
 
     LocalStorageBucketMetadataOperations(@Parameter LocalStorageConfiguration configuration) {
-        Path configuredBucketPath = configuration.getPath().toAbsolutePath().normalize();
-        this.rootDirectory = configuredBucketPath.getParent();
-        if (rootDirectory == null) {
-            throw new IllegalArgumentException("Local storage bucket metadata operations require a bucket path with a parent directory");
-        }
-        this.metadataDirectory = rootDirectory
-            .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.METADATA_DIRECTORY);
-        this.metadataRoot = metadataDirectory.resolve(BUCKETS_DIRECTORY);
-        this.supportsPosixPermissions = rootDirectory.getFileSystem().supportedFileAttributeViews().contains("posix");
-        if (!LocalStorageIoSupport.mkdirs(metadataDirectory, metadataRoot, supportsPosixPermissions)) {
-            throw new ObjectStorageException("Error creating bucket metadata directory: " + metadataRoot);
-        }
+        this.layout = new LocalStorageLayout(configuration);
+        layout.requireBucketRoot("bucket metadata operations");
+        this.supportsPosixPermissions = layout.storageRoot().getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
     @Override
@@ -79,12 +65,12 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
 
     @Override
     public void save(@NonNull BucketMetadataWrite write) {
-        Path bucketPath = LocalStorageIoSupport.resolveBucketPath(rootDirectory, write.name());
+        Path bucketPath = layout.bucketPath(write.name());
         if (!Files.isDirectory(bucketPath, LinkOption.NOFOLLOW_LINKS)) {
             throw new ObjectStorageException("Cannot persist metadata for a missing bucket: " + write.name());
         }
         Path metadataFile = metadataFilePath(write.name());
-        if (!LocalStorageIoSupport.mkdirs(metadataDirectory, metadataFile.getParent(), supportsPosixPermissions)) {
+        if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), metadataFile.getParent(), supportsPosixPermissions)) {
             throw new ObjectStorageException("Error creating metadata directories for bucket: " + write.name());
         }
         Properties properties = LocalStorageMetadataSupport.toProperties(write);
@@ -108,8 +94,6 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
     }
 
     private Path metadataFilePath(String name) {
-        LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
-        LocalStorageIoSupport.rejectSymbolicLinks(rootDirectory, metadataRoot);
-        return LocalStorageIoSupport.resolveSafe(metadataRoot, name);
+        return layout.bucketMetadataFile(name);
     }
 }

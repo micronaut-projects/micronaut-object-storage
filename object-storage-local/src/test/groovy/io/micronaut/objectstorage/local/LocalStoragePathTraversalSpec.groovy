@@ -106,7 +106,7 @@ class LocalStoragePathTraversalSpec extends Specification {
         deleteRecursively(tmp)
     }
 
-    def 'symlinked metadata directory is rejected during upload'() {
+    def 'symlinked root metadata directory is rejected during upload'() {
         given:
         Path tmp = Files.createTempDirectory("micronaut-object-storage")
         ApplicationContext ctx = null
@@ -117,7 +117,7 @@ class LocalStoragePathTraversalSpec extends Specification {
         Path metadataTarget = outside.resolve("metadata-target")
         Files.createDirectory(metadataTarget)
         assumeSymbolicLinksSupported(tmp)
-        Files.createSymbolicLink(bucket.resolve(LocalStorageOperations.INTERNAL_DIRECTORY), metadataTarget)
+        Files.createSymbolicLink(tmp.resolve(LocalStorageOperations.INTERNAL_DIRECTORY), metadataTarget)
 
         ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
         UploadRequest request = UploadRequest.fromBytes("evil".bytes, "public", "text/plain")
@@ -129,7 +129,10 @@ class LocalStoragePathTraversalSpec extends Specification {
         then:
         thrown IllegalArgumentException
         !Files.exists(bucket.resolve("public"))
-        !Files.exists(metadataTarget.resolve(LocalStorageOperations.METADATA_DIRECTORY).resolve("public"))
+        !Files.exists(metadataTarget.resolve(LocalStorageLayout.METADATA_DIRECTORY)
+            .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
+            .resolve("bucket")
+            .resolve("public"))
 
         cleanup:
         ctx?.close()

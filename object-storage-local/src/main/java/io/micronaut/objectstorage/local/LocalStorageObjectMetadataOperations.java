@@ -27,8 +27,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -41,38 +44,33 @@ import java.util.Properties;
 @EachBean(LocalStorageConfiguration.class)
 final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperations<Path> {
 
-    private final Path bucketPath;
-    private final Path metadataRoot;
+    private final LocalStorageLayout layout;
     private final boolean supportsPosixPermissions;
 
     LocalStorageObjectMetadataOperations(@Parameter LocalStorageConfiguration configuration) {
-        this.bucketPath = configuration.getPath();
-        this.metadataRoot = bucketPath
-            .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.METADATA_DIRECTORY);
-        this.supportsPosixPermissions = bucketPath.getFileSystem().supportedFileAttributeViews().contains("posix");
-        if (!LocalStorageIoSupport.mkdirs(bucketPath, metadataRoot, supportsPosixPermissions)) {
-            throw new ObjectStorageException("Error creating metadata directory: " + metadataRoot);
-        }
+        this.layout = new LocalStorageLayout(configuration);
+        this.supportsPosixPermissions = layout.storageRoot().getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
     @Override
     @NonNull
     public Optional<ObjectMetadataEntry<Path>> retrieve(@NonNull String key) {
-        Path metadataFile = metadataFilePath(key);
-        if (!Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
-            return Optional.empty();
+        for (Path metadataFile : layout.objectMetadataReadPaths(key)) {
+            try {
+                return Optional.of(LocalStorageMetadataSupport.readObjectMetadata(metadataFile, key));
+            } catch (NoSuchFileException e) {
+                // Missing metadata is the only absence signal. Other I/O failures must not fall through to stale sidecars.
+                continue;
+            } catch (IOException e) {
+                throw new ObjectStorageException("Error reading metadata for object: " + key, e);
+            }
         }
-        try {
-            return Optional.of(LocalStorageMetadataSupport.readObjectMetadata(metadataFile, key));
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error reading metadata for object: " + key, e);
-        }
+        return Optional.empty();
     }
 
     @Override
     public void save(@NonNull ObjectMetadataWrite write) {
-        Path objectFile = LocalStorageIoSupport.resolveSafe(bucketPath, write.key());
+        Path objectFile = layout.objectPath(write.key());
         if (!Files.exists(objectFile, LinkOption.NOFOLLOW_LINKS)) {
             throw new ObjectStorageException("Cannot persist metadata for a missing object: " + write.key());
         }
@@ -88,24 +86,27 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
 
     @Override
     public void delete(@NonNull String key) {
-        Path metadataFile = metadataFilePath(key);
-        if (Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
+        List<IOException> failures = new ArrayList<>();
+        for (Path metadataFile : layout.objectMetadataDeletePaths(key)) {
             try {
                 Files.delete(metadataFile);
+            } catch (NoSuchFileException e) {
+                // Missing metadata is the only absence signal. Other I/O failures must be reported.
+                continue;
             } catch (IOException e) {
-                throw new ObjectStorageException("Error deleting metadata for object: " + key, e);
+                failures.add(e);
             }
+        }
+        if (!failures.isEmpty()) {
+            IOException failure = failures.remove(0);
+            failures.forEach(failure::addSuppressed);
+            throw new ObjectStorageException("Error deleting metadata for object: " + key, failure);
         }
     }
 
-    private Path metadataFilePath(String key) {
-        LocalStorageIoSupport.rejectSymbolicLinks(bucketPath, metadataRoot);
-        return LocalStorageIoSupport.resolveSafe(metadataRoot, key);
-    }
-
     private Path prepareMetadataTarget(String key) {
-        Path metadataFile = metadataFilePath(key);
-        if (!LocalStorageIoSupport.mkdirs(metadataRoot, metadataFile.getParent(), supportsPosixPermissions)) {
+        Path metadataFile = layout.objectMetadataFile(key);
+        if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), metadataFile.getParent(), supportsPosixPermissions)) {
             throw new ObjectStorageException("Error creating metadata directories for object: " + key);
         }
         return metadataFile;

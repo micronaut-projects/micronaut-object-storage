@@ -84,19 +84,52 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         def bucketPath = operations.retrieve('visible.txt').get().nativeEntry.parent
         Path internalDirectory = bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
         Path snapshotDirectory = internalDirectory.resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
+        Path legacyMetadataDirectory = bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY)
         Files.createDirectories(snapshotDirectory)
         Files.writeString(snapshotDirectory.resolve('temporary'), 'hidden')
+        Files.createDirectories(legacyMetadataDirectory)
+        Files.writeString(legacyMetadataDirectory.resolve('visible.txt'), 'owner=hidden')
 
         expect:
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage/')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage/metadata')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage/snapshots')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.metadata')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.metadata/')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.metadata/visible.txt')).keys.empty
         operations.listObjects() == ['visible.txt'] as Set
 
         cleanup:
+        Files.deleteIfExists(legacyMetadataDirectory.resolve('visible.txt'))
+        Files.deleteIfExists(legacyMetadataDirectory)
         Files.deleteIfExists(snapshotDirectory.resolve('temporary'))
         Files.deleteIfExists(snapshotDirectory)
+    }
+
+    void 'configured bucket path cannot use reserved local storage namespaces'() {
+        given:
+        Path root = Files.createTempDirectory('LocalStorageReservedMetadataSpec')
+        Path bucketPath = root.resolve(name)
+        LocalStorageConfiguration configuration = new LocalStorageConfiguration('default')
+        configuration.path = bucketPath
+
+        when:
+        new LocalStorageLayout(configuration)
+
+        then:
+        def e = thrown(IllegalArgumentException)
+        e.message == "Local storage bucket path uses the reserved ${reservedNamespace} namespace: ${bucketPath}"
+
+        cleanup:
+        Files.deleteIfExists(root)
+
+        where:
+        name          | reservedNamespace
+        '.mn-storage' | '.mn-storage'
+        '.Mn-Storage' | '.mn-storage'
+        '.metadata'   | '.metadata'
+        '.Metadata'   | '.metadata'
     }
 
     private static List<String> blockedKeys() {
@@ -120,10 +153,14 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
     }
 
     private static List<String> reservedNamespaces() {
-        ['.mn-storage', '.Mn-Storage', '.MN-STORAGE']
+        ['.mn-storage', '.Mn-Storage', '.MN-STORAGE', '.metadata', '.Metadata', '.METADATA']
     }
 
     private static String reservedNamespace(String key) {
-        '.mn-storage'
+        def normalizedPath = Path.of(key).normalize()
+        def firstSegment = normalizedPath.nameCount > 0 ? normalizedPath.getName(0).toString() : key
+        firstSegment.equalsIgnoreCase(LocalStorageOperations.LEGACY_METADATA_DIRECTORY)
+                ? LocalStorageOperations.LEGACY_METADATA_DIRECTORY
+                : LocalStorageOperations.INTERNAL_DIRECTORY
     }
 }

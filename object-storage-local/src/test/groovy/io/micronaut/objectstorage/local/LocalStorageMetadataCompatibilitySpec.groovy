@@ -1,12 +1,17 @@
 package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.metadata.ObjectMetadataWrite
 import io.micronaut.objectstorage.request.UploadRequest
+import spock.lang.Requires
 import spock.lang.Specification
 
+import java.nio.file.FileSystems
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission
 import java.util.Properties
 
 class LocalStorageMetadataCompatibilitySpec extends Specification {
@@ -30,20 +35,22 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         }
     }
 
-    void 'legacy sidecars without a marker stay in legacy mode even for structured-looking keys'() {
+    void 'default metadata operations do not create sidecar directories on context startup'() {
         given:
-        ctx.getBean(LocalStorageOperations).upload(UploadRequest.fromBytes('hello'.bytes, 'legacy.txt', 'text/plain'))
-        Path legacyFile = bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.METADATA_DIRECTORY)
-            .resolve('legacy.txt')
-        Files.createDirectories(legacyFile.parent)
-        Properties legacy = new Properties()
-        legacy.setProperty('metadata.owner', 'ops')
-        legacy.setProperty('attribute.region', 'eu-west-1')
-        legacy.setProperty('system.contentType', 'text/plain')
-        Files.newOutputStream(legacyFile).withCloseable {
-            legacy.store(it, 'legacy metadata')
-        }
+        ctx.getBean(LocalStorageOperations)
+        ctx.getBean(LocalStorageObjectMetadataOperations)
+        ctx.getBean(LocalStorageBucketMetadataOperations)
+
+        expect:
+        !Files.exists(rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
+        !Files.exists(bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
+        !Files.exists(bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY))
+    }
+
+    void 'legacy metadata sidecars without a marker stay in legacy mode even for structured-looking keys'() {
+        given:
+        Path legacyFile = legacyObjectMetadataFile('legacy.txt')
+        writeLegacyProperties(legacyFile)
 
         when:
         def entry = ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('legacy.txt').get()
@@ -61,7 +68,7 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         entry.lastModified == null
     }
 
-    void 'structured sidecars write an explicit marker and preserve prefixed metadata keys'() {
+    void 'structured sidecars write to the root object metadata namespace'() {
         given:
         ctx.getBean(LocalStorageOperations).upload(UploadRequest.fromBytes('hello'.bytes, 'structured.txt', 'text/plain'))
         def metadataOperations = ctx.getBean(LocalStorageObjectMetadataOperations)
@@ -77,18 +84,112 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
             null
         ))
         Properties stored = new Properties()
-        Files.newInputStream(bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.METADATA_DIRECTORY)
-            .resolve('structured.txt')).withCloseable {
+        Files.newInputStream(rootObjectMetadataFile('structured.txt')).withCloseable {
             stored.load(it)
         }
         def entry = metadataOperations.retrieve('structured.txt').get()
 
         then:
+        !Files.exists(legacyObjectMetadataFile('structured.txt'))
         stored.getProperty('micronaut.local.metadata.format') == 'structured-v1'
         entry.metadata == ['metadata.owner': 'ops']
         entry.attributes == ['attribute.region': 'eu-west-1']
         entry.contentType == 'text/plain'
         entry.etag == 'etag-1'
+    }
+
+    void 'object delete removes root and legacy metadata sidecars'() {
+        given:
+        Files.createDirectories(bucketPath)
+        Files.writeString(bucketPath.resolve('delete-me.txt'), 'hello')
+        Path rootFile = rootObjectMetadataFile('delete-me.txt')
+        Path legacyFile = legacyObjectMetadataFile('delete-me.txt')
+        writeLegacyProperties(rootFile)
+        writeLegacyProperties(legacyFile)
+
+        when:
+        ctx.getBean(LocalStorageOperations).delete('delete-me.txt')
+
+        then:
+        !Files.exists(rootFile)
+        !Files.exists(legacyFile)
+    }
+
+    @Requires({ FileSystems.default.supportedFileAttributeViews().contains('posix') })
+    void 'object metadata retrieve reports canonical read errors instead of falling back to legacy sidecars'() {
+        given:
+        Files.createDirectories(bucketPath)
+        Files.writeString(bucketPath.resolve('blocked-read.txt'), 'hello')
+        Path rootFile = rootObjectMetadataFile('blocked-read.txt')
+        Path legacyFile = legacyObjectMetadataFile('blocked-read.txt')
+        writeLegacyProperties(rootFile)
+        writeLegacyProperties(legacyFile)
+        Path blockedDirectory = rootFile.parent
+        Set<PosixFilePermission> originalPermissions = Files.getPosixFilePermissions(blockedDirectory)
+        Files.setPosixFilePermissions(blockedDirectory, [] as Set<PosixFilePermission>)
+
+        when:
+        ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('blocked-read.txt')
+
+        then:
+        def e = thrown(ObjectStorageException)
+        e.message == 'Error reading metadata for object: blocked-read.txt'
+
+        cleanup:
+        restorePermissions(blockedDirectory, originalPermissions)
+    }
+
+    @Requires({ FileSystems.default.supportedFileAttributeViews().contains('posix') })
+    void 'object metadata delete reports canonical delete errors instead of treating them as absent'() {
+        given:
+        Files.createDirectories(bucketPath)
+        Files.writeString(bucketPath.resolve('blocked-delete.txt'), 'hello')
+        Path rootFile = rootObjectMetadataFile('blocked-delete.txt')
+        Path legacyFile = legacyObjectMetadataFile('blocked-delete.txt')
+        writeLegacyProperties(rootFile)
+        writeLegacyProperties(legacyFile)
+        Path blockedDirectory = rootFile.parent
+        Set<PosixFilePermission> originalPermissions = Files.getPosixFilePermissions(blockedDirectory)
+        Files.setPosixFilePermissions(blockedDirectory, [] as Set<PosixFilePermission>)
+
+        when:
+        ctx.getBean(LocalStorageObjectMetadataOperations).delete('blocked-delete.txt')
+
+        then:
+        def e = thrown(ObjectStorageException)
+        e.message == 'Error deleting metadata for object: blocked-delete.txt'
+
+        cleanup:
+        restorePermissions(blockedDirectory, originalPermissions)
+    }
+
+    private Path rootObjectMetadataFile(String key) {
+        rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.METADATA_DIRECTORY)
+            .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
+            .resolve('default')
+            .resolve(key)
+    }
+
+    private Path legacyObjectMetadataFile(String key) {
+        bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY)
+            .resolve(key)
+    }
+
+    private static void writeLegacyProperties(Path path) {
+        Files.createDirectories(path.parent)
+        Properties legacy = new Properties()
+        legacy.setProperty('metadata.owner', 'ops')
+        legacy.setProperty('attribute.region', 'eu-west-1')
+        legacy.setProperty('system.contentType', 'text/plain')
+        Files.newOutputStream(path).withCloseable {
+            legacy.store(it, 'legacy metadata')
+        }
+    }
+
+    private static void restorePermissions(Path directory, Set<PosixFilePermission> permissions) {
+        if (directory != null && permissions != null && Files.exists(directory, LinkOption.NOFOLLOW_LINKS)) {
+            Files.setPosixFilePermissions(directory, permissions)
+        }
     }
 }

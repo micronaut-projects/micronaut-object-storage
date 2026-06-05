@@ -59,6 +59,6 @@ class LocalStorageBucketMetadataOperationsSpec extends BucketMetadataOperationsS
         thrown IllegalArgumentException
 
         where:
-        name << ['..', 'foo/bar', '.mn-storage']
+        name << ['..', 'foo/bar', '.mn-storage', '.metadata', '.Metadata']
     }
 }

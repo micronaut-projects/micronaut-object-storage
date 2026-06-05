@@ -40,21 +40,19 @@ import java.util.Optional;
  */
 @EachBean(LocalStorageConfiguration.class)
 final class LocalStorageBucketOperations implements BucketOperations<Path> {
-    private final Path rootDirectory;
+    private final LocalStorageLayout layout;
     private final BucketMetadataOperations<Path> bucketMetadataOperations;
 
     LocalStorageBucketOperations(@Parameter LocalStorageConfiguration configuration,
                                  BucketMetadataOperations<Path> bucketMetadataOperations) {
-        this.rootDirectory = configuration.getPath().toAbsolutePath().normalize().getParent();
+        this.layout = new LocalStorageLayout(configuration);
         this.bucketMetadataOperations = bucketMetadataOperations;
-        if (rootDirectory == null) {
-            throw new IllegalArgumentException("Local storage bucket operations require a bucket path with a parent directory");
-        }
+        layout.requireBucketRoot("bucket operations");
     }
 
     @Override
     public void create(@NonNull String name) {
-        Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
+        Path path = layout.bucketPath(name);
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
@@ -65,7 +63,7 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
     @Override
     @NonNull
     public Optional<BucketEntry<Path>> retrieve(@NonNull String name) {
-        Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
+        Path path = layout.bucketPath(name);
         if (!Files.isDirectory(path)) {
             return Optional.empty();
         }
@@ -74,14 +72,31 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
 
     @Override
     public void delete(@NonNull String name) {
-        Path path = LocalStorageIoSupport.resolveBucketPath(rootDirectory, name);
+        Path path = layout.bucketPath(name);
         try {
-            deleteRecursively(path);
+            try {
+                deleteRecursively(path);
+            } catch (NoSuchFileException ignored) {
+                // Deleting a missing bucket is a no-op for user files, but provider state can still be stale.
+            }
+            deleteProviderManagedBucketState(name);
             bucketMetadataOperations.delete(name);
-        } catch (NoSuchFileException ignored) {
-            // Deleting a missing bucket is a no-op.
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    private void deleteProviderManagedBucketState(String name) throws IOException {
+        for (Path directory : layout.providerManagedBucketDirectories(name)) {
+            deleteRecursivelyIfExists(directory);
+        }
+    }
+
+    private static void deleteRecursivelyIfExists(Path path) throws IOException {
+        try {
+            deleteRecursively(path);
+        } catch (NoSuchFileException ignored) {
+            // The bucket may not have provider-managed object metadata or snapshots.
         }
     }
 
