@@ -20,17 +20,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 final class LocalStorageIoSupport {
@@ -73,35 +73,56 @@ final class LocalStorageIoSupport {
         }
     }
 
-    static OutputStream newOutputStreamNoFollow(Path file, boolean supportsPosixPermissions) throws IOException {
-        if (supportsPosixPermissions) {
-            try {
-                Set<OpenOption> createOptions = new HashSet<>();
-                createOptions.add(StandardOpenOption.WRITE);
-                createOptions.add(StandardOpenOption.CREATE_NEW);
-                createOptions.add(LinkOption.NOFOLLOW_LINKS);
-                return Channels.newOutputStream(FileChannel.open(file, createOptions, FILE_PERMISSIONS_ATTRIBUTE));
-            } catch (FileAlreadyExistsException ignored) {
-                Files.setPosixFilePermissions(file, FILE_PERMISSIONS);
-                return Channels.newOutputStream(FileChannel.open(
-                    file,
-                    Set.of(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS)
-                ));
-            }
-        }
-        return Channels.newOutputStream(Files.newByteChannel(file, Set.of(
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING,
-            StandardOpenOption.WRITE,
-            LinkOption.NOFOLLOW_LINKS
-        )));
-    }
-
     static Path createTempFile(Path directory, String prefix, String suffix, boolean supportsPosixPermissions) throws IOException {
         if (supportsPosixPermissions) {
             return Files.createTempFile(directory, prefix, suffix, FILE_PERMISSIONS_ATTRIBUTE);
         }
         return Files.createTempFile(directory, prefix, suffix);
+    }
+
+    static Path writeAndReplace(Path file,
+                                Path temporaryDirectory,
+                                String temporaryPrefix,
+                                String temporarySuffix,
+                                boolean supportsPosixPermissions,
+                                OutputStreamWriter writer) throws IOException {
+        Path temporaryFile = createTempFile(temporaryDirectory, temporaryPrefix, temporarySuffix, supportsPosixPermissions);
+        try {
+            try (FileChannel temporaryChannel = FileChannel.open(
+                temporaryFile,
+                Set.of(StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS)
+            );
+                 OutputStream temporaryOut = Channels.newOutputStream(temporaryChannel)) {
+                writer.write(temporaryOut);
+                temporaryOut.flush();
+                temporaryChannel.force(true);
+            }
+            moveReplacing(temporaryFile, file);
+            forceDirectories(file.getParent(), temporaryDirectory);
+            return file;
+        } catch (IOException e) {
+            deleteTemporaryFile(temporaryFile, e);
+            throw e;
+        } catch (RuntimeException e) {
+            deleteTemporaryFile(temporaryFile, e);
+            throw e;
+        } catch (Error e) {
+            deleteTemporaryFile(temporaryFile, e);
+            throw e;
+        }
+    }
+
+    static void moveReplacing(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException e) {
+            try {
+                Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException fallbackFailure) {
+                fallbackFailure.addSuppressed(e);
+                throw fallbackFailure;
+            }
+        }
     }
 
     static InputStream newInputStreamNoFollow(Path path) throws IOException {
@@ -167,5 +188,36 @@ final class LocalStorageIoSupport {
             current = current.resolve(segment);
             rejectSymbolicLink(current);
         }
+    }
+
+    private static void deleteTemporaryFile(Path temporaryFile, Throwable failure) {
+        try {
+            Files.deleteIfExists(temporaryFile);
+        } catch (IOException | RuntimeException e) {
+            failure.addSuppressed(e);
+        }
+    }
+
+    private static void forceDirectories(Path first, Path second) {
+        forceDirectory(first);
+        if (second != null && !second.equals(first)) {
+            forceDirectory(second);
+        }
+    }
+
+    private static void forceDirectory(Path directory) {
+        if (directory == null) {
+            return;
+        }
+        try (FileChannel directoryChannel = FileChannel.open(directory, StandardOpenOption.READ)) {
+            directoryChannel.force(true);
+        } catch (IOException | SecurityException | UnsupportedOperationException ignored) {
+            // Directory fsync is not portable through Java NIO, so keep it best-effort.
+        }
+    }
+
+    @FunctionalInterface
+    interface OutputStreamWriter {
+        void write(OutputStream outputStream) throws IOException;
     }
 }

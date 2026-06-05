@@ -36,12 +36,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -80,6 +78,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     static final String MULTIPART_DIRECTORY = LocalStorageLayout.MULTIPART_DIRECTORY;
     static final String SNAPSHOT_DIRECTORY = LocalStorageLayout.SNAPSHOT_DIRECTORY;
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
+    private static final String TEMPORARY_FILE_PREFIX = "micronaut-object-storage-local";
+    private static final String TEMPORARY_FILE_SUFFIX = ".tmp";
 
     private final LocalStorageConfiguration configuration;
     private final LocalStorageLayout layout;
@@ -380,16 +380,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void moveSnapshotReplacing(Path snapshot, Path file) throws IOException {
-        try {
-            Files.move(snapshot, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-        } catch (AtomicMoveNotSupportedException e) {
-            try {
-                Files.move(snapshot, file, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException fallbackFailure) {
-                fallbackFailure.addSuppressed(e);
-                throw fallbackFailure;
-            }
-        }
+        LocalStorageIoSupport.moveReplacing(snapshot, file);
     }
 
     private void deleteSnapshot(StoredFileSnapshot snapshot, RuntimeException failure) {
@@ -416,28 +407,40 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
+        deleteEmptyDirectories(directories, failure, "snapshot");
+    }
+
+    private void deleteEmptyDirectories(List<Path> directories, Throwable failure, String description) {
         for (Path directory : directories) {
             try {
                 Files.deleteIfExists(directory);
             } catch (DirectoryNotEmptyException ignored) {
-                // Another temporary snapshot still uses this directory.
+                // Another in-flight local storage operation still uses this directory.
             } catch (IOException e) {
                 if (failure != null) {
                     failure.addSuppressed(e);
                 } else {
-                    throw new ObjectStorageException("Error deleting temporary snapshot directory: " + directory, e);
+                    throw new ObjectStorageException("Error deleting " + description + " directory: " + directory, e);
                 }
             }
         }
     }
 
     private Path storeFile(Path file, InputStream inputStream) {
-        try (InputStream in = inputStream) {
-            mkdirs(configuration.getPath(), file.getParent());
-            try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
-                in.transferTo(fileOut);
-                return file;
-            }
+        mkdirs(configuration.getPath(), file.getParent());
+        Path temporaryDirectory = layout.temporaryBucketDirectory();
+        try {
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            mkdirs(layout.rootInternalDirectory(), temporaryDirectory);
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            return LocalStorageIoSupport.writeAndReplace(
+                file,
+                temporaryDirectory,
+                TEMPORARY_FILE_PREFIX,
+                TEMPORARY_FILE_SUFFIX,
+                supportsPosixPermissions,
+                inputStream::transferTo
+            );
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
         }
@@ -445,10 +448,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private boolean mkdirs(Path rootPath, Path path) {
         return LocalStorageIoSupport.mkdirs(rootPath, path, supportsPosixPermissions);
-    }
-
-    private OutputStream newOutputStreamNoFollow(Path file) throws IOException {
-        return LocalStorageIoSupport.newOutputStreamNoFollow(file, supportsPosixPermissions);
     }
 
     private static InputStream newInputStreamNoFollow(Path path) throws IOException {

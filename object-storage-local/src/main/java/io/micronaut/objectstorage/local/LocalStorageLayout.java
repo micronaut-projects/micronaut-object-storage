@@ -28,6 +28,7 @@ final class LocalStorageLayout {
     static final String BUCKETS_DIRECTORY = "buckets";
     static final String MULTIPART_DIRECTORY = "multipart";
     static final String SNAPSHOT_DIRECTORY = "snapshots";
+    static final String TEMPORARY_DIRECTORY = "tmp";
 
     private final Path bucketPath;
     private final Path storageRoot;
@@ -158,11 +159,25 @@ final class LocalStorageLayout {
         );
     }
 
+    Path temporaryBucketDirectory() {
+        return rootInternalDirectory()
+            .resolve(TEMPORARY_DIRECTORY)
+            .resolve(bucketName);
+    }
+
+    Path temporaryBucketDirectory(String name) {
+        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("temporary file cleanup"), name);
+        return rootInternalDirectory()
+            .resolve(TEMPORARY_DIRECTORY)
+            .resolve(name);
+    }
+
     List<Path> providerManagedBucketDirectories(String name) {
         return List.of(
             objectMetadataBucketRoot(name),
             multipartBucketDirectory(name),
-            snapshotBucketDirectory(name)
+            snapshotBucketDirectory(name),
+            temporaryBucketDirectory(name)
         );
     }
 

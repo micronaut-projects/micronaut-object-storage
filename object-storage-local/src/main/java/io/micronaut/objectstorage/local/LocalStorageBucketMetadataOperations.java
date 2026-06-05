@@ -24,7 +24,6 @@ import io.micronaut.objectstorage.metadata.BucketMetadataWrite;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -74,8 +73,15 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
             throw new ObjectStorageException("Error creating metadata directories for bucket: " + write.name());
         }
         Properties properties = LocalStorageMetadataSupport.toProperties(write);
-        try (OutputStream metadataOut = LocalStorageIoSupport.newOutputStreamNoFollow(metadataFile, supportsPosixPermissions)) {
-            properties.store(metadataOut, "Metadata for bucket: " + write.name());
+        try {
+            LocalStorageIoSupport.writeAndReplace(
+                metadataFile,
+                metadataFile.getParent(),
+                "micronaut-object-storage-local-bucket-metadata",
+                ".tmp",
+                supportsPosixPermissions,
+                metadataOut -> properties.store(metadataOut, "Metadata for bucket: " + write.name())
+            );
         } catch (IOException e) {
             throw new ObjectStorageException("Error storing metadata for bucket: " + write.name(), e);
         }

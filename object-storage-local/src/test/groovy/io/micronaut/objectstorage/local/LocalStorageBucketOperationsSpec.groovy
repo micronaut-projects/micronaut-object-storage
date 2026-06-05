@@ -108,6 +108,9 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         Path snapshotDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
             .resolve('default')
+        Path temporaryDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
+            .resolve('default')
         getObjectStorage().upload(UploadRequest.fromBytes('hello'.bytes, 'delete-me.txt', 'text/plain'))
         def multipartOperations = ctx.getBean(LocalStorageMultipartOperations)
         def multipartUpload = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest('multipart/delete-me.txt', 'text/plain')).upload
@@ -119,6 +122,7 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         Files.exists(objectMetadataDirectory.resolve('delete-me.txt'))
         Files.exists(multipartDirectory.resolve(multipartUpload.uploadId))
         Files.exists(snapshotDirectory.resolve('temporary'))
+        Files.exists(temporaryDirectory)
 
         when:
         getBucketOperations().delete('default')
@@ -128,6 +132,7 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         !Files.exists(objectMetadataDirectory)
         !Files.exists(multipartDirectory)
         !Files.exists(snapshotDirectory)
+        !Files.exists(temporaryDirectory)
         !ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('delete-me.txt').present
     }
 }

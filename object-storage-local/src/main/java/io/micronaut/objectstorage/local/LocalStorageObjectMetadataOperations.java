@@ -24,7 +24,6 @@ import io.micronaut.objectstorage.metadata.ObjectMetadataWrite;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
@@ -77,8 +76,15 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
         Path metadataFile = prepareMetadataTarget(write.key());
         ObjectMetadataWrite effectiveWrite = enrich(write, objectFile);
         Properties properties = LocalStorageMetadataSupport.toProperties(effectiveWrite);
-        try (OutputStream metadataOut = LocalStorageIoSupport.newOutputStreamNoFollow(metadataFile, supportsPosixPermissions)) {
-            properties.store(metadataOut, "Metadata for file: " + write.key());
+        try {
+            LocalStorageIoSupport.writeAndReplace(
+                metadataFile,
+                metadataFile.getParent(),
+                "micronaut-object-storage-local-metadata",
+                ".tmp",
+                supportsPosixPermissions,
+                metadataOut -> properties.store(metadataOut, "Metadata for file: " + write.key())
+            );
         } catch (IOException e) {
             throw new ObjectStorageException("Error storing metadata for object: " + write.key(), e);
         }
