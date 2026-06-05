@@ -28,7 +28,8 @@ Provider-managed files live under one `.mn-storage` directory in the storage roo
 Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata sidecars live under
 `.mn-storage/metadata/buckets/<bucket>`, in-progress multipart upload state lives under
 `.mn-storage/multipart/<bucket>`, temporary local file rollback snapshots live under `.mn-storage/snapshots/<bucket>`,
-and in-flight local file writes use `.mn-storage/tmp/<bucket>`.
+and in-flight local file writes use `.mn-storage/tmp/<bucket>`. Before creating a new temporary file, local writes
+opportunistically remove matching temporary files older than one day.
 
 For compatibility with persistent local storage paths created by released older versions, metadata reads also check
 legacy per-bucket `.metadata` sidecars. New metadata writes use the root `.mn-storage` layout, and deletes remove both

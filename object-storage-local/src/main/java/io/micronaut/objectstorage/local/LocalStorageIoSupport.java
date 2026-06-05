@@ -30,8 +30,12 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 final class LocalStorageIoSupport {
 
@@ -48,6 +52,8 @@ final class LocalStorageIoSupport {
         PosixFilePermissions.asFileAttribute(DIRECTORY_PERMISSIONS);
     private static final FileAttribute<Set<PosixFilePermission>> FILE_PERMISSIONS_ATTRIBUTE =
         PosixFilePermissions.asFileAttribute(FILE_PERMISSIONS);
+    private static final Duration STALE_TEMPORARY_FILE_AGE = Duration.ofDays(1);
+    private static final Set<Path> ACTIVE_TEMPORARY_FILES = ConcurrentHashMap.newKeySet();
 
     private LocalStorageIoSupport() {
     }
@@ -86,7 +92,9 @@ final class LocalStorageIoSupport {
                                 String temporarySuffix,
                                 boolean supportsPosixPermissions,
                                 OutputStreamWriter writer) throws IOException {
+        cleanupStaleTemporaryFiles(temporaryDirectory, temporaryPrefix, temporarySuffix);
         Path temporaryFile = createTempFile(temporaryDirectory, temporaryPrefix, temporarySuffix, supportsPosixPermissions);
+        Path trackedTemporaryFile = trackTemporaryFile(temporaryFile);
         try {
             try (FileChannel temporaryChannel = FileChannel.open(
                 temporaryFile,
@@ -109,6 +117,8 @@ final class LocalStorageIoSupport {
         } catch (Error e) {
             deleteTemporaryFile(temporaryFile, e);
             throw e;
+        } finally {
+            ACTIVE_TEMPORARY_FILES.remove(trackedTemporaryFile);
         }
     }
 
@@ -196,6 +206,55 @@ final class LocalStorageIoSupport {
         } catch (IOException | RuntimeException e) {
             failure.addSuppressed(e);
         }
+    }
+
+    private static Path trackTemporaryFile(Path temporaryFile) {
+        Path trackedTemporaryFile = normalizedTrackedPath(temporaryFile);
+        ACTIVE_TEMPORARY_FILES.add(trackedTemporaryFile);
+        return trackedTemporaryFile;
+    }
+
+    private static void cleanupStaleTemporaryFiles(Path directory, String prefix, String suffix) {
+        Instant cutoff = Instant.now().minus(STALE_TEMPORARY_FILE_AGE);
+        try (Stream<Path> stream = Files.list(directory)) {
+            stream
+                .filter(path -> isStaleTemporaryFile(path, prefix, suffix, cutoff))
+                .forEach(LocalStorageIoSupport::deleteStaleTemporaryFile);
+        } catch (IOException | RuntimeException ignored) {
+            // Temporary file cleanup is best-effort and must not prevent the requested write.
+        }
+    }
+
+    private static boolean isStaleTemporaryFile(Path path, String prefix, String suffix, Instant cutoff) {
+        Path fileName = path.getFileName();
+        if (fileName == null) {
+            return false;
+        }
+        String name = fileName.toString();
+        if (!name.startsWith(prefix) || !name.endsWith(suffix)) {
+            return false;
+        }
+        if (ACTIVE_TEMPORARY_FILES.contains(normalizedTrackedPath(path))) {
+            return false;
+        }
+        try {
+            return Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) &&
+                Files.getLastModifiedTime(path, LinkOption.NOFOLLOW_LINKS).toInstant().isBefore(cutoff);
+        } catch (IOException | SecurityException e) {
+            return false;
+        }
+    }
+
+    private static void deleteStaleTemporaryFile(Path temporaryFile) {
+        try {
+            Files.deleteIfExists(temporaryFile);
+        } catch (IOException | RuntimeException ignored) {
+            // A stale temp file can be removed on a future write if this best-effort attempt fails.
+        }
+    }
+
+    private static Path normalizedTrackedPath(Path path) {
+        return path.toAbsolutePath().normalize();
     }
 
     private static void forceDirectories(Path first, Path second) {

@@ -7,6 +7,7 @@ import spock.lang.Specification
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.FileTime
 import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
@@ -152,6 +153,67 @@ class LocalStorageDurabilitySpec extends Specification {
         e.message == 'write failed'
         Files.readString(target, StandardCharsets.UTF_8) == 'old'
         temporaryFiles(directory).empty
+    }
+
+    void 'write and replace removes temporary file when writer fails with runtime exception'() {
+        given:
+        Path directory = Files.createTempDirectory(rootDirectory, 'atomic-runtime-failure')
+        Path target = directory.resolve('metadata.properties')
+        Files.writeString(target, 'old', StandardCharsets.UTF_8)
+
+        when:
+        LocalStorageIoSupport.writeAndReplace(target, directory, 'metadata', '.tmp', false, { output ->
+            output.write(bytes('partial'))
+            throw new IllegalStateException('write failed')
+        })
+
+        then:
+        IllegalStateException e = thrown()
+        e.message == 'write failed'
+        Files.readString(target, StandardCharsets.UTF_8) == 'old'
+        temporaryFiles(directory).empty
+    }
+
+    void 'write and replace removes temporary file when writer throws error'() {
+        given:
+        Path directory = Files.createTempDirectory(rootDirectory, 'atomic-error-failure')
+        Path target = directory.resolve('metadata.properties')
+        Files.writeString(target, 'old', StandardCharsets.UTF_8)
+
+        when:
+        LocalStorageIoSupport.writeAndReplace(target, directory, 'metadata', '.tmp', false, { output ->
+            output.write(bytes('partial'))
+            throw new AssertionError('write failed')
+        })
+
+        then:
+        AssertionError e = thrown()
+        e.message == 'write failed'
+        Files.readString(target, StandardCharsets.UTF_8) == 'old'
+        temporaryFiles(directory).empty
+    }
+
+    void 'upload removes stale matching temporary files without deleting fresh or unrelated files'() {
+        given:
+        Path temporaryDirectory = defaultTemporaryDirectory()
+        Files.createDirectories(temporaryDirectory)
+        Path staleTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-stale.tmp')
+        Path freshTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-fresh.tmp')
+        Path unrelatedTemporaryFile = temporaryDirectory.resolve('unrelated-stale.tmp')
+        Files.writeString(staleTemporaryFile, 'stale', StandardCharsets.UTF_8)
+        Files.writeString(freshTemporaryFile, 'fresh', StandardCharsets.UTF_8)
+        Files.writeString(unrelatedTemporaryFile, 'unrelated', StandardCharsets.UTF_8)
+        Files.setLastModifiedTime(staleTemporaryFile, FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2)))
+        Files.setLastModifiedTime(unrelatedTemporaryFile, FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2)))
+
+        when:
+        operations.upload(UploadRequest.fromBytes(bytes('created'), 'created.txt', 'text/plain'))
+
+        then:
+        !Files.exists(staleTemporaryFile)
+        Files.readString(freshTemporaryFile, StandardCharsets.UTF_8) == 'fresh'
+        Files.readString(unrelatedTemporaryFile, StandardCharsets.UTF_8) == 'unrelated'
+        text('created.txt') == 'created'
     }
 
     private String text(String key) {

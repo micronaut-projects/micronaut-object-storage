@@ -340,7 +340,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), snapshotDirectory);
             Path snapshot = LocalStorageIoSupport.createTempFile(
                 snapshotDirectory,
-                "micronaut-object-storage-local",
+                TEMPORARY_FILE_PREFIX,
                 ".snapshot",
                 supportsPosixPermissions
             );
