@@ -4,6 +4,7 @@ quickStart: Quick Start
 reactiveOperations: Reactive Operations
 preSignedUploads: Pre-Signed Uploads
 paginatedListing: Paginated Listing
+multipartUploads: Multipart Uploads
 bucketManagement: Bucket and Container Management
 metadataPersistence: Metadata Persistence SPI
 aws: Amazon S3

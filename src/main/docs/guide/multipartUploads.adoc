@@ -1,0 +1,61 @@
+== Multipart Uploads
+
+Multipart uploads are available through api:objectstorage.multipart.MultipartObjectStorageOperations[].
+This contract is additive to api:objectstorage.ObjectStorageOperations[] so existing single-object upload code does not change.
+
+The multipart lifecycle uses the following portable request and response types:
+
+- api:objectstorage.multipart.CreateMultipartUploadRequest[]
+- api:objectstorage.multipart.UploadPartRequest[]
+- api:objectstorage.multipart.ListMultipartPartsRequest[]
+- api:objectstorage.multipart.CompleteMultipartUploadRequest[]
+- api:objectstorage.multipart.AbortMultipartUploadRequest[]
+- api:objectstorage.multipart.MultipartUploadHandle[]
+- api:objectstorage.multipart.MultipartPart[]
+
+== Support Matrix
+
+[cols="1,1"]
+|===
+| Backend | Multipart lifecycle support
+
+| Amazon S3
+| Supported
+
+| Azure Blob Storage
+| Not yet supported
+
+| Google Cloud Storage
+| Not yet supported
+
+| Oracle Cloud Infrastructure Object Storage
+| Supported
+
+| Local Storage
+| Not yet supported
+|===
+
+== Lifecycle Rules
+
+- `createMultipartUpload` returns an opaque upload id and does not imply any background cleanup guarantee.
+- In-progress multipart uploads remain caller-owned resources until they are completed or aborted.
+- `uploadPart` associates a numbered part with a previously created upload handle.
+- Object metadata and content type are set when creating the multipart upload, not on each individual part.
+- Providers may enforce their own part-size limits. Amazon S3 requires each non-final part to be at least
+  5 MiB. Oracle Cloud Infrastructure Object Storage requires stricter non-final chunks; use chunks greater
+  than 10 MiB, for example 11 MiB. The final part may be smaller.
+- `listParts` is read-only and exposes provider pagination through opaque continuation tokens.
+- `completeMultipartUpload` requires a strictly ordered part manifest.
+- Retrying `completeMultipartUpload` is only safe when reusing the same upload id and exact part manifest.
+- `abortMultipartUpload` is safe to retry.
+
+== Example
+
+snippet::example.MultipartUploadService[project-base="doc-examples/example", source="main", indent="0", tags="multipart-upload"]
+
+In this example, `nonFinalChunk` is non-final and must satisfy the selected provider's minimum part size. The final
+chunk may be smaller when the provider allows final-part size waivers.
+
+When uploading multipart parts from a stream-backed request instead of a file or byte array, provide
+the content size up front so providers such as Amazon S3 and Oracle Cloud Infrastructure Object Storage can stream the part without buffering it
+fully in memory.
