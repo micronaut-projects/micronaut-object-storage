@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.request;
+package io.micronaut.objectstorage.multipart;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -25,14 +25,14 @@ import java.util.Optional;
 /**
  * Multipart upload creation request.
  *
- * @since 3.0.1
+ * @param key the target object key
+ * @param contentType the optional content type
+ * @param metadata the optional object metadata
+ * @since 3.1.0
  */
-public final class CreateMultipartUploadRequest {
-
-    private final String key;
-    @Nullable
-    private final String contentType;
-    private final Map<String, String> metadata;
+public record CreateMultipartUploadRequest(@NonNull String key,
+                                           @Nullable String contentType,
+                                           @NonNull Map<String, String> metadata) {
 
     /**
      * @param key the target object key
@@ -54,12 +54,10 @@ public final class CreateMultipartUploadRequest {
      * @param contentType the optional content type
      * @param metadata the optional object metadata
      */
-    public CreateMultipartUploadRequest(@NonNull String key,
-                                        @Nullable String contentType,
-                                        @NonNull Map<String, String> metadata) {
-        this.key = Objects.requireNonNull(key, "key");
-        this.contentType = normalize(contentType);
-        this.metadata = Map.copyOf(Objects.requireNonNull(metadata, "metadata"));
+    public CreateMultipartUploadRequest {
+        key = Objects.requireNonNull(key, "key");
+        contentType = normalize(contentType);
+        metadata = Map.copyOf(Objects.requireNonNull(metadata, "metadata"));
     }
 
     /**

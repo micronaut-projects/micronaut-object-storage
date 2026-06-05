@@ -13,32 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.response;
+package io.micronaut.objectstorage.multipart;
 
 import io.micronaut.context.annotation.DefaultImplementation;
-import io.micronaut.objectstorage.MultipartUploadHandle;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Multipart upload creation response.
+ * Multipart upload completion response.
  *
- * @param <R> Cloud vendor-specific create multipart upload response
- * @since 3.0.1
+ * @param <R> Cloud vendor-specific complete multipart upload response
+ * @since 3.1.0
  */
-@DefaultImplementation(DefaultCreateMultipartUploadResponse.class)
-public interface CreateMultipartUploadResponse<R> {
+@DefaultImplementation(DefaultCompleteMultipartUploadResponse.class)
+public interface CompleteMultipartUploadResponse<R> {
 
     /**
-     * Creates a multipart upload creation response.
+     * Creates a multipart upload completion response.
      *
      * @param upload the multipart upload handle
+     * @param eTag the final object entity tag
      * @param nativeResponse the native provider response
-     * @param <R> Cloud vendor-specific create multipart upload response
+     * @param <R> Cloud vendor-specific complete multipart upload response
      * @return the response
      */
     @NonNull
-    static <R> CreateMultipartUploadResponse<R> of(@NonNull MultipartUploadHandle upload, @NonNull R nativeResponse) {
-        return new DefaultCreateMultipartUploadResponse<>(upload, nativeResponse);
+    static <R> CompleteMultipartUploadResponse<R> of(@NonNull MultipartUploadHandle upload,
+                                                     @NonNull String eTag,
+                                                     @NonNull R nativeResponse) {
+        return new DefaultCompleteMultipartUploadResponse<>(upload, eTag, nativeResponse);
     }
 
     /**
@@ -46,6 +48,12 @@ public interface CreateMultipartUploadResponse<R> {
      */
     @NonNull
     MultipartUploadHandle getUpload();
+
+    /**
+     * @return the final object entity tag
+     */
+    @NonNull
+    String getETag();
 
     /**
      * @return the native provider response

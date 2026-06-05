@@ -7,10 +7,10 @@ import com.oracle.bmc.objectstorage.requests.DeleteBucketRequest
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest
 import com.oracle.bmc.objectstorage.responses.DeleteObjectResponse
 import com.oracle.bmc.objectstorage.responses.PutObjectResponse
-import io.micronaut.objectstorage.MultipartObjectStorageOperations
 import io.micronaut.objectstorage.MultipartObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.bucket.BucketOperations
+import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import jakarta.inject.Named

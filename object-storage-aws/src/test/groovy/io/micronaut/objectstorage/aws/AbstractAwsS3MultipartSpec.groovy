@@ -1,15 +1,12 @@
 package io.micronaut.objectstorage.aws
 
-import io.micronaut.objectstorage.MultipartObjectStorageOperations
-import io.micronaut.objectstorage.MultipartObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.MultipartObjectStorageOperationsSpecification
 import io.micronaut.objectstorage.bucket.BucketOperations
+import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 import jakarta.inject.Named
-import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.CreateBucketRequest
-import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
@@ -23,9 +20,6 @@ abstract class AbstractAwsS3MultipartSpec extends MultipartObjectStorageOperatio
     private static final int AWS_NON_FINAL_MULTIPART_PART_SIZE_BYTES = 5 * 1024 * 1024
 
     @Inject
-    S3Client s3
-
-    @Inject
     @Named(OBJECT_STORAGE_NAME)
     AwsS3Operations awsS3Bucket
 
@@ -34,11 +28,11 @@ abstract class AbstractAwsS3MultipartSpec extends MultipartObjectStorageOperatio
     AwsS3BucketOperations awsS3BucketOperations
 
     void setup() {
-        s3.createBucket(CreateBucketRequest.builder().bucket(BUCKET_NAME).build() as CreateBucketRequest)
+        awsS3BucketOperations.create(BUCKET_NAME)
     }
 
     void cleanup() {
-        s3.deleteBucket(DeleteBucketRequest.builder().bucket(BUCKET_NAME).build() as DeleteBucketRequest)
+        awsS3BucketOperations.delete(BUCKET_NAME)
     }
 
     @Override

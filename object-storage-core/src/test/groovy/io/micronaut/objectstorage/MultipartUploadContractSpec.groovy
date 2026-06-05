@@ -1,11 +1,13 @@
 package io.micronaut.objectstorage
 
-import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest
-import io.micronaut.objectstorage.request.CreateMultipartUploadRequest
-import io.micronaut.objectstorage.request.ListMultipartPartsRequest
-import io.micronaut.objectstorage.request.UploadPartRequest
+import io.micronaut.objectstorage.multipart.CompleteMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsResponse
+import io.micronaut.objectstorage.multipart.MultipartPart
+import io.micronaut.objectstorage.multipart.MultipartUploadHandle
+import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.UploadRequest
-import io.micronaut.objectstorage.response.ListMultipartPartsResponse
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -14,9 +16,9 @@ class MultipartUploadContractSpec extends Specification {
 
     void "multipart part validates portable part metadata"() {
         expect:
-        new MultipartPart(1, "etag-1", 0).checksum == Optional.empty()
-        new MultipartPart(1, "etag-1", 128, "").checksum == Optional.empty()
-        new MultipartPart(1, "etag-1", 128, "checksum-1").checksum == Optional.of("checksum-1")
+        new MultipartPart(1, "etag-1", 0).getChecksum() == Optional.empty()
+        new MultipartPart(1, "etag-1", 128, "").getChecksum() == Optional.empty()
+        new MultipartPart(1, "etag-1", 128, "checksum-1").getChecksum() == Optional.of("checksum-1")
 
         when:
         new MultipartPart(partNumber, "etag-1", size)
@@ -40,7 +42,7 @@ class MultipartUploadContractSpec extends Specification {
 
         then:
         request.key == "videos/demo.mp4"
-        request.contentType == Optional.empty()
+        request.getContentType() == Optional.empty()
         request.metadata == [owner: "micronaut"]
 
         when:
@@ -116,9 +118,9 @@ class MultipartUploadContractSpec extends Specification {
         then:
         request.upload == upload
         request.pageSize == 2
-        request.continuationToken == Optional.empty()
+        request.getContinuationToken() == Optional.empty()
         response.parts == [firstPart]
-        response.continuationToken == Optional.empty()
+        response.getContinuationToken() == Optional.empty()
 
         when:
         response.parts << new MultipartPart(3, "etag-3", 32)
@@ -133,7 +135,7 @@ class MultipartUploadContractSpec extends Specification {
         thrown(IllegalArgumentException)
 
         expect:
-        new ListMultipartPartsRequest(upload, 1, "token-1").continuationToken == Optional.of("token-1")
-        new ListMultipartPartsResponse([firstPart], "token-2").continuationToken == Optional.of("token-2")
+        new ListMultipartPartsRequest(upload, 1, "token-1").getContinuationToken() == Optional.of("token-1")
+        new ListMultipartPartsResponse([firstPart], "token-2").getContinuationToken() == Optional.of("token-2")
     }
 }

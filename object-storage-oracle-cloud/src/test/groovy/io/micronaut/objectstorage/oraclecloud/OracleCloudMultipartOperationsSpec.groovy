@@ -15,14 +15,14 @@ import com.oracle.bmc.objectstorage.responses.CreateMultipartUploadResponse as O
 import com.oracle.bmc.objectstorage.responses.ListMultipartUploadPartsResponse as OciListMultipartUploadPartsResponse
 import com.oracle.bmc.objectstorage.responses.UploadPartResponse as OciUploadPartResponse
 import com.oracle.bmc.objectstorage.transfer.UploadManager
-import io.micronaut.objectstorage.MultipartPart
-import io.micronaut.objectstorage.MultipartUploadHandle
+import io.micronaut.objectstorage.multipart.MultipartPart
+import io.micronaut.objectstorage.multipart.MultipartUploadHandle
 import io.micronaut.objectstorage.ObjectStorageException
-import io.micronaut.objectstorage.request.AbortMultipartUploadRequest
-import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest
-import io.micronaut.objectstorage.request.CreateMultipartUploadRequest
-import io.micronaut.objectstorage.request.ListMultipartPartsRequest
-import io.micronaut.objectstorage.request.UploadPartRequest
+import io.micronaut.objectstorage.multipart.AbortMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CompleteMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsRequest
+import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 
@@ -91,7 +91,7 @@ class OracleCloudMultipartOperationsSpec extends Specification {
         response.part.partNumber == 1
         response.part.size == 4L
         response.part.ETag == 'etag-1'
-        response.part.checksum.get() == 'sha256-1'
+        response.part.getChecksum().get() == 'sha256-1'
     }
 
     void "upload part rejects streaming requests without content size"() {
@@ -150,8 +150,8 @@ class OracleCloudMultipartOperationsSpec extends Specification {
         response.parts*.partNumber == [1]
         response.parts*.ETag == ['etag-1']
         response.parts*.size == [4L]
-        response.parts.first().checksum.get() == 'md5-1'
-        response.continuationToken.get() == 'next-page-2'
+        response.parts.first().getChecksum().get() == 'md5-1'
+        response.getContinuationToken().get() == 'next-page-2'
     }
 
     void "list parts maps empty OCI response to empty portable page"() {
@@ -169,7 +169,7 @@ class OracleCloudMultipartOperationsSpec extends Specification {
 
         and:
         response.parts.empty
-        !response.continuationToken.present
+        !response.getContinuationToken().present
     }
 
     void "complete multipart upload maps portable manifest to OCI commit request"() {

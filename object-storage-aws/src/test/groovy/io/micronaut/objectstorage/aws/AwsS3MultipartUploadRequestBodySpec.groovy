@@ -1,10 +1,10 @@
 package io.micronaut.objectstorage.aws
 
 import io.micronaut.objectstorage.InputStreamMapper
-import io.micronaut.objectstorage.MultipartUploadHandle
+import io.micronaut.objectstorage.multipart.MultipartUploadHandle
 import io.micronaut.objectstorage.ObjectStorageException
-import io.micronaut.objectstorage.request.ListMultipartPartsRequest
-import io.micronaut.objectstorage.request.UploadPartRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsRequest
+import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.UploadRequest
 import spock.lang.Specification
 import software.amazon.awssdk.services.s3.S3Client
@@ -69,7 +69,7 @@ class AwsS3MultipartUploadRequestBodySpec extends Specification {
 
         when:
         def firstPage = operations.listParts(new ListMultipartPartsRequest(upload, 2))
-        String continuationToken = firstPage.continuationToken.orElseThrow()
+        String continuationToken = firstPage.getContinuationToken().orElseThrow()
         def secondPage = operations.listParts(new ListMultipartPartsRequest(upload, 2, continuationToken))
 
         then:

@@ -15,14 +15,17 @@
  */
 package io.micronaut.objectstorage
 
-import io.micronaut.objectstorage.request.AbortMultipartUploadRequest
-import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest
-import io.micronaut.objectstorage.request.CreateMultipartUploadRequest
-import io.micronaut.objectstorage.request.ListMultipartPartsRequest
+import io.micronaut.objectstorage.multipart.AbortMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CompleteMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsResponse
+import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations
+import io.micronaut.objectstorage.multipart.MultipartPart
+import io.micronaut.objectstorage.multipart.MultipartUploadHandle
+import io.micronaut.objectstorage.multipart.UploadPartRequest
+import io.micronaut.objectstorage.multipart.UploadPartResponse
 import io.micronaut.objectstorage.request.UploadRequest
-import io.micronaut.objectstorage.request.UploadPartRequest
-import io.micronaut.objectstorage.response.ListMultipartPartsResponse
-import io.micronaut.objectstorage.response.UploadPartResponse
 import spock.util.concurrent.PollingConditions
 
 import java.nio.charset.StandardCharsets
@@ -97,13 +100,13 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         pages
         pages.every { it.parts.size() <= firstPageRequest.pageSize }
         replayedFirstPage.parts*.partNumber == firstPage.parts*.partNumber
-        replayedFirstPage.continuationToken == firstPage.continuationToken
+        replayedFirstPage.getContinuationToken() == firstPage.getContinuationToken()
         pages.first().parts*.partNumber == firstPage.parts*.partNumber
-        pages.first().continuationToken == firstPage.continuationToken
+        pages.first().getContinuationToken() == firstPage.getContinuationToken()
         pages.dropRight(1).every { it.parts }
         adjacentMultipartPages(pages).every { pair -> !pair[0].parts*.partNumber.intersect(pair[1].parts*.partNumber) }
         partNumbers == [1, 2, 3]
-        !pages.last().continuationToken.present
+        !pages.last().getContinuationToken().present
 
         cleanup:
         storage.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
@@ -184,7 +187,7 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         while (true) {
             ListMultipartPartsResponse page = storage.listParts(currentRequest)
             pages << page
-            Optional<String> continuationToken = page.continuationToken
+            Optional<String> continuationToken = page.getContinuationToken()
             if (!continuationToken.present) {
                 return pages
             }

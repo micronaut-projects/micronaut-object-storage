@@ -13,39 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.response;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartUploadHandle;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Objects;
+
 /**
- * Default implementation of {@link CompleteMultipartUploadResponse}.
+ * Default implementation of {@link CreateMultipartUploadResponse}.
  *
- * @param <R> Cloud vendor-specific complete multipart upload response
- * @since 3.0.1
+ * @param <R> Cloud vendor-specific create multipart upload response
+ * @param upload the multipart upload handle
+ * @param nativeResponse the native provider response
+ * @since 3.1.0
  */
-public class DefaultCompleteMultipartUploadResponse<R> implements CompleteMultipartUploadResponse<R> {
+public record DefaultCreateMultipartUploadResponse<R>(@NonNull MultipartUploadHandle upload,
+                                                      @NonNull R nativeResponse) implements CreateMultipartUploadResponse<R> {
 
-    private final MultipartUploadHandle upload;
-    private final String eTag;
-    private final R nativeResponse;
-
-    protected DefaultCompleteMultipartUploadResponse(MultipartUploadHandle upload, String eTag, R nativeResponse) {
-        this.upload = upload;
-        this.eTag = eTag;
-        this.nativeResponse = nativeResponse;
+    /**
+     * Compact constructor.
+     */
+    public DefaultCreateMultipartUploadResponse {
+        upload = Objects.requireNonNull(upload, "upload");
+        nativeResponse = Objects.requireNonNull(nativeResponse, "nativeResponse");
     }
 
     @Override
     @NonNull
     public MultipartUploadHandle getUpload() {
         return upload;
-    }
-
-    @Override
-    @NonNull
-    public String getETag() {
-        return eTag;
     }
 
     @Override

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.request;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartUploadHandle;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -25,14 +24,14 @@ import java.util.Optional;
 /**
  * Multipart part listing request.
  *
- * @since 3.0.1
+ * @param upload the multipart upload handle
+ * @param pageSize the maximum number of parts to return
+ * @param continuationToken the opaque continuation token for the next page
+ * @since 3.1.0
  */
-public final class ListMultipartPartsRequest {
-
-    private final MultipartUploadHandle upload;
-    private final int pageSize;
-    @Nullable
-    private final String continuationToken;
+public record ListMultipartPartsRequest(@NonNull MultipartUploadHandle upload,
+                                        int pageSize,
+                                        @Nullable String continuationToken) {
 
     /**
      * @param upload the multipart upload handle
@@ -47,13 +46,12 @@ public final class ListMultipartPartsRequest {
      * @param pageSize the maximum number of parts to return
      * @param continuationToken the opaque continuation token for the next page
      */
-    public ListMultipartPartsRequest(@NonNull MultipartUploadHandle upload, int pageSize, @Nullable String continuationToken) {
+    public ListMultipartPartsRequest {
         if (pageSize <= 0) {
             throw new IllegalArgumentException("pageSize must be greater than 0");
         }
-        this.upload = Objects.requireNonNull(upload, "upload");
-        this.pageSize = pageSize;
-        this.continuationToken = normalize(continuationToken);
+        upload = Objects.requireNonNull(upload, "upload");
+        continuationToken = normalize(continuationToken);
     }
 
     /**

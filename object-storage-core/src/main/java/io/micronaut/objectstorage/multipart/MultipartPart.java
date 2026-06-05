@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage;
+package io.micronaut.objectstorage.multipart;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -24,15 +24,16 @@ import java.util.Optional;
 /**
  * Portable multipart upload part metadata.
  *
- * @since 3.0.1
+ * @param partNumber the positive part number
+ * @param eTag the provider entity tag for the part
+ * @param size the uploaded part size in bytes
+ * @param checksum an optional portable checksum value
+ * @since 3.1.0
  */
-public final class MultipartPart {
-
-    private final int partNumber;
-    private final String eTag;
-    private final long size;
-    @Nullable
-    private final String checksum;
+public record MultipartPart(int partNumber,
+                            @NonNull String eTag,
+                            long size,
+                            @Nullable String checksum) {
 
     /**
      * @param partNumber the positive part number
@@ -49,17 +50,15 @@ public final class MultipartPart {
      * @param size the uploaded part size in bytes
      * @param checksum an optional portable checksum value
      */
-    public MultipartPart(int partNumber, @NonNull String eTag, long size, @Nullable String checksum) {
+    public MultipartPart {
         if (partNumber <= 0) {
             throw new IllegalArgumentException("partNumber must be greater than 0");
         }
         if (size < 0) {
             throw new IllegalArgumentException("size must be greater than or equal to 0");
         }
-        this.partNumber = partNumber;
-        this.eTag = Objects.requireNonNull(eTag, "eTag");
-        this.size = size;
-        this.checksum = normalize(checksum);
+        eTag = Objects.requireNonNull(eTag, "eTag");
+        checksum = normalize(checksum);
     }
 
     /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage;
+package io.micronaut.objectstorage.multipart;
 
 import org.jspecify.annotations.NonNull;
 
@@ -22,20 +22,19 @@ import java.util.Objects;
 /**
  * Opaque multipart upload identity.
  *
- * @since 3.0.1
+ * @param key the target object key
+ * @param uploadId the opaque provider upload id
+ * @since 3.1.0
  */
-public final class MultipartUploadHandle {
-
-    private final String key;
-    private final String uploadId;
+public record MultipartUploadHandle(@NonNull String key,
+                                    @NonNull String uploadId) {
 
     /**
-     * @param key the target object key
-     * @param uploadId the opaque provider upload id
+     * Compact constructor.
      */
-    public MultipartUploadHandle(@NonNull String key, @NonNull String uploadId) {
-        this.key = Objects.requireNonNull(key, "key");
-        this.uploadId = Objects.requireNonNull(uploadId, "uploadId");
+    public MultipartUploadHandle {
+        key = Objects.requireNonNull(key, "key");
+        uploadId = Objects.requireNonNull(uploadId, "uploadId");
     }
 
     /**

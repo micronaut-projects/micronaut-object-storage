@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.response;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartPart;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Objects;
 
 /**
  * Default implementation of {@link UploadPartResponse}.
  *
  * @param <R> Cloud vendor-specific upload part response
- * @since 3.0.1
+ * @param part the uploaded part metadata
+ * @param nativeResponse the native provider response
+ * @since 3.1.0
  */
-public class DefaultUploadPartResponse<R> implements UploadPartResponse<R> {
+public record DefaultUploadPartResponse<R>(@NonNull MultipartPart part,
+                                           @NonNull R nativeResponse) implements UploadPartResponse<R> {
 
-    private final MultipartPart part;
-    private final R nativeResponse;
-
-    protected DefaultUploadPartResponse(MultipartPart part, R nativeResponse) {
-        this.part = part;
-        this.nativeResponse = nativeResponse;
+    /**
+     * Compact constructor.
+     */
+    public DefaultUploadPartResponse {
+        part = Objects.requireNonNull(part, "part");
+        nativeResponse = Objects.requireNonNull(nativeResponse, "nativeResponse");
     }
 
     @Override

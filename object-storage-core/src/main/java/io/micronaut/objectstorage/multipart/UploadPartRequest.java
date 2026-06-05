@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.request;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartUploadHandle;
+import io.micronaut.objectstorage.request.UploadRequest;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
@@ -25,29 +25,27 @@ import java.util.Objects;
  *
  * <p>The supplied {@link UploadRequest} must target the same key as the multipart upload handle.</p>
  *
- * @since 3.0.1
+ * @param upload the multipart upload handle
+ * @param partNumber the positive part number
+ * @param uploadRequest the payload upload request
+ * @since 3.1.0
  */
-public final class UploadPartRequest {
-
-    private final MultipartUploadHandle upload;
-    private final int partNumber;
-    private final UploadRequest uploadRequest;
+public record UploadPartRequest(@NonNull MultipartUploadHandle upload,
+                                int partNumber,
+                                @NonNull UploadRequest uploadRequest) {
 
     /**
-     * @param upload the multipart upload handle
-     * @param partNumber the positive part number
-     * @param uploadRequest the payload upload request
+     * Compact constructor.
      */
-    public UploadPartRequest(@NonNull MultipartUploadHandle upload, int partNumber, @NonNull UploadRequest uploadRequest) {
-        this.upload = Objects.requireNonNull(upload, "upload");
+    public UploadPartRequest {
+        upload = Objects.requireNonNull(upload, "upload");
         if (partNumber <= 0) {
             throw new IllegalArgumentException("partNumber must be greater than 0");
         }
-        this.uploadRequest = Objects.requireNonNull(uploadRequest, "uploadRequest");
+        uploadRequest = Objects.requireNonNull(uploadRequest, "uploadRequest");
         if (!upload.getKey().equals(uploadRequest.getKey())) {
             throw new IllegalArgumentException("uploadRequest key must match the multipart upload key");
         }
-        this.partNumber = partNumber;
     }
 
     /**

@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage;
+package io.micronaut.objectstorage.multipart;
 
 import io.micronaut.core.annotation.Blocking;
-import io.micronaut.objectstorage.request.AbortMultipartUploadRequest;
-import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest;
-import io.micronaut.objectstorage.request.CreateMultipartUploadRequest;
-import io.micronaut.objectstorage.request.ListMultipartPartsRequest;
-import io.micronaut.objectstorage.request.UploadPartRequest;
-import io.micronaut.objectstorage.response.CompleteMultipartUploadResponse;
-import io.micronaut.objectstorage.response.CreateMultipartUploadResponse;
-import io.micronaut.objectstorage.response.ListMultipartPartsResponse;
-import io.micronaut.objectstorage.response.UploadPartResponse;
+import io.micronaut.objectstorage.ObjectStorageException;
+import io.micronaut.objectstorage.ObjectStorageOperations;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -40,10 +33,10 @@ import org.jspecify.annotations.NonNull;
  *
  * @param <C> Cloud vendor-specific create multipart upload response
  * @param <U> Cloud vendor-specific upload part response
- * @param <COMP> Cloud vendor-specific complete multipart upload response
- * @since 3.0.1
+ * @param <R> Cloud vendor-specific complete multipart upload response
+ * @since 3.1.0
  */
-public interface MultipartObjectStorageOperations<C, U, COMP> {
+public interface MultipartObjectStorageOperations<C, U, R> {
 
     /**
      * Creates a new multipart upload and returns the opaque upload handle.
@@ -87,7 +80,7 @@ public interface MultipartObjectStorageOperations<C, U, COMP> {
      */
     @Blocking
     @NonNull
-    CompleteMultipartUploadResponse<COMP> completeMultipartUpload(@NonNull CompleteMultipartUploadRequest request);
+    CompleteMultipartUploadResponse<R> completeMultipartUpload(@NonNull CompleteMultipartUploadRequest request);
 
     /**
      * Aborts an in-progress multipart upload.

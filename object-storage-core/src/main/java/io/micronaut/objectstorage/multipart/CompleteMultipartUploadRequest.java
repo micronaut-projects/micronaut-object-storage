@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.request;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartPart;
-import io.micronaut.objectstorage.MultipartUploadHandle;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -25,25 +23,23 @@ import java.util.Objects;
 /**
  * Multipart upload completion request.
  *
- * @since 3.0.1
+ * @param upload the multipart upload handle
+ * @param parts the ordered part manifest to complete
+ * @since 3.1.0
  */
-public final class CompleteMultipartUploadRequest {
-
-    private final MultipartUploadHandle upload;
-    private final List<MultipartPart> parts;
+public record CompleteMultipartUploadRequest(@NonNull MultipartUploadHandle upload,
+                                             @NonNull List<MultipartPart> parts) {
 
     /**
-     * @param upload the multipart upload handle
-     * @param parts the ordered part manifest to complete
+     * Compact constructor.
      */
-    public CompleteMultipartUploadRequest(@NonNull MultipartUploadHandle upload,
-                                          @NonNull List<MultipartPart> parts) {
-        this.upload = Objects.requireNonNull(upload, "upload");
+    public CompleteMultipartUploadRequest {
+        upload = Objects.requireNonNull(upload, "upload");
         Objects.requireNonNull(parts, "parts");
         if (parts.isEmpty()) {
             throw new IllegalArgumentException("parts must not be empty");
         }
-        this.parts = validateOrdered(List.copyOf(parts));
+        parts = validateOrdered(List.copyOf(parts));
     }
 
     /**

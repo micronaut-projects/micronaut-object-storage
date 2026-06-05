@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.response;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartPart;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * Paginated multipart part listing response.
  *
- * @since 3.0.1
+ * @param parts the ordered multipart parts in the current page
+ * @param continuationToken the opaque continuation token for the next page
+ * @since 3.1.0
  */
-public final class ListMultipartPartsResponse {
-
-    private final List<MultipartPart> parts;
-    @Nullable
-    private final String continuationToken;
+public record ListMultipartPartsResponse(@NonNull List<MultipartPart> parts,
+                                         @Nullable String continuationToken) {
 
     /**
      * @param parts the ordered multipart parts in the current page
@@ -44,9 +43,9 @@ public final class ListMultipartPartsResponse {
      * @param parts the ordered multipart parts in the current page
      * @param continuationToken the opaque continuation token for the next page
      */
-    public ListMultipartPartsResponse(@NonNull List<MultipartPart> parts, @Nullable String continuationToken) {
-        this.parts = List.copyOf(parts);
-        this.continuationToken = continuationToken == null || continuationToken.isEmpty() ? null : continuationToken;
+    public ListMultipartPartsResponse {
+        parts = List.copyOf(Objects.requireNonNull(parts, "parts"));
+        continuationToken = normalize(continuationToken);
     }
 
     /**
@@ -63,5 +62,10 @@ public final class ListMultipartPartsResponse {
     @NonNull
     public Optional<String> getContinuationToken() {
         return Optional.ofNullable(continuationToken);
+    }
+
+    @Nullable
+    private static String normalize(@Nullable String value) {
+        return value == null || value.isEmpty() ? null : value;
     }
 }

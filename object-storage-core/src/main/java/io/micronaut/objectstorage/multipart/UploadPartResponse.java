@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.response;
+package io.micronaut.objectstorage.multipart;
 
 import io.micronaut.context.annotation.DefaultImplementation;
-import io.micronaut.objectstorage.MultipartPart;
 import org.jspecify.annotations.NonNull;
 
 /**
  * Multipart part upload response.
  *
  * @param <R> Cloud vendor-specific upload part response
- * @since 3.0.1
+ * @since 3.1.0
  */
 @DefaultImplementation(DefaultUploadPartResponse.class)
 public interface UploadPartResponse<R> {

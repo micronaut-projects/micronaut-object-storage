@@ -1,15 +1,15 @@
-Multipart uploads are available through api:objectstorage.MultipartObjectStorageOperations[].
+Multipart uploads are available through api:objectstorage.multipart.MultipartObjectStorageOperations[].
 This contract is additive to api:objectstorage.ObjectStorageOperations[] so existing single-object upload code does not change.
 
 The multipart lifecycle uses the following portable request and response types:
 
-- api:objectstorage.request.CreateMultipartUploadRequest[]
-- api:objectstorage.request.UploadPartRequest[]
-- api:objectstorage.request.ListMultipartPartsRequest[]
-- api:objectstorage.request.CompleteMultipartUploadRequest[]
-- api:objectstorage.request.AbortMultipartUploadRequest[]
-- api:objectstorage.MultipartUploadHandle[]
-- api:objectstorage.MultipartPart[]
+- api:objectstorage.multipart.CreateMultipartUploadRequest[]
+- api:objectstorage.multipart.UploadPartRequest[]
+- api:objectstorage.multipart.ListMultipartPartsRequest[]
+- api:objectstorage.multipart.CompleteMultipartUploadRequest[]
+- api:objectstorage.multipart.AbortMultipartUploadRequest[]
+- api:objectstorage.multipart.MultipartUploadHandle[]
+- api:objectstorage.multipart.MultipartPart[]
 
 == Support Matrix
 
@@ -21,16 +21,16 @@ The multipart lifecycle uses the following portable request and response types:
 | Supported
 
 | Azure Blob Storage
-| Not yet supported
+| Not yet supported; tracked in https://github.com/{githubSlug}/issues/795[#795]
 
 | Google Cloud Storage
-| Not yet supported
+| Not yet supported; tracked in https://github.com/{githubSlug}/issues/796[#796]
 
 | Oracle Cloud Infrastructure Object Storage
 | Supported
 
 | Local Storage
-| Not yet supported
+| Not yet supported; tracked in https://github.com/{githubSlug}/issues/788[#788]
 |===
 
 == Lifecycle Rules
@@ -51,11 +51,11 @@ The multipart lifecycle uses the following portable request and response types:
 
 [source,java]
 ----
-import io.micronaut.objectstorage.MultipartObjectStorageOperations;
-import io.micronaut.objectstorage.request.AbortMultipartUploadRequest;
-import io.micronaut.objectstorage.request.CompleteMultipartUploadRequest;
-import io.micronaut.objectstorage.request.CreateMultipartUploadRequest;
-import io.micronaut.objectstorage.request.UploadPartRequest;
+import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations;
+import io.micronaut.objectstorage.multipart.AbortMultipartUploadRequest;
+import io.micronaut.objectstorage.multipart.CompleteMultipartUploadRequest;
+import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest;
+import io.micronaut.objectstorage.multipart.UploadPartRequest;
 import io.micronaut.objectstorage.request.UploadRequest;
 import java.util.List;
 

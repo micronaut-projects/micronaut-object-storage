@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.objectstorage.request;
+package io.micronaut.objectstorage.multipart;
 
-import io.micronaut.objectstorage.MultipartUploadHandle;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
@@ -23,17 +22,16 @@ import java.util.Objects;
 /**
  * Multipart upload abort request.
  *
- * @since 3.0.1
+ * @param upload the multipart upload handle
+ * @since 3.1.0
  */
-public final class AbortMultipartUploadRequest {
-
-    private final MultipartUploadHandle upload;
+public record AbortMultipartUploadRequest(@NonNull MultipartUploadHandle upload) {
 
     /**
-     * @param upload the multipart upload handle
+     * Compact constructor.
      */
-    public AbortMultipartUploadRequest(@NonNull MultipartUploadHandle upload) {
-        this.upload = Objects.requireNonNull(upload, "upload");
+    public AbortMultipartUploadRequest {
+        upload = Objects.requireNonNull(upload, "upload");
     }
 
     /**
