@@ -1,3 +1,5 @@
+== Multipart Uploads
+
 Multipart uploads are available through api:objectstorage.multipart.MultipartObjectStorageOperations[].
 This contract is additive to api:objectstorage.ObjectStorageOperations[] so existing single-object upload code does not change.
 
@@ -21,16 +23,16 @@ The multipart lifecycle uses the following portable request and response types:
 | Supported
 
 | Azure Blob Storage
-| Not yet supported; tracked in https://github.com/{githubSlug}/issues/795[#795]
+| Not yet supported
 
 | Google Cloud Storage
-| Not yet supported; tracked in https://github.com/{githubSlug}/issues/796[#796]
+| Not yet supported
 
 | Oracle Cloud Infrastructure Object Storage
 | Supported
 
 | Local Storage
-| Not yet supported; tracked in https://github.com/{githubSlug}/issues/788[#788]
+| Not yet supported
 |===
 
 == Lifecycle Rules
@@ -49,41 +51,9 @@ The multipart lifecycle uses the following portable request and response types:
 
 == Example
 
-[source,java]
-----
-import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations;
-import io.micronaut.objectstorage.multipart.AbortMultipartUploadRequest;
-import io.micronaut.objectstorage.multipart.CompleteMultipartUploadRequest;
-import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest;
-import io.micronaut.objectstorage.multipart.UploadPartRequest;
-import io.micronaut.objectstorage.request.UploadRequest;
-import java.util.List;
+snippet::example.MultipartUploadService[project-base="doc-examples/example", source="main", indent="0", tags="multipart-upload"]
 
-MultipartObjectStorageOperations<?, ?, ?> multipart = ...
-
-var createResponse = multipart.createMultipartUpload(
-    new CreateMultipartUploadRequest("videos/demo.mp4", "video/mp4")
-);
-var upload = createResponse.getUpload();
-
-var firstPart = multipart.uploadPart(
-    new UploadPartRequest(upload, 1, UploadRequest.fromBytes(chunkOne, upload.getKey()))
-);
-var secondPart = multipart.uploadPart(
-    new UploadPartRequest(upload, 2, UploadRequest.fromBytes(chunkTwo, upload.getKey()))
-);
-
-try {
-    multipart.completeMultipartUpload(
-        new CompleteMultipartUploadRequest(upload, List.of(firstPart.getPart(), secondPart.getPart()))
-    );
-} catch (RuntimeException e) {
-    multipart.abortMultipartUpload(new AbortMultipartUploadRequest(upload));
-    throw e;
-}
-----
-
-In this example, `chunkOne` is non-final and must satisfy the selected provider's minimum part size. The final
+In this example, `nonFinalChunk` is non-final and must satisfy the selected provider's minimum part size. The final
 chunk may be smaller when the provider allows final-part size waivers.
 
 When uploading multipart parts from a stream-backed request instead of a file or byte array, provide

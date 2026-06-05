@@ -83,10 +83,11 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         MultipartObjectStorageOperations<?, ?, ?> storage = getMultipartObjectStorage()
         String key = "multipart/${System.nanoTime()}/parts.txt"
         def upload = storage.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE)).upload
+        byte[] nonFinalPartBytes = nonFinalMultipartPartBytes()
 
         and:
-        storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(PART_ONE_TEXT.bytes, key, CONTENT_TYPE)))
-        storage.uploadPart(new UploadPartRequest(upload, 2, UploadRequest.fromBytes(PART_TWO_TEXT.bytes, key, CONTENT_TYPE)))
+        storage.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes(nonFinalPartBytes, key, CONTENT_TYPE)))
+        storage.uploadPart(new UploadPartRequest(upload, 2, UploadRequest.fromBytes(nonFinalPartBytes, key, CONTENT_TYPE)))
         storage.uploadPart(new UploadPartRequest(upload, 3, UploadRequest.fromBytes(PART_THREE_TEXT.bytes, key, CONTENT_TYPE)))
 
         when:
