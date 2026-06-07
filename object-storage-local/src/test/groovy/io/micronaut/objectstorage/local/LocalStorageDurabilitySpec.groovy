@@ -230,6 +230,7 @@ class LocalStorageDurabilitySpec extends Specification {
         rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
             .resolve('default')
+            .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
     }
 
     private static void await(CountDownLatch latch) throws IOException {

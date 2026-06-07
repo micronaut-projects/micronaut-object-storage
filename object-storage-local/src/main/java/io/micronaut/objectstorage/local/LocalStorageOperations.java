@@ -428,7 +428,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private Path storeFile(Path file, InputStream inputStream) {
         mkdirs(configuration.getPath(), file.getParent());
-        Path temporaryDirectory = layout.temporaryBucketDirectory();
+        Path temporaryDirectory = layout.objectTemporaryDirectory();
         try {
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
             mkdirs(layout.rootInternalDirectory(), temporaryDirectory);

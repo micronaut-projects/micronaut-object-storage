@@ -72,11 +72,12 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
         if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), metadataFile.getParent(), supportsPosixPermissions)) {
             throw new ObjectStorageException("Error creating metadata directories for bucket: " + write.name());
         }
+        Path temporaryDirectory = prepareTemporaryDirectory(write.name());
         Properties properties = LocalStorageMetadataSupport.toProperties(write);
         try {
             LocalStorageIoSupport.writeAndReplace(
                 metadataFile,
-                metadataFile.getParent(),
+                temporaryDirectory,
                 "micronaut-object-storage-local-bucket-metadata",
                 ".tmp",
                 supportsPosixPermissions,
@@ -101,5 +102,19 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
 
     private Path metadataFilePath(String name) {
         return layout.bucketMetadataFile(name);
+    }
+
+    private Path prepareTemporaryDirectory(String name) {
+        Path temporaryDirectory = layout.bucketMetadataTemporaryDirectory(name);
+        try {
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), temporaryDirectory, supportsPosixPermissions)) {
+                throw new ObjectStorageException("Error creating temporary metadata directories for bucket: " + name);
+            }
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            return temporaryDirectory;
+        } catch (IllegalArgumentException e) {
+            throw new ObjectStorageException("Error preparing temporary metadata directory for bucket: " + name, e);
+        }
     }
 }

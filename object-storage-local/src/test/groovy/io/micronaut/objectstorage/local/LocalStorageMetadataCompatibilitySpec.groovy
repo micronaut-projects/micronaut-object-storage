@@ -11,7 +11,9 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFilePermission
+import java.util.concurrent.TimeUnit
 import java.util.Properties
 
 class LocalStorageMetadataCompatibilitySpec extends Specification {
@@ -96,6 +98,35 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         entry.attributes == ['attribute.region': 'eu-west-1']
         entry.contentType == 'text/plain'
         entry.etag == 'etag-1'
+    }
+
+    void 'stale temp cleanup does not delete object metadata sidecars with temp-like names'() {
+        given:
+        String victimKey = 'micronaut-object-storage-local-metadata-victim.tmp'
+        String otherKey = 'unrelated.txt'
+        def operations = ctx.getBean(LocalStorageOperations)
+        def metadataOperations = ctx.getBean(LocalStorageObjectMetadataOperations)
+        UploadRequest victimRequest = UploadRequest.fromBytes('victim'.bytes, victimKey, 'text/plain')
+        victimRequest.metadata = [role: 'victim']
+        operations.upload(victimRequest)
+        operations.upload(UploadRequest.fromBytes('other'.bytes, otherKey, 'text/plain'))
+        Path victimMetadataFile = rootObjectMetadataFile(victimKey)
+        Files.setLastModifiedTime(victimMetadataFile, staleFileTime())
+
+        when:
+        metadataOperations.save(new ObjectMetadataWrite(
+            otherKey,
+            [role: 'other'],
+            [:],
+            'text/plain',
+            null,
+            null,
+            null
+        ))
+
+        then:
+        Files.exists(victimMetadataFile)
+        metadataOperations.retrieve(victimKey).get().metadata == [role: 'victim']
     }
 
     void 'object delete removes root and legacy metadata sidecars'() {
@@ -185,6 +216,10 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         Files.newOutputStream(path).withCloseable {
             legacy.store(it, 'legacy metadata')
         }
+    }
+
+    private static FileTime staleFileTime() {
+        FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
     }
 
     private static void restorePermissions(Path directory, Set<PosixFilePermission> permissions) {

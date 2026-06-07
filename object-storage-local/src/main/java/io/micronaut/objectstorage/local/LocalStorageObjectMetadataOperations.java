@@ -74,12 +74,13 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
             throw new ObjectStorageException("Cannot persist metadata for a missing object: " + write.key());
         }
         Path metadataFile = prepareMetadataTarget(write.key());
+        Path temporaryDirectory = prepareTemporaryDirectory(write.key());
         ObjectMetadataWrite effectiveWrite = enrich(write, objectFile);
         Properties properties = LocalStorageMetadataSupport.toProperties(effectiveWrite);
         try {
             LocalStorageIoSupport.writeAndReplace(
                 metadataFile,
-                metadataFile.getParent(),
+                temporaryDirectory,
                 "micronaut-object-storage-local-metadata",
                 ".tmp",
                 supportsPosixPermissions,
@@ -116,6 +117,20 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
             throw new ObjectStorageException("Error creating metadata directories for object: " + key);
         }
         return metadataFile;
+    }
+
+    private Path prepareTemporaryDirectory(String key) {
+        Path temporaryDirectory = layout.objectMetadataTemporaryDirectory();
+        try {
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), temporaryDirectory, supportsPosixPermissions)) {
+                throw new ObjectStorageException("Error creating temporary metadata directories for object: " + key);
+            }
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            return temporaryDirectory;
+        } catch (IllegalArgumentException e) {
+            throw new ObjectStorageException("Error preparing temporary metadata directory for object: " + key, e);
+        }
     }
 
     private ObjectMetadataWrite enrich(ObjectMetadataWrite write, Path objectFile) {

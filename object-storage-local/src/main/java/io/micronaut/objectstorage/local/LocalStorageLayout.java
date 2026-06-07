@@ -29,6 +29,8 @@ final class LocalStorageLayout {
     static final String MULTIPART_DIRECTORY = "multipart";
     static final String SNAPSHOT_DIRECTORY = "snapshots";
     static final String TEMPORARY_DIRECTORY = "tmp";
+    static final String OBJECT_METADATA_TEMPORARY_DIRECTORY = "object-metadata";
+    static final String BUCKET_METADATA_TEMPORARY_DIRECTORY = "bucket-metadata";
 
     private final Path bucketPath;
     private final Path storageRoot;
@@ -170,6 +172,18 @@ final class LocalStorageLayout {
         return rootInternalDirectory()
             .resolve(TEMPORARY_DIRECTORY)
             .resolve(name);
+    }
+
+    Path objectTemporaryDirectory() {
+        return temporaryBucketDirectory().resolve(OBJECTS_DIRECTORY);
+    }
+
+    Path objectMetadataTemporaryDirectory() {
+        return temporaryBucketDirectory().resolve(OBJECT_METADATA_TEMPORARY_DIRECTORY);
+    }
+
+    Path bucketMetadataTemporaryDirectory(String name) {
+        return temporaryBucketDirectory(name).resolve(BUCKET_METADATA_TEMPORARY_DIRECTORY);
     }
 
     List<Path> providerManagedBucketDirectories(String name) {
