@@ -86,8 +86,7 @@ final class LocalStorageLayout {
     }
 
     Path objectMetadataBucketRoot(String name) {
-        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("object metadata cleanup"), name);
-        return objectMetadataRoot().resolve(name);
+        return providerManagedBucketDirectory(name, objectMetadataRoot(), "object metadata cleanup");
     }
 
     Path objectMetadataFile(String key) {
@@ -127,10 +126,11 @@ final class LocalStorageLayout {
     }
 
     Path snapshotBucketDirectory(String name) {
-        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("snapshot cleanup"), name);
-        return rootInternalDirectory()
-            .resolve(SNAPSHOT_DIRECTORY)
-            .resolve(name);
+        return providerManagedBucketDirectory(
+            name,
+            rootInternalDirectory().resolve(SNAPSHOT_DIRECTORY),
+            "snapshot cleanup"
+        );
     }
 
     Path multipartBucketDirectory() {
@@ -142,10 +142,11 @@ final class LocalStorageLayout {
     }
 
     Path multipartBucketDirectory(String name) {
-        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("multipart upload cleanup"), name);
-        return rootInternalDirectory()
-            .resolve(MULTIPART_DIRECTORY)
-            .resolve(name);
+        return providerManagedBucketDirectory(
+            name,
+            rootInternalDirectory().resolve(MULTIPART_DIRECTORY),
+            "multipart upload cleanup"
+        );
     }
 
     List<Path> multipartCleanupDirectories() {
@@ -178,6 +179,13 @@ final class LocalStorageLayout {
         Path metadataRoot = bucketPath.resolve(LEGACY_METADATA_DIRECTORY);
         LocalStorageIoSupport.rejectSymbolicLinks(bucketPath.normalize(), metadataRoot.normalize());
         return LocalStorageIoSupport.resolveSafe(metadataRoot, key);
+    }
+
+    private Path providerManagedBucketDirectory(String name, Path root, String component) {
+        requireBucketRoot(component);
+        Path bucketDirectory = LocalStorageIoSupport.resolveBucketPath(root, name);
+        LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, bucketDirectory);
+        return bucketDirectory;
     }
 
     static Optional<String> reservedLocalStorageNamespace(String name) {

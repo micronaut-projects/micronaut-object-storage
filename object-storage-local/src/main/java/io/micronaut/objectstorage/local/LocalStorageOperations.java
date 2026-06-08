@@ -432,10 +432,12 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private Path storeFile(Path file, InputStream inputStream) {
-        mkdirs(configuration.getPath(), file.getParent());
-        try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
-            inputStream.transferTo(fileOut);
-            return file;
+        try (InputStream in = inputStream) {
+            mkdirs(configuration.getPath(), file.getParent());
+            try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
+                in.transferTo(fileOut);
+                return file;
+            }
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
         }

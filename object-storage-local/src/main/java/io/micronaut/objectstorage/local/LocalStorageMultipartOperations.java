@@ -74,7 +74,7 @@ import java.util.stream.Stream;
 @Requires(beans = LocalStorageOperations.class)
 @Primary
 final class LocalStorageMultipartOperations implements MultipartObjectStorageOperations<
-    LocalStorageMultipartOperations.LocalMultipartUpload,
+    LocalStorageMultipartUpload,
     LocalStorageOperations.LocalStorageFile,
     LocalStorageOperations.LocalStorageFile> {
 
@@ -82,6 +82,7 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
 
     private static final String MULTIPART_PARTS_DIRECTORY = "parts";
     private static final String MULTIPART_UPLOAD_PROPERTIES = "upload.properties";
+    private static final String MULTIPART_COMPLETED_PROPERTIES = "completed.properties";
     private static final String MULTIPART_PART_EXTENSION = ".part";
     private static final String MULTIPART_PART_PROPERTIES_EXTENSION = ".properties";
     private static final String MULTIPART_COMPLETE_FILE_SUFFIX = ".complete";
@@ -106,7 +107,7 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
 
     @Override
     @NonNull
-    public CreateMultipartUploadResponse<LocalMultipartUpload> createMultipartUpload(@NonNull CreateMultipartUploadRequest request) {
+    public CreateMultipartUploadResponse<LocalStorageMultipartUpload> createMultipartUpload(@NonNull CreateMultipartUploadRequest request) {
         layout.objectPath(request.getKey());
         String uploadId = UUID.randomUUID().toString();
         Path uploadPath = multipartUploadPath(uploadId);
@@ -125,7 +126,7 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
         }
         return CreateMultipartUploadResponse.of(
             new MultipartUploadHandle(request.getKey(), uploadId),
-            new LocalMultipartUpload(uploadPath)
+            new LocalStorageMultipartUpload(uploadPath)
         );
     }
 
@@ -136,6 +137,7 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
         int partNumber = request.getPartNumber();
         Path partsPath = multipartPartsPath(session.path());
         Path partPropertiesFile = multipartPartPropertiesPath(session.path(), partNumber);
+        String previousPartFileName = retrieveCurrentPartFileName(session.path(), partPropertiesFile, partNumber).orElse(null);
         if (!mkdirs(partsPath)) {
             throw new ObjectStorageException("Error creating local multipart part directories: " + partsPath);
         }
@@ -156,7 +158,6 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
             properties.setProperty(MULTIPART_PART_SIZE_PROPERTY, Long.toString(partSize));
             properties.setProperty(MULTIPART_PART_FILE_PROPERTY, partFileName);
             storeRequiredProperties(temporaryPartPropertiesFile, properties);
-            String previousPartFileName = retrieveCurrentPartFileName(partPropertiesFile).orElse(null);
             moveReplacing(temporaryPartFile, partFile);
             partFileCommitted = true;
             moveReplacing(temporaryPartPropertiesFile, partPropertiesFile);
@@ -208,6 +209,7 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
                 session.metadata()
             );
             var uploadResponse = objectStorageOperations.upload(uploadRequest);
+            markMultipartUploadCompleted(session.path());
             deleteMultipartUploadAfterCompletion(session.path());
             return CompleteMultipartUploadResponse.of(upload, uploadResponse.getETag(), uploadResponse.getNativeResponse());
         } catch (RuntimeException e) {
@@ -220,16 +222,17 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
     public void abortMultipartUpload(@NonNull AbortMultipartUploadRequest request) {
         MultipartUploadHandle upload = request.getUpload();
         Path uploadPath = multipartUploadPath(upload.getUploadId());
-        Path propertiesPath = uploadPath.resolve(MULTIPART_UPLOAD_PROPERTIES);
-        if (Files.exists(propertiesPath, LinkOption.NOFOLLOW_LINKS)) {
-            validateUploadSessionKey(upload, retrieveRequiredProperties(propertiesPath));
-        }
+        retrieveAbortProperties(uploadPath).ifPresent(properties -> validateUploadSessionKey(upload, properties));
         deleteMultipartUpload(uploadPath);
     }
 
     @NonNull
     private UploadSession retrieveUploadSession(@NonNull MultipartUploadHandle upload) {
         Path uploadPath = multipartUploadPath(upload.getUploadId());
+        Path completedPropertiesPath = uploadPath.resolve(MULTIPART_COMPLETED_PROPERTIES);
+        if (Files.exists(completedPropertiesPath, LinkOption.NOFOLLOW_LINKS)) {
+            throw new ObjectStorageException("Local multipart upload is already completed: " + upload.getUploadId());
+        }
         Path propertiesPath = uploadPath.resolve(MULTIPART_UPLOAD_PROPERTIES);
         if (!Files.exists(propertiesPath, LinkOption.NOFOLLOW_LINKS)) {
             throw new ObjectStorageException("Local multipart upload does not exist: " + upload.getUploadId());
@@ -413,15 +416,16 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
         }
     }
 
-    private Optional<String> retrieveCurrentPartFileName(Path propertiesPath) {
+    private Optional<String> retrieveCurrentPartFileName(Path uploadPath, Path propertiesPath, int partNumber) {
         if (!Files.exists(propertiesPath, LinkOption.NOFOLLOW_LINKS)) {
             return Optional.empty();
         }
-        try {
-            return Optional.ofNullable(retrieveRequiredProperties(propertiesPath).getProperty(MULTIPART_PART_FILE_PROPERTY));
-        } catch (RuntimeException e) {
-            return Optional.empty();
+        String partFileName = retrieveRequiredProperties(propertiesPath).getProperty(MULTIPART_PART_FILE_PROPERTY);
+        if (partFileName == null) {
+            throw new ObjectStorageException("Local multipart part metadata is incomplete: " + partNumber);
         }
+        multipartPartDataPath(uploadPath, partFileName);
+        return Optional.of(partFileName);
     }
 
     private void deleteStalePartFile(Path uploadPath, @Nullable String previousPartFileName, String currentPartFileName) {
@@ -438,11 +442,13 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
     }
 
     private void storeFile(Path file, InputStream inputStream) {
-        if (!mkdirs(file.getParent())) {
-            throw new ObjectStorageException("Error creating local multipart part directories: " + file);
-        }
-        try (OutputStream fileOut = LocalStorageIoSupport.newOutputStreamNoFollow(file, supportsPosixPermissions)) {
-            inputStream.transferTo(fileOut);
+        try (InputStream in = inputStream) {
+            if (!mkdirs(file.getParent())) {
+                throw new ObjectStorageException("Error creating local multipart part directories: " + file);
+            }
+            try (OutputStream fileOut = LocalStorageIoSupport.newOutputStreamNoFollow(file, supportsPosixPermissions)) {
+                in.transferTo(fileOut);
+            }
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying multipart part to: " + file, e);
         }
@@ -483,6 +489,33 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
         }
     }
 
+    private Optional<Properties> retrieveAbortProperties(Path uploadPath) {
+        Optional<Properties> activeProperties = retrievePropertiesIfExists(uploadPath.resolve(MULTIPART_UPLOAD_PROPERTIES));
+        if (activeProperties.isPresent()) {
+            return activeProperties;
+        }
+        return retrievePropertiesIfExists(uploadPath.resolve(MULTIPART_COMPLETED_PROPERTIES));
+    }
+
+    private Optional<Properties> retrievePropertiesIfExists(Path propertiesPath) {
+        Properties properties = new Properties();
+        try (InputStream in = LocalStorageIoSupport.newInputStreamNoFollow(propertiesPath)) {
+            properties.load(in);
+            return Optional.of(properties);
+        } catch (NoSuchFileException e) {
+            return Optional.empty();
+        } catch (IOException e) {
+            throw new ObjectStorageException("Error reading local multipart metadata: " + propertiesPath, e);
+        }
+    }
+
+    private void markMultipartUploadCompleted(Path uploadPath) {
+        moveReplacing(
+            uploadPath.resolve(MULTIPART_UPLOAD_PROPERTIES),
+            uploadPath.resolve(MULTIPART_COMPLETED_PROPERTIES)
+        );
+    }
+
     private Path createTempFile(Path directory, String prefix, String suffix) {
         try {
             return LocalStorageIoSupport.createTempFile(directory, prefix, suffix, supportsPosixPermissions);
@@ -516,11 +549,37 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
 
     private void deleteMultipartUploadAfterCompletion(Path uploadPath) {
         try {
-            deleteMultipartUpload(uploadPath);
+            deleteCompletedMultipartUpload(uploadPath);
         } catch (RuntimeException e) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Error deleting completed local multipart upload: {}", uploadPath, e);
             }
+        }
+    }
+
+    private void deleteCompletedMultipartUpload(Path uploadPath) {
+        try {
+            Path completedPropertiesPath = uploadPath.resolve(MULTIPART_COMPLETED_PROPERTIES);
+            try (Stream<Path> stream = Files.list(uploadPath)) {
+                for (Path path : stream.filter(path -> !path.equals(completedPropertiesPath)).toList()) {
+                    deleteRecursivelyOrFile(path);
+                }
+            }
+            Files.deleteIfExists(completedPropertiesPath);
+            Files.deleteIfExists(uploadPath);
+        } catch (NoSuchFileException ignored) {
+            // A concurrent abort or cleanup may have already removed the completed session.
+        } catch (IOException e) {
+            throw new ObjectStorageException("Error deleting local multipart upload: " + uploadPath, e);
+        }
+        deleteEmptyMultipartDirectories(null);
+    }
+
+    private void deleteRecursivelyOrFile(Path path) throws IOException {
+        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+            LocalStorageBucketOperations.deleteRecursively(path);
+        } else {
+            Files.delete(path);
         }
     }
 
@@ -563,9 +622,6 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
     @Nullable
     private static String nullIfEmpty(@Nullable String value) {
         return value == null || value.isEmpty() ? null : value;
-    }
-
-    record LocalMultipartUpload(@NonNull Path path) {
     }
 
     private record UploadSession(@NonNull Path path,

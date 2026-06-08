@@ -2,7 +2,9 @@ package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.objectstorage.multipart.AbortMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CompleteMultipartUploadRequest
 import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.ListMultipartPartsRequest
 import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
@@ -255,12 +257,129 @@ class LocalStoragePathTraversalSpec extends Specification {
         ctx.getBean(LocalStorageBucketOperations).delete("bucket")
 
         then:
-        thrown IllegalStateException
+        thrown IllegalArgumentException
         !Files.list(multipartTarget).withCloseable { stream -> stream.findAny().present }
 
         cleanup:
         ctx?.close()
         deleteRecursively(tmp)
+    }
+
+    def 'symlinked provider-managed #component parent is not followed during bucket delete'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path providerTarget = outside.resolve("${component}-target")
+        Path protectedBucketState = providerTarget.resolve("bucket")
+        Files.createDirectories(protectedBucketState)
+        Files.writeString(protectedBucketState.resolve("protected"), "keep")
+        Path providerRoot = internalPath(tmp, providerRootSegments)
+        Files.createDirectories(providerRoot.parent)
+        assumeSymbolicLinksSupported(tmp)
+        Files.createSymbolicLink(providerRoot, providerTarget)
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+
+        when:
+        ctx.getBean(LocalStorageBucketOperations).delete("bucket")
+
+        then:
+        thrown IllegalArgumentException
+        Files.exists(protectedBucketState.resolve("protected"))
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+
+        where:
+        component         | providerRootSegments
+        'metadata object' | [LocalStorageLayout.METADATA_DIRECTORY, LocalStorageLayout.OBJECTS_DIRECTORY]
+        'multipart'       | [LocalStorageLayout.MULTIPART_DIRECTORY]
+        'snapshot'        | [LocalStorageLayout.SNAPSHOT_DIRECTORY]
+    }
+
+    def 'symlinked multipart parts directory is rejected during list parts'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path partsTarget = outside.resolve("parts-target")
+        Files.createDirectory(partsTarget)
+        assumeSymbolicLinksSupported(tmp)
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        LocalStorageMultipartOperations multipartOperations = ctx.getBean(LocalStorageMultipartOperations)
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest("public", "text/plain"))
+        Files.createSymbolicLink(createResponse.nativeResponse.path.resolve("parts"), partsTarget)
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(createResponse.upload, 10))
+
+        then:
+        thrown IllegalArgumentException
+        !Files.list(partsTarget).withCloseable { stream -> stream.findAny().present }
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    def 'symlinked multipart part data is rejected during complete'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path secret = outside.resolve("secret")
+        Files.writeString(secret, "keep")
+        assumeSymbolicLinksSupported(tmp)
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        LocalStorageMultipartOperations multipartOperations = ctx.getBean(LocalStorageMultipartOperations)
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest("public", "text/plain"))
+        def uploadPart = multipartOperations.uploadPart(new UploadPartRequest(
+            createResponse.upload,
+            1,
+            UploadRequest.fromBytes("safe".bytes, "public", "text/plain")
+        ))
+        Properties properties = loadProperties(createResponse.nativeResponse.path.resolve("parts").resolve("1.properties"))
+        Path partPath = createResponse.nativeResponse.path.resolve("parts").resolve(properties.getProperty("file"))
+        Files.delete(partPath)
+        Files.createSymbolicLink(partPath, secret)
+
+        when:
+        multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(createResponse.upload, [uploadPart.part]))
+
+        then:
+        thrown IllegalArgumentException
+        Files.readString(secret) == "keep"
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    private static Path internalPath(Path tmp, List<String> segments) {
+        Path path = tmp.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+        for (String segment : segments) {
+            path = path.resolve(segment)
+        }
+        path
+    }
+
+    private static Properties loadProperties(Path path) {
+        Properties properties = new Properties()
+        Files.newInputStream(path).withCloseable { properties.load(it) }
+        properties
     }
 
     private static void assumeSymbolicLinksSupported(Path directory) {

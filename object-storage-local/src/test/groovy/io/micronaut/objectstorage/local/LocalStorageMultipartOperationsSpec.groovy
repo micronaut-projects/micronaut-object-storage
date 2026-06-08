@@ -18,10 +18,12 @@ import io.micronaut.objectstorage.response.UploadResponse
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+import org.opentest4j.TestAbortedException
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermission
 import java.util.Base64
 
 @MicronautTest
@@ -100,6 +102,7 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
 
         then:
         Files.exists(createResponse.nativeResponse.path)
+        createResponse.nativeResponse instanceof LocalStorageMultipartUpload
         operations.listObjects().empty
 
         when:
@@ -113,6 +116,53 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         entry.metadata == metadata
         entry.contentType.get() == CONTENT_TYPE
         !Files.exists(createResponse.nativeResponse.path)
+    }
+
+    void 'local multipart complete marks upload terminal before best-effort cleanup'() {
+        given:
+        assumePosixPermissionsSupported(configuration.path)
+        String key = 'multipart-local/completed-before-cleanup.txt'
+        def fixture = createUploadWithSinglePart(key)
+        Path partsPath = fixture.uploadPath.resolve('parts')
+        setOwnerReadExecuteOnly(partsPath)
+
+        when:
+        def response = multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(fixture.upload, [fixture.part]))
+        def entry = operations.retrieve(key).get()
+
+        then:
+        response.ETag
+        entry.inputStream.text == 'part'
+        Files.exists(fixture.uploadPath)
+        Files.exists(completedPropertiesPath(fixture.uploadPath))
+        !Files.exists(fixture.uploadPath.resolve('upload.properties'))
+
+        when:
+        multipartOperations.uploadPart(new UploadPartRequest(fixture.upload, 2, UploadRequest.fromBytes('late'.bytes, key, CONTENT_TYPE)))
+
+        then:
+        ObjectStorageException uploadPartException = thrown()
+        uploadPartException.message == "Local multipart upload is already completed: ${fixture.upload.uploadId}"
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(fixture.upload, 10))
+
+        then:
+        ObjectStorageException listPartsException = thrown()
+        listPartsException.message == "Local multipart upload is already completed: ${fixture.upload.uploadId}"
+
+        when:
+        multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(fixture.upload, [fixture.part]))
+
+        then:
+        ObjectStorageException completeException = thrown()
+        completeException.message == "Local multipart upload is already completed: ${fixture.upload.uploadId}"
+
+        cleanup:
+        restoreOwnerOnlyDirectoryPermissions(partsPath)
+        if (fixture != null) {
+            multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
+        }
     }
 
     void 'failed local multipart part replacement preserves the previously uploaded part'() {
@@ -138,6 +188,41 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         listedParts*.ETag == [originalPart.part.ETag]
         response.ETag
         entry.inputStream.text == 'original'
+    }
+
+    void 'local multipart part replacement rejects corrupt existing metadata before committing replacement'() {
+        given:
+        String key = "multipart-local/corrupt-replacement-${scenario}.txt"
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+        multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('original'.bytes, key, CONTENT_TYPE)))
+        Path propertiesPath = partPropertiesPath(createResponse.nativeResponse.path, 1)
+        Properties originalProperties = loadProperties(propertiesPath)
+        Path originalPartPath = partDataPath(createResponse.nativeResponse.path, originalProperties.getProperty('file'))
+        Properties corruptProperties = new Properties()
+        corruptProperties.putAll(originalProperties)
+        tamper(corruptProperties)
+        storeProperties(propertiesPath, corruptProperties)
+
+        when:
+        multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('replacement'.bytes, key, CONTENT_TYPE)))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == expectedMessage
+        Files.exists(originalPartPath)
+        findPartDataFiles(createResponse.nativeResponse.path) == [originalPartPath]
+
+        cleanup:
+        if (createResponse != null && propertiesPath != null && originalProperties != null) {
+            storeProperties(propertiesPath, originalProperties)
+            multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        }
+
+        where:
+        scenario     | tamper                                                                  | expectedMessage
+        'incomplete' | { Properties properties -> properties.remove('file') }                   | 'Local multipart part metadata is incomplete: 1'
+        'invalid'    | { Properties properties -> properties.setProperty('file', '../1.part') } | 'Invalid local multipart part file: ../1.part'
     }
 
     void 'successful local multipart part replacement commits the latest part'() {
@@ -215,6 +300,77 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
 
         then:
         !Files.exists(createResponse.nativeResponse.path)
+    }
+
+    void 'local multipart abort is retry-safe when active metadata is already gone'() {
+        given:
+        String key = 'multipart-local/missing-active-metadata.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+        Files.delete(createResponse.nativeResponse.path.resolve('upload.properties'))
+
+        when:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+
+        then:
+        noExceptionThrown()
+        !Files.exists(createResponse.nativeResponse.path)
+    }
+
+    void 'local multipart abort validates completed metadata before deleting leftover state'() {
+        given:
+        String key = 'multipart-local/completed-abort.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+        Files.move(createResponse.nativeResponse.path.resolve('upload.properties'), completedPropertiesPath(createResponse.nativeResponse.path))
+        def wrongKeyUpload = new MultipartUploadHandle('multipart-local/wrong.txt', upload.uploadId)
+
+        when:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(wrongKeyUpload))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Multipart upload key does not match local upload session'
+        Files.exists(createResponse.nativeResponse.path)
+
+        when:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+
+        then:
+        noExceptionThrown()
+        !Files.exists(createResponse.nativeResponse.path)
+    }
+
+    void 'local multipart part upload closes the consumed input stream'() {
+        given:
+        String key = 'multipart-local/close-part-stream.txt'
+        def upload = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE)).upload
+        def request = new CloseTrackingUploadRequest(key, CONTENT_TYPE, 'part'.bytes)
+
+        when:
+        multipartOperations.uploadPart(new UploadPartRequest(upload, 1, request))
+
+        then:
+        request.closed
+
+        cleanup:
+        if (upload != null) {
+            multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        }
+    }
+
+    void 'local direct upload closes the consumed input stream'() {
+        given:
+        String key = 'multipart-local/close-direct-stream.txt'
+        def request = new CloseTrackingUploadRequest(key, CONTENT_TYPE, 'direct'.bytes)
+
+        when:
+        operations.upload(request)
+
+        then:
+        request.closed
     }
 
     void 'local multipart complete rejects ETag mismatches'() {
@@ -501,6 +657,19 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         uploadPath.resolve('parts').resolve(fileName)
     }
 
+    private static Path completedPropertiesPath(Path uploadPath) {
+        uploadPath.resolve('completed.properties')
+    }
+
+    private static List<Path> findPartDataFiles(Path uploadPath) {
+        Files.list(uploadPath.resolve('parts')).withCloseable { stream ->
+            stream
+                .filter { path -> path.fileName.toString().endsWith('.part') }
+                .sorted()
+                .toList()
+        }
+    }
+
     private static Properties loadProperties(Path path) {
         Properties properties = new Properties()
         Files.newInputStream(path).withCloseable { properties.load(it) }
@@ -509,6 +678,29 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
 
     private static void storeProperties(Path path, Properties properties) {
         Files.newOutputStream(path).withCloseable { properties.store(it, 'test') }
+    }
+
+    private static void assumePosixPermissionsSupported(Path path) {
+        if (!path.fileSystem.supportedFileAttributeViews().contains('posix')) {
+            throw new TestAbortedException('POSIX file permissions are not supported in this environment')
+        }
+    }
+
+    private static void setOwnerReadExecuteOnly(Path path) {
+        Files.setPosixFilePermissions(path, EnumSet.of(
+            PosixFilePermission.OWNER_READ,
+            PosixFilePermission.OWNER_EXECUTE
+        ))
+    }
+
+    private static void restoreOwnerOnlyDirectoryPermissions(Path path) {
+        if (path != null && Files.exists(path) && path.fileSystem.supportedFileAttributeViews().contains('posix')) {
+            Files.setPosixFilePermissions(path, EnumSet.of(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OWNER_EXECUTE
+            ))
+        }
     }
 
     private static final class MultipartUploadFixture {
@@ -620,6 +812,63 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
             System.arraycopy(bytes, index, buffer, offset, count)
             index += count
             count
+        }
+    }
+
+    private static final class CloseTrackingUploadRequest implements UploadRequest {
+        private final String key
+        private final String contentType
+        private final byte[] bytes
+        private final CloseTrackingInputStream inputStream
+
+        private CloseTrackingUploadRequest(String key, String contentType, byte[] bytes) {
+            this.key = key
+            this.contentType = contentType
+            this.bytes = bytes
+            this.inputStream = new CloseTrackingInputStream(bytes)
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            Optional.of(contentType)
+        }
+
+        @Override
+        String getKey() {
+            key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            Optional.of((long) bytes.length)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            inputStream
+        }
+
+        @Override
+        Map<String, String> getMetadata() {
+            [:]
+        }
+
+        boolean isClosed() {
+            inputStream.closed
+        }
+    }
+
+    private static final class CloseTrackingInputStream extends ByteArrayInputStream {
+        private boolean closed
+
+        private CloseTrackingInputStream(byte[] bytes) {
+            super(bytes)
+        }
+
+        @Override
+        void close() throws IOException {
+            closed = true
+            super.close()
         }
     }
 }

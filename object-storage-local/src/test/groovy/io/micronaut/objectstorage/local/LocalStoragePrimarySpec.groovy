@@ -41,9 +41,12 @@ class LocalStoragePrimarySpec extends Specification {
 
     void "local multipart storage is primary"() {
         when:
+        def beans = ctx.getBeansOfType(MultipartObjectStorageOperations)
         def operations = ctx.getBean(MultipartObjectStorageOperations)
 
         then:
+        beans.size() == 2
+        beans.any { it instanceof LocalStorageMultipartOperations }
         operations instanceof LocalStorageMultipartOperations
     }
 
