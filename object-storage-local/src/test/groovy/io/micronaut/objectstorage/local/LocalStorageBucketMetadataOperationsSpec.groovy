@@ -94,6 +94,21 @@ class LocalStorageBucketMetadataOperationsSpec extends BucketMetadataOperationsS
         metadataOperations.retrieve(bucketName).get().metadata == [role: 'updated']
     }
 
+    void 'bucket metadata delete is idempotent when metadata is missing'() {
+        given:
+        String bucketName = 'missing-metadata'
+        getBucketOperations().create(bucketName)
+        def metadataOperations = getBucketMetadataOperations()
+
+        when:
+        metadataOperations.delete(bucketName)
+        metadataOperations.delete(bucketName)
+
+        then:
+        noExceptionThrown()
+        !metadataOperations.retrieve(bucketName).present
+    }
+
     void 'it rejects invalid bucket metadata names consistently'() {
         when:
         getBucketMetadataOperations().retrieve(name)

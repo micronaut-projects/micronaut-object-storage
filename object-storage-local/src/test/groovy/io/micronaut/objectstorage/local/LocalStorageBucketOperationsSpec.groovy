@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
+import java.util.concurrent.locks.Lock
 
 class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
 
@@ -171,11 +171,8 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         then:
         deleteStarted.await(5, TimeUnit.SECONDS) == true
 
-        when:
-        delete.get(500, TimeUnit.MILLISECONDS)
-
-        then:
-        thrown TimeoutException
+        and:
+        assertQueuedBucketDeleteBlocksNewReaders(defaultBucketPath)
         Files.exists(defaultBucketPath)
 
         when:
@@ -200,6 +197,24 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
             Thread.currentThread().interrupt()
             throw new IOException('Interrupted while waiting for test writer to finish', e)
         }
+    }
+
+    private static void assertQueuedBucketDeleteBlocksNewReaders(Path bucketPath) throws IOException {
+        Lock readLock = LocalStorageLocks.bucketReadLock(bucketPath)
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+        while (System.nanoTime() < deadline) {
+            try {
+                if (!readLock.tryLock(50, TimeUnit.MILLISECONDS)) {
+                    return
+                }
+                readLock.unlock()
+                TimeUnit.MILLISECONDS.sleep(10)
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt()
+                throw new IOException('Interrupted while waiting for queued bucket delete', e)
+            }
+        }
+        throw new AssertionError('Timed out waiting for bucket delete to queue behind object mutation')
     }
 
     private static final class BlockingUploadRequest implements UploadRequest {

@@ -70,11 +70,7 @@ class LocalStorageCustomMetadataDurabilitySpec extends AbstractLocalStorageCusto
         String key = 'snapshot-cleanup-failure.txt'
         operations.upload(UploadRequest.fromBytes('original'.bytes, key, 'text/plain'))
         Path objectPath = operations.retrieve(key).get().nativeEntry
-        Path bucketPath = objectPath.parent
-        Path snapshotDirectory = bucketPath.parent
-            .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
-            .resolve(bucketPath.fileName.toString())
+        Path snapshotDirectory = snapshotBucketDirectory(objectPath)
         objectMetadataOperations.saveCallback = { ObjectMetadataWrite ignored ->
             replaceSnapshotsWithNonEmptyDirectories(snapshotDirectory)
         }
@@ -242,7 +238,7 @@ class LocalStorageCustomMetadataDurabilitySpec extends AbstractLocalStorageCusto
         operations.exists('destination.txt')
         def entry = operations.retrieve('destination.txt').get()
         new String(entry.inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'destination'
-        !Files.exists(entry.nativeEntry.parent.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
+        !Files.exists(snapshotBucketDirectory(entry.nativeEntry))
     }
 
     void 'failed copy metadata save cannot restore over concurrent destination upload'() {
@@ -313,8 +309,7 @@ class LocalStorageCustomMetadataDurabilitySpec extends AbstractLocalStorageCusto
         operations.exists('delete-failure.txt')
         def entry = operations.retrieve('delete-failure.txt').get()
         new String(entry.inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'content'
-        !Files.exists(entry.nativeEntry.parent.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
-            .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY))
+        !Files.exists(snapshotBucketDirectory(entry.nativeEntry))
     }
 
     private static void replaceSnapshotsWithNonEmptyDirectories(Path snapshotDirectory) {
@@ -332,5 +327,13 @@ class LocalStorageCustomMetadataDurabilitySpec extends AbstractLocalStorageCusto
         Files.list(directory).withCloseable { stream ->
             stream.anyMatch { path -> Files.isDirectory(path) && Files.exists(path.resolve('still-here')) }
         }
+    }
+
+    private static Path snapshotBucketDirectory(Path objectPath) {
+        Path bucketPath = objectPath.parent
+        bucketPath.parent
+            .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
+            .resolve(bucketPath.fileName.toString())
     }
 }

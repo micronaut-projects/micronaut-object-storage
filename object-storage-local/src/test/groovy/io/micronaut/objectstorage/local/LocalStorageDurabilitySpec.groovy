@@ -203,8 +203,8 @@ class LocalStorageDurabilitySpec extends Specification {
         Files.writeString(staleTemporaryFile, 'stale', StandardCharsets.UTF_8)
         Files.writeString(freshTemporaryFile, 'fresh', StandardCharsets.UTF_8)
         Files.writeString(unrelatedTemporaryFile, 'unrelated', StandardCharsets.UTF_8)
-        Files.setLastModifiedTime(staleTemporaryFile, FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2)))
-        Files.setLastModifiedTime(unrelatedTemporaryFile, FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2)))
+        Files.setLastModifiedTime(staleTemporaryFile, staleFileTime())
+        Files.setLastModifiedTime(unrelatedTemporaryFile, staleFileTime())
 
         when:
         operations.upload(UploadRequest.fromBytes(bytes('created'), 'created.txt', 'text/plain'))
@@ -214,6 +214,48 @@ class LocalStorageDurabilitySpec extends Specification {
         Files.readString(freshTemporaryFile, StandardCharsets.UTF_8) == 'fresh'
         Files.readString(unrelatedTemporaryFile, StandardCharsets.UTF_8) == 'unrelated'
         text('created.txt') == 'created'
+    }
+
+    void 'stale cleanup does not delete active upload temporary files'() {
+        given:
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        Path cleanupTrigger = rootDirectory.resolve('cleanup-trigger')
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+        Future<?> upload = null
+
+        when:
+        upload = executor.submit({
+            operations.upload(new BlockingUploadRequest(bytes('active'), 'active.txt', writeStarted, allowWriteToFinish))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+        List<Path> activeTemporaryFiles = temporaryFiles(defaultTemporaryDirectory())
+        activeTemporaryFiles.size() == 1
+
+        when:
+        Path activeTemporaryFile = activeTemporaryFiles[0]
+        Files.setLastModifiedTime(activeTemporaryFile, staleFileTime())
+        LocalStorageIoSupport.writeAndReplace(cleanupTrigger, defaultTemporaryDirectory(), 'micronaut-object-storage-local', '.tmp', false, { output ->
+            output.write(bytes('trigger'))
+        })
+
+        then:
+        Files.exists(activeTemporaryFile)
+        Files.readString(cleanupTrigger, StandardCharsets.UTF_8) == 'trigger'
+
+        when:
+        allowWriteToFinish.countDown()
+        upload.get(5, TimeUnit.SECONDS)
+
+        then:
+        text('active.txt') == 'active'
+        temporaryFiles(defaultTemporaryDirectory()).empty
+
+        cleanup:
+        allowWriteToFinish.countDown()
+        executor?.shutdownNow()
     }
 
     private String text(String key) {
@@ -231,6 +273,10 @@ class LocalStorageDurabilitySpec extends Specification {
             .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
             .resolve('default')
             .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
+    }
+
+    private static FileTime staleFileTime() {
+        FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
     }
 
     private static void await(CountDownLatch latch) throws IOException {

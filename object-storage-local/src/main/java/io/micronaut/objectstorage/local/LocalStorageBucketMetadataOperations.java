@@ -26,6 +26,7 @@ import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
@@ -53,11 +54,10 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
     @NonNull
     public Optional<BucketMetadataEntry<Path>> retrieve(@NonNull String name) {
         Path metadataFile = metadataFilePath(name);
-        if (!Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
-            return Optional.empty();
-        }
         try {
             return Optional.of(LocalStorageMetadataSupport.readBucketMetadata(metadataFile, name));
+        } catch (NoSuchFileException e) {
+            return Optional.empty();
         } catch (IOException e) {
             throw new ObjectStorageException("Error reading metadata for bucket: " + name, e);
         }
@@ -101,12 +101,12 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
         Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.bucketPath(name));
         bucketLock.lock();
         try {
-            if (Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
-                try {
-                    Files.delete(metadataFile);
-                } catch (IOException e) {
-                    throw new ObjectStorageException("Error deleting metadata for bucket: " + name, e);
-                }
+            try {
+                Files.delete(metadataFile);
+            } catch (NoSuchFileException e) {
+                // Missing metadata is the only absence signal. Other I/O failures must be reported.
+            } catch (IOException e) {
+                throw new ObjectStorageException("Error deleting metadata for bucket: " + name, e);
             }
         } finally {
             bucketLock.unlock();

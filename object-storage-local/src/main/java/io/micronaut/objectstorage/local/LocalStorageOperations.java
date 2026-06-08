@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -195,11 +196,11 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         try {
             mutationLock.lock();
             try {
-                if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+                StoredFileSnapshot snapshot = snapshotStoredFile(path);
+                if (!snapshot.exists()) {
                     objectMetadataOperations.delete(key);
                     return new LocalStorageFile(null);
                 }
-                StoredFileSnapshot snapshot = snapshotStoredFile(path);
                 RuntimeException failure = null;
                 boolean preserveSnapshot = false;
                 try {
@@ -404,9 +405,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private StoredFileSnapshot snapshotStoredFile(Path file) {
-        if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
-            return StoredFileSnapshot.empty();
-        }
         Path snapshotDirectory = layout.snapshotBucketDirectory();
         List<Path> cleanupDirectories = layout.snapshotCleanupDirectories();
         try {
@@ -420,10 +418,21 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 supportsPosixPermissions
             );
             return copyStoredFileToSnapshot(file, snapshot, cleanupDirectories);
+        } catch (NoSuchFileException e) {
+            if (isMissingStoredFile(file, e)) {
+                deleteEmptySnapshotDirectories(cleanupDirectories, null);
+                return StoredFileSnapshot.empty();
+            }
+            deleteEmptySnapshotDirectories(cleanupDirectories, e);
+            throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         } catch (IOException e) {
             deleteEmptySnapshotDirectories(cleanupDirectories, e);
             throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         }
+    }
+
+    private static boolean isMissingStoredFile(Path file, NoSuchFileException e) {
+        return file.toString().equals(e.getFile());
     }
 
     private StoredFileSnapshot copyStoredFileToSnapshot(Path file, Path snapshot, List<Path> cleanupDirectories) throws IOException {
