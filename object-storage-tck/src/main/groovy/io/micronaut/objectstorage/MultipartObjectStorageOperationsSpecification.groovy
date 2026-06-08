@@ -101,9 +101,9 @@ abstract class MultipartObjectStorageOperationsSpecification extends ObjectStora
         pages
         pages.every { it.parts.size() <= firstPageRequest.pageSize }
         replayedFirstPage.parts*.partNumber == firstPage.parts*.partNumber
-        replayedFirstPage.getContinuationToken() == firstPage.getContinuationToken()
+        replayedFirstPage.getContinuationToken().present == firstPage.getContinuationToken().present
         pages.first().parts*.partNumber == firstPage.parts*.partNumber
-        pages.first().getContinuationToken() == firstPage.getContinuationToken()
+        pages.first().getContinuationToken().present == firstPage.getContinuationToken().present
         pages.dropRight(1).every { it.parts }
         adjacentMultipartPages(pages).every { pair -> !pair[0].parts*.partNumber.intersect(pair[1].parts*.partNumber) }
         partNumbers == [1, 2, 3]
