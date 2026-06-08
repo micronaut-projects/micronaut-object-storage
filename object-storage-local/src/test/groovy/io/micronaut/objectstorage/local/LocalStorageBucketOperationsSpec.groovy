@@ -4,6 +4,8 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.objectstorage.BucketOperationsSpecification
 import io.micronaut.objectstorage.ObjectStorageOperations
 import io.micronaut.objectstorage.bucket.BucketOperations
+import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.UploadRequest
 
 import java.nio.file.Files
@@ -94,21 +96,28 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         Files.exists(metadataFile)
     }
 
-    void 'bucket delete removes provider managed object metadata and snapshots'() {
+    void 'bucket delete removes provider managed object metadata multipart state and snapshots'() {
         given:
         Path objectMetadataDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageLayout.METADATA_DIRECTORY)
             .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
             .resolve('default')
+        Path multipartDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.MULTIPART_DIRECTORY)
+            .resolve('default')
         Path snapshotDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
             .resolve('default')
         getObjectStorage().upload(UploadRequest.fromBytes('hello'.bytes, 'delete-me.txt', 'text/plain'))
+        def multipartOperations = ctx.getBean(LocalStorageMultipartOperations)
+        def multipartUpload = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest('multipart/delete-me.txt', 'text/plain')).upload
+        multipartOperations.uploadPart(new UploadPartRequest(multipartUpload, 1, UploadRequest.fromBytes('part'.bytes, 'multipart/delete-me.txt', 'text/plain')))
         Files.createDirectories(snapshotDirectory)
         Files.writeString(snapshotDirectory.resolve('temporary'), 'snapshot')
 
         expect:
         Files.exists(objectMetadataDirectory.resolve('delete-me.txt'))
+        Files.exists(multipartDirectory.resolve(multipartUpload.uploadId))
         Files.exists(snapshotDirectory.resolve('temporary'))
 
         when:
@@ -117,6 +126,7 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         then:
         !Files.exists(defaultBucketPath)
         !Files.exists(objectMetadataDirectory)
+        !Files.exists(multipartDirectory)
         !Files.exists(snapshotDirectory)
         !ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('delete-me.txt').present
     }

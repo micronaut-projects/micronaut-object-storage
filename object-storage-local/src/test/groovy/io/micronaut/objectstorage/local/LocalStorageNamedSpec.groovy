@@ -3,6 +3,7 @@ package io.micronaut.objectstorage.local
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
@@ -23,10 +24,20 @@ class LocalStorageNamedSpec extends Specification {
     @Named("source-storage")
     ObjectStorageOperations<?, ?, ?> storageOperations
 
+    @Inject
+    @Named("source-storage")
+    MultipartObjectStorageOperations<?, ?, ?> multipartStorageOperations
+
     void "it can inject named storage operations"() {
         expect:
         storageOperations
         storageOperations instanceof LocalStorageOperations
+    }
+
+    void "it can inject named multipart storage operations"() {
+        expect:
+        multipartStorageOperations
+        multipartStorageOperations instanceof LocalStorageMultipartOperations
     }
 
     @Requires(property = "spec.name", value = SPEC_NAME)

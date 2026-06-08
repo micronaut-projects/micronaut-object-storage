@@ -26,6 +26,7 @@ final class LocalStorageLayout {
     static final String METADATA_DIRECTORY = "metadata";
     static final String OBJECTS_DIRECTORY = "objects";
     static final String BUCKETS_DIRECTORY = "buckets";
+    static final String MULTIPART_DIRECTORY = "multipart";
     static final String SNAPSHOT_DIRECTORY = "snapshots";
 
     private final Path bucketPath;
@@ -132,9 +133,34 @@ final class LocalStorageLayout {
             .resolve(name);
     }
 
+    Path multipartBucketDirectory() {
+        Path multipartBucketDirectory = rootInternalDirectory()
+            .resolve(MULTIPART_DIRECTORY)
+            .resolve(bucketName);
+        LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, multipartBucketDirectory);
+        return multipartBucketDirectory;
+    }
+
+    Path multipartBucketDirectory(String name) {
+        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("multipart upload cleanup"), name);
+        return rootInternalDirectory()
+            .resolve(MULTIPART_DIRECTORY)
+            .resolve(name);
+    }
+
+    List<Path> multipartCleanupDirectories() {
+        Path multipartBucketDirectory = multipartBucketDirectory();
+        return List.of(
+            multipartBucketDirectory,
+            multipartBucketDirectory.getParent(),
+            rootInternalDirectory()
+        );
+    }
+
     List<Path> providerManagedBucketDirectories(String name) {
         return List.of(
             objectMetadataBucketRoot(name),
+            multipartBucketDirectory(name),
             snapshotBucketDirectory(name)
         );
     }

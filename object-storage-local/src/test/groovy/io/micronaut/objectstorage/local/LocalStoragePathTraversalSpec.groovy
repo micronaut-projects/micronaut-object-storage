@@ -1,6 +1,9 @@
 package io.micronaut.objectstorage.local
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.objectstorage.multipart.AbortMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
+import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.ListObjectsRequest
 import io.micronaut.objectstorage.request.UploadRequest
 import org.opentest4j.TestAbortedException
@@ -133,6 +136,127 @@ class LocalStoragePathTraversalSpec extends Specification {
             .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
             .resolve("bucket")
             .resolve("public"))
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    def 'symlinked root multipart directory is rejected during create multipart upload'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path multipartTarget = outside.resolve("multipart-target")
+        Files.createDirectory(multipartTarget)
+        assumeSymbolicLinksSupported(tmp)
+        Files.createDirectories(tmp.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
+        Files.createSymbolicLink(
+            tmp.resolve(LocalStorageOperations.INTERNAL_DIRECTORY).resolve(LocalStorageOperations.MULTIPART_DIRECTORY),
+            multipartTarget
+        )
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+
+        when:
+        ctx.getBean(LocalStorageMultipartOperations).createMultipartUpload(new CreateMultipartUploadRequest("public", "text/plain"))
+
+        then:
+        thrown IllegalArgumentException
+        !Files.list(multipartTarget).withCloseable { stream -> stream.findAny().present }
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    def 'symlinked multipart upload directory is rejected during upload part'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path multipartTarget = outside.resolve("multipart-target")
+        Files.createDirectory(multipartTarget)
+        assumeSymbolicLinksSupported(tmp)
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        LocalStorageMultipartOperations multipartOperations = ctx.getBean(LocalStorageMultipartOperations)
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest("public", "text/plain"))
+        LocalStorageBucketOperations.deleteRecursively(createResponse.nativeResponse.path)
+        Files.createSymbolicLink(createResponse.nativeResponse.path, multipartTarget)
+
+        when:
+        multipartOperations.uploadPart(new UploadPartRequest(createResponse.upload, 1, UploadRequest.fromBytes("evil".bytes, "public", "text/plain")))
+
+        then:
+        thrown IllegalArgumentException
+        !Files.list(multipartTarget).withCloseable { stream -> stream.findAny().present }
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    def 'symlinked multipart upload directory is rejected during abort'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path multipartTarget = outside.resolve("multipart-target")
+        Files.createDirectory(multipartTarget)
+        assumeSymbolicLinksSupported(tmp)
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+        LocalStorageMultipartOperations multipartOperations = ctx.getBean(LocalStorageMultipartOperations)
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest("public", "text/plain"))
+        LocalStorageBucketOperations.deleteRecursively(createResponse.nativeResponse.path)
+        Files.createSymbolicLink(createResponse.nativeResponse.path, multipartTarget)
+
+        when:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(createResponse.upload))
+
+        then:
+        thrown IllegalArgumentException
+        !Files.list(multipartTarget).withCloseable { stream -> stream.findAny().present }
+
+        cleanup:
+        ctx?.close()
+        deleteRecursively(tmp)
+    }
+
+    def 'symlinked multipart bucket state is not followed during bucket delete'() {
+        given:
+        Path tmp = Files.createTempDirectory("micronaut-object-storage")
+        ApplicationContext ctx = null
+        Path outside = tmp.resolve("outside")
+        Files.createDirectory(outside)
+        Path bucket = tmp.resolve("bucket")
+        Files.createDirectory(bucket)
+        Path multipartTarget = outside.resolve("multipart-target")
+        Files.createDirectory(multipartTarget)
+        Path multipartRoot = tmp.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.MULTIPART_DIRECTORY)
+        Files.createDirectories(multipartRoot)
+        assumeSymbolicLinksSupported(tmp)
+        Files.createSymbolicLink(multipartRoot.resolve("bucket"), multipartTarget)
+
+        ctx = ApplicationContext.run(["micronaut.object-storage.local.a.path": bucket.toString()])
+
+        when:
+        ctx.getBean(LocalStorageBucketOperations).delete("bucket")
+
+        then:
+        thrown IllegalStateException
+        !Files.list(multipartTarget).withCloseable { stream -> stream.findAny().present }
 
         cleanup:
         ctx?.close()

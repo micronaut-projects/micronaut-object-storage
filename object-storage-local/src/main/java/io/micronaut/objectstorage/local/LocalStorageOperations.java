@@ -77,6 +77,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     static final String INTERNAL_DIRECTORY = LocalStorageLayout.INTERNAL_DIRECTORY;
     static final String LEGACY_METADATA_DIRECTORY = LocalStorageLayout.LEGACY_METADATA_DIRECTORY;
     static final String OBJECTS_DIRECTORY = LocalStorageLayout.OBJECTS_DIRECTORY;
+    static final String MULTIPART_DIRECTORY = LocalStorageLayout.MULTIPART_DIRECTORY;
     static final String SNAPSHOT_DIRECTORY = LocalStorageLayout.SNAPSHOT_DIRECTORY;
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
