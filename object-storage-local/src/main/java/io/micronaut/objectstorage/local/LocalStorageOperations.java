@@ -468,11 +468,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             try {
                 Files.deleteIfExists(snapshot.path());
             } catch (IOException e) {
-                if (failure != null) {
-                    failure.addSuppressed(e);
-                } else {
-                    throw new ObjectStorageException("Error deleting temporary file snapshot: " + snapshot.path(), e);
-                }
+                recordSnapshotCleanupFailure(failure, e);
             }
         }
         deleteEmptySnapshotDirectories(snapshot.cleanupDirectories(), failure);
@@ -487,23 +483,26 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
-        deleteEmptyDirectories(directories, failure, "snapshot");
+        deleteEmptyDirectories(directories, failure);
     }
 
-    private void deleteEmptyDirectories(List<Path> directories, Throwable failure, String description) {
+    private void deleteEmptyDirectories(List<Path> directories, Throwable failure) {
         for (Path directory : directories) {
             try {
                 Files.deleteIfExists(directory);
             } catch (DirectoryNotEmptyException ignored) {
                 // Another snapshot or provider-managed file still uses this directory.
             } catch (IOException e) {
-                if (failure != null) {
-                    failure.addSuppressed(e);
-                } else {
-                    throw new ObjectStorageException("Error deleting " + description + " directory: " + directory, e);
-                }
+                recordSnapshotCleanupFailure(failure, e);
             }
         }
+    }
+
+    private static void recordSnapshotCleanupFailure(Throwable failure, IOException cleanupFailure) {
+        if (failure != null) {
+            failure.addSuppressed(cleanupFailure);
+        }
+        // After a successful mutation, leftover snapshots are cleanup debt, not operation failure.
     }
 
     private Path storeFile(Path file, InputStream inputStream) {

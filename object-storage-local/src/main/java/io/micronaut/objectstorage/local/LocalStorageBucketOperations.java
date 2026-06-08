@@ -109,7 +109,7 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
         try {
             deleteRecursively(path);
         } catch (NoSuchFileException ignored) {
-            // The bucket may not have provider-managed object metadata or snapshots.
+            // The bucket may not have provider-managed metadata, snapshots, or temporary files.
         }
     }
 

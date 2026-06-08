@@ -105,7 +105,7 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         Files.exists(metadataFile)
     }
 
-    void 'bucket delete removes provider managed object metadata multipart state and snapshots'() {
+    void 'bucket delete removes provider managed metadata multipart state snapshots and temporary files'() {
         given:
         Path objectMetadataDirectory = rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
             .resolve(LocalStorageLayout.METADATA_DIRECTORY)

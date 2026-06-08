@@ -157,6 +157,35 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         new String(operations.retrieve('existing.txt').get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'original'
     }
 
+    void 'snapshot cleanup failure does not fail committed upload'() {
+        given:
+        String key = 'snapshot-cleanup-failure.txt'
+        operations.upload(UploadRequest.fromBytes('original'.bytes, key, 'text/plain'))
+        Path objectPath = operations.retrieve(key).get().nativeEntry
+        Path bucketPath = objectPath.parent
+        Path snapshotDirectory = bucketPath.parent
+            .resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
+            .resolve(bucketPath.fileName.toString())
+        objectMetadataOperations.saveCallback = { ObjectMetadataWrite ignored ->
+            replaceSnapshotsWithNonEmptyDirectories(snapshotDirectory)
+        }
+
+        when:
+        operations.upload(UploadRequest.fromBytes('replacement'.bytes, key, 'text/plain'))
+
+        then:
+        noExceptionThrown()
+        text(key) == 'replacement'
+        containsNonEmptyDirectory(snapshotDirectory)
+
+        cleanup:
+        objectMetadataOperations.saveCallback = null
+        if (snapshotDirectory != null && Files.exists(snapshotDirectory)) {
+            LocalStorageBucketOperations.deleteRecursively(snapshotDirectory)
+        }
+    }
+
     void 'upload uses the resolved request key consistently'() {
         given:
         ChangingKeyUploadRequest request = new ChangingKeyUploadRequest('content'.bytes, 'consistent.txt', 'wrong.txt')
@@ -426,6 +455,23 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         new String(operations.retrieve(key).get().inputStream.readAllBytes(), StandardCharsets.UTF_8)
     }
 
+    private static void replaceSnapshotsWithNonEmptyDirectories(Path snapshotDirectory) {
+        List<Path> snapshots = Files.list(snapshotDirectory).withCloseable { stream ->
+            stream.toList()
+        }
+        snapshots.each { snapshot ->
+            Files.delete(snapshot)
+            Files.createDirectory(snapshot)
+            Files.writeString(snapshot.resolve('still-here'), 'snapshot')
+        }
+    }
+
+    private static boolean containsNonEmptyDirectory(Path directory) {
+        Files.list(directory).withCloseable { stream ->
+            stream.anyMatch { path -> Files.isDirectory(path) && Files.exists(path.resolve('still-here')) }
+        }
+    }
+
     @Factory
     @Requires(property = "spec.name", value = SPEC_NAME)
     static class MetadataOperationsFactory {
@@ -454,6 +500,7 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         CountDownLatch allowSaveFailure
         CountDownLatch deleteFailureStarted
         CountDownLatch allowDeleteFailure
+        Closure<?> saveCallback
         boolean failSaves
         boolean failDeletes
 
@@ -485,6 +532,7 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
             if (failSaves) {
                 throw new IllegalStateException('metadata unavailable')
             }
+            saveCallback?.call(write)
             writes.put(write.key(), write)
         }
 
@@ -517,6 +565,7 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
             allowSaveFailure = null
             deleteFailureStarted = null
             allowDeleteFailure = null
+            saveCallback = null
         }
 
         void failNextSave(String key, CountDownLatch saveFailureStarted, CountDownLatch allowSaveFailure) {
