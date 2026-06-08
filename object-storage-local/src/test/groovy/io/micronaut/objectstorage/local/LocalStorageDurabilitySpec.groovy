@@ -52,7 +52,7 @@ class LocalStorageDurabilitySpec extends Specification {
         } as Callable)
 
         then:
-        writeStarted.await(5, TimeUnit.SECONDS)
+        writeStarted.await(5, TimeUnit.SECONDS) == true
         text('object.txt') == 'original'
         operations.listObjects() == ['object.txt'] as Set
 
@@ -82,7 +82,7 @@ class LocalStorageDurabilitySpec extends Specification {
         } as Callable)
 
         then:
-        writeStarted.await(5, TimeUnit.SECONDS)
+        writeStarted.await(5, TimeUnit.SECONDS) == true
         !operations.retrieve('created.txt').present
         !operations.listObjects().contains('created.txt')
 
@@ -120,7 +120,7 @@ class LocalStorageDurabilitySpec extends Specification {
         } as Callable)
 
         then:
-        writeStarted.await(5, TimeUnit.SECONDS)
+        writeStarted.await(5, TimeUnit.SECONDS) == true
         Files.readString(target, StandardCharsets.UTF_8) == 'old'
 
         when:

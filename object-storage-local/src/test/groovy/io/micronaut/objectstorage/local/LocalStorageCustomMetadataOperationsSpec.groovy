@@ -18,10 +18,19 @@ import jakarta.inject.Named
 import jakarta.inject.Singleton
 import spock.lang.Specification
 
+import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 @Property(name = "spec.name", value = LocalStorageCustomMetadataOperationsSpec.SPEC_NAME)
 @Property(name = "micronaut.object-storage.local.default.enabled", value = "true")
@@ -104,6 +113,22 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         operations.retrieve('destination.txt').get().inputStream.text == 'source'
     }
 
+    void 'local self copy is a no op'() {
+        given:
+        UploadRequest request = UploadRequest.fromBytes('self'.bytes, 'self-copy.txt', 'text/plain')
+        request.metadata = [source: 'original']
+        operations.upload(request)
+        objectMetadataOperations.failSaves = true
+
+        when:
+        operations.copy('self-copy.txt', 'self-copy.txt')
+
+        then:
+        noExceptionThrown()
+        text('self-copy.txt') == 'self'
+        objectMetadataOperations.retrieve('self-copy.txt').get().metadata == [source: 'original']
+    }
+
     void 'failed object metadata save removes a newly created object'() {
         given:
         objectMetadataOperations.failSaves = true
@@ -130,6 +155,125 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         e.message == 'metadata unavailable'
         operations.exists('existing.txt')
         new String(operations.retrieve('existing.txt').get().inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'original'
+    }
+
+    void 'upload uses the resolved request key consistently'() {
+        given:
+        ChangingKeyUploadRequest request = new ChangingKeyUploadRequest('content'.bytes, 'consistent.txt', 'wrong.txt')
+
+        when:
+        def response = operations.upload(request)
+
+        then:
+        response.key == 'consistent.txt'
+        request.keyCalls == 1
+        operations.exists('consistent.txt')
+        !operations.exists('wrong.txt')
+        objectMetadataOperations.retrieve('consistent.txt').present
+    }
+
+    void 'failed object metadata save cannot restore over concurrent same key upload'() {
+        given:
+        String key = 'race.txt'
+        operations.upload(UploadRequest.fromBytes('original'.bytes, key, 'text/plain'))
+        CountDownLatch failingSaveStarted = new CountDownLatch(1)
+        CountDownLatch allowFailingSave = new CountDownLatch(1)
+        CountDownLatch successfulKeyRequested = new CountDownLatch(1)
+        CountDownLatch successfulInputRequested = new CountDownLatch(1)
+        objectMetadataOperations.failNextSave(key, failingSaveStarted, allowFailingSave)
+        ExecutorService executor = Executors.newFixedThreadPool(2)
+        Future<?> failingUpload = null
+        Future<?> successfulUpload = null
+
+        when:
+        failingUpload = executor.submit({
+            operations.upload(UploadRequest.fromBytes('failed'.bytes, key, 'text/plain'))
+        } as Callable)
+
+        then:
+        failingSaveStarted.await(5, TimeUnit.SECONDS) == true
+
+        when:
+        successfulUpload = executor.submit({
+            operations.upload(new InputTrackedUploadRequest('winner'.bytes, key, successfulKeyRequested, successfulInputRequested))
+        } as Callable)
+
+        then:
+        successfulKeyRequested.await(5, TimeUnit.SECONDS) == true
+        successfulInputRequested.await(1, TimeUnit.SECONDS) == false
+
+        when:
+        allowFailingSave.countDown()
+        failingUpload.get(5, TimeUnit.SECONDS)
+
+        then:
+        ExecutionException e = thrown()
+        e.cause instanceof IllegalStateException
+        e.cause.message == 'metadata unavailable'
+
+        when:
+        successfulUpload.get(5, TimeUnit.SECONDS)
+
+        then:
+        successfulInputRequested.await(5, TimeUnit.SECONDS) == true
+        operations.exists(key)
+        text(key) == 'winner'
+
+        cleanup:
+        allowFailingSave?.countDown()
+        executor?.shutdownNow()
+    }
+
+    void 'failed object metadata delete cannot restore over concurrent same key upload'() {
+        given:
+        String key = 'delete-race.txt'
+        operations.upload(UploadRequest.fromBytes('original'.bytes, key, 'text/plain'))
+        CountDownLatch failingDeleteStarted = new CountDownLatch(1)
+        CountDownLatch allowFailingDelete = new CountDownLatch(1)
+        CountDownLatch successfulKeyRequested = new CountDownLatch(1)
+        CountDownLatch successfulInputRequested = new CountDownLatch(1)
+        objectMetadataOperations.failNextDelete(key, failingDeleteStarted, allowFailingDelete)
+        ExecutorService executor = Executors.newFixedThreadPool(2)
+        Future<?> failingDelete = null
+        Future<?> successfulUpload = null
+
+        when:
+        failingDelete = executor.submit({
+            operations.delete(key)
+        } as Callable)
+
+        then:
+        failingDeleteStarted.await(5, TimeUnit.SECONDS) == true
+
+        when:
+        successfulUpload = executor.submit({
+            operations.upload(new InputTrackedUploadRequest('winner'.bytes, key, successfulKeyRequested, successfulInputRequested))
+        } as Callable)
+
+        then:
+        successfulKeyRequested.await(5, TimeUnit.SECONDS) == true
+        successfulInputRequested.await(1, TimeUnit.SECONDS) == false
+
+        when:
+        allowFailingDelete.countDown()
+        failingDelete.get(5, TimeUnit.SECONDS)
+
+        then:
+        ExecutionException e = thrown()
+        e.cause instanceof IllegalStateException
+        e.cause.message == 'metadata unavailable'
+
+        when:
+        successfulUpload.get(5, TimeUnit.SECONDS)
+
+        then:
+        successfulInputRequested.await(5, TimeUnit.SECONDS) == true
+        operations.exists(key)
+        text(key) == 'winner'
+
+        cleanup:
+        allowFailingDelete?.countDown()
+        executor?.shutdownNow()
     }
 
     void 'failed copy metadata save removes a newly created destination object'() {
@@ -162,6 +306,60 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         def entry = operations.retrieve('destination.txt').get()
         new String(entry.inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'destination'
         !Files.exists(entry.nativeEntry.parent.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
+    }
+
+    void 'failed copy metadata save cannot restore over concurrent destination upload'() {
+        given:
+        String sourceKey = 'copy-source-race.txt'
+        String destinationKey = 'copy-destination-race.txt'
+        operations.upload(UploadRequest.fromBytes('source'.bytes, sourceKey, 'text/plain'))
+        operations.upload(UploadRequest.fromBytes('destination'.bytes, destinationKey, 'text/plain'))
+        CountDownLatch failingSaveStarted = new CountDownLatch(1)
+        CountDownLatch allowFailingSave = new CountDownLatch(1)
+        CountDownLatch successfulKeyRequested = new CountDownLatch(1)
+        CountDownLatch successfulInputRequested = new CountDownLatch(1)
+        objectMetadataOperations.failNextSave(destinationKey, failingSaveStarted, allowFailingSave)
+        ExecutorService executor = Executors.newFixedThreadPool(2)
+        Future<?> failingCopy = null
+        Future<?> successfulUpload = null
+
+        when:
+        failingCopy = executor.submit({
+            operations.copy(sourceKey, destinationKey)
+        } as Callable)
+
+        then:
+        failingSaveStarted.await(5, TimeUnit.SECONDS) == true
+
+        when:
+        successfulUpload = executor.submit({
+            operations.upload(new InputTrackedUploadRequest('winner'.bytes, destinationKey, successfulKeyRequested, successfulInputRequested))
+        } as Callable)
+
+        then:
+        successfulKeyRequested.await(5, TimeUnit.SECONDS) == true
+        successfulInputRequested.await(1, TimeUnit.SECONDS) == false
+
+        when:
+        allowFailingSave.countDown()
+        failingCopy.get(5, TimeUnit.SECONDS)
+
+        then:
+        ExecutionException e = thrown()
+        e.cause instanceof IllegalStateException
+        e.cause.message == 'metadata unavailable'
+
+        when:
+        successfulUpload.get(5, TimeUnit.SECONDS)
+
+        then:
+        successfulInputRequested.await(5, TimeUnit.SECONDS) == true
+        operations.exists(destinationKey)
+        text(destinationKey) == 'winner'
+
+        cleanup:
+        allowFailingSave?.countDown()
+        executor?.shutdownNow()
     }
 
     void 'failed object metadata delete preserves the stored object'() {
@@ -224,6 +422,10 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         }
     }
 
+    private String text(String key) {
+        new String(operations.retrieve(key).get().inputStream.readAllBytes(), StandardCharsets.UTF_8)
+    }
+
     @Factory
     @Requires(property = "spec.name", value = SPEC_NAME)
     static class MetadataOperationsFactory {
@@ -246,6 +448,12 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
     static class CustomObjectMetadataOperations implements ObjectMetadataOperations<Path> {
         final Map<String, ObjectMetadataWrite> writes = new ConcurrentHashMap<>()
         final List<String> deletedKeys = Collections.synchronizedList([])
+        final Set<String> failNextSaveKeys = ConcurrentHashMap.newKeySet()
+        final Set<String> failNextDeleteKeys = ConcurrentHashMap.newKeySet()
+        CountDownLatch saveFailureStarted
+        CountDownLatch allowSaveFailure
+        CountDownLatch deleteFailureStarted
+        CountDownLatch allowDeleteFailure
         boolean failSaves
         boolean failDeletes
 
@@ -269,6 +477,11 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
 
         @Override
         void save(ObjectMetadataWrite write) {
+            if (failNextSaveKeys.remove(write.key())) {
+                saveFailureStarted?.countDown()
+                await(allowSaveFailure)
+                throw new IllegalStateException('metadata unavailable')
+            }
             if (failSaves) {
                 throw new IllegalStateException('metadata unavailable')
             }
@@ -277,6 +490,11 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
 
         @Override
         void delete(String key) {
+            if (failNextDeleteKeys.remove(key)) {
+                deleteFailureStarted?.countDown()
+                await(allowDeleteFailure)
+                throw new IllegalStateException('metadata unavailable')
+            }
             if (failDeletes) {
                 throw new IllegalStateException('metadata unavailable')
             }
@@ -293,6 +511,105 @@ class LocalStorageCustomMetadataOperationsSpec extends Specification {
         void clearFailures() {
             failSaves = false
             failDeletes = false
+            failNextSaveKeys.clear()
+            failNextDeleteKeys.clear()
+            saveFailureStarted = null
+            allowSaveFailure = null
+            deleteFailureStarted = null
+            allowDeleteFailure = null
+        }
+
+        void failNextSave(String key, CountDownLatch saveFailureStarted, CountDownLatch allowSaveFailure) {
+            failNextSaveKeys.add(key)
+            this.saveFailureStarted = saveFailureStarted
+            this.allowSaveFailure = allowSaveFailure
+        }
+
+        void failNextDelete(String key, CountDownLatch deleteFailureStarted, CountDownLatch allowDeleteFailure) {
+            failNextDeleteKeys.add(key)
+            this.deleteFailureStarted = deleteFailureStarted
+            this.allowDeleteFailure = allowDeleteFailure
+        }
+
+        private static void await(CountDownLatch latch) {
+            if (latch != null && !latch.await(5, TimeUnit.SECONDS)) {
+                throw new IllegalStateException('timed out waiting for metadata failure release')
+            }
+        }
+    }
+
+    private static final class ChangingKeyUploadRequest implements UploadRequest {
+
+        private final byte[] bytes
+        private final String firstKey
+        private final String secondKey
+        int keyCalls
+
+        ChangingKeyUploadRequest(byte[] bytes, String firstKey, String secondKey) {
+            this.bytes = bytes
+            this.firstKey = firstKey
+            this.secondKey = secondKey
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            Optional.of('text/plain')
+        }
+
+        @Override
+        String getKey() {
+            keyCalls++
+            keyCalls == 1 ? firstKey : secondKey
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            Optional.of((long) bytes.length)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            new ByteArrayInputStream(bytes)
+        }
+    }
+
+    private static final class InputTrackedUploadRequest implements UploadRequest {
+
+        private final byte[] bytes
+        private final String key
+        private final CountDownLatch keyRequested
+        private final CountDownLatch inputRequested
+
+        InputTrackedUploadRequest(byte[] bytes,
+                                  String key,
+                                  CountDownLatch keyRequested,
+                                  CountDownLatch inputRequested) {
+            this.bytes = bytes
+            this.key = key
+            this.keyRequested = keyRequested
+            this.inputRequested = inputRequested
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            Optional.of('text/plain')
+        }
+
+        @Override
+        String getKey() {
+            keyRequested.countDown()
+            key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            Optional.of((long) bytes.length)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            inputRequested.countDown()
+            new ByteArrayInputStream(bytes)
         }
     }
 

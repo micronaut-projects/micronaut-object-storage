@@ -8,8 +8,17 @@ import io.micronaut.objectstorage.multipart.CreateMultipartUploadRequest
 import io.micronaut.objectstorage.multipart.UploadPartRequest
 import io.micronaut.objectstorage.request.UploadRequest
 
+import java.io.IOException
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.Callable
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
 
@@ -134,5 +143,126 @@ class LocalStorageBucketOperationsSpec extends BucketOperationsSpecification {
         !Files.exists(snapshotDirectory)
         !Files.exists(temporaryDirectory)
         !ctx.getBean(LocalStorageObjectMetadataOperations).retrieve('delete-me.txt').present
+    }
+
+    void 'bucket delete waits for an in-flight object mutation'() {
+        given:
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        CountDownLatch deleteStarted = new CountDownLatch(1)
+        ExecutorService executor = Executors.newFixedThreadPool(2)
+        Future<?> upload = null
+        Future<?> delete = null
+
+        when:
+        upload = executor.submit({
+            getObjectStorage().upload(new BlockingUploadRequest('held'.bytes, 'held.txt', writeStarted, allowWriteToFinish))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+
+        when:
+        delete = executor.submit({
+            deleteStarted.countDown()
+            getBucketOperations().delete('default')
+        } as Callable)
+
+        then:
+        deleteStarted.await(5, TimeUnit.SECONDS) == true
+
+        when:
+        delete.get(500, TimeUnit.MILLISECONDS)
+
+        then:
+        thrown TimeoutException
+        Files.exists(defaultBucketPath)
+
+        when:
+        allowWriteToFinish.countDown()
+        upload.get(5, TimeUnit.SECONDS)
+        delete.get(5, TimeUnit.SECONDS)
+
+        then:
+        !Files.exists(defaultBucketPath)
+
+        cleanup:
+        allowWriteToFinish?.countDown()
+        executor?.shutdownNow()
+    }
+
+    private static void await(CountDownLatch latch) throws IOException {
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new IOException('Timed out waiting for test writer to finish')
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt()
+            throw new IOException('Interrupted while waiting for test writer to finish', e)
+        }
+    }
+
+    private static final class BlockingUploadRequest implements UploadRequest {
+        private final byte[] bytes
+        private final String key
+        private final CountDownLatch writeStarted
+        private final CountDownLatch allowWriteToFinish
+
+        private BlockingUploadRequest(byte[] bytes,
+                                      String key,
+                                      CountDownLatch writeStarted,
+                                      CountDownLatch allowWriteToFinish) {
+            this.bytes = bytes
+            this.key = key
+            this.writeStarted = writeStarted
+            this.allowWriteToFinish = allowWriteToFinish
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            Optional.of('text/plain')
+        }
+
+        @Override
+        String getKey() {
+            key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            Optional.of(bytes.length as Long)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            new BlockingInputStream(bytes, writeStarted, allowWriteToFinish)
+        }
+    }
+
+    private static final class BlockingInputStream extends InputStream {
+        private final byte[] bytes
+        private final CountDownLatch writeStarted
+        private final CountDownLatch allowWriteToFinish
+        private int index
+
+        private BlockingInputStream(byte[] bytes,
+                                    CountDownLatch writeStarted,
+                                    CountDownLatch allowWriteToFinish) {
+            this.bytes = bytes
+            this.writeStarted = writeStarted
+            this.allowWriteToFinish = allowWriteToFinish
+        }
+
+        @Override
+        int read() throws IOException {
+            if (index == bytes.length) {
+                return -1
+            }
+            if (index == 0) {
+                writeStarted.countDown()
+                await(allowWriteToFinish)
+            }
+            bytes[index++] & 0xff
+        }
     }
 }

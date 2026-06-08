@@ -67,6 +67,33 @@ class LocalStorageBucketMetadataOperationsSpec extends BucketMetadataOperationsS
         metadataOperations.retrieve(victimName).get().metadata == [role: 'victim']
     }
 
+    void 'bucket metadata save removes stale matching temporary files'() {
+        given:
+        String bucketName = 'cleanup'
+        getBucketOperations().create(bucketName)
+        def metadataOperations = getBucketMetadataOperations()
+        metadataOperations.save(new BucketMetadataWrite(bucketName, [role: 'original'], [:]))
+        Path temporaryDirectory = bucketMetadataTemporaryDirectory(bucketName)
+        Files.createDirectories(temporaryDirectory)
+        Path staleTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-bucket-metadata-stale.tmp')
+        Path freshTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-bucket-metadata-fresh.tmp')
+        Path unrelatedTemporaryFile = temporaryDirectory.resolve('unrelated-stale.tmp')
+        Files.writeString(staleTemporaryFile, 'stale')
+        Files.writeString(freshTemporaryFile, 'fresh')
+        Files.writeString(unrelatedTemporaryFile, 'unrelated')
+        Files.setLastModifiedTime(staleTemporaryFile, staleFileTime())
+        Files.setLastModifiedTime(unrelatedTemporaryFile, staleFileTime())
+
+        when:
+        metadataOperations.save(new BucketMetadataWrite(bucketName, [role: 'updated'], [:]))
+
+        then:
+        !Files.exists(staleTemporaryFile)
+        Files.readString(freshTemporaryFile) == 'fresh'
+        Files.readString(unrelatedTemporaryFile) == 'unrelated'
+        metadataOperations.retrieve(bucketName).get().metadata == [role: 'updated']
+    }
+
     void 'it rejects invalid bucket metadata names consistently'() {
         when:
         getBucketMetadataOperations().retrieve(name)
@@ -89,6 +116,13 @@ class LocalStorageBucketMetadataOperationsSpec extends BucketMetadataOperationsS
             .resolve(LocalStorageLayout.METADATA_DIRECTORY)
             .resolve(LocalStorageLayout.BUCKETS_DIRECTORY)
             .resolve(name)
+    }
+
+    private Path bucketMetadataTemporaryDirectory(String name) {
+        rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
+            .resolve(name)
+            .resolve(LocalStorageLayout.BUCKET_METADATA_TEMPORARY_DIRECTORY)
     }
 
     private static FileTime staleFileTime() {

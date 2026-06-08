@@ -129,6 +129,41 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         metadataOperations.retrieve(victimKey).get().metadata == [role: 'victim']
     }
 
+    void 'object metadata save removes stale matching temporary files'() {
+        given:
+        String key = 'metadata-cleanup.txt'
+        def operations = ctx.getBean(LocalStorageOperations)
+        def metadataOperations = ctx.getBean(LocalStorageObjectMetadataOperations)
+        operations.upload(UploadRequest.fromBytes('content'.bytes, key, 'text/plain'))
+        Path temporaryDirectory = objectMetadataTemporaryDirectory()
+        Files.createDirectories(temporaryDirectory)
+        Path staleTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-metadata-stale.tmp')
+        Path freshTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-metadata-fresh.tmp')
+        Path unrelatedTemporaryFile = temporaryDirectory.resolve('unrelated-stale.tmp')
+        Files.writeString(staleTemporaryFile, 'stale')
+        Files.writeString(freshTemporaryFile, 'fresh')
+        Files.writeString(unrelatedTemporaryFile, 'unrelated')
+        Files.setLastModifiedTime(staleTemporaryFile, staleFileTime())
+        Files.setLastModifiedTime(unrelatedTemporaryFile, staleFileTime())
+
+        when:
+        metadataOperations.save(new ObjectMetadataWrite(
+            key,
+            [role: 'updated'],
+            [:],
+            'text/plain',
+            null,
+            null,
+            null
+        ))
+
+        then:
+        !Files.exists(staleTemporaryFile)
+        Files.readString(freshTemporaryFile) == 'fresh'
+        Files.readString(unrelatedTemporaryFile) == 'unrelated'
+        metadataOperations.retrieve(key).get().metadata == [role: 'updated']
+    }
+
     void 'object delete removes root and legacy metadata sidecars'() {
         given:
         Files.createDirectories(bucketPath)
@@ -200,6 +235,13 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
             .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
             .resolve('default')
             .resolve(key)
+    }
+
+    private Path objectMetadataTemporaryDirectory() {
+        rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
+            .resolve('default')
+            .resolve(LocalStorageLayout.OBJECT_METADATA_TEMPORARY_DIRECTORY)
     }
 
     private Path legacyObjectMetadataFile(String key) {

@@ -59,6 +59,10 @@ final class LocalStorageLayout {
         return storageRoot;
     }
 
+    Path configuredBucketPath() {
+        return bucketPath.toAbsolutePath().normalize();
+    }
+
     Path requireBucketRoot(String component) {
         if (!hasBucketParent) {
             throw new IllegalArgumentException("Local storage " + component + " requires a bucket path with a parent directory");

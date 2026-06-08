@@ -29,6 +29,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Local bucket metadata operations.
@@ -65,38 +66,50 @@ final class LocalStorageBucketMetadataOperations implements BucketMetadataOperat
     @Override
     public void save(@NonNull BucketMetadataWrite write) {
         Path bucketPath = layout.bucketPath(write.name());
-        if (!Files.isDirectory(bucketPath, LinkOption.NOFOLLOW_LINKS)) {
-            throw new ObjectStorageException("Cannot persist metadata for a missing bucket: " + write.name());
-        }
-        Path metadataFile = metadataFilePath(write.name());
-        if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), metadataFile.getParent(), supportsPosixPermissions)) {
-            throw new ObjectStorageException("Error creating metadata directories for bucket: " + write.name());
-        }
-        Path temporaryDirectory = prepareTemporaryDirectory(write.name());
-        Properties properties = LocalStorageMetadataSupport.toProperties(write);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(bucketPath);
+        bucketLock.lock();
         try {
-            LocalStorageIoSupport.writeAndReplace(
-                metadataFile,
-                temporaryDirectory,
-                "micronaut-object-storage-local-bucket-metadata",
-                ".tmp",
-                supportsPosixPermissions,
-                metadataOut -> properties.store(metadataOut, "Metadata for bucket: " + write.name())
-            );
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error storing metadata for bucket: " + write.name(), e);
+            if (!Files.isDirectory(bucketPath, LinkOption.NOFOLLOW_LINKS)) {
+                throw new ObjectStorageException("Cannot persist metadata for a missing bucket: " + write.name());
+            }
+            Path metadataFile = metadataFilePath(write.name());
+            if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), metadataFile.getParent(), supportsPosixPermissions)) {
+                throw new ObjectStorageException("Error creating metadata directories for bucket: " + write.name());
+            }
+            Path temporaryDirectory = prepareTemporaryDirectory(write.name());
+            Properties properties = LocalStorageMetadataSupport.toProperties(write);
+            try {
+                LocalStorageIoSupport.writeAndReplace(
+                    metadataFile,
+                    temporaryDirectory,
+                    "micronaut-object-storage-local-bucket-metadata",
+                    ".tmp",
+                    supportsPosixPermissions,
+                    metadataOut -> properties.store(metadataOut, "Metadata for bucket: " + write.name())
+                );
+            } catch (IOException e) {
+                throw new ObjectStorageException("Error storing metadata for bucket: " + write.name(), e);
+            }
+        } finally {
+            bucketLock.unlock();
         }
     }
 
     @Override
     public void delete(@NonNull String name) {
         Path metadataFile = metadataFilePath(name);
-        if (Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
-            try {
-                Files.delete(metadataFile);
-            } catch (IOException e) {
-                throw new ObjectStorageException("Error deleting metadata for bucket: " + name, e);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.bucketPath(name));
+        bucketLock.lock();
+        try {
+            if (Files.exists(metadataFile, LinkOption.NOFOLLOW_LINKS)) {
+                try {
+                    Files.delete(metadataFile);
+                } catch (IOException e) {
+                    throw new ObjectStorageException("Error deleting metadata for bucket: " + name, e);
+                }
             }
+        } finally {
+            bucketLock.unlock();
         }
     }
 
