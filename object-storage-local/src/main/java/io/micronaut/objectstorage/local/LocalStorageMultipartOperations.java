@@ -33,7 +33,7 @@ import io.micronaut.objectstorage.multipart.MultipartPart;
 import io.micronaut.objectstorage.multipart.MultipartUploadHandle;
 import io.micronaut.objectstorage.multipart.UploadPartRequest;
 import io.micronaut.objectstorage.multipart.UploadPartResponse;
-import io.micronaut.objectstorage.request.UploadRequest;
+import io.micronaut.objectstorage.request.FileUploadRequest;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -201,11 +201,11 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
         UploadSession session = retrieveUploadSession(upload);
         Path completedFile = buildCompletedMultipartFile(session.path(), request.getParts(), upload.getUploadId());
         try {
-            LocalMultipartUploadRequest uploadRequest = new LocalMultipartUploadRequest(
+            var uploadRequest = new LocalCompletedMultipartUploadRequest(
                 upload.getKey(),
+                session.contentType(),
                 completedFile,
-                session.metadata(),
-                session.contentType()
+                session.metadata()
             );
             var uploadResponse = objectStorageOperations.upload(uploadRequest);
             deleteMultipartUploadAfterCompletion(session.path());
@@ -327,32 +327,11 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
             return Optional.empty();
         }
         try {
-            if (!continuationToken.startsWith(MULTIPART_CONTINUATION_TOKEN_PREFIX)) {
-                throw new ObjectStorageException("Invalid local multipart continuation token");
-            }
-            String decodedToken = new String(
-                Base64.getUrlDecoder().decode(continuationToken.substring(MULTIPART_CONTINUATION_TOKEN_PREFIX.length())),
-                StandardCharsets.UTF_8
-            );
-            String[] parts = decodedToken.split("\n", -1);
-            if (parts.length != 4) {
-                throw new ObjectStorageException("Invalid local multipart continuation token");
-            }
-            MultipartUploadHandle upload = request.getUpload();
-            String key = decodeTokenPart(parts[0]);
-            String uploadId = decodeTokenPart(parts[1]);
-            String pageSize = decodeTokenPart(parts[2]);
-            String partNumberMarker = decodeTokenPart(parts[3]);
-            if (!upload.getKey().equals(key)
-                || !upload.getUploadId().equals(uploadId)
-                || !Integer.toString(request.getPageSize()).equals(pageSize)) {
+            LocalMultipartContinuationToken decodedToken = LocalMultipartContinuationToken.decode(continuationToken);
+            if (!decodedToken.matches(request)) {
                 throw new ObjectStorageException("Local multipart continuation token does not match the current request");
             }
-            int marker = Integer.parseInt(partNumberMarker);
-            if (marker <= 0) {
-                throw new ObjectStorageException("Invalid local multipart continuation token");
-            }
-            return Optional.of(marker);
+            return Optional.of(decodedToken.partNumberMarker());
         } catch (IllegalArgumentException e) {
             throw new ObjectStorageException("Invalid local multipart continuation token", e);
         }
@@ -370,12 +349,16 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
             .encodeToString(payload.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String encodeTokenPart(String value) {
+    private static String encodeTokenPart(String value) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String decodeTokenPart(String value) {
+    private static String decodeTokenPart(String value) {
         return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
+    }
+
+    private static ObjectStorageException invalidMultipartContinuationToken() {
+        return new ObjectStorageException("Invalid local multipart continuation token");
     }
 
     private Path multipartUploadPath(String uploadId) {
@@ -594,31 +577,54 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
                                        @NonNull Path path) {
     }
 
-    private record LocalMultipartUploadRequest(@NonNull String key,
-                                               @NonNull Path path,
-                                               @NonNull Map<String, String> metadata,
-                                               @Nullable String contentType) implements UploadRequest {
+    private record LocalMultipartContinuationToken(@NonNull String key,
+                                                   @NonNull String uploadId,
+                                                   int pageSize,
+                                                   int partNumberMarker) {
 
-        @Override
-        @NonNull
-        public Optional<String> getContentType() {
-            return Optional.ofNullable(contentType);
-        }
-
-        @Override
-        @NonNull
-        public String getKey() {
-            return key;
-        }
-
-        @Override
-        @NonNull
-        public Optional<Long> getContentSize() {
-            try {
-                return Optional.of(Files.size(path));
-            } catch (IOException e) {
-                throw new ObjectStorageException("Error reading completed multipart file size: " + path, e);
+        private static LocalMultipartContinuationToken decode(String continuationToken) {
+            if (!continuationToken.startsWith(MULTIPART_CONTINUATION_TOKEN_PREFIX)) {
+                throw invalidMultipartContinuationToken();
             }
+            String decodedToken = new String(
+                Base64.getUrlDecoder().decode(continuationToken.substring(MULTIPART_CONTINUATION_TOKEN_PREFIX.length())),
+                StandardCharsets.UTF_8
+            );
+            String[] parts = decodedToken.split("\n", -1);
+            if (parts.length != 4) {
+                throw invalidMultipartContinuationToken();
+            }
+            int partNumberMarker = Integer.parseInt(decodeTokenPart(parts[3]));
+            if (partNumberMarker <= 0) {
+                throw invalidMultipartContinuationToken();
+            }
+            return new LocalMultipartContinuationToken(
+                decodeTokenPart(parts[0]),
+                decodeTokenPart(parts[1]),
+                Integer.parseInt(decodeTokenPart(parts[2])),
+                partNumberMarker
+            );
+        }
+
+        private boolean matches(ListMultipartPartsRequest request) {
+            MultipartUploadHandle upload = request.getUpload();
+            return upload.getKey().equals(key)
+                && upload.getUploadId().equals(uploadId)
+                && request.getPageSize() == pageSize;
+        }
+    }
+
+    private static final class LocalCompletedMultipartUploadRequest extends FileUploadRequest {
+
+        @NonNull
+        private final Path path;
+
+        private LocalCompletedMultipartUploadRequest(@NonNull String keyName,
+                                                     @Nullable String contentType,
+                                                     @NonNull Path path,
+                                                     @NonNull Map<String, String> metadata) {
+            super(keyName, contentType, path, metadata);
+            this.path = path;
         }
 
         @Override
@@ -629,12 +635,6 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
             } catch (IOException e) {
                 throw new ObjectStorageException("Error reading completed multipart file: " + path, e);
             }
-        }
-
-        @Override
-        @NonNull
-        public Map<String, String> getMetadata() {
-            return metadata;
         }
     }
 }

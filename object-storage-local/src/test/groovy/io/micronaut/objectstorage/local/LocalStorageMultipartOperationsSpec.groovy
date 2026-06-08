@@ -70,6 +70,23 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         operations.listObjects().each { operations.delete(it) }
     }
 
+    void 'local multipart lists no parts for a new upload'() {
+        given:
+        String key = 'multipart-local/new-upload.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+
+        when:
+        def response = multipartOperations.listParts(new ListMultipartPartsRequest(upload, 10, ''))
+
+        then:
+        response.parts.empty
+        !response.getContinuationToken().present
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+    }
+
     void 'local multipart scratch state is hidden until completion and cleaned up after completion'() {
         given:
         String key = 'multipart-local/demo.txt'
@@ -121,6 +138,25 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         listedParts*.ETag == [originalPart.part.ETag]
         response.ETag
         entry.inputStream.text == 'original'
+    }
+
+    void 'successful local multipart part replacement commits the latest part'() {
+        given:
+        String key = 'multipart-local/successful-replacement.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+        multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('old'.bytes, key, CONTENT_TYPE)))
+        String stalePartFileName = loadProperties(partPropertiesPath(createResponse.nativeResponse.path, 1)).getProperty('file')
+
+        when:
+        def replacementPart = multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('new'.bytes, key, CONTENT_TYPE)))
+        def response = multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(upload, [replacementPart.part]))
+        def entry = operations.retrieve(key).get()
+
+        then:
+        response.ETag
+        entry.inputStream.text == 'new'
+        !Files.exists(partDataPath(createResponse.nativeResponse.path, stalePartFileName))
     }
 
     void 'failed local multipart complete removes assembled temporary file and leaves upload abortable'() {
@@ -179,6 +215,138 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
 
         then:
         !Files.exists(createResponse.nativeResponse.path)
+    }
+
+    void 'local multipart complete rejects ETag mismatches'() {
+        given:
+        def fixture = createUploadWithSinglePart('multipart-local/wrong-etag.txt')
+        MultipartPart wrongPart = new MultipartPart(fixture.part.partNumber, 'wrong-etag', fixture.part.size)
+
+        when:
+        multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(fixture.upload, [wrongPart]))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Local multipart part ETag does not match: 1'
+        !containsCompletedMultipartFile(fixture.uploadPath)
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
+    }
+
+    void 'local multipart tolerates empty stored content type'() {
+        given:
+        def fixture = createUploadWithSinglePart('multipart-local/empty-content-type.txt')
+        Path uploadPropertiesPath = fixture.uploadPath.resolve('upload.properties')
+        Properties properties = loadProperties(uploadPropertiesPath)
+        properties.setProperty('contentType', '')
+        storeProperties(uploadPropertiesPath, properties)
+
+        when:
+        def response = multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(fixture.upload, [fixture.part]))
+
+        then:
+        response.ETag
+    }
+
+    void 'local multipart rejects incomplete part metadata'() {
+        given:
+        def fixture = createUploadWithSinglePart("multipart-local/incomplete-${propertyName}.txt")
+        Properties properties = loadProperties(partPropertiesPath(fixture.uploadPath, 1))
+        properties.remove(propertyName)
+        storeProperties(partPropertiesPath(fixture.uploadPath, 1), properties)
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(fixture.upload, 10))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Local multipart part metadata is incomplete: 1'
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
+
+        where:
+        propertyName << ['eTag', 'size', 'file']
+    }
+
+    void 'local multipart rejects missing part data'() {
+        given:
+        def fixture = createUploadWithSinglePart('multipart-local/missing-part-data.txt')
+        Properties properties = loadProperties(partPropertiesPath(fixture.uploadPath, 1))
+        Files.delete(partDataPath(fixture.uploadPath, properties.getProperty('file')))
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(fixture.upload, 10))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Local multipart part does not exist: 1'
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
+    }
+
+    void 'local multipart rejects part size metadata mismatches'() {
+        given:
+        def fixture = createUploadWithSinglePart("multipart-local/${sizeValue}.txt")
+        Properties properties = loadProperties(partPropertiesPath(fixture.uploadPath, 1))
+        properties.setProperty('size', sizeValue)
+        storeProperties(partPropertiesPath(fixture.uploadPath, 1), properties)
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(fixture.upload, 10))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == expectedMessage
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
+
+        where:
+        sizeValue      | expectedMessage
+        '999'          | 'Local multipart part size does not match metadata: 1'
+        'not-a-number' | 'Local multipart part size is invalid: 1'
+    }
+
+    void 'local multipart rejects invalid stored part file names'() {
+        given:
+        def fixture = createUploadWithSinglePart("multipart-local/invalid-part-file-${index}.txt")
+        Properties properties = loadProperties(partPropertiesPath(fixture.uploadPath, 1))
+        properties.setProperty('file', fileName)
+        storeProperties(partPropertiesPath(fixture.uploadPath, 1), properties)
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(fixture.upload, 10))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == "Invalid local multipart part file: ${fileName}"
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
+
+        where:
+        index | fileName
+        1     | 'part.txt'
+        2     | '../escape.part'
+    }
+
+    void 'local multipart rejects malformed part metadata file names'() {
+        given:
+        def fixture = createUploadWithSinglePart('multipart-local/malformed-part-metadata.txt')
+        Files.writeString(fixture.uploadPath.resolve('parts').resolve('broken.properties'), '')
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(fixture.upload, 10))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Invalid local multipart part file: broken.properties'
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(fixture.upload))
     }
 
     void 'local multipart abort validates the upload key before deleting an existing upload'() {
@@ -254,6 +422,26 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         ]
     }
 
+    void 'local multipart rejects malformed continuation token page sizes'() {
+        given:
+        String key = 'multipart-local/malformed-page-size-token.txt'
+        def upload = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE)).upload
+
+        when:
+        multipartOperations.listParts(new ListMultipartPartsRequest(
+            upload,
+            2,
+            continuationToken(key, upload.uploadId, 'two', '1')
+        ))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Invalid local multipart continuation token'
+
+        cleanup:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+    }
+
     void 'local multipart rejects non-positive continuation markers before listing parts'() {
         given:
         String key = 'multipart-local/non-positive-token-marker.txt'
@@ -289,6 +477,52 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         !Files.exists(multipartBucketDirectory)
     }
 
+    void 'local multipart rejects invalid upload ids'() {
+        when:
+        multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(new MultipartUploadHandle('multipart-local/object.txt', 'not-a-uuid')))
+
+        then:
+        ObjectStorageException e = thrown()
+        e.message == 'Invalid local multipart upload id: not-a-uuid'
+    }
+
+    private MultipartUploadFixture createUploadWithSinglePart(String key) {
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+        def part = multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('part'.bytes, key, CONTENT_TYPE))).part
+        new MultipartUploadFixture(upload, createResponse.nativeResponse.path, part)
+    }
+
+    private static Path partPropertiesPath(Path uploadPath, int partNumber) {
+        uploadPath.resolve('parts').resolve(partNumber + '.properties')
+    }
+
+    private static Path partDataPath(Path uploadPath, String fileName) {
+        uploadPath.resolve('parts').resolve(fileName)
+    }
+
+    private static Properties loadProperties(Path path) {
+        Properties properties = new Properties()
+        Files.newInputStream(path).withCloseable { properties.load(it) }
+        properties
+    }
+
+    private static void storeProperties(Path path, Properties properties) {
+        Files.newOutputStream(path).withCloseable { properties.store(it, 'test') }
+    }
+
+    private static final class MultipartUploadFixture {
+        private final MultipartUploadHandle upload
+        private final Path uploadPath
+        private final MultipartPart part
+
+        private MultipartUploadFixture(MultipartUploadHandle upload, Path uploadPath, MultipartPart part) {
+            this.upload = upload
+            this.uploadPath = uploadPath
+            this.part = part
+        }
+    }
+
     private static boolean containsCompletedMultipartFile(Path uploadPath) {
         Files.list(uploadPath).withCloseable { stream ->
             stream.anyMatch { path -> path.fileName.toString().endsWith('.complete') }
@@ -296,11 +530,15 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
     }
 
     private static String continuationToken(String key, String uploadId, int pageSize, int marker) {
+        continuationToken(key, uploadId, Integer.toString(pageSize), Integer.toString(marker))
+    }
+
+    private static String continuationToken(String key, String uploadId, String pageSize, String marker) {
         String payload = new StringJoiner('\n')
             .add(encodeTokenPart(key))
             .add(encodeTokenPart(uploadId))
-            .add(encodeTokenPart(Integer.toString(pageSize)))
-            .add(encodeTokenPart(Integer.toString(marker)))
+            .add(encodeTokenPart(pageSize))
+            .add(encodeTokenPart(marker))
             .toString()
         'local-multipart:v1:' + Base64.getUrlEncoder().withoutPadding()
             .encodeToString(payload.getBytes(StandardCharsets.UTF_8))
