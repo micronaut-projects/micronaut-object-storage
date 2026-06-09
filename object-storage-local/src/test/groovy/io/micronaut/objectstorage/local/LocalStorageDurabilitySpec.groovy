@@ -1,0 +1,365 @@
+package io.micronaut.objectstorage.local
+
+import io.micronaut.context.ApplicationContext
+import io.micronaut.objectstorage.request.UploadRequest
+import spock.lang.Specification
+
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.attribute.FileTime
+import java.util.concurrent.Callable
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+
+class LocalStorageDurabilitySpec extends Specification {
+
+    private Path rootDirectory
+    private Path defaultBucketPath
+    private ApplicationContext ctx
+    private LocalStorageOperations operations
+
+    void setup() {
+        rootDirectory = Files.createTempDirectory('LocalStorageDurabilitySpec')
+        defaultBucketPath = rootDirectory.resolve('default')
+        ctx = ApplicationContext.run([
+            'micronaut.object-storage.local.default.path': defaultBucketPath.toString()
+        ])
+        operations = ctx.getBean(LocalStorageOperations)
+    }
+
+    void cleanup() {
+        ctx?.close()
+        if (rootDirectory != null && Files.exists(rootDirectory)) {
+            LocalStorageBucketOperations.deleteRecursively(rootDirectory)
+        }
+    }
+
+    void 'replacement upload does not expose partial bytes while input stream is still writing'() {
+        given:
+        operations.upload(UploadRequest.fromBytes(bytes('original'), 'object.txt', 'text/plain'))
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+        Future<?> upload = null
+
+        when:
+        upload = executor.submit({
+            operations.upload(new BlockingUploadRequest(bytes('replacement'), 'object.txt', writeStarted, allowWriteToFinish))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+        text('object.txt') == 'original'
+        operations.listObjects() == ['object.txt'] as Set
+
+        when:
+        allowWriteToFinish.countDown()
+        upload.get(5, TimeUnit.SECONDS)
+
+        then:
+        text('object.txt') == 'replacement'
+        temporaryFiles(defaultTemporaryDirectory()).empty
+
+        cleanup:
+        allowWriteToFinish.countDown()
+        executor?.shutdownNow()
+    }
+
+    void 'new upload does not expose object while input stream is still writing'() {
+        given:
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+        Future<?> upload = null
+
+        when:
+        upload = executor.submit({
+            operations.upload(new BlockingUploadRequest(bytes('created'), 'created.txt', writeStarted, allowWriteToFinish))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+        !operations.retrieve('created.txt').present
+        !operations.listObjects().contains('created.txt')
+
+        when:
+        allowWriteToFinish.countDown()
+        upload.get(5, TimeUnit.SECONDS)
+
+        then:
+        text('created.txt') == 'created'
+        operations.listObjects() == ['created.txt'] as Set
+        temporaryFiles(defaultTemporaryDirectory()).empty
+
+        cleanup:
+        allowWriteToFinish.countDown()
+        executor?.shutdownNow()
+    }
+
+    void 'write and replace keeps target visible until temporary file is moved'() {
+        given:
+        Path directory = Files.createTempDirectory(rootDirectory, 'atomic')
+        Path target = directory.resolve('metadata.properties')
+        Files.writeString(target, 'old', StandardCharsets.UTF_8)
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+        Future<?> write = null
+
+        when:
+        write = executor.submit({
+            LocalStorageIoSupport.writeAndReplace(target, directory, 'metadata', '.tmp', false, { output ->
+                writeStarted.countDown()
+                await(allowWriteToFinish)
+                output.write(bytes('new'))
+            })
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+        Files.readString(target, StandardCharsets.UTF_8) == 'old'
+
+        when:
+        allowWriteToFinish.countDown()
+        write.get(5, TimeUnit.SECONDS)
+
+        then:
+        Files.readString(target, StandardCharsets.UTF_8) == 'new'
+        temporaryFiles(directory).empty
+
+        cleanup:
+        allowWriteToFinish.countDown()
+        executor?.shutdownNow()
+    }
+
+    void 'write and replace removes temporary file when writer fails'() {
+        given:
+        Path directory = Files.createTempDirectory(rootDirectory, 'atomic-failure')
+        Path target = directory.resolve('metadata.properties')
+        Files.writeString(target, 'old', StandardCharsets.UTF_8)
+
+        when:
+        LocalStorageIoSupport.writeAndReplace(target, directory, 'metadata', '.tmp', false, { output ->
+            output.write(bytes('partial'))
+            throw new IOException('write failed')
+        })
+
+        then:
+        IOException e = thrown()
+        e.message == 'write failed'
+        Files.readString(target, StandardCharsets.UTF_8) == 'old'
+        temporaryFiles(directory).empty
+    }
+
+    void 'write and replace removes temporary file when writer fails with runtime exception'() {
+        given:
+        Path directory = Files.createTempDirectory(rootDirectory, 'atomic-runtime-failure')
+        Path target = directory.resolve('metadata.properties')
+        Files.writeString(target, 'old', StandardCharsets.UTF_8)
+
+        when:
+        LocalStorageIoSupport.writeAndReplace(target, directory, 'metadata', '.tmp', false, { output ->
+            output.write(bytes('partial'))
+            throw new IllegalStateException('write failed')
+        })
+
+        then:
+        IllegalStateException e = thrown()
+        e.message == 'write failed'
+        Files.readString(target, StandardCharsets.UTF_8) == 'old'
+        temporaryFiles(directory).empty
+    }
+
+    void 'write and replace removes temporary file when writer throws error'() {
+        given:
+        Path directory = Files.createTempDirectory(rootDirectory, 'atomic-error-failure')
+        Path target = directory.resolve('metadata.properties')
+        Files.writeString(target, 'old', StandardCharsets.UTF_8)
+
+        when:
+        LocalStorageIoSupport.writeAndReplace(target, directory, 'metadata', '.tmp', false, { output ->
+            output.write(bytes('partial'))
+            throw new AssertionError('write failed')
+        })
+
+        then:
+        AssertionError e = thrown()
+        e.message == 'write failed'
+        Files.readString(target, StandardCharsets.UTF_8) == 'old'
+        temporaryFiles(directory).empty
+    }
+
+    void 'upload removes stale matching temporary files without deleting fresh or unrelated files'() {
+        given:
+        Path temporaryDirectory = defaultTemporaryDirectory()
+        Files.createDirectories(temporaryDirectory)
+        Path staleTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-stale.tmp')
+        Path freshTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-fresh.tmp')
+        Path unrelatedTemporaryFile = temporaryDirectory.resolve('unrelated-stale.tmp')
+        Files.writeString(staleTemporaryFile, 'stale', StandardCharsets.UTF_8)
+        Files.writeString(freshTemporaryFile, 'fresh', StandardCharsets.UTF_8)
+        Files.writeString(unrelatedTemporaryFile, 'unrelated', StandardCharsets.UTF_8)
+        Files.setLastModifiedTime(staleTemporaryFile, staleFileTime())
+        Files.setLastModifiedTime(unrelatedTemporaryFile, staleFileTime())
+
+        when:
+        operations.upload(UploadRequest.fromBytes(bytes('created'), 'created.txt', 'text/plain'))
+
+        then:
+        !Files.exists(staleTemporaryFile)
+        Files.readString(freshTemporaryFile, StandardCharsets.UTF_8) == 'fresh'
+        Files.readString(unrelatedTemporaryFile, StandardCharsets.UTF_8) == 'unrelated'
+        text('created.txt') == 'created'
+    }
+
+    void 'stale cleanup does not delete active upload temporary files'() {
+        given:
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        Path cleanupTrigger = rootDirectory.resolve('cleanup-trigger')
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+        Future<?> upload = null
+
+        when:
+        upload = executor.submit({
+            operations.upload(new BlockingUploadRequest(bytes('active'), 'active.txt', writeStarted, allowWriteToFinish))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+        List<Path> activeTemporaryFiles = temporaryFiles(defaultTemporaryDirectory())
+        activeTemporaryFiles.size() == 1
+
+        when:
+        Path activeTemporaryFile = activeTemporaryFiles[0]
+        Files.setLastModifiedTime(activeTemporaryFile, staleFileTime())
+        LocalStorageIoSupport.writeAndReplace(cleanupTrigger, defaultTemporaryDirectory(), 'micronaut-object-storage-local', '.tmp', false, { output ->
+            output.write(bytes('trigger'))
+        })
+
+        then:
+        Files.exists(activeTemporaryFile)
+        Files.readString(cleanupTrigger, StandardCharsets.UTF_8) == 'trigger'
+
+        when:
+        allowWriteToFinish.countDown()
+        upload.get(5, TimeUnit.SECONDS)
+
+        then:
+        text('active.txt') == 'active'
+        temporaryFiles(defaultTemporaryDirectory()).empty
+
+        cleanup:
+        allowWriteToFinish.countDown()
+        executor?.shutdownNow()
+    }
+
+    private String text(String key) {
+        operations.retrieve(key).get().inputStream.withCloseable { input ->
+            new String(input.readAllBytes(), StandardCharsets.UTF_8)
+        }
+    }
+
+    private static byte[] bytes(String value) {
+        value.getBytes(StandardCharsets.UTF_8)
+    }
+
+    private Path defaultTemporaryDirectory() {
+        rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
+            .resolve('default')
+            .resolve(LocalStorageOperations.OBJECTS_DIRECTORY)
+    }
+
+    private static FileTime staleFileTime() {
+        FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+    }
+
+    private static void await(CountDownLatch latch) throws IOException {
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                throw new IOException('Timed out waiting for test writer to finish')
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt()
+            throw new IOException('Interrupted while waiting for test writer to finish', e)
+        }
+    }
+
+    private static List<Path> temporaryFiles(Path directory) {
+        if (!Files.exists(directory)) {
+            return []
+        }
+        Files.list(directory).withCloseable { stream ->
+            stream.filter { path -> path.fileName.toString().endsWith('.tmp') }.toList()
+        }
+    }
+
+    private static final class BlockingUploadRequest implements UploadRequest {
+        private final byte[] bytes
+        private final String key
+        private final CountDownLatch writeStarted
+        private final CountDownLatch allowWriteToFinish
+
+        private BlockingUploadRequest(byte[] bytes,
+                                      String key,
+                                      CountDownLatch writeStarted,
+                                      CountDownLatch allowWriteToFinish) {
+            this.bytes = bytes
+            this.key = key
+            this.writeStarted = writeStarted
+            this.allowWriteToFinish = allowWriteToFinish
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            Optional.of('text/plain')
+        }
+
+        @Override
+        String getKey() {
+            key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            Optional.of(bytes.length as Long)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            new BlockingInputStream(bytes, writeStarted, allowWriteToFinish)
+        }
+    }
+
+    private static final class BlockingInputStream extends InputStream {
+        private final byte[] bytes
+        private final CountDownLatch writeStarted
+        private final CountDownLatch allowWriteToFinish
+        private int index
+
+        private BlockingInputStream(byte[] bytes,
+                                    CountDownLatch writeStarted,
+                                    CountDownLatch allowWriteToFinish) {
+            this.bytes = bytes
+            this.writeStarted = writeStarted
+            this.allowWriteToFinish = allowWriteToFinish
+        }
+
+        @Override
+        int read() throws IOException {
+            if (index == bytes.length) {
+                return -1
+            }
+            if (index == 0) {
+                writeStarted.countDown()
+                await(allowWriteToFinish)
+            }
+            bytes[index++] & 0xff
+        }
+    }
+}

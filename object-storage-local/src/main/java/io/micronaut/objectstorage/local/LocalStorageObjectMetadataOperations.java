@@ -24,7 +24,6 @@ import io.micronaut.objectstorage.metadata.ObjectMetadataWrite;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Local object metadata operations.
@@ -70,37 +70,57 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
 
     @Override
     public void save(@NonNull ObjectMetadataWrite write) {
-        Path objectFile = layout.objectPath(write.key());
-        if (!Files.exists(objectFile, LinkOption.NOFOLLOW_LINKS)) {
-            throw new ObjectStorageException("Cannot persist metadata for a missing object: " + write.key());
-        }
-        Path metadataFile = prepareMetadataTarget(write.key());
-        ObjectMetadataWrite effectiveWrite = enrich(write, objectFile);
-        Properties properties = LocalStorageMetadataSupport.toProperties(effectiveWrite);
-        try (OutputStream metadataOut = LocalStorageIoSupport.newOutputStreamNoFollow(metadataFile, supportsPosixPermissions)) {
-            properties.store(metadataOut, "Metadata for file: " + write.key());
-        } catch (IOException e) {
-            throw new ObjectStorageException("Error storing metadata for object: " + write.key(), e);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
+        bucketLock.lock();
+        try {
+            Path objectFile = layout.objectPath(write.key());
+            if (!Files.exists(objectFile, LinkOption.NOFOLLOW_LINKS)) {
+                throw new ObjectStorageException("Cannot persist metadata for a missing object: " + write.key());
+            }
+            Path metadataFile = prepareMetadataTarget(write.key());
+            Path temporaryDirectory = prepareTemporaryDirectory(write.key());
+            ObjectMetadataWrite effectiveWrite = enrich(write, objectFile);
+            Properties properties = LocalStorageMetadataSupport.toProperties(effectiveWrite);
+            try {
+                LocalStorageIoSupport.writeAndReplace(
+                    metadataFile,
+                    temporaryDirectory,
+                    "micronaut-object-storage-local-metadata",
+                    ".tmp",
+                    supportsPosixPermissions,
+                    metadataOut -> properties.store(metadataOut, "Metadata for file: " + write.key())
+                );
+            } catch (IOException e) {
+                throw new ObjectStorageException("Error storing metadata for object: " + write.key(), e);
+            }
+        } finally {
+            bucketLock.unlock();
         }
     }
 
     @Override
     public void delete(@NonNull String key) {
-        List<IOException> failures = new ArrayList<>();
-        for (Path metadataFile : layout.objectMetadataDeletePaths(key)) {
-            try {
-                Files.delete(metadataFile);
-            } catch (NoSuchFileException e) {
-                // Missing metadata is the only absence signal. Other I/O failures must be reported.
-                continue;
-            } catch (IOException e) {
-                failures.add(e);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
+        bucketLock.lock();
+        try {
+            List<IOException> failures = new ArrayList<>();
+            for (Path metadataFile : layout.objectMetadataDeletePaths(key)) {
+                try {
+                    Files.delete(metadataFile);
+                } catch (NoSuchFileException e) {
+                    // Missing metadata is the only absence signal. Other I/O failures must be reported.
+                    continue;
+                } catch (IOException e) {
+                    failures.add(e);
+                }
             }
-        }
-        if (!failures.isEmpty()) {
-            IOException failure = failures.remove(0);
-            failures.forEach(failure::addSuppressed);
-            throw new ObjectStorageException("Error deleting metadata for object: " + key, failure);
+            if (!failures.isEmpty()) {
+                IOException failure = failures.remove(0);
+                failures.forEach(failure::addSuppressed);
+                throw new ObjectStorageException("Error deleting metadata for object: " + key, failure);
+            }
+        } finally {
+            bucketLock.unlock();
         }
     }
 
@@ -110,6 +130,20 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
             throw new ObjectStorageException("Error creating metadata directories for object: " + key);
         }
         return metadataFile;
+    }
+
+    private Path prepareTemporaryDirectory(String key) {
+        Path temporaryDirectory = layout.objectMetadataTemporaryDirectory();
+        try {
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            if (!LocalStorageIoSupport.mkdirs(layout.rootInternalDirectory(), temporaryDirectory, supportsPosixPermissions)) {
+                throw new ObjectStorageException("Error creating temporary metadata directories for object: " + key);
+            }
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            return temporaryDirectory;
+        } catch (IllegalArgumentException e) {
+            throw new ObjectStorageException("Error preparing temporary metadata directory for object: " + key, e);
+        }
     }
 
     private ObjectMetadataWrite enrich(ObjectMetadataWrite write, Path objectFile) {

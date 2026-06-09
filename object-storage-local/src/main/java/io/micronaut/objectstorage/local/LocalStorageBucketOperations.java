@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Local bucket operations.
@@ -53,10 +54,16 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
     @Override
     public void create(@NonNull String name) {
         Path path = layout.bucketPath(name);
+        Lock bucketLock = LocalStorageLocks.bucketWriteLock(path);
+        bucketLock.lock();
         try {
-            Files.createDirectories(path);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        } finally {
+            bucketLock.unlock();
         }
     }
 
@@ -73,16 +80,22 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
     @Override
     public void delete(@NonNull String name) {
         Path path = layout.bucketPath(name);
+        Lock bucketLock = LocalStorageLocks.bucketWriteLock(path);
+        bucketLock.lock();
         try {
             try {
-                deleteRecursively(path);
-            } catch (NoSuchFileException ignored) {
-                // Deleting a missing bucket is a no-op for user files, but provider state can still be stale.
+                try {
+                    deleteRecursively(path);
+                } catch (NoSuchFileException ignored) {
+                    // Deleting a missing bucket is a no-op for user files, but provider state can still be stale.
+                }
+                deleteProviderManagedBucketState(name);
+                bucketMetadataOperations.delete(name);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-            deleteProviderManagedBucketState(name);
-            bucketMetadataOperations.delete(name);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        } finally {
+            bucketLock.unlock();
         }
     }
 
@@ -96,7 +109,7 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
         try {
             deleteRecursively(path);
         } catch (NoSuchFileException ignored) {
-            // The bucket may not have provider-managed object metadata or snapshots.
+            // The bucket may not have provider-managed metadata, snapshots, or temporary files.
         }
     }
 

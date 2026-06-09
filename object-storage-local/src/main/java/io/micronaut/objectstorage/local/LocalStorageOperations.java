@@ -36,12 +36,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -51,6 +50,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -80,6 +81,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     static final String MULTIPART_DIRECTORY = LocalStorageLayout.MULTIPART_DIRECTORY;
     static final String SNAPSHOT_DIRECTORY = LocalStorageLayout.SNAPSHOT_DIRECTORY;
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
+    private static final String TEMPORARY_FILE_PREFIX = "micronaut-object-storage-local";
+    private static final String TEMPORARY_FILE_SUFFIX = ".tmp";
 
     private final LocalStorageConfiguration configuration;
     private final LocalStorageLayout layout;
@@ -129,30 +132,46 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @NonNull
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request,
                                                    @NonNull Consumer<LocalStorageFile> requestConsumer) {
-        Path file = layout.objectPath(request.getKey());
-        StoredFileSnapshot snapshot = snapshotStoredFile(file);
-        RuntimeException failure = null;
+        String key = request.getKey();
+        Path file = layout.objectPath(key);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
+        ReentrantLock mutationLock = LocalStorageLocks.objectMutationLock(file);
+        LocalStorageFile localFile;
+        bucketLock.lock();
         try {
-            storeFile(file, request.getInputStream());
-            objectMetadataOperations.save(new ObjectMetadataWrite(
-                request.getKey(),
-                request.getMetadata(),
-                Map.of(),
-                request.getContentType().orElse(null),
-                request.getContentSize().orElse(null),
-                null,
-                null
-            ));
-        } catch (RuntimeException e) {
-            failure = e;
-            restoreStoredFileAfterFailure(file, snapshot, e);
-            throw e;
+            mutationLock.lock();
+            try {
+                StoredFileSnapshot snapshot = snapshotStoredFile(file);
+                RuntimeException failure = null;
+                boolean preserveSnapshot = false;
+                try {
+                    storeFile(file, request.getInputStream());
+                    objectMetadataOperations.save(new ObjectMetadataWrite(
+                        key,
+                        request.getMetadata(),
+                        Map.of(),
+                        request.getContentType().orElse(null),
+                        request.getContentSize().orElse(null),
+                        null,
+                        null
+                    ));
+                } catch (RuntimeException e) {
+                    failure = e;
+                    boolean restored = restoreStoredFileAfterFailure(file, snapshot, e);
+                    preserveSnapshot = snapshot.exists() && !restored;
+                    throw e;
+                } finally {
+                    deleteSnapshot(snapshot, failure, preserveSnapshot);
+                }
+                localFile = new LocalStorageFile(file);
+            } finally {
+                mutationLock.unlock();
+            }
         } finally {
-            deleteSnapshot(snapshot, failure);
+            bucketLock.unlock();
         }
-        LocalStorageFile localFile = new LocalStorageFile(file);
         requestConsumer.accept(localFile);
-        return UploadResponse.of(request.getKey(), UUID.randomUUID().toString(), localFile);
+        return UploadResponse.of(key, UUID.randomUUID().toString(), localFile);
     }
 
     @Override
@@ -170,26 +189,38 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @Override
     @NonNull
     public LocalStorageFile delete(@NonNull String key) {
-        Optional<Path> file = retrieveFile(key);
-        if (file.isEmpty()) {
-            objectMetadataOperations.delete(key);
-            return new LocalStorageFile(null);
-        }
-        file.ifPresent(path -> {
-            StoredFileSnapshot snapshot = snapshotStoredFile(path);
-            RuntimeException failure = null;
+        Path path = layout.objectPath(key);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
+        ReentrantLock mutationLock = LocalStorageLocks.objectMutationLock(path);
+        bucketLock.lock();
+        try {
+            mutationLock.lock();
             try {
-                deleteFile(path);
-                objectMetadataOperations.delete(key);
-            } catch (RuntimeException e) {
-                failure = e;
-                restoreStoredFileAfterFailure(path, snapshot, e);
-                throw e;
+                StoredFileSnapshot snapshot = snapshotStoredFile(path);
+                if (!snapshot.exists()) {
+                    objectMetadataOperations.delete(key);
+                    return new LocalStorageFile(null);
+                }
+                RuntimeException failure = null;
+                boolean preserveSnapshot = false;
+                try {
+                    deleteFile(path);
+                    objectMetadataOperations.delete(key);
+                } catch (RuntimeException e) {
+                    failure = e;
+                    boolean restored = restoreStoredFileAfterFailure(path, snapshot, e);
+                    preserveSnapshot = snapshot.exists() && !restored;
+                    throw e;
+                } finally {
+                    deleteSnapshot(snapshot, failure, preserveSnapshot);
+                }
+                return new LocalStorageFile(path);
             } finally {
-                deleteSnapshot(snapshot, failure);
+                mutationLock.unlock();
             }
-        });
-        return new LocalStorageFile(file.orElse(null));
+        } finally {
+            bucketLock.unlock();
+        }
     }
 
     @Override
@@ -272,7 +303,50 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     @Override
     public void copy(@NonNull String sourceKey, @NonNull String destinationKey) {
-        retrieveFile(sourceKey).ifPresent(source -> copyStoredFile(sourceKey, source, destinationKey));
+        Path sourceFile = layout.objectPath(sourceKey);
+        Path destinationFile = layout.objectPath(destinationKey);
+        Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
+        bucketLock.lock();
+        try {
+            if (sourceFile.equals(destinationFile)) {
+                return;
+            }
+            int sourceLockIndex = LocalStorageLocks.objectMutationLockIndex(sourceFile);
+            int destinationLockIndex = LocalStorageLocks.objectMutationLockIndex(destinationFile);
+            ReentrantLock sourceLock = LocalStorageLocks.objectMutationLock(sourceLockIndex);
+            ReentrantLock destinationLock = LocalStorageLocks.objectMutationLock(destinationLockIndex);
+            if (sourceLock == destinationLock) {
+                sourceLock.lock();
+                try {
+                    retrieveFile(sourceKey).ifPresent(source -> copyStoredFile(sourceKey, source, destinationKey, destinationFile));
+                } finally {
+                    sourceLock.unlock();
+                }
+                return;
+            }
+            ReentrantLock firstLock;
+            ReentrantLock secondLock;
+            if (sourceLockIndex < destinationLockIndex) {
+                firstLock = sourceLock;
+                secondLock = destinationLock;
+            } else {
+                firstLock = destinationLock;
+                secondLock = sourceLock;
+            }
+            firstLock.lock();
+            try {
+                secondLock.lock();
+                try {
+                    retrieveFile(sourceKey).ifPresent(source -> copyStoredFile(sourceKey, source, destinationKey, destinationFile));
+                } finally {
+                    secondLock.unlock();
+                }
+            } finally {
+                firstLock.unlock();
+            }
+        } finally {
+            bucketLock.unlock();
+        }
     }
 
     private Optional<Path> retrieveFile(String key) {
@@ -292,24 +366,26 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
-    private void copyStoredFile(String sourceKey, Path source, String destinationKey) {
-        Path destinationFile = layout.objectPath(destinationKey);
+    private void copyStoredFile(String sourceKey, Path source, String destinationKey, Path destinationFile) {
         StoredFileSnapshot snapshot = snapshotStoredFile(destinationFile);
         RuntimeException failure = null;
+        boolean preserveSnapshot = false;
         try (InputStream in = newInputStreamNoFollow(source)) {
             storeFile(destinationFile, in);
             copyObjectMetadata(sourceKey, destinationKey);
         } catch (IOException e) {
             ObjectStorageException objectStorageException = new ObjectStorageException("Error copying file: " + source, e);
             failure = objectStorageException;
-            restoreStoredFileAfterFailure(destinationFile, snapshot, objectStorageException);
+            boolean restored = restoreStoredFileAfterFailure(destinationFile, snapshot, objectStorageException);
+            preserveSnapshot = snapshot.exists() && !restored;
             throw objectStorageException;
         } catch (RuntimeException e) {
             failure = e;
-            restoreStoredFileAfterFailure(destinationFile, snapshot, e);
+            boolean restored = restoreStoredFileAfterFailure(destinationFile, snapshot, e);
+            preserveSnapshot = snapshot.exists() && !restored;
             throw e;
         } finally {
-            deleteSnapshot(snapshot, failure);
+            deleteSnapshot(snapshot, failure, preserveSnapshot);
         }
     }
 
@@ -329,9 +405,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private StoredFileSnapshot snapshotStoredFile(Path file) {
-        if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
-            return StoredFileSnapshot.empty();
-        }
         Path snapshotDirectory = layout.snapshotBucketDirectory();
         List<Path> cleanupDirectories = layout.snapshotCleanupDirectories();
         try {
@@ -340,15 +413,26 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), snapshotDirectory);
             Path snapshot = LocalStorageIoSupport.createTempFile(
                 snapshotDirectory,
-                "micronaut-object-storage-local",
+                TEMPORARY_FILE_PREFIX,
                 ".snapshot",
                 supportsPosixPermissions
             );
             return copyStoredFileToSnapshot(file, snapshot, cleanupDirectories);
+        } catch (NoSuchFileException e) {
+            if (isMissingStoredFile(file, e)) {
+                deleteEmptySnapshotDirectories(cleanupDirectories, null);
+                return StoredFileSnapshot.empty();
+            }
+            deleteEmptySnapshotDirectories(cleanupDirectories, e);
+            throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         } catch (IOException e) {
             deleteEmptySnapshotDirectories(cleanupDirectories, e);
             throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         }
+    }
+
+    private static boolean isMissingStoredFile(Path file, NoSuchFileException e) {
+        return file.toString().equals(e.getFile());
     }
 
     private StoredFileSnapshot copyStoredFileToSnapshot(Path file, Path snapshot, List<Path> cleanupDirectories) throws IOException {
@@ -366,7 +450,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return new StoredFileSnapshot(snapshot, cleanupDirectories);
     }
 
-    private void restoreStoredFileAfterFailure(Path file, StoredFileSnapshot snapshot, RuntimeException failure) {
+    private boolean restoreStoredFileAfterFailure(Path file, StoredFileSnapshot snapshot, RuntimeException failure) {
         try {
             // Restore only the local file state; metadata-store transactionality belongs to the metadata implementation.
             if (snapshot.exists()) {
@@ -374,34 +458,26 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             } else {
                 Files.deleteIfExists(file);
             }
+            return true;
         } catch (IOException | RuntimeException e) {
             failure.addSuppressed(e);
+            return false;
         }
     }
 
     private void moveSnapshotReplacing(Path snapshot, Path file) throws IOException {
-        try {
-            Files.move(snapshot, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-        } catch (AtomicMoveNotSupportedException e) {
-            try {
-                Files.move(snapshot, file, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException fallbackFailure) {
-                fallbackFailure.addSuppressed(e);
-                throw fallbackFailure;
-            }
-        }
+        LocalStorageIoSupport.moveReplacing(snapshot, file);
     }
 
-    private void deleteSnapshot(StoredFileSnapshot snapshot, RuntimeException failure) {
+    private void deleteSnapshot(StoredFileSnapshot snapshot, RuntimeException failure, boolean preserveSnapshot) {
+        if (preserveSnapshot) {
+            return;
+        }
         if (snapshot.exists()) {
             try {
                 Files.deleteIfExists(snapshot.path());
             } catch (IOException e) {
-                if (failure != null) {
-                    failure.addSuppressed(e);
-                } else {
-                    throw new ObjectStorageException("Error deleting temporary file snapshot: " + snapshot.path(), e);
-                }
+                recordSnapshotCleanupFailure(failure, e);
             }
         }
         deleteEmptySnapshotDirectories(snapshot.cleanupDirectories(), failure);
@@ -416,28 +492,43 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
+        deleteEmptyDirectories(directories, failure);
+    }
+
+    private void deleteEmptyDirectories(List<Path> directories, Throwable failure) {
         for (Path directory : directories) {
             try {
                 Files.deleteIfExists(directory);
             } catch (DirectoryNotEmptyException ignored) {
-                // Another temporary snapshot still uses this directory.
+                // Another snapshot or provider-managed file still uses this directory.
             } catch (IOException e) {
-                if (failure != null) {
-                    failure.addSuppressed(e);
-                } else {
-                    throw new ObjectStorageException("Error deleting temporary snapshot directory: " + directory, e);
-                }
+                recordSnapshotCleanupFailure(failure, e);
             }
         }
     }
 
+    private static void recordSnapshotCleanupFailure(Throwable failure, IOException cleanupFailure) {
+        if (failure != null) {
+            failure.addSuppressed(cleanupFailure);
+        }
+        // After a successful mutation, leftover snapshots are cleanup debt, not operation failure.
+    }
+
     private Path storeFile(Path file, InputStream inputStream) {
+        mkdirs(configuration.getPath(), file.getParent());
+        Path temporaryDirectory = layout.objectTemporaryDirectory();
         try (InputStream in = inputStream) {
-            mkdirs(configuration.getPath(), file.getParent());
-            try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
-                in.transferTo(fileOut);
-                return file;
-            }
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            mkdirs(layout.rootInternalDirectory(), temporaryDirectory);
+            LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
+            return LocalStorageIoSupport.writeAndReplace(
+                file,
+                temporaryDirectory,
+                TEMPORARY_FILE_PREFIX,
+                TEMPORARY_FILE_SUFFIX,
+                supportsPosixPermissions,
+                in::transferTo
+            );
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
         }
@@ -445,10 +536,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private boolean mkdirs(Path rootPath, Path path) {
         return LocalStorageIoSupport.mkdirs(rootPath, path, supportsPosixPermissions);
-    }
-
-    private OutputStream newOutputStreamNoFollow(Path file) throws IOException {
-        return LocalStorageIoSupport.newOutputStreamNoFollow(file, supportsPosixPermissions);
     }
 
     private static InputStream newInputStreamNoFollow(Path path) throws IOException {

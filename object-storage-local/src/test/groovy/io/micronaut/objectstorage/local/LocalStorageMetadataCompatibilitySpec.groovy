@@ -11,7 +11,9 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFilePermission
+import java.util.concurrent.TimeUnit
 import java.util.Properties
 
 class LocalStorageMetadataCompatibilitySpec extends Specification {
@@ -98,6 +100,70 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         entry.etag == 'etag-1'
     }
 
+    void 'stale temp cleanup does not delete object metadata sidecars with temp-like names'() {
+        given:
+        String victimKey = 'micronaut-object-storage-local-metadata-victim.tmp'
+        String otherKey = 'unrelated.txt'
+        def operations = ctx.getBean(LocalStorageOperations)
+        def metadataOperations = ctx.getBean(LocalStorageObjectMetadataOperations)
+        UploadRequest victimRequest = UploadRequest.fromBytes('victim'.bytes, victimKey, 'text/plain')
+        victimRequest.metadata = [role: 'victim']
+        operations.upload(victimRequest)
+        operations.upload(UploadRequest.fromBytes('other'.bytes, otherKey, 'text/plain'))
+        Path victimMetadataFile = rootObjectMetadataFile(victimKey)
+        Files.setLastModifiedTime(victimMetadataFile, staleFileTime())
+
+        when:
+        metadataOperations.save(new ObjectMetadataWrite(
+            otherKey,
+            [role: 'other'],
+            [:],
+            'text/plain',
+            null,
+            null,
+            null
+        ))
+
+        then:
+        Files.exists(victimMetadataFile)
+        metadataOperations.retrieve(victimKey).get().metadata == [role: 'victim']
+    }
+
+    void 'object metadata save removes stale matching temporary files'() {
+        given:
+        String key = 'metadata-cleanup.txt'
+        def operations = ctx.getBean(LocalStorageOperations)
+        def metadataOperations = ctx.getBean(LocalStorageObjectMetadataOperations)
+        operations.upload(UploadRequest.fromBytes('content'.bytes, key, 'text/plain'))
+        Path temporaryDirectory = objectMetadataTemporaryDirectory()
+        Files.createDirectories(temporaryDirectory)
+        Path staleTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-metadata-stale.tmp')
+        Path freshTemporaryFile = temporaryDirectory.resolve('micronaut-object-storage-local-metadata-fresh.tmp')
+        Path unrelatedTemporaryFile = temporaryDirectory.resolve('unrelated-stale.tmp')
+        Files.writeString(staleTemporaryFile, 'stale')
+        Files.writeString(freshTemporaryFile, 'fresh')
+        Files.writeString(unrelatedTemporaryFile, 'unrelated')
+        Files.setLastModifiedTime(staleTemporaryFile, staleFileTime())
+        Files.setLastModifiedTime(unrelatedTemporaryFile, staleFileTime())
+
+        when:
+        metadataOperations.save(new ObjectMetadataWrite(
+            key,
+            [role: 'updated'],
+            [:],
+            'text/plain',
+            null,
+            null,
+            null
+        ))
+
+        then:
+        !Files.exists(staleTemporaryFile)
+        Files.readString(freshTemporaryFile) == 'fresh'
+        Files.readString(unrelatedTemporaryFile) == 'unrelated'
+        metadataOperations.retrieve(key).get().metadata == [role: 'updated']
+    }
+
     void 'object delete removes root and legacy metadata sidecars'() {
         given:
         Files.createDirectories(bucketPath)
@@ -171,6 +237,13 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
             .resolve(key)
     }
 
+    private Path objectMetadataTemporaryDirectory() {
+        rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+            .resolve(LocalStorageLayout.TEMPORARY_DIRECTORY)
+            .resolve('default')
+            .resolve(LocalStorageLayout.OBJECT_METADATA_TEMPORARY_DIRECTORY)
+    }
+
     private Path legacyObjectMetadataFile(String key) {
         bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY)
             .resolve(key)
@@ -185,6 +258,10 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         Files.newOutputStream(path).withCloseable {
             legacy.store(it, 'legacy metadata')
         }
+    }
+
+    private static FileTime staleFileTime() {
+        FileTime.fromMillis(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
     }
 
     private static void restorePermissions(Path directory, Set<PosixFilePermission> permissions) {

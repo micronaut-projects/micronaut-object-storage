@@ -17,21 +17,36 @@ NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperation
 api:objectstorage.ObjectStorageOperations[].
 
 NOTE: The local storage implementation reserves the `.mn-storage` key namespace for provider-managed metadata,
-multipart upload state, and temporary rollback files. It also reserves the legacy `.metadata` key namespace used by
-released older versions for metadata sidecars. User object keys cannot be `.mn-storage`, `.metadata`, or start with
-either reserved namespace followed by `/` (or the equivalent platform file separator). Local bucket names and configured
-local bucket directory names cannot use those reserved namespaces either.
+multipart upload state, temporary write files, and temporary rollback files. It also reserves the legacy `.metadata` key
+namespace used by released older versions for metadata sidecars. User object keys cannot be `.mn-storage`, `.metadata`,
+or start with either reserved namespace followed by `/` (or the equivalent platform file separator). Local bucket names
+and configured local bucket directory names cannot use those reserved namespaces either.
 
 The local implementation is also the reference provider for
 api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[].
 Provider-managed files live under one `.mn-storage` directory in the storage root that contains the configured bucket.
 Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata sidecars live under
 `.mn-storage/metadata/buckets/<bucket>`, in-progress multipart upload state lives under
-`.mn-storage/multipart/<bucket>`, and temporary local file rollback snapshots live under `.mn-storage/snapshots/<bucket>`.
+`.mn-storage/multipart/<bucket>`, temporary local file rollback snapshots live under `.mn-storage/snapshots/<bucket>`,
+and in-flight local file writes use typed provider temp directories under `.mn-storage/tmp/<bucket>`, such as `objects`,
+`object-metadata`, and `bucket-metadata`. Before creating a new replacement temporary file, local writes opportunistically
+attempt best-effort removal of matching replacement temporary files older than one day from the relevant typed provider
+temp directory. Rollback snapshots are normally removed after the local mutation completes, but a cleanup failure after a
+committed mutation can leave snapshot cleanup debt; rollback snapshots are not part of the one-day replacement temp
+cleanup. Temp-file replacement uses atomic moves where supported by the local file system, with a non-atomic replace
+fallback and best-effort directory synchronization where those operations are unavailable. Within a single JVM, local
+writes, deletes, and copies that mutate the same object path are serialized so a failed metadata operation rollback does
+not replace a later same-path mutation. Bucket deletion is also serialized against in-flight object mutations for that
+bucket in the same JVM and removes provider-managed object metadata sidecars, multipart upload state, rollback snapshots,
+replacement temporary files, and built-in local bucket metadata for that bucket. These guarantees are per file. Object
+byte replacement and metadata persistence are separate operations; the local provider does not provide a single
+crash-atomic transaction across both. Custom metadata providers, including database-backed implementations, are
+responsible for their own metadata durability, cleanup lifecycle, and any higher-level transaction or compensation
+behavior.
 
-For compatibility with persistent local storage paths created by released older versions, metadata reads also check
-legacy per-bucket `.metadata` sidecars. New metadata writes use the root `.mn-storage` layout, and deletes remove both
-the root sidecar and the legacy `.metadata` sidecar for the deleted object.
+For compatibility with persistent local storage paths created by released older versions, the built-in local sidecar
+metadata provider also checks legacy per-bucket `.metadata` sidecars. New built-in sidecar metadata writes use the root
+`.mn-storage` layout, and deletes remove both the root sidecar and the legacy `.metadata` sidecar for the deleted object.
 
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 

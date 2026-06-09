@@ -28,6 +28,9 @@ final class LocalStorageLayout {
     static final String BUCKETS_DIRECTORY = "buckets";
     static final String MULTIPART_DIRECTORY = "multipart";
     static final String SNAPSHOT_DIRECTORY = "snapshots";
+    static final String TEMPORARY_DIRECTORY = "tmp";
+    static final String OBJECT_METADATA_TEMPORARY_DIRECTORY = "object-metadata";
+    static final String BUCKET_METADATA_TEMPORARY_DIRECTORY = "bucket-metadata";
 
     private final Path bucketPath;
     private final Path storageRoot;
@@ -54,6 +57,10 @@ final class LocalStorageLayout {
 
     Path storageRoot() {
         return storageRoot;
+    }
+
+    Path configuredBucketPath() {
+        return bucketPath.toAbsolutePath().normalize();
     }
 
     Path requireBucketRoot(String component) {
@@ -158,11 +165,37 @@ final class LocalStorageLayout {
         );
     }
 
+    Path temporaryBucketDirectory() {
+        return rootInternalDirectory()
+            .resolve(TEMPORARY_DIRECTORY)
+            .resolve(bucketName);
+    }
+
+    Path temporaryBucketDirectory(String name) {
+        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("temporary file cleanup"), name);
+        return rootInternalDirectory()
+            .resolve(TEMPORARY_DIRECTORY)
+            .resolve(name);
+    }
+
+    Path objectTemporaryDirectory() {
+        return temporaryBucketDirectory().resolve(OBJECTS_DIRECTORY);
+    }
+
+    Path objectMetadataTemporaryDirectory() {
+        return temporaryBucketDirectory().resolve(OBJECT_METADATA_TEMPORARY_DIRECTORY);
+    }
+
+    Path bucketMetadataTemporaryDirectory(String name) {
+        return temporaryBucketDirectory(name).resolve(BUCKET_METADATA_TEMPORARY_DIRECTORY);
+    }
+
     List<Path> providerManagedBucketDirectories(String name) {
         return List.of(
             objectMetadataBucketRoot(name),
             multipartBucketDirectory(name),
-            snapshotBucketDirectory(name)
+            snapshotBucketDirectory(name),
+            temporaryBucketDirectory(name)
         );
     }
 
