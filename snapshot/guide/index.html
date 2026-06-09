@@ -1122,7 +1122,7 @@ This contract is additive to <a href="../api/io/micronaut/objectstorage/ObjectSt
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Local Storage</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Not yet supported</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Supported</p></td>
 </tr>
 </tbody>
 </table>
@@ -1148,7 +1148,8 @@ This contract is additive to <a href="../api/io/micronaut/objectstorage/ObjectSt
 <li>
 <p>Providers may enforce their own part-size limits. Amazon S3 requires each non-final part to be at least
 5 MiB. Oracle Cloud Infrastructure Object Storage requires stricter non-final chunks; use chunks greater
-than 10 MiB, for example 11 MiB. The final part may be smaller.</p>
+than 10 MiB, for example 11 MiB. The local storage provider does not enforce a multipart part-size
+minimum. The final part may be smaller.</p>
 </li>
 <li>
 <p><code>listParts</code> is read-only and exposes provider pagination through opaque continuation tokens.</p>
@@ -2573,11 +2574,11 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The local storage implementation reserves the <code>.mn-storage</code> key namespace for provider-managed metadata and
-temporary rollback files. It also reserves the legacy <code>.metadata</code> key namespace used by released older versions for
-metadata sidecars. User object keys cannot be <code>.mn-storage</code>, <code>.metadata</code>, or start with either reserved namespace
-followed by <code>/</code> (or the equivalent platform file separator). Local bucket names and configured local bucket directory
-names cannot use those reserved namespaces either.
+The local storage implementation reserves the <code>.mn-storage</code> key namespace for provider-managed metadata,
+multipart upload state, and temporary rollback files. It also reserves the legacy <code>.metadata</code> key namespace used by
+released older versions for metadata sidecars. User object keys cannot be <code>.mn-storage</code>, <code>.metadata</code>, or start with
+either reserved namespace followed by <code>/</code> (or the equivalent platform file separator). Local bucket names and configured
+local bucket directory names cannot use those reserved namespaces either.
 </td>
 </tr>
 </table>
@@ -2587,8 +2588,8 @@ names cannot use those reserved namespaces either.
 <a href="../api/io/micronaut/objectstorage/metadata/ObjectMetadataOperations.html">ObjectMetadataOperations</a> and <a href="../api/io/micronaut/objectstorage/metadata/BucketMetadataOperations.html">BucketMetadataOperations</a>.
 Provider-managed files live under one <code>.mn-storage</code> directory in the storage root that contains the configured bucket.
 Object metadata sidecars live under <code>.mn-storage/metadata/objects/&lt;bucket&gt;/&lt;key&gt;</code>, bucket metadata sidecars live under
-<code>.mn-storage/metadata/buckets/&lt;bucket&gt;</code>, and temporary local file rollback snapshots live under
-<code>.mn-storage/snapshots/&lt;bucket&gt;</code>.</p>
+<code>.mn-storage/metadata/buckets/&lt;bucket&gt;</code>, in-progress multipart upload state lives under
+<code>.mn-storage/multipart/&lt;bucket&gt;</code>, and temporary local file rollback snapshots live under <code>.mn-storage/snapshots/&lt;bucket&gt;</code>.</p>
 </div>
 <div class="paragraph">
 <p>For compatibility with persistent local storage paths created by released older versions, metadata reads also check
@@ -2711,7 +2712,9 @@ restrictive ACLs by the caller.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/local/LocalStorageOperations.html">LocalStorageOperations</a>.</p>
+<p>The concrete implementation of <code>ObjectStorageOperations</code> is <a href="../api/io/micronaut/objectstorage/local/LocalStorageOperations.html">LocalStorageOperations</a>.
+The local module also provides <a href="../api/io/micronaut/objectstorage/multipart/MultipartObjectStorageOperations.html">MultipartObjectStorageOperations</a> for multipart upload lifecycle support.
+See the <a href="#multipartUploads">Multipart Uploads</a> guide for the portable multipart API.</p>
 </div>
 
 <h1 id="control-panel"><a class="anchor" href="#control-panel"></a>15 Control Panel</h1>
