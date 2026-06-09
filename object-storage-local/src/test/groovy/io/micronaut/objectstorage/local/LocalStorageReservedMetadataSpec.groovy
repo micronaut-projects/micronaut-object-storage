@@ -83,8 +83,11 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.upload(UploadRequest.fromBytes('visible'.bytes, 'visible.txt', 'text/plain'))
         def bucketPath = operations.retrieve('visible.txt').get().nativeEntry.parent
         Path internalDirectory = bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY)
+        Path multipartDirectory = internalDirectory.resolve(LocalStorageOperations.MULTIPART_DIRECTORY)
         Path snapshotDirectory = internalDirectory.resolve(LocalStorageOperations.SNAPSHOT_DIRECTORY)
         Path legacyMetadataDirectory = bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY)
+        Files.createDirectories(multipartDirectory)
+        Files.writeString(multipartDirectory.resolve('temporary'), 'hidden')
         Files.createDirectories(snapshotDirectory)
         Files.writeString(snapshotDirectory.resolve('temporary'), 'hidden')
         Files.createDirectories(legacyMetadataDirectory)
@@ -94,6 +97,7 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage/')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage/metadata')).keys.empty
+        operations.listObjects(new ListObjectsRequest(5, '.mn-storage/multipart')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.mn-storage/snapshots')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.metadata')).keys.empty
         operations.listObjects(new ListObjectsRequest(5, '.metadata/')).keys.empty
@@ -103,6 +107,8 @@ class LocalStorageReservedMetadataSpec extends Specification implements TestProp
         cleanup:
         Files.deleteIfExists(legacyMetadataDirectory.resolve('visible.txt'))
         Files.deleteIfExists(legacyMetadataDirectory)
+        Files.deleteIfExists(multipartDirectory.resolve('temporary'))
+        Files.deleteIfExists(multipartDirectory)
         Files.deleteIfExists(snapshotDirectory.resolve('temporary'))
         Files.deleteIfExists(snapshotDirectory)
     }

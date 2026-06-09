@@ -32,7 +32,7 @@ The multipart lifecycle uses the following portable request and response types:
 | Supported
 
 | Local Storage
-| Not yet supported
+| Supported
 |===
 
 == Lifecycle Rules
@@ -43,7 +43,8 @@ The multipart lifecycle uses the following portable request and response types:
 - Object metadata and content type are set when creating the multipart upload, not on each individual part.
 - Providers may enforce their own part-size limits. Amazon S3 requires each non-final part to be at least
   5 MiB. Oracle Cloud Infrastructure Object Storage requires stricter non-final chunks; use chunks greater
-  than 10 MiB, for example 11 MiB. The final part may be smaller.
+  than 10 MiB, for example 11 MiB. The local storage provider does not enforce a multipart part-size
+  minimum. The final part may be smaller.
 - `listParts` is read-only and exposes provider pagination through opaque continuation tokens.
 - `completeMultipartUpload` requires a strictly ordered part manifest.
 - Retrying `completeMultipartUpload` is only safe when reusing the same upload id and exact part manifest.

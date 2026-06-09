@@ -5,6 +5,7 @@ import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.Requires
 import io.micronaut.objectstorage.ObjectStorageOperations
+import io.micronaut.objectstorage.multipart.MultipartObjectStorageOperations
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
@@ -36,6 +37,17 @@ class LocalStoragePrimarySpec extends Specification {
 
         then:
         operations instanceof LocalStorageOperations
+    }
+
+    void "local multipart storage is primary"() {
+        when:
+        def beans = ctx.getBeansOfType(MultipartObjectStorageOperations)
+        def operations = ctx.getBean(MultipartObjectStorageOperations)
+
+        then:
+        beans.size() == 2
+        beans.any { it instanceof LocalStorageMultipartOperations }
+        operations instanceof LocalStorageMultipartOperations
     }
 
     @Requires(property = "spec.name", value = SPEC_NAME)

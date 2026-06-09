@@ -26,6 +26,7 @@ final class LocalStorageLayout {
     static final String METADATA_DIRECTORY = "metadata";
     static final String OBJECTS_DIRECTORY = "objects";
     static final String BUCKETS_DIRECTORY = "buckets";
+    static final String MULTIPART_DIRECTORY = "multipart";
     static final String SNAPSHOT_DIRECTORY = "snapshots";
 
     private final Path bucketPath;
@@ -85,8 +86,7 @@ final class LocalStorageLayout {
     }
 
     Path objectMetadataBucketRoot(String name) {
-        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("object metadata cleanup"), name);
-        return objectMetadataRoot().resolve(name);
+        return providerManagedBucketDirectory(name, objectMetadataRoot(), "object metadata cleanup");
     }
 
     Path objectMetadataFile(String key) {
@@ -126,15 +126,42 @@ final class LocalStorageLayout {
     }
 
     Path snapshotBucketDirectory(String name) {
-        LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("snapshot cleanup"), name);
-        return rootInternalDirectory()
-            .resolve(SNAPSHOT_DIRECTORY)
-            .resolve(name);
+        return providerManagedBucketDirectory(
+            name,
+            rootInternalDirectory().resolve(SNAPSHOT_DIRECTORY),
+            "snapshot cleanup"
+        );
+    }
+
+    Path multipartBucketDirectory() {
+        Path multipartBucketDirectory = rootInternalDirectory()
+            .resolve(MULTIPART_DIRECTORY)
+            .resolve(bucketName);
+        LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, multipartBucketDirectory);
+        return multipartBucketDirectory;
+    }
+
+    Path multipartBucketDirectory(String name) {
+        return providerManagedBucketDirectory(
+            name,
+            rootInternalDirectory().resolve(MULTIPART_DIRECTORY),
+            "multipart upload cleanup"
+        );
+    }
+
+    List<Path> multipartCleanupDirectories() {
+        Path multipartBucketDirectory = multipartBucketDirectory();
+        return List.of(
+            multipartBucketDirectory,
+            multipartBucketDirectory.getParent(),
+            rootInternalDirectory()
+        );
     }
 
     List<Path> providerManagedBucketDirectories(String name) {
         return List.of(
             objectMetadataBucketRoot(name),
+            multipartBucketDirectory(name),
             snapshotBucketDirectory(name)
         );
     }
@@ -152,6 +179,13 @@ final class LocalStorageLayout {
         Path metadataRoot = bucketPath.resolve(LEGACY_METADATA_DIRECTORY);
         LocalStorageIoSupport.rejectSymbolicLinks(bucketPath.normalize(), metadataRoot.normalize());
         return LocalStorageIoSupport.resolveSafe(metadataRoot, key);
+    }
+
+    private Path providerManagedBucketDirectory(String name, Path root, String component) {
+        requireBucketRoot(component);
+        Path bucketDirectory = LocalStorageIoSupport.resolveBucketPath(root, name);
+        LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, bucketDirectory);
+        return bucketDirectory;
     }
 
     static Optional<String> reservedLocalStorageNamespace(String name) {

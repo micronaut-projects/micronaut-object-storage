@@ -16,18 +16,18 @@ micronaut:
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
 
-NOTE: The local storage implementation reserves the `.mn-storage` key namespace for provider-managed metadata and
-temporary rollback files. It also reserves the legacy `.metadata` key namespace used by released older versions for
-metadata sidecars. User object keys cannot be `.mn-storage`, `.metadata`, or start with either reserved namespace
-followed by `/` (or the equivalent platform file separator). Local bucket names and configured local bucket directory
-names cannot use those reserved namespaces either.
+NOTE: The local storage implementation reserves the `.mn-storage` key namespace for provider-managed metadata,
+multipart upload state, and temporary rollback files. It also reserves the legacy `.metadata` key namespace used by
+released older versions for metadata sidecars. User object keys cannot be `.mn-storage`, `.metadata`, or start with
+either reserved namespace followed by `/` (or the equivalent platform file separator). Local bucket names and configured
+local bucket directory names cannot use those reserved namespaces either.
 
 The local implementation is also the reference provider for
 api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[].
 Provider-managed files live under one `.mn-storage` directory in the storage root that contains the configured bucket.
 Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata sidecars live under
-`.mn-storage/metadata/buckets/<bucket>`, and temporary local file rollback snapshots live under
-`.mn-storage/snapshots/<bucket>`.
+`.mn-storage/metadata/buckets/<bucket>`, in-progress multipart upload state lives under
+`.mn-storage/multipart/<bucket>`, and temporary local file rollback snapshots live under `.mn-storage/snapshots/<bucket>`.
 
 For compatibility with persistent local storage paths created by released older versions, metadata reads also check
 legacy per-bucket `.metadata` sidecars. New metadata writes use the root `.mn-storage` layout, and deletes remove both
@@ -51,3 +51,5 @@ include::doc-examples/example-java/src/test/resources/application-testing.yml[]
 ----
 
 The concrete implementation of `ObjectStorageOperations` is api:objectstorage.local.LocalStorageOperations[].
+The local module also provides api:objectstorage.multipart.MultipartObjectStorageOperations[] for multipart upload lifecycle support.
+See the <<multipartUploads,Multipart Uploads>> guide for the portable multipart API.

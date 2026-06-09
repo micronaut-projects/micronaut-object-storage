@@ -77,6 +77,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     static final String INTERNAL_DIRECTORY = LocalStorageLayout.INTERNAL_DIRECTORY;
     static final String LEGACY_METADATA_DIRECTORY = LocalStorageLayout.LEGACY_METADATA_DIRECTORY;
     static final String OBJECTS_DIRECTORY = LocalStorageLayout.OBJECTS_DIRECTORY;
+    static final String MULTIPART_DIRECTORY = LocalStorageLayout.MULTIPART_DIRECTORY;
     static final String SNAPSHOT_DIRECTORY = LocalStorageLayout.SNAPSHOT_DIRECTORY;
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
 
@@ -431,10 +432,12 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private Path storeFile(Path file, InputStream inputStream) {
-        mkdirs(configuration.getPath(), file.getParent());
-        try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
-            inputStream.transferTo(fileOut);
-            return file;
+        try (InputStream in = inputStream) {
+            mkdirs(configuration.getPath(), file.getParent());
+            try (OutputStream fileOut = newOutputStreamNoFollow(file)) {
+                in.transferTo(fileOut);
+                return file;
+            }
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
         }
