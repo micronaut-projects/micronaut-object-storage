@@ -86,6 +86,30 @@ final class LocalStorageIoSupport {
         return Files.createTempFile(directory, prefix, suffix);
     }
 
+    static OutputStream newOutputStreamNoFollow(Path file, boolean supportsPosixPermissions) throws IOException {
+        if (supportsPosixPermissions) {
+            try {
+                return Channels.newOutputStream(FileChannel.open(
+                    file,
+                    Set.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW, LinkOption.NOFOLLOW_LINKS),
+                    FILE_PERMISSIONS_ATTRIBUTE
+                ));
+            } catch (FileAlreadyExistsException ignored) {
+                Files.setPosixFilePermissions(file, FILE_PERMISSIONS);
+                return Channels.newOutputStream(FileChannel.open(
+                    file,
+                    Set.of(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS)
+                ));
+            }
+        }
+        return Channels.newOutputStream(Files.newByteChannel(file, Set.of(
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING,
+            StandardOpenOption.WRITE,
+            LinkOption.NOFOLLOW_LINKS
+        )));
+    }
+
     static Path writeAndReplace(Path file,
                                 Path temporaryDirectory,
                                 String temporaryPrefix,

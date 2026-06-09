@@ -517,7 +517,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     private Path storeFile(Path file, InputStream inputStream) {
         mkdirs(configuration.getPath(), file.getParent());
         Path temporaryDirectory = layout.objectTemporaryDirectory();
-        try {
+        try (InputStream in = inputStream) {
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
             mkdirs(layout.rootInternalDirectory(), temporaryDirectory);
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
@@ -527,7 +527,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 TEMPORARY_FILE_PREFIX,
                 TEMPORARY_FILE_SUFFIX,
                 supportsPosixPermissions,
-                inputStream::transferTo
+                in::transferTo
             );
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
