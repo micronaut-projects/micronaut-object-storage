@@ -187,6 +187,12 @@ public interface UploadRequest {
     Optional<Long> getContentSize();
 
     /**
+     * Returns an input stream of the object to be stored.
+     *
+     * <p>Callers must not access the stream while an upload is in progress. Provider implementations
+     * may close it, so callers that own the stream should ensure it is closed after a blocking upload
+     * returns or after a reactive upload terminates.</p>
+     *
      * @return an input stream of the object to be stored.
      */
     @NonNull

@@ -27,9 +27,15 @@ import java.util.Optional;
 /**
  * An {@link UploadRequest} backed by an {@link InputStream}.
  *
- * <p>The request returns the same stream instance and is intended for a single upload. Providing the
- * content length allows providers to stream the request without buffering and is required by some
- * provider operations.</p>
+ * <p>The request returns the same stream instance and does not copy or buffer its contents. Callers
+ * must not access the stream while an upload is in progress. Provider implementations may close the
+ * stream, so callers that own it should ensure it is closed after a blocking upload returns or after
+ * a reactive upload terminates.</p>
+ *
+ * <p>Because the stream is not recreated, automatic retries may require a stream that supports
+ * {@link InputStream#mark(int)} and {@link InputStream#reset()}. A non-repeatable stream may fail if a
+ * provider retries after consuming part of it. Providing the content length allows providers to
+ * stream the request without buffering and is required by some provider operations.</p>
  *
  * @since 3.1.0
  */
@@ -60,7 +66,7 @@ public class InputStreamUploadRequest extends AbstractUploadRequest {
      *
      * @param inputStream the source input stream.
      * @param key the key under which the object will be stored.
-     * @param contentLength the content length, in bytes.
+     * @param contentLength the number of bytes to read from the stream.
      * @since 3.1.0
      */
     public InputStreamUploadRequest(@NonNull InputStream inputStream,
@@ -75,7 +81,7 @@ public class InputStreamUploadRequest extends AbstractUploadRequest {
      * @param inputStream the source input stream.
      * @param key the key under which the object will be stored.
      * @param contentType the content type, or {@code null} when unknown.
-     * @param contentLength the content length in bytes, or {@code null} when unknown.
+     * @param contentLength the number of bytes to read from the stream, or {@code null} when unknown.
      * @since 3.1.0
      */
     public InputStreamUploadRequest(@NonNull InputStream inputStream,
@@ -91,7 +97,7 @@ public class InputStreamUploadRequest extends AbstractUploadRequest {
      * @param inputStream the source input stream.
      * @param key the key under which the object will be stored.
      * @param contentType the content type, or {@code null} when unknown.
-     * @param contentLength the content length in bytes, or {@code null} when unknown.
+     * @param contentLength the number of bytes to read from the stream, or {@code null} when unknown.
      * @param metadata key-value pairs to store with the object.
      * @since 3.1.0
      */

@@ -87,7 +87,13 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
     multipart part uploads require a declared content length.
 <2> Content type and metadata work the same way as for other api:objectstorage.request.UploadRequest[] implementations.
 
-An api:objectstorage.request.InputStreamUploadRequest[] returns the same stream instance and is intended for one upload.
+An api:objectstorage.request.InputStreamUploadRequest[] returns the same stream instance without copying or buffering it.
+Do not access the stream while a blocking upload is running or until a reactive upload terminates. Provider
+implementations may close the stream; code that owns it should ensure it is closed after the upload completes.
+
+Because the same stream instance is used for the whole upload, automatic retries may require a stream that supports
+`mark` and `reset`. In particular, a synchronous AWS S3 upload with a non-repeatable stream can fail if the SDK retries
+after consuming part of the stream.
 
 == Retrieving files
 
