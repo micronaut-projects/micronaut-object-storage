@@ -119,9 +119,7 @@ final class LocalStorageMultipartUploadState {
         if (!mkdirs(partsPath)) {
             throw new ObjectStorageException("Error creating local multipart part directories: " + partsPath);
         }
-        String eTag = UUID.randomUUID().toString();
-        String partFileName = partNumber + "-" + eTag + MULTIPART_PART_EXTENSION;
-        Path partFile = multipartPartDataPath(uploadPath, partFileName);
+        Path partFile = null;
         Path temporaryPartFile = null;
         Path temporaryPartPropertiesFile = null;
         boolean partFileCommitted = false;
@@ -129,8 +127,10 @@ final class LocalStorageMultipartUploadState {
         try {
             temporaryPartFile = createTempFile(partsPath, partNumber + "-", MULTIPART_PART_EXTENSION + ".tmp");
             temporaryPartPropertiesFile = createTempFile(partsPath, partNumber + "-", MULTIPART_PART_PROPERTIES_EXTENSION + ".tmp");
-            storeFile(temporaryPartFile, inputStream);
+            String eTag = storeFile(temporaryPartFile, inputStream);
             long partSize = size(temporaryPartFile);
+            String partFileName = partNumber + "-" + UUID.randomUUID() + MULTIPART_PART_EXTENSION;
+            partFile = multipartPartDataPath(uploadPath, partFileName);
             Properties properties = new Properties();
             properties.setProperty(MULTIPART_PART_ETAG_PROPERTY, eTag);
             properties.setProperty(MULTIPART_PART_SIZE_PROPERTY, Long.toString(partSize));
@@ -352,13 +352,13 @@ final class LocalStorageMultipartUploadState {
         }
     }
 
-    private void storeFile(Path file, InputStream inputStream) {
+    private String storeFile(Path file, InputStream inputStream) {
         try (InputStream in = inputStream) {
             if (!mkdirs(file.getParent())) {
                 throw new ObjectStorageException("Error creating local multipart part directories: " + file);
             }
             try (OutputStream fileOut = LocalStorageIoSupport.newOutputStreamNoFollow(file, supportsPosixPermissions)) {
-                in.transferTo(fileOut);
+                return LocalStorageETag.transferTo(in, fileOut);
             }
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying multipart part to: " + file, e);

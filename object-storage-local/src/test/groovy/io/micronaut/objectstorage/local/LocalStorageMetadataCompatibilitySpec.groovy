@@ -13,8 +13,9 @@ import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFilePermission
-import java.util.concurrent.TimeUnit
+import java.security.MessageDigest
 import java.util.Properties
+import java.util.concurrent.TimeUnit
 
 class LocalStorageMetadataCompatibilitySpec extends Specification {
 
@@ -47,6 +48,23 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         !Files.exists(rootDirectory.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
         !Files.exists(bucketPath.resolve(LocalStorageOperations.INTERNAL_DIRECTORY))
         !Files.exists(bucketPath.resolve(LocalStorageOperations.LEGACY_METADATA_DIRECTORY))
+    }
+
+    void 'local upload persists deterministic content etag in sidecar metadata'() {
+        given:
+        def operations = ctx.getBean(LocalStorageOperations)
+        def metadataOperations = ctx.getBean(LocalStorageObjectMetadataOperations)
+
+        when:
+        def firstResponse = operations.upload(UploadRequest.fromBytes('hello'.bytes, 'first.txt', 'text/plain'))
+        def secondResponse = operations.upload(UploadRequest.fromBytes('hello'.bytes, 'second.txt', 'text/plain'))
+        def changedResponse = operations.upload(UploadRequest.fromBytes('hello!'.bytes, 'changed.txt', 'text/plain'))
+
+        then:
+        firstResponse.ETag == sha256ETag('hello')
+        firstResponse.ETag == secondResponse.ETag
+        firstResponse.ETag != changedResponse.ETag
+        metadataOperations.retrieve('first.txt').get().etag == firstResponse.ETag
     }
 
     void 'legacy metadata sidecars without a marker stay in legacy mode even for structured-looking keys'() {
@@ -268,5 +286,12 @@ class LocalStorageMetadataCompatibilitySpec extends Specification {
         if (directory != null && permissions != null && Files.exists(directory, LinkOption.NOFOLLOW_LINKS)) {
             Files.setPosixFilePermissions(directory, permissions)
         }
+    }
+
+    private static String sha256ETag(String text) {
+        MessageDigest.getInstance('SHA-256')
+            .digest(text.bytes)
+            .collect { String.format('%02x', it & 0xff) }
+            .join()
     }
 }
