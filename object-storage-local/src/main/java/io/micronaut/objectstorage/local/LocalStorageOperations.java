@@ -214,13 +214,14 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 } finally {
                     deleteSnapshot(snapshot, failure, preserveSnapshot);
                 }
-                return new LocalStorageFile(path);
             } finally {
                 mutationLock.unlock();
             }
         } finally {
             bucketLock.unlock();
         }
+        pruneEmptyParentDirectories(path);
+        return new LocalStorageFile(path);
     }
 
     @Override
@@ -363,6 +364,29 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             Files.delete(path);
         } catch (IOException e) {
             throw new ObjectStorageException("Error deleting file: " + path, e);
+        }
+    }
+
+    private void pruneEmptyParentDirectories(Path deletedPath) {
+        Path boundary = layout.configuredBucketPath();
+        Lock bucketLock = LocalStorageLocks.bucketWriteLock(boundary);
+        bucketLock.lock();
+        try {
+            Path directory = deletedPath.toAbsolutePath().normalize().getParent();
+            while (directory != null && directory.startsWith(boundary) && !directory.equals(boundary)) {
+                if (!Files.isDirectory(directory, LinkOption.NOFOLLOW_LINKS)) {
+                    return;
+                }
+                try {
+                    Files.delete(directory);
+                } catch (IOException e) {
+                    // A non-empty or otherwise unavailable directory ends this best-effort cleanup.
+                    return;
+                }
+                directory = directory.getParent();
+            }
+        } finally {
+            bucketLock.unlock();
         }
     }
 

@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.Lock
 
 class LocalStorageDurabilitySpec extends Specification {
 
@@ -97,6 +98,71 @@ class LocalStorageDurabilitySpec extends Specification {
 
         cleanup:
         allowWriteToFinish.countDown()
+        executor?.shutdownNow()
+    }
+
+    void 'delete prunes empty key directories without deleting the configured bucket'() {
+        given:
+        operations.upload(UploadRequest.fromBytes(bytes('image'), 'users/many/image.png', 'image/png'))
+        operations.upload(UploadRequest.fromBytes(bytes('profile'), 'users/profile.txt', 'text/plain'))
+
+        when:
+        operations.delete('users/many/image.png')
+
+        then:
+        !Files.exists(defaultBucketPath.resolve('users/many'))
+        Files.isDirectory(defaultBucketPath.resolve('users'))
+
+        when:
+        operations.delete('users/profile.txt')
+
+        then:
+        !Files.exists(defaultBucketPath.resolve('users'))
+        Files.isDirectory(defaultBucketPath)
+    }
+
+    void 'delete waits for an in-flight upload before pruning shared key directories'() {
+        given:
+        operations.upload(UploadRequest.fromBytes(bytes('old'), 'users/old.txt', 'text/plain'))
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        CountDownLatch deleteStarted = new CountDownLatch(1)
+        ExecutorService executor = Executors.newFixedThreadPool(2)
+        Future<?> upload = null
+        Future<?> delete = null
+
+        when:
+        upload = executor.submit({
+            operations.upload(new BlockingUploadRequest(bytes('new'), 'users/new.txt', writeStarted, allowWriteToFinish))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS) == true
+
+        when:
+        delete = executor.submit({
+            deleteStarted.countDown()
+            operations.delete('users/old.txt')
+        } as Callable)
+
+        then:
+        deleteStarted.await(5, TimeUnit.SECONDS) == true
+
+        and:
+        assertQueuedDirectoryCleanupBlocksNewReaders(defaultBucketPath)
+
+        when:
+        allowWriteToFinish.countDown()
+        upload.get(5, TimeUnit.SECONDS)
+        delete.get(5, TimeUnit.SECONDS)
+
+        then:
+        !operations.retrieve('users/old.txt').present
+        text('users/new.txt') == 'new'
+        Files.isDirectory(defaultBucketPath.resolve('users'))
+
+        cleanup:
+        allowWriteToFinish?.countDown()
         executor?.shutdownNow()
     }
 
@@ -288,6 +354,24 @@ class LocalStorageDurabilitySpec extends Specification {
             Thread.currentThread().interrupt()
             throw new IOException('Interrupted while waiting for test writer to finish', e)
         }
+    }
+
+    private static void assertQueuedDirectoryCleanupBlocksNewReaders(Path bucketPath) throws IOException {
+        Lock readLock = LocalStorageLocks.bucketReadLock(bucketPath)
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+        while (System.nanoTime() < deadline) {
+            try {
+                if (!readLock.tryLock(50, TimeUnit.MILLISECONDS)) {
+                    return
+                }
+                readLock.unlock()
+                TimeUnit.MILLISECONDS.sleep(10)
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt()
+                throw new IOException('Interrupted while waiting for directory cleanup', e)
+            }
+        }
+        throw new AssertionError('Timed out waiting for directory cleanup to queue behind object mutation')
     }
 
     private static List<Path> temporaryFiles(Path directory) {
