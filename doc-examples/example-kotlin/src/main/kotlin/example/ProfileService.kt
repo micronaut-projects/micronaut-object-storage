@@ -7,6 +7,7 @@ import io.micronaut.objectstorage.request.UploadRequest
 import io.micronaut.objectstorage.response.ListObjectsResponse
 import jakarta.inject.Singleton
 import java.io.File
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -23,6 +24,19 @@ open class ProfileService(private val objectStorage: ObjectStorageOperations<*, 
         return response.key // <3>
     }
     //end::upload[]
+
+    //tag::input-stream-upload[]
+    open fun saveProfilePicture(userId: String, inputStream: InputStream, contentLength: Long): String? {
+        val request = UploadRequest.fromInputStream(
+            inputStream,
+            "$userId/profile.jpg",
+            "image/jpeg",
+            contentLength // <1>
+        )
+        request.metadata = mapOf("source" to "validated-upload") // <2>
+        return objectStorage.upload(request).key
+    }
+    //end::input-stream-upload[]
 
     //tag::retrieve[]
     open fun retrieveProfilePicture(userId: String, fileName: String): Path? {

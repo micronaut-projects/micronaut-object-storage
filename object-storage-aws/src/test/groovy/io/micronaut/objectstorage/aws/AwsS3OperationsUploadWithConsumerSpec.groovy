@@ -24,7 +24,6 @@ import spock.lang.Specification
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.file.Path
-import java.util.Optional
 
 @Property(name = "micronaut.object-storage.aws.default.bucket", value = "profile-pictures-bucket")
 @Property(name = "spec.name", value = SPEC_NAME)
@@ -65,7 +64,11 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
     void "known-length uploads use the streaming AWS request body path"() {
         given:
         byte[] bytes = "stream-body".bytes
-        UploadRequest uploadRequest = new StubUploadRequest("stream.txt", bytes, true)
+        UploadRequest uploadRequest = UploadRequest.fromInputStream(
+            new ByteArrayInputStream(bytes),
+            "stream.txt",
+            bytes.length
+        )
 
         when:
         objectStorage.upload(uploadRequest)
@@ -81,7 +84,10 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
     void "unknown-length uploads keep the byte-array fallback"() {
         given:
         byte[] bytes = "fallback-body".bytes
-        UploadRequest uploadRequest = new StubUploadRequest("fallback.txt", bytes, false)
+        UploadRequest uploadRequest = UploadRequest.fromInputStream(
+            new ByteArrayInputStream(bytes),
+            "fallback.txt"
+        )
 
         when:
         objectStorage.upload(uploadRequest)
@@ -143,35 +149,4 @@ class AwsS3OperationsUploadWithConsumerSpec extends Specification {
         }
     }
 
-    private static final class StubUploadRequest implements UploadRequest {
-        private final String key
-        private final byte[] bytes
-        private final boolean knownLength
-
-        StubUploadRequest(String key, byte[] bytes, boolean knownLength) {
-            this.key = key
-            this.bytes = bytes
-            this.knownLength = knownLength
-        }
-
-        @Override
-        Optional<String> getContentType() {
-            return Optional.of("text/plain")
-        }
-
-        @Override
-        String getKey() {
-            return key
-        }
-
-        @Override
-        Optional<Long> getContentSize() {
-            return knownLength ? Optional.of(bytes.length as long) : Optional.empty()
-        }
-
-        @Override
-        InputStream getInputStream() {
-            return new ByteArrayInputStream(bytes)
-        }
-    }
 }

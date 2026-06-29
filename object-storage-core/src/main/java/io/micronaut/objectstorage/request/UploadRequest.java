@@ -16,6 +16,7 @@
 package io.micronaut.objectstorage.request;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.multipart.StreamingFileUpload;
 
@@ -71,6 +72,57 @@ public interface UploadRequest {
                                    @NonNull String key,
                                    @NonNull String contentType) {
         return new BytesUploadRequest(bytes, key, contentType);
+    }
+
+    /**
+     * Creates an upload request backed by an input stream whose content length is unknown.
+     *
+     * @param inputStream the source input stream.
+     * @param key the key under which the object will be stored ({@code path/to/file}).
+     * @return An {@link UploadRequest} from the given input stream and key.
+     * @since 3.1.0
+     */
+    @NonNull
+    static UploadRequest fromInputStream(@NonNull InputStream inputStream, @NonNull String key) {
+        return new InputStreamUploadRequest(inputStream, key);
+    }
+
+    /**
+     * Creates an upload request backed by an input stream with a known content length.
+     * Providing the content length allows providers to stream the request without buffering and is
+     * required by some provider operations.
+     *
+     * @param inputStream the source input stream.
+     * @param key the key under which the object will be stored ({@code path/to/file}).
+     * @param contentLength the content length, in bytes.
+     * @return An {@link UploadRequest} from the given parameters.
+     * @since 3.1.0
+     */
+    @NonNull
+    static UploadRequest fromInputStream(@NonNull InputStream inputStream,
+                                         @NonNull String key,
+                                         long contentLength) {
+        return new InputStreamUploadRequest(inputStream, key, contentLength);
+    }
+
+    /**
+     * Creates an upload request backed by an input stream.
+     * Providing the content length allows providers to stream the request without buffering and is
+     * required by some provider operations.
+     *
+     * @param inputStream the source input stream.
+     * @param key the key under which the object will be stored ({@code path/to/file}).
+     * @param contentType the content type, or {@code null} when unknown.
+     * @param contentLength the content length in bytes, or {@code null} when unknown.
+     * @return An {@link UploadRequest} from the given parameters.
+     * @since 3.1.0
+     */
+    @NonNull
+    static UploadRequest fromInputStream(@NonNull InputStream inputStream,
+                                         @NonNull String key,
+                                         @Nullable String contentType,
+                                         @Nullable Long contentLength) {
+        return new InputStreamUploadRequest(inputStream, key, contentType, contentLength);
     }
 
     /**
