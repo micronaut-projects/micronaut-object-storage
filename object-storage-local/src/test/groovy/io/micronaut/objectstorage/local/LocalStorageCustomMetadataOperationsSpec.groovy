@@ -8,6 +8,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.security.MessageDigest
 
 @Property(name = "spec.name", value = AbstractLocalStorageCustomMetadataSpec.SPEC_NAME)
 @Property(name = "micronaut.object-storage.local.default.enabled", value = "true")
@@ -33,24 +34,38 @@ class LocalStorageCustomMetadataOperationsSpec extends AbstractLocalStorageCusto
         objectMetadataOperations.deletedKeys == ['nested/object.txt']
     }
 
+    void 'local object storage delegates content etag to configured metadata operations'() {
+        when:
+        def firstResponse = operations.upload(UploadRequest.fromBytes('hello'.bytes, 'etag/first.txt', 'text/plain'))
+        def secondResponse = operations.upload(UploadRequest.fromBytes('hello'.bytes, 'etag/second.txt', 'text/plain'))
+        def changedResponse = operations.upload(UploadRequest.fromBytes('hello!'.bytes, 'etag/changed.txt', 'text/plain'))
+
+        then:
+        firstResponse.ETag == sha256ETag('hello')
+        firstResponse.ETag == secondResponse.ETag
+        firstResponse.ETag != changedResponse.ETag
+        objectMetadataOperations.retrieve('etag/first.txt').get().etag == firstResponse.ETag
+    }
+
     void 'local copy delegates object metadata to configured metadata operations'() {
         given:
         UploadRequest request = UploadRequest.fromBytes('hello'.bytes, 'source.txt', 'text/plain')
         request.metadata = [source: 'custom']
-        operations.upload(request)
+        def sourceResponse = operations.upload(request)
 
         when:
         operations.copy('source.txt', 'copy.txt')
 
         then:
         objectMetadataOperations.retrieve('copy.txt').get().metadata == [source: 'custom']
+        objectMetadataOperations.retrieve('copy.txt').get().etag == sourceResponse.ETag
         operations.retrieve('copy.txt').get().metadata == [source: 'custom']
         operations.retrieve('copy.txt').get().inputStream.text == 'hello'
     }
 
-    void 'local copy deletes destination metadata when source metadata is missing'() {
+    void 'local copy persists content etag when source metadata is missing'() {
         given:
-        operations.upload(UploadRequest.fromBytes('source'.bytes, 'source-without-metadata.txt', 'text/plain'))
+        def sourceResponse = operations.upload(UploadRequest.fromBytes('source'.bytes, 'source-without-metadata.txt', 'text/plain'))
         UploadRequest destination = UploadRequest.fromBytes('destination'.bytes, 'destination.txt', 'text/plain')
         destination.metadata = [source: 'stale']
         operations.upload(destination)
@@ -61,8 +76,9 @@ class LocalStorageCustomMetadataOperationsSpec extends AbstractLocalStorageCusto
         operations.copy('source-without-metadata.txt', 'destination.txt')
 
         then:
-        objectMetadataOperations.deletedKeys == ['destination.txt']
-        !objectMetadataOperations.retrieve('destination.txt').present
+        objectMetadataOperations.deletedKeys.empty
+        objectMetadataOperations.retrieve('destination.txt').get().metadata == [:]
+        objectMetadataOperations.retrieve('destination.txt').get().etag == sourceResponse.ETag
         operations.retrieve('destination.txt').get().metadata == [:]
         operations.retrieve('destination.txt').get().inputStream.text == 'source'
     }
@@ -107,5 +123,11 @@ class LocalStorageCustomMetadataOperationsSpec extends AbstractLocalStorageCusto
         if (Files.exists(rootDirectory)) {
             LocalStorageBucketOperations.deleteRecursively(rootDirectory)
         }
+    }
+    private static String sha256ETag(String text) {
+        MessageDigest.getInstance('SHA-256')
+            .digest(text.bytes)
+            .collect { String.format('%02x', it & 0xff) }
+            .join()
     }
 }

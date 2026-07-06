@@ -24,7 +24,15 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFilePermission
+import java.security.MessageDigest
 import java.util.Base64
+import java.util.concurrent.Callable
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 @MicronautTest
 class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperationsSpecification implements TestPropertyProvider {
@@ -42,6 +50,9 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
 
     @Inject
     LocalStorageConfiguration configuration
+
+    @Inject
+    LocalStorageObjectMetadataOperations objectMetadataOperations
 
     @Override
     ObjectStorageOperations<?, ?, ?> getObjectStorage() {
@@ -118,6 +129,29 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         !Files.exists(createResponse.nativeResponse.path)
     }
 
+    void 'local multipart uses content etags for parts and completed object'() {
+        given:
+        String key = 'multipart-local/content-etag.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+
+        when:
+        def firstPart = multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('micro'.bytes, key, CONTENT_TYPE)))
+        def secondPart = multipartOperations.uploadPart(new UploadPartRequest(upload, 2, UploadRequest.fromBytes('naut'.bytes, key, CONTENT_TYPE)))
+
+        then:
+        firstPart.part.ETag == sha256ETag('micro')
+        secondPart.part.ETag == sha256ETag('naut')
+
+        when:
+        def response = multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(upload, [firstPart.part, secondPart.part]))
+
+        then:
+        response.ETag == sha256ETag('micronaut')
+        objectMetadataOperations.retrieve(key).get().etag == response.ETag
+        !Files.exists(createResponse.nativeResponse.path)
+    }
+
     void 'local multipart complete marks upload terminal before best-effort cleanup'() {
         given:
         assumePosixPermissionsSupported(configuration.path)
@@ -188,6 +222,92 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         listedParts*.ETag == [originalPart.part.ETag]
         response.ETag
         entry.inputStream.text == 'original'
+    }
+
+    void 'identical multipart part replacements use unique backing files'() {
+        given:
+        String key = 'multipart-local/unique-part-files.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+
+        when:
+        def originalPart = multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('same'.bytes, key, CONTENT_TYPE)))
+        def replacementPart = multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('same'.bytes, key, CONTENT_TYPE)))
+
+        then:
+        originalPart.part.ETag == replacementPart.part.ETag
+        originalPart.nativeResponse.path != replacementPart.nativeResponse.path
+        !Files.exists(originalPart.nativeResponse.path)
+        Files.exists(replacementPart.nativeResponse.path)
+
+        cleanup:
+        if (createResponse != null && Files.exists(createResponse.nativeResponse.path)) {
+            multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        }
+    }
+
+    void 'failed identical multipart part replacement preserves the active part file'() {
+        given:
+        String key = 'multipart-local/identical-replacement.txt'
+        def createResponse = multipartOperations.createMultipartUpload(new CreateMultipartUploadRequest(key, CONTENT_TYPE))
+        def upload = createResponse.upload
+        def originalPart = multipartOperations.uploadPart(new UploadPartRequest(upload, 1, UploadRequest.fromBytes('same'.bytes, key, CONTENT_TYPE)))
+        Path propertiesPath = partPropertiesPath(createResponse.nativeResponse.path, 1)
+        Properties originalProperties = loadProperties(propertiesPath)
+        Path originalPartPath = partDataPath(createResponse.nativeResponse.path, originalProperties.getProperty('file'))
+        CountDownLatch writeStarted = new CountDownLatch(1)
+        CountDownLatch allowWriteToFinish = new CountDownLatch(1)
+        ExecutorService executor = Executors.newSingleThreadExecutor()
+        Future<?> replacement = null
+
+        when:
+        replacement = executor.submit({
+            multipartOperations.uploadPart(new UploadPartRequest(
+                upload,
+                1,
+                new BlockingUploadRequest(key, CONTENT_TYPE, 'same'.bytes, writeStarted, allowWriteToFinish)
+            ))
+        } as Callable)
+
+        then:
+        writeStarted.await(5, TimeUnit.SECONDS)
+
+        when:
+        Files.delete(propertiesPath)
+        Files.createDirectory(propertiesPath)
+        Files.writeString(propertiesPath.resolve('blocker'), 'blocker')
+        allowWriteToFinish.countDown()
+        replacement.get(5, TimeUnit.SECONDS)
+
+        then:
+        ExecutionException e = thrown()
+        e.cause instanceof ObjectStorageException
+        Files.exists(originalPartPath)
+        findPartDataFiles(createResponse.nativeResponse.path) == [originalPartPath]
+
+        when:
+        LocalStorageBucketOperations.deleteRecursively(propertiesPath)
+        storeProperties(propertiesPath, originalProperties)
+        def listedParts = multipartOperations.listParts(new ListMultipartPartsRequest(upload, 10)).parts
+        def response = multipartOperations.completeMultipartUpload(new CompleteMultipartUploadRequest(upload, [originalPart.part]))
+
+        then:
+        listedParts*.ETag == [originalPart.part.ETag]
+        response.ETag == sha256ETag('same')
+        operations.retrieve(key).get().inputStream.text == 'same'
+
+        cleanup:
+        allowWriteToFinish.countDown()
+        executor?.shutdownNow()
+        if (propertiesPath != null && Files.isDirectory(propertiesPath)) {
+            LocalStorageBucketOperations.deleteRecursively(propertiesPath)
+        }
+        if (propertiesPath != null && originalProperties != null && Files.exists(propertiesPath.parent) && !Files.exists(propertiesPath)) {
+            storeProperties(propertiesPath, originalProperties)
+        }
+        if (createResponse != null && Files.exists(createResponse.nativeResponse.path)) {
+            multipartOperations.abortMultipartUpload(new AbortMultipartUploadRequest(upload))
+        }
     }
 
     void 'local multipart part replacement rejects corrupt existing metadata before committing replacement'() {
@@ -703,6 +823,13 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         }
     }
 
+    private static String sha256ETag(String text) {
+        MessageDigest.getInstance('SHA-256')
+            .digest(text.bytes)
+            .collect { String.format('%02x', it & 0xff) }
+            .join()
+    }
+
     private static final class MultipartUploadFixture {
         private final MultipartUploadHandle upload
         private final Path uploadPath
@@ -776,6 +903,97 @@ class LocalStorageMultipartOperationsSpec extends MultipartObjectStorageOperatio
         @Override
         Map<String, String> getMetadata() {
             [:]
+        }
+    }
+
+    private static final class BlockingUploadRequest implements UploadRequest {
+        private final String key
+        private final String contentType
+        private final byte[] bytes
+        private final BlockingInputStream inputStream
+
+        private BlockingUploadRequest(String key,
+                                      String contentType,
+                                      byte[] bytes,
+                                      CountDownLatch writeStarted,
+                                      CountDownLatch allowWriteToFinish) {
+            this.key = key
+            this.contentType = contentType
+            this.bytes = bytes
+            this.inputStream = new BlockingInputStream(bytes, writeStarted, allowWriteToFinish)
+        }
+
+        @Override
+        Optional<String> getContentType() {
+            Optional.of(contentType)
+        }
+
+        @Override
+        String getKey() {
+            key
+        }
+
+        @Override
+        Optional<Long> getContentSize() {
+            Optional.of((long) bytes.length)
+        }
+
+        @Override
+        InputStream getInputStream() {
+            inputStream
+        }
+
+        @Override
+        Map<String, String> getMetadata() {
+            [:]
+        }
+    }
+
+    private static final class BlockingInputStream extends InputStream {
+        private final ByteArrayInputStream delegate
+        private final CountDownLatch writeStarted
+        private final CountDownLatch allowWriteToFinish
+        private boolean blocked
+
+        private BlockingInputStream(byte[] bytes,
+                                    CountDownLatch writeStarted,
+                                    CountDownLatch allowWriteToFinish) {
+            this.delegate = new ByteArrayInputStream(bytes)
+            this.writeStarted = writeStarted
+            this.allowWriteToFinish = allowWriteToFinish
+        }
+
+        @Override
+        int read() throws IOException {
+            awaitWrite()
+            delegate.read()
+        }
+
+        @Override
+        int read(byte[] buffer, int offset, int length) throws IOException {
+            awaitWrite()
+            delegate.read(buffer, offset, length)
+        }
+
+        @Override
+        void close() throws IOException {
+            delegate.close()
+        }
+
+        private void awaitWrite() throws IOException {
+            if (blocked) {
+                return
+            }
+            blocked = true
+            writeStarted.countDown()
+            try {
+                if (!allowWriteToFinish.await(5, TimeUnit.SECONDS)) {
+                    throw new IOException('timed out waiting to finish upload')
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt()
+                throw new IOException('interrupted while waiting to finish upload', e)
+            }
         }
     }
 

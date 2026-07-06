@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -137,6 +136,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
         ReentrantLock mutationLock = LocalStorageLocks.objectMutationLock(file);
         LocalStorageFile localFile;
+        String eTag;
         bucketLock.lock();
         try {
             mutationLock.lock();
@@ -145,14 +145,14 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 RuntimeException failure = null;
                 boolean preserveSnapshot = false;
                 try {
-                    storeFile(file, request.getInputStream());
+                    eTag = storeFile(file, request.getInputStream());
                     objectMetadataOperations.save(new ObjectMetadataWrite(
                         key,
                         request.getMetadata(),
                         Map.of(),
                         request.getContentType().orElse(null),
                         request.getContentSize().orElse(null),
-                        null,
+                        eTag,
                         null
                     ));
                 } catch (RuntimeException e) {
@@ -171,7 +171,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             bucketLock.unlock();
         }
         requestConsumer.accept(localFile);
-        return UploadResponse.of(key, UUID.randomUUID().toString(), localFile);
+        return UploadResponse.of(key, eTag, localFile);
     }
 
     @Override
@@ -395,8 +395,8 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         RuntimeException failure = null;
         boolean preserveSnapshot = false;
         try (InputStream in = newInputStreamNoFollow(source)) {
-            storeFile(destinationFile, in);
-            copyObjectMetadata(sourceKey, destinationKey);
+            String eTag = storeFile(destinationFile, in);
+            copyObjectMetadata(sourceKey, destinationKey, eTag);
         } catch (IOException e) {
             ObjectStorageException objectStorageException = new ObjectStorageException("Error copying file: " + source, e);
             failure = objectStorageException;
@@ -413,7 +413,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         }
     }
 
-    private void copyObjectMetadata(String sourceKey, String destinationKey) {
+    private void copyObjectMetadata(String sourceKey, String destinationKey, String eTag) {
         objectMetadataOperations.retrieve(sourceKey).ifPresentOrElse(entry ->
             objectMetadataOperations.save(new ObjectMetadataWrite(
                 destinationKey,
@@ -421,10 +421,18 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 entry.attributes(),
                 entry.contentType(),
                 entry.contentLength(),
-                entry.etag(),
+                eTag,
                 entry.lastModified()
             )),
-            () -> objectMetadataOperations.delete(destinationKey)
+            () -> objectMetadataOperations.save(new ObjectMetadataWrite(
+                destinationKey,
+                Map.of(),
+                Map.of(),
+                null,
+                null,
+                eTag,
+                null
+            ))
         );
     }
 
@@ -538,21 +546,23 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         // After a successful mutation, leftover snapshots are cleanup debt, not operation failure.
     }
 
-    private Path storeFile(Path file, InputStream inputStream) {
+    private String storeFile(Path file, InputStream inputStream) {
         mkdirs(configuration.getPath(), file.getParent());
         Path temporaryDirectory = layout.objectTemporaryDirectory();
+        String[] eTag = new String[1];
         try (InputStream in = inputStream) {
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
             mkdirs(layout.rootInternalDirectory(), temporaryDirectory);
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), temporaryDirectory);
-            return LocalStorageIoSupport.writeAndReplace(
+            LocalStorageIoSupport.writeAndReplace(
                 file,
                 temporaryDirectory,
                 TEMPORARY_FILE_PREFIX,
                 TEMPORARY_FILE_SUFFIX,
                 supportsPosixPermissions,
-                in::transferTo
+                out -> eTag[0] = LocalStorageETag.transferTo(in, out)
             );
+            return eTag[0];
         } catch (IOException e) {
             throw new ObjectStorageException("Error copying file to: " + file, e);
         }
