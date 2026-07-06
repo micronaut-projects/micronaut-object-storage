@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Optional;
 
 //tag::beginclass[]
@@ -38,6 +39,19 @@ public class ProfileService {
         return response.getKey(); // <3>
     }
     //end::upload[]
+
+    //tag::input-stream-upload[]
+    public String saveProfilePicture(String userId, InputStream inputStream, long contentLength) {
+        UploadRequest request = UploadRequest.fromInputStream(
+            inputStream,
+            userId + "/profile.jpg",
+            "image/jpeg",
+            contentLength // <1>
+        );
+        request.setMetadata(Map.of("source", "validated-upload")); // <2>
+        return objectStorage.upload(request).getKey();
+    }
+    //end::input-stream-upload[]
 
     //tag::retrieve[]
     public Optional<Path> retrieveProfilePicture(String userId, String fileName) {

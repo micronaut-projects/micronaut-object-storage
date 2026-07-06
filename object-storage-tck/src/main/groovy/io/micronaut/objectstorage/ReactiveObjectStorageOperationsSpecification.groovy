@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
+import java.io.ByteArrayInputStream
 import java.time.Duration
 
 abstract class ReactiveObjectStorageOperationsSpecification extends Specification {
@@ -167,6 +168,36 @@ abstract class ReactiveObjectStorageOperationsSpecification extends Specificatio
             ObjectStorageOperationsSpecification.createTestFile('dir'),
             ObjectStorageOperationsSpecification.createTestFile('dir/subdir'),
         ]
+    }
+
+    void 'it can upload, get and delete an input stream reactively'() {
+        given:
+        ReactiveObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        byte[] bytes = 'reactive-streaming-object-storage'.bytes
+        String key = 'streams/reactive-upload.txt'
+        UploadRequest uploadRequest = UploadRequest.fromInputStream(
+            new ByteArrayInputStream(bytes),
+            key,
+            CONTENT_TYPE,
+            bytes.length as long
+        )
+        uploadRequest.metadata = METADATA
+
+        when:
+        UploadResponse response = awaitOne(storage.upload(uploadRequest))
+        Optional<ObjectStorageEntry<?>> objectStorageEntry = awaitOne(storage.retrieve(key))
+
+        then:
+        response.ETag
+        objectStorageEntry.present
+        objectStorageEntry.get().inputStream.bytes == bytes
+        objectStorageEntry.get().contentType == Optional.of(CONTENT_TYPE)
+        if (emulatorSupportsMetadata()) {
+            assert objectStorageEntry.get().metadata == METADATA
+        }
+
+        cleanup:
+        awaitOne(storage.delete(key))
     }
 
     void 'it can list objects reactively with portable pagination semantics'() {

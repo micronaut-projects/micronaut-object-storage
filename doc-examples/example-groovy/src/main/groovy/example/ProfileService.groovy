@@ -31,6 +31,19 @@ class ProfileService {
     }
     //end::upload[]
 
+    //tag::input-stream-upload[]
+    String saveProfilePicture(String userId, InputStream inputStream, long contentLength) {
+        UploadRequest request = UploadRequest.fromInputStream(
+            inputStream,
+            "${userId}/profile.jpg",
+            "image/jpeg",
+            contentLength // <1>
+        )
+        request.metadata = [source: "validated-upload"] // <2>
+        objectStorage.upload(request).key
+    }
+    //end::input-stream-upload[]
+
     //tag::retrieve[]
     Optional<Path> retrieveProfilePicture(String userId, String fileName) {
         String key = "${userId}/${fileName}"

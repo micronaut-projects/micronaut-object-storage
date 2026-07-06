@@ -77,6 +77,24 @@ If you receive a `StreamingFileUpload` in a multipart controller, you can forwar
 
 snippet::example.UploadController[project-base="doc-examples/example", source="main", indent="0", tags="streaming"]
 
+If the content is already available as an `InputStream`, for example after validating or transforming an incoming
+request stream, you can upload it directly without first collecting it into a byte array:
+
+snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="input-stream-upload"]
+
+<1> Supply the content length whenever it is known. This allows providers to stream the content directly; some provider
+    operations require it. In particular, synchronous AWS S3 uploads buffer unknown-length streams, and AWS S3 and OCI
+    multipart part uploads require a declared content length.
+<2> Content type and metadata work the same way as for other api:objectstorage.request.UploadRequest[] implementations.
+
+An api:objectstorage.request.InputStreamUploadRequest[] returns the same stream instance without copying or buffering it.
+Do not access the stream while a blocking upload is running or until a reactive upload terminates. Provider
+implementations may close the stream; code that owns it should ensure it is closed after the upload completes.
+
+Because the same stream instance is used for the whole upload, automatic retries may require a stream that supports
+`mark` and `reset`. In particular, a synchronous AWS S3 upload with a non-repeatable stream can fail if the SDK retries
+after consuming part of the stream.
+
 == Retrieving files
 
 snippet::example.ProfileService[project-base="doc-examples/example", source="main", indent="0", tags="retrieve"]

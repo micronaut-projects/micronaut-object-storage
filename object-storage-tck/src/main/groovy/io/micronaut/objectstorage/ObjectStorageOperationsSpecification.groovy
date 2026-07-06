@@ -26,6 +26,7 @@ import org.opentest4j.TestAbortedException
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
+import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -173,6 +174,36 @@ abstract class ObjectStorageOperationsSpecification extends Specification {
                 createTestFile('dir'),
                 createTestFile('dir/subdir'),
         ]
+    }
+
+    void 'it can upload, get and delete object from an input stream'() {
+        given:
+        ObjectStorageOperations<?, ?, ?> storage = getObjectStorage()
+        byte[] bytes = 'streaming-object-storage'.bytes
+        String key = 'streams/upload.txt'
+        UploadRequest uploadRequest = UploadRequest.fromInputStream(
+            new ByteArrayInputStream(bytes),
+            key,
+            CONTENT_TYPE,
+            bytes.length as long
+        )
+        uploadRequest.metadata = METADATA
+
+        when:
+        UploadResponse response = storage.upload(uploadRequest)
+        Optional<ObjectStorageEntry<?>> objectStorageEntry = storage.retrieve(key)
+
+        then:
+        response.ETag
+        objectStorageEntry.present
+        objectStorageEntry.get().inputStream.bytes == bytes
+        objectStorageEntry.get().contentType == Optional.of(CONTENT_TYPE)
+        if (emulatorSupportsMetadata()) {
+            assert objectStorageEntry.get().metadata == METADATA
+        }
+
+        cleanup:
+        storage.delete(key)
     }
 
     void 'it can list objects with portable pagination semantics'() {
