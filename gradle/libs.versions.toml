@@ -16,7 +16,7 @@ bytebuddy = '1.18.8'
 # Gradle plugins
 micronaut-gradle-plugin = "5.0.2"
 kotlin-gradle-plugin = "2.3.21"
-kotlin-gradle-ksp-plugin = "2.3.7"
+kotlin-gradle-ksp-plugin = "2.3.10"
 
 [libraries]
 # Core
