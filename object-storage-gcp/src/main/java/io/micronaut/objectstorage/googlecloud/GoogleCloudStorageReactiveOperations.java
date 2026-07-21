@@ -18,6 +18,7 @@ package io.micronaut.objectstorage.googlecloud;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import io.micronaut.context.annotation.EachBean;
+import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.objectstorage.internal.DefaultReactiveObjectStorageOperations;
 import io.micronaut.scheduling.TaskExecutors;
@@ -39,7 +40,7 @@ public class GoogleCloudStorageReactiveOperations extends DefaultReactiveObjectS
     Blob,
     Boolean> {
 
-    public GoogleCloudStorageReactiveOperations(GoogleCloudStorageOperations operations,
+    public GoogleCloudStorageReactiveOperations(@Parameter GoogleCloudStorageOperations operations,
                                                 @Named(TaskExecutors.BLOCKING) ExecutorService blockingExecutor) {
         super(operations, blockingExecutor);
     }
