@@ -1,7 +1,7 @@
 [versions]
 micronaut-platform = "5.0.5"
-micronaut-test = "5.0.0"
 micronaut = "5.1.7"
+micronaut-test = "5.1.0"
 micronaut-aws = "5.0.2"
 micronaut-azure = "6.1.0"
 micronaut-gcp = "6.0.0"
