@@ -11,9 +11,8 @@ dependencies {
         exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
     }
     constraints {
-        // "com.google.cloud:google-cloud-storage 26.80.0 requests jackson-core 2.18.1, which is affected by GHSA-72hv-8253-57qq"
-        api("com.fasterxml.jackson.core:jackson-core:2.18.6") {
-            because("Require a non-vulnerable jackson-core version instead of the transitive 2.18.1 from google-cloud-storage")
+        api("com.fasterxml.jackson.core:jackson-core:2.18.9") {
+            because("Require a version without the known Jackson Databind vulnerabilities brought by google-cloud-storage")
         }
     }
     api("com.fasterxml.jackson.core:jackson-core")
