@@ -42,12 +42,18 @@ import java.util.concurrent.locks.Lock;
 @EachBean(LocalStorageConfiguration.class)
 final class LocalStorageBucketOperations implements BucketOperations<Path> {
     private final LocalStorageLayout layout;
+    private final LocalStorageMetadataMode metadataMode;
     private final BucketMetadataOperations<Path> bucketMetadataOperations;
+    private final LocalStorageBucketMetadataOperations sidecarMetadataOperations;
 
     LocalStorageBucketOperations(@Parameter LocalStorageConfiguration configuration,
                                  BucketMetadataOperations<Path> bucketMetadataOperations) {
         this.layout = new LocalStorageLayout(configuration);
+        this.metadataMode = configuration.getMetadataMode();
         this.bucketMetadataOperations = bucketMetadataOperations;
+        this.sidecarMetadataOperations = bucketMetadataOperations instanceof LocalStorageBucketMetadataOperations localOperations
+            ? localOperations
+            : new LocalStorageBucketMetadataOperations(configuration);
         layout.requireBucketRoot("bucket operations");
     }
 
@@ -90,7 +96,12 @@ final class LocalStorageBucketOperations implements BucketOperations<Path> {
                     // Deleting a missing bucket is a no-op for user files, but provider state can still be stale.
                 }
                 deleteProviderManagedBucketState(name);
-                bucketMetadataOperations.delete(name);
+                if (metadataMode == LocalStorageMetadataMode.ENABLED) {
+                    bucketMetadataOperations.delete(name);
+                } else {
+                    // A custom SPI bean must never be invoked in NONE mode.
+                    sidecarMetadataOperations.delete(name);
+                }
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }

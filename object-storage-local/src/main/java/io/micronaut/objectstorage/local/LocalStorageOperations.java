@@ -85,7 +85,9 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private final LocalStorageConfiguration configuration;
     private final LocalStorageLayout layout;
+    private final LocalStorageMetadataMode metadataMode;
     private final ObjectMetadataOperations<Path> objectMetadataOperations;
+    private final LocalStorageObjectMetadataOperations sidecarMetadataOperations;
     private final boolean supportsPosixPermissions;
 
     /**
@@ -112,12 +114,22 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         this(configuration, (ObjectMetadataOperations<Path>) objectMetadataOperations);
     }
 
+    /**
+     * Create local storage operations with a custom metadata persistence implementation.
+     *
+     * @param configuration The local storage configuration.
+     * @param objectMetadataOperations The object metadata operations.
+     */
     @Inject
     public LocalStorageOperations(@Parameter LocalStorageConfiguration configuration,
                                   ObjectMetadataOperations<Path> objectMetadataOperations) {
         this.configuration = configuration;
         this.layout = new LocalStorageLayout(configuration);
+        this.metadataMode = configuration.getMetadataMode();
         this.objectMetadataOperations = objectMetadataOperations;
+        this.sidecarMetadataOperations = objectMetadataOperations instanceof LocalStorageObjectMetadataOperations localOperations
+            ? localOperations
+            : new LocalStorageObjectMetadataOperations(configuration);
         this.supportsPosixPermissions = configuration.getPath().getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
@@ -131,6 +143,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     @NonNull
     public UploadResponse<LocalStorageFile> upload(@NonNull UploadRequest request,
                                                    @NonNull Consumer<LocalStorageFile> requestConsumer) {
+        validateMetadata(metadataMode, request.getMetadata());
         String key = request.getKey();
         Path file = layout.objectPath(key);
         Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
@@ -145,16 +158,19 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 RuntimeException failure = null;
                 boolean preserveSnapshot = false;
                 try {
+                    prepareMetadataForMutation(key);
                     eTag = storeFile(file, request.getInputStream());
-                    objectMetadataOperations.save(new ObjectMetadataWrite(
-                        key,
-                        request.getMetadata(),
-                        Map.of(),
-                        request.getContentType().orElse(null),
-                        request.getContentSize().orElse(null),
-                        eTag,
-                        null
-                    ));
+                    if (metadataMode == LocalStorageMetadataMode.ENABLED) {
+                        objectMetadataOperations.save(new ObjectMetadataWrite(
+                            key,
+                            request.getMetadata(),
+                            Map.of(),
+                            request.getContentType().orElse(null),
+                            request.getContentSize().orElse(null),
+                            eTag,
+                            null
+                        ));
+                    }
                 } catch (RuntimeException e) {
                     failure = e;
                     boolean restored = restoreStoredFileAfterFailure(file, snapshot, e);
@@ -182,7 +198,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return file.map(path -> new LocalStorageEntry(
             key,
             path,
-            objectMetadataOperations.retrieve(key).map(ObjectMetadataEntry::metadata).orElse(Collections.emptyMap())
+            retrieveMetadata(key)
         ));
     }
 
@@ -196,16 +212,18 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         try {
             mutationLock.lock();
             try {
+                prepareMetadataForMutation(key);
                 StoredFileSnapshot snapshot = snapshotStoredFile(path);
                 if (!snapshot.exists()) {
-                    objectMetadataOperations.delete(key);
                     return new LocalStorageFile(null);
                 }
                 RuntimeException failure = null;
                 boolean preserveSnapshot = false;
                 try {
                     deleteFile(path);
-                    objectMetadataOperations.delete(key);
+                    if (metadataMode == LocalStorageMetadataMode.ENABLED) {
+                        objectMetadataOperations.delete(key);
+                    }
                 } catch (RuntimeException e) {
                     failure = e;
                     boolean restored = restoreStoredFileAfterFailure(path, snapshot, e);
@@ -391,12 +409,15 @@ public class LocalStorageOperations implements ObjectStorageOperations<
     }
 
     private void copyStoredFile(String sourceKey, Path source, String destinationKey, Path destinationFile) {
+        prepareMetadataForMutation(destinationKey);
         StoredFileSnapshot snapshot = snapshotStoredFile(destinationFile);
         RuntimeException failure = null;
         boolean preserveSnapshot = false;
         try (InputStream in = newInputStreamNoFollow(source)) {
             String eTag = storeFile(destinationFile, in);
-            copyObjectMetadata(sourceKey, destinationKey, eTag);
+            if (metadataMode == LocalStorageMetadataMode.ENABLED) {
+                copyObjectMetadata(sourceKey, destinationKey, eTag);
+            }
         } catch (IOException e) {
             ObjectStorageException objectStorageException = new ObjectStorageException("Error copying file: " + source, e);
             failure = objectStorageException;
@@ -434,6 +455,28 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 null
             ))
         );
+    }
+
+    private Map<String, String> retrieveMetadata(String key) {
+        if (metadataMode == LocalStorageMetadataMode.NONE) {
+            return Collections.emptyMap();
+        }
+        return objectMetadataOperations.retrieve(key)
+            .map(ObjectMetadataEntry::metadata)
+            .orElse(Collections.emptyMap());
+    }
+
+    private void prepareMetadataForMutation(String key) {
+        if (metadataMode == LocalStorageMetadataMode.NONE) {
+            // Remove only built-in local sidecars. A custom SPI bean must never be invoked in NONE mode.
+            sidecarMetadataOperations.delete(key);
+        }
+    }
+
+    static void validateMetadata(LocalStorageMetadataMode metadataMode, Map<String, String> metadata) {
+        if (metadataMode == LocalStorageMetadataMode.NONE && !metadata.isEmpty()) {
+            throw new ObjectStorageException("Local storage metadata mode NONE does not support user metadata");
+        }
     }
 
     private StoredFileSnapshot snapshotStoredFile(Path file) {

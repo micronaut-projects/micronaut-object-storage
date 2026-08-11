@@ -56,17 +56,20 @@ final class LocalStorageMultipartOperations implements MultipartObjectStorageOpe
 
     private final LocalStorageOperations objectStorageOperations;
     private final LocalStorageMultipartUploadState uploadState;
+    private final LocalStorageMetadataMode metadataMode;
 
     LocalStorageMultipartOperations(@Parameter LocalStorageConfiguration configuration,
                                     LocalStorageOperations objectStorageOperations) {
         LocalStorageLayout layout = new LocalStorageLayout(configuration);
         this.objectStorageOperations = objectStorageOperations;
         this.uploadState = new LocalStorageMultipartUploadState(layout);
+        this.metadataMode = configuration.getMetadataMode();
     }
 
     @Override
     @NonNull
     public CreateMultipartUploadResponse<LocalStorageMultipartUpload> createMultipartUpload(@NonNull CreateMultipartUploadRequest request) {
+        LocalStorageOperations.validateMetadata(metadataMode, request.getMetadata());
         String uploadId = UUID.randomUUID().toString();
         Path uploadPath = uploadState.createUpload(request, uploadId);
         return CreateMultipartUploadResponse.of(
