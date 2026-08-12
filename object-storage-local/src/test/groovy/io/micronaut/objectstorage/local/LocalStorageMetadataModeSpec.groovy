@@ -104,6 +104,27 @@ class LocalStorageMetadataModeSpec extends Specification {
         LocalStorageBucketOperations.deleteRecursively(root)
     }
 
+    void 'enabled delete removes metadata when object bytes are already missing'() {
+        given:
+        Path root = Files.createTempDirectory('local-enabled-missing-object')
+        Path bucket = root.resolve('default')
+        LocalStorageOperations operations = new LocalStorageOperations(enabledConfiguration(bucket))
+        def request = UploadRequest.fromBytes('content'.bytes, 'missing.txt')
+        request.metadata = [owner: 'micronaut']
+        operations.upload(request)
+        Files.delete(bucket.resolve('missing.txt'))
+
+        when:
+        operations.delete('missing.txt')
+
+        then:
+        !Files.exists(objectSidecar(root, 'missing.txt'))
+        !Files.exists(legacySidecar(bucket, 'missing.txt'))
+
+        cleanup:
+        LocalStorageBucketOperations.deleteRecursively(root)
+    }
+
     void 'none rejects metadata before overwriting an existing object'() {
         given:
         Path root = Files.createTempDirectory('local-none-reject')

@@ -215,6 +215,9 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 prepareMetadataForMutation(key);
                 StoredFileSnapshot snapshot = snapshotStoredFile(path);
                 if (!snapshot.exists()) {
+                    if (metadataMode == LocalStorageMetadataMode.ENABLED) {
+                        objectMetadataOperations.delete(key);
+                    }
                     return new LocalStorageFile(null);
                 }
                 RuntimeException failure = null;
