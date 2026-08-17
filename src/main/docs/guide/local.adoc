@@ -11,10 +11,40 @@ micronaut:
     local:
       default:
         enabled: true
+        metadata-mode: enabled
 ----
 
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
+
+The `metadata-mode` property controls persistent metadata ownership:
+
+`ENABLED`:: The default. The local provider persists metadata through the configured metadata SPI. The built-in
+implementation uses filesystem sidecars.
+`NONE`:: The local provider persists object bytes but no object or bucket metadata sidecars.
+
+Applications that own persistent metadata in a database can select `NONE`:
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    local:
+      default:
+        enabled: true
+        path: /data/storage/objects
+        metadata-mode: none
+----
+
+In `NONE` mode, uploads with non-empty user metadata are rejected before the destination is mutated. Content type and
+content length may still be used during an operation, but they are not persisted as sidecars. Uploads continue calculating
+SHA-256 while streaming content and return the lowercase digest as the ETag. Retrieval returns the object bytes, an empty
+metadata map, and the existing filename-based content-type result.
+
+Applications choosing `NONE` are responsible for persisting any logical metadata they need, including ownership, content
+type, size, timestamps, object identity, and the ETag returned after a successful upload. The application must coordinate
+its own database transaction with successful object operations; the local provider does not access or participate in the
+application database.
 
 NOTE: The local storage implementation reserves the `.mn-storage` key namespace for provider-managed metadata,
 multipart upload state, temporary write files, and temporary rollback files. It also reserves the legacy `.metadata` key
@@ -23,10 +53,16 @@ or start with either reserved namespace followed by `/` (or the equivalent platf
 and configured local bucket directory names cannot use those reserved namespaces either.
 
 The local implementation is also the reference provider for
-api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[].
-Provider-managed files live under one `.mn-storage` directory in the storage root that contains the configured bucket.
-Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata sidecars live under
-`.mn-storage/metadata/buckets/<bucket>`, in-progress multipart upload state lives under
+api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[]. In
+`ENABLED` mode, configured implementations of those SPIs remain responsible for metadata persistence. With the built-in
+implementation, provider-managed files live under one `.mn-storage` directory in the storage root that contains the
+configured bucket. Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata
+sidecars live under `.mn-storage/metadata/buckets/<bucket>`, and legacy per-bucket `.metadata` sidecars remain readable.
+New sidecar writes use the root `.mn-storage` layout, and deletes remove both the current and legacy sidecars for the
+affected object.
+
+The `.mn-storage` directory is not exclusively a metadata directory and can still exist in `NONE` mode. In-progress
+multipart upload state lives under
 `.mn-storage/multipart/<bucket>`, temporary local file rollback snapshots live under `.mn-storage/snapshots/<bucket>`,
 and in-flight local file writes use typed provider temp directories under `.mn-storage/tmp/<bucket>`, such as `objects`,
 `object-metadata`, and `bucket-metadata`. Before creating a new replacement temporary file, local writes opportunistically
@@ -44,9 +80,11 @@ crash-atomic transaction across both. Custom metadata providers, including datab
 responsible for their own metadata durability, cleanup lifecycle, and any higher-level transaction or compensation
 behavior.
 
-For compatibility with persistent local storage paths created by released older versions, the built-in local sidecar
-metadata provider also checks legacy per-bucket `.metadata` sidecars. New built-in sidecar metadata writes use the root
-`.mn-storage` layout, and deletes remove both the root sidecar and the legacy `.metadata` sidecar for the deleted object.
+Switching to `NONE` does not recursively purge existing metadata. `NONE` never reads current or legacy sidecars, and an
+upload, copy, or delete removes current and legacy sidecars for the affected key before mutating its bytes. This prevents
+stale metadata from reappearing for that key if the configuration later switches back to `ENABLED`. Unrelated sidecars
+remain in place and require an explicit migration cleanup. Provider-managed directories and legacy `.metadata` remain
+hidden from object listing in both modes, although direct filesystem users can see them.
 
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 
