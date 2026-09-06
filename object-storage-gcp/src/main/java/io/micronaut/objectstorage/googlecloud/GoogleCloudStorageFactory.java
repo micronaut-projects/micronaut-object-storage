@@ -22,6 +22,7 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.gcp.GoogleCloudConfiguration;
 import io.micronaut.gcp.condition.RequiresGoogleProjectId;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.jspecify.annotations.NonNull;
 
@@ -32,16 +33,31 @@ import org.jspecify.annotations.NonNull;
 @Factory
 public class GoogleCloudStorageFactory {
 
+    private final GoogleCloudStorageModuleConfiguration objectStorageConfiguration;
+
+    /**
+     * Creates a Google Cloud Storage factory with the default module configuration.
+     */
+    public GoogleCloudStorageFactory() {
+        this(new GoogleCloudStorageModuleConfiguration());
+    }
+
+    @Inject
+    GoogleCloudStorageFactory(GoogleCloudStorageModuleConfiguration objectStorageConfiguration) {
+        this.objectStorageConfiguration = objectStorageConfiguration;
+    }
+
     /**
      * @param configuration The Google Cloud Configuration
-     * @param googleCredentials        The Google Credentials
+     * @param googleCredentials The Google Credentials
      * @return The storage instance
      */
     @RequiresGoogleProjectId
     @Singleton
     public StorageOptions.@NonNull Builder builder(@NonNull GoogleCloudConfiguration configuration,
                                                    @NonNull GoogleCredentials googleCredentials) {
-        return StorageOptions.newBuilder()
+        var builder = objectStorageConfiguration.isGrpcEnabled() ? StorageOptions.grpc() : StorageOptions.newBuilder();
+        return builder
             .setProjectId(configuration.getProjectId())
             .setCredentials(googleCredentials);
     }
