@@ -1,6 +1,6 @@
 [versions]
-micronaut-platform = "5.1.4"
-micronaut = "5.2.0"
+micronaut-platform = "5.1.5"
+micronaut = "5.2.1"
 micronaut-test = "5.1.0"
 micronaut-aws = "5.1.1"
 micronaut-azure = "6.1.0"
