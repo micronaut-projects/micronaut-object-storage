@@ -33,10 +33,7 @@ namespace and bucket.
 For configuration properties other than the specified above, you can add bean to your application that implements
 https://docs.micronaut.io/latest/guide/#events[`BeanCreatedEventListener`]. For example:
 
-[source,java]
-----
-include::doc-examples/example-java/src/main/java/example/oraclecloud/ObjectStorageClientBuilderCustomizer.java[tags="class"]
-----
+snippet::example.oraclecloud.ObjectStorageClientBuilderCustomizer[project-base="doc-examples/example", source="main", indent="0", tags="class"]
 
 See api:objectstorage.multipart.MultipartObjectStorageOperations[] and the <<multipartUploads,Multipart Uploads>> guide for the
 portable multipart lifecycle contract.

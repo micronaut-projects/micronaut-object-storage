@@ -32,7 +32,4 @@ configured container name.
 For configuration properties other than the specified above, you can add bean to your application that implements
 https://docs.micronaut.io/latest/guide/#events[`BeanCreatedEventListener`]. For example:
 
-[source,java]
-----
-include::doc-examples/example-java/src/main/java/example/azure/BlobServiceClientBuilderCustomizer.java[tags="class"]
-----
+snippet::example.azure.BlobServiceClientBuilderCustomizer[project-base="doc-examples/example", source="main", indent="0", tags="class"]
