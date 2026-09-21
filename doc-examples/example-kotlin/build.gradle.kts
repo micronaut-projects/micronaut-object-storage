@@ -7,4 +7,5 @@ plugins {
 
 dependencies {
     ksp(mn.micronaut.http.validation)
+    implementation(projects.micronautObjectStorageOracleCloud)
 }
