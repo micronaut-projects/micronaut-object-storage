@@ -17,5 +17,6 @@ class BlobServiceClientBuilderCustomizerTest:
         pipeline = self.client.getHttpPipeline()
         policies = [pipeline.getPolicy(i) for i in range(pipeline.getPolicyCount())]
 
-        # the no-op policy added by the Python customizer comes back to Python as the lambda itself
-        assert any(getattr(policy, "__name__", None) == "<lambda>" for policy in policies)
+        # a Python callable converted to a functional interface (the no-op `HttpPipelinePolicy` lambda of the
+        # customizer) is the original callable again when it is returned to Python
+        assert any(callable(policy) and getattr(policy, "__name__", None) == "<lambda>" for policy in policies)

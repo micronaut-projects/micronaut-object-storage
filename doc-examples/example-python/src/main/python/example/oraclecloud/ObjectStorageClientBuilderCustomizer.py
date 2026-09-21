@@ -9,8 +9,8 @@ from micronaut.context.event import BeanCreatedEvent, BeanCreatedEventListener
 @Singleton
 class ObjectStorageClientBuilderCustomizer(BeanCreatedEventListener[ObjectStorageClient.Builder]):
 
-    CONNECTION_TIMEOUT_IN_MILLISECONDS: int = 25000
-    READ_TIMEOUT_IN_MILLISECONDS: int = 35000
+    CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000
+    READ_TIMEOUT_IN_MILLISECONDS = 35000
 
     def onCreated(self, event: BeanCreatedEvent[ObjectStorageClient.Builder]) -> ObjectStorageClient.Builder:
         client_configuration = ClientConfiguration.builder() \

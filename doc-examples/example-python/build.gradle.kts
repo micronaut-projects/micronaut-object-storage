@@ -42,25 +42,7 @@ dependencies {
     testRuntimeOnly(libs.bytebuddy)
 }
 
-// TODO(python): the documentation classes live in src/main/python (the `source="main"` snippets) and the
-// tests in src/test/python. Compiling them separately yields two GraalPy VFS roots whose generated shim
-// modules shadow each other at test time, and the Python compiler (micronaut-inject-python) resolves the imports of a source file
-// only within its own source root, so both roots are merged into one directory compiled with the tests.
-val mergePythonSources = tasks.register<Sync>("mergePythonSources") {
-    from(layout.projectDirectory.dir("src/main/python"))
-    from(layout.projectDirectory.dir("src/test/python"))
-    into(layout.buildDirectory.dir("merged-python-sources"))
-}
-tasks.named("compilePython") {
-    enabled = false
-}
-tasks.named<io.micronaut.build.python.PythonCompile>("compileTestPython") {
-    dependsOn(mergePythonSources)
-    source.setFrom(mergePythonSources.map { it.destinationDir })
-}
-
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     systemProperty("micronaut.python.pool.enabled", "false")
-    enableAssertions = false
 }
