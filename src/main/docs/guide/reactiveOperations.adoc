@@ -12,23 +12,7 @@ The reactive API mirrors the blocking contract:
 
 Example injection:
 
-[source,java]
-----
-package example;
-
-import io.micronaut.objectstorage.ReactiveObjectStorageOperations;
-import jakarta.inject.Singleton;
-
-@Singleton
-class ReactiveProfileService {
-
-    private final ReactiveObjectStorageOperations<?, ?, ?> objectStorage;
-
-    ReactiveProfileService(ReactiveObjectStorageOperations<?, ?, ?> objectStorage) {
-        this.objectStorage = objectStorage;
-    }
-}
-----
+snippet::example.ReactiveProfileService[project-base="doc-examples/example", source="main", indent="0", tags="class"]
 
 Phase 1 keeps the existing request and entry abstractions unchanged:
 

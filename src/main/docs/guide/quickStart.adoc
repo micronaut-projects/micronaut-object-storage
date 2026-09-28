@@ -104,11 +104,11 @@ snippet::example.ProfileService[project-base="doc-examples/example", source="mai
 
 If you prefer URI-based resolution, you can retrieve the same object through api:io.micronaut.core.io.ResourceResolver[]:
 
-[source,java]
-----
-ResourceResolver resourceResolver = new ResourceResolver(resourceLoaders);
-Optional<InputStream> logo = resourceResolver.getResourceAsStream("pictures://avatars/logo.png");
-----
+snippet::example.LogoService[project-base="doc-examples/example", source="main", indent="0", tags="class"]
+
+<1> The api:io.micronaut.core.io.ResourceResolver[] bean aggregates the `ResourceLoader` beans published by the
+    configured storages.
+<2> The `pictures` storage resolves the URI to the object with the key `avatars/logo.png`.
 
 == Deleting files
 

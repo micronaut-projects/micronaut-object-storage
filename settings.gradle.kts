@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "8.0.2"
+    id("io.micronaut.build.shared.settings") version "8.1.2"
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -29,6 +29,7 @@ include("test-suite-graal")
 include("doc-examples:example-java")
 include("doc-examples:example-groovy")
 include("doc-examples:example-kotlin")
+include("doc-examples:example-python")
 include("test-suite-utils")
 configure<MicronautBuildSettingsExtension> {
     useStandardizedProjectNames.set(true)
