@@ -24,7 +24,7 @@
         }
     </script>
     <style type="text/css">
-        .lang-java { display: block }; .lang-python { display: block }; .lang-kotlin { display: block }; .lang-groovy { display: block }; .lang-scala { display: block }; 
+        .lang-java { display: block }; .lang-python { display: block }; .lang-kotlin { display: block }; .lang-groovy { display: block }; 
     </style>
 </head>
 
@@ -155,13 +155,13 @@
         <h1>Micronaut Object Storage</h1>
         <p></p>
         <p>Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers</p>
-        <p><strong>Version:</strong> 3.2.0-SNAPSHOT </p>
+        <p><strong>Version:</strong> 3.1.1-SNAPSHOT </p>
     </div>
     
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/introduction.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/introduction.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -200,7 +200,7 @@ blocking contract with Reactive Streams <code>Publisher</code> return types.</p>
 <h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>2 Release History</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/releaseHistory.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/releaseHistory.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -216,7 +216,7 @@ blocking contract with Reactive Streams <code>Publisher</code> return types.</p>
 <h1 id="quickStart"><a class="anchor" href="#quickStart"></a>3 Quick Start</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/quickStart.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/quickStart.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -264,15 +264,6 @@ public class ProfileService {
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class ProfileService:
-
-    def __init__(self, object_storage: ObjectStorageOperations):
-        self.object_storage = object_storage</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
 open class ProfileService(private val objectStorage: ObjectStorageOperations&lt;*, *, *&gt;) {
 
@@ -309,15 +300,6 @@ public class UploadController {
     }
 
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Controller
-class UploadController:
-
-    def __init__(self, object_storage: AwsS3Operations):
-        self.object_storage = object_storage</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -480,14 +462,6 @@ they must not collide with the provider aliases <code>s3</code>, <code>gs</code>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def save_profile_picture(self, user_id: str, path: Path) -&gt; str:
-    request = UploadRequest.fromPath(path, user_id)  # <b class="conum">(1)</b>
-    response = self.object_storage.upload(request)  # <b class="conum">(2)</b>
-    return response.getKey()  # <b class="conum">(3)</b></code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun saveProfilePicture(userId: String, path: Path): String? {
     val request = UploadRequest.fromPath(path, userId) // <b class="conum">(1)</b>
     val response = objectStorage.upload(request) // <b class="conum">(2)</b>
@@ -539,11 +513,6 @@ cloud vendor-specific request class or builder.</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">response = self.object_storage.upload(object_storage_upload, lambda builder: builder.acl(ObjectCannedACL.PUBLIC_READ))</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">val response = objectStorage.upload(objectStorageUpload) { builder: PutObjectRequest.Builder -&gt;
     builder.acl(ObjectCannedACL.PUBLIC_READ)
 }</code></pre>
@@ -569,17 +538,6 @@ public HttpResponse&lt;String&gt; streamingUpload(StreamingFileUpload fileUpload
         .created(response.getKey())
         .header("ETag", response.getNativeResponse().eTag());
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Post(uri="/stream", consumes=MediaType.MULTIPART_FORM_DATA, produces=MediaType.TEXT_PLAIN)
-def streaming_upload(self, file_upload: StreamingFileUpload) -&gt; HttpResponse[str]:
-    object_storage_upload = UploadRequest.fromStreamingFileUpload(file_upload, "uploads/" + file_upload.getFilename())
-    response = self.object_storage.upload(object_storage_upload)
-    return HttpResponse \
-        .created(response.getKey()) \
-        .header("ETag", response.getNativeResponse().eTag())</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -622,19 +580,6 @@ request stream, you can upload it directly without first collecting it into a by
     request.setMetadata(Map.of("source", "validated-upload")); // <b class="conum">(2)</b>
     return objectStorage.upload(request).getKey();
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def save_profile_picture_stream(self, user_id: str, input_stream: InputStream, content_length: int) -&gt; str:
-    request = UploadRequest.fromInputStream(
-        input_stream,
-        user_id + "/profile.jpg",
-        "image/jpeg",
-        content_length  # <b class="conum">(1)</b>
-    )
-    request.setMetadata({"source": "validated-upload"})  # <b class="conum">(2)</b>
-    return self.object_storage.upload(request).getKey()</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -718,24 +663,6 @@ after consuming part of the stream.</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def retrieve_profile_picture(self, user_id: str, file_name: str) -&gt; Path | None:
-    destination = None
-    try:
-        key = user_id + "/" + file_name
-        stream = self.object_storage.retrieve(key).map(lambda entry: entry.getInputStream())  # <b class="conum">(1)</b>
-        if stream.isPresent():
-            destination = File.createTempFile(user_id, "temp").toPath()
-            Files.copy(stream.get(), destination, StandardCopyOption.REPLACE_EXISTING)
-            return destination
-        else:
-            return None
-    except IOException as e:
-        LOG.error("Error while trying to save profile picture to the local file [%s]: %s", destination, e.getMessage())
-        return None</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun retrieveProfilePicture(userId: String, fileName: String): Path? {
     val key = "$userId/$fileName"
     val stream = objectStorage.retrieve&lt;ObjectStorageEntry&lt;*&gt;&gt;(key) // <b class="conum">(1)</b>
@@ -779,75 +706,11 @@ There is also a <code>getNativeEntry()</code> method that gives you access to th
 <div class="paragraph">
 <p>If you prefer URI-based resolution, you can retrieve the same object through <a href="../api/io/micronaut/core/io/ResourceResolver.html">ResourceResolver</a>:</p>
 </div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
-public class LogoService {
-
-    private final ResourceResolver resourceResolver;
-
-    public LogoService(ResourceResolver resourceResolver) { // <b class="conum">(1)</b>
-        this.resourceResolver = resourceResolver;
-    }
-
-    public Optional&lt;InputStream&gt; retrieveLogo() {
-        return resourceResolver.getResourceAsStream("pictures://avatars/logo.png"); // <b class="conum">(2)</b>
-    }
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">ResourceResolver resourceResolver = new ResourceResolver(resourceLoaders);
+Optional&lt;InputStream&gt; logo = resourceResolver.getResourceAsStream("pictures://avatars/logo.png");</code></pre>
 </div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class LogoService:
-
-    def __init__(self, resource_resolver: ResourceResolver):  # <b class="conum">(1)</b>
-        self.resource_resolver = resource_resolver
-
-    def retrieve_logo(self) -&gt; InputStream | None:
-        return self.resource_resolver.getResourceAsStream("pictures://avatars/logo.png").orElse(None)  # <b class="conum">(2)</b></code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
-open class LogoService(private val resourceResolver: ResourceResolver) { // <b class="conum">(1)</b>
-
-    open fun retrieveLogo(): Optional&lt;InputStream&gt; {
-        return resourceResolver.getResourceAsStream("pictures://avatars/logo.png") // <b class="conum">(2)</b>
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Singleton
-class LogoService {
-
-    private final ResourceResolver resourceResolver
-
-    LogoService(ResourceResolver resourceResolver) { // <b class="conum">(1)</b>
-        this.resourceResolver = resourceResolver
-    }
-
-    Optional&lt;InputStream&gt; retrieveLogo() {
-        resourceResolver.getResourceAsStream("pictures://avatars/logo.png") // <b class="conum">(2)</b>
-    }
-}</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The <a href="../api/io/micronaut/core/io/ResourceResolver.html">ResourceResolver</a> bean aggregates the <code>ResourceLoader</code> beans published by the
-configured storages.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The <code>pictures</code> storage resolves the URI to the object with the key <code>avatars/logo.png</code>.</td>
-</tr>
-</table>
 </div>
 </div>
 </div>
@@ -860,13 +723,6 @@ configured storages.</td>
     String key = userId + "/" + fileName;
     objectStorage.delete(key); // <b class="conum">(1)</b>
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def delete_profile_picture(self, user_id: str, file_name: str) -&gt; None:
-    key = user_id + "/" + file_name
-    self.object_storage.delete(key)  # <b class="conum">(1)</b></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -905,7 +761,7 @@ configured storages.</td>
 <h1 id="reactiveOperations"><a class="anchor" href="#reactiveOperations"></a>4 Reactive Operations</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/reactiveOperations.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/reactiveOperations.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -937,43 +793,20 @@ Reactive Streams-based companion to <a href="../api/io/micronaut/objectstorage/O
 <div class="paragraph">
 <p>Example injection:</p>
 </div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
-public class ReactiveProfileService {
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.objectstorage.ReactiveObjectStorageOperations;
+import jakarta.inject.Singleton;
+
+@Singleton
+class ReactiveProfileService {
 
     private final ReactiveObjectStorageOperations&lt;?, ?, ?&gt; objectStorage;
 
-    public ReactiveProfileService(ReactiveObjectStorageOperations&lt;?, ?, ?&gt; objectStorage) {
-        this.objectStorage = objectStorage;
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class ReactiveProfileService:
-
-    def __init__(self, object_storage: ReactiveObjectStorageOperations):
-        self.object_storage = object_storage</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
-class ReactiveProfileService(private val objectStorage: ReactiveObjectStorageOperations&lt;*, *, *&gt;)</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Singleton
-class ReactiveProfileService {
-
-    private final ReactiveObjectStorageOperations&lt;?, ?, ?&gt; objectStorage
-
     ReactiveProfileService(ReactiveObjectStorageOperations&lt;?, ?, ?&gt; objectStorage) {
-        this.objectStorage = objectStorage
+        this.objectStorage = objectStorage;
     }
 }</code></pre>
 </div>
@@ -1024,7 +857,7 @@ existing blocking implementations onto Micronaut&#8217;s blocking executor</p>
 <h1 id="preSignedUploads"><a class="anchor" href="#preSignedUploads"></a>5 Pre-Signed Uploads</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/preSignedUploads.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/preSignedUploads.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1112,25 +945,6 @@ public HttpResponse&lt;PresignedUploadResponse&gt; create(@Body CreateUploadComm
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Post(uri="/signed", consumes=MediaType.APPLICATION_JSON, produces=MediaType.APPLICATION_JSON)
-def create(self, command: Annotated[CreateUploadCommand, Body]) -&gt; HttpResponse[PresignedUploadResponse]:
-    request = CreatePresignedUploadRequest("profiles/" + command.userId + ".png", Duration.ofMinutes(5))  # <b class="conum">(1)</b>
-    request.setContentType(MediaType.IMAGE_PNG)
-    request.setMetadata({"owner": command.userId})
-
-    signed_upload = self.object_storage.createPresignedUpload(request) \
-        .orElseThrow(lambda: IllegalStateException("This provider does not support pre-signed uploads"))
-
-    return HttpResponse.ok(PresignedUploadResponse(  # <b class="conum">(2)</b>
-        signed_upload.getUri().toString(),
-        signed_upload.getMethod(),
-        signed_upload.getHeaders(),
-        signed_upload.getExpiration()
-    ))</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Post(uri = "/signed", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
 open fun create(@Body command: CreateUploadCommand): HttpResponse&lt;PresignedUploadResponse&gt; {
     val request = CreatePresignedUploadRequest("profiles/${command.userId}.png", Duration.ofMinutes(5)) // <b class="conum">(1)</b>
@@ -1190,7 +1004,7 @@ HttpResponse&lt;PresignedUploadResponse&gt; create(@Body CreateUploadCommand com
 <h1 id="paginatedListing"><a class="anchor" href="#paginatedListing"></a>6 Paginated Listing</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/paginatedListing.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/paginatedListing.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1235,25 +1049,6 @@ the examples intentionally keep the code provider-agnostic and rely only on Obje
         continuation = response.getContinuationToken().orElse(null); // <b class="conum">(3)</b>
     } while (continuation != null);
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def list_profile_pictures_by_page(self, user_id: str) -&gt; None:
-    prefix = user_id + "/"  # raw prefix filtering
-    continuation = None
-    while True:
-        request = ListObjectsRequest(2, prefix, continuation)  # <b class="conum">(1)</b>
-        response = self.object_storage.listObjects(request)
-
-        # Process the keys in this page
-        for key in response.getKeys():
-            print("Found: " + key)  # <b class="conum">(2)</b>
-
-        # Replay the continuation token returned by the provider for the next page
-        continuation = response.getContinuationToken().orElse(None)  # <b class="conum">(3)</b>
-        if continuation is None:
-            break</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1315,7 +1110,7 @@ continuation token (null for the first page).</td>
 <h1 id="multipartUploads"><a class="anchor" href="#multipartUploads"></a>7 Multipart Uploads</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/multipartUploads.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/multipartUploads.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1468,31 +1263,6 @@ minimum. The final part may be smaller.</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def upload_video(self, key: str, non_final_chunk: bytes, final_chunk: bytes) -&gt; str:
-    create_response = self.multipart_object_storage.createMultipartUpload(
-        CreateMultipartUploadRequest(key, "video/mp4")
-    )
-    upload = create_response.getUpload()
-
-    try:
-        first_part = self.multipart_object_storage.uploadPart(
-            UploadPartRequest(upload, 1, UploadRequest.fromBytes(non_final_chunk, upload.getKey()))
-        )
-        second_part = self.multipart_object_storage.uploadPart(
-            UploadPartRequest(upload, 2, UploadRequest.fromBytes(final_chunk, upload.getKey()))
-        )
-
-        self.multipart_object_storage.completeMultipartUpload(
-            CompleteMultipartUploadRequest(upload, [first_part.getPart(), second_part.getPart()])
-        )
-        return upload.getKey()
-    except RuntimeException as e:
-        self.multipart_object_storage.abortMultipartUpload(AbortMultipartUploadRequest(upload))
-        raise e</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun uploadVideo(key: String, nonFinalChunk: ByteArray, finalChunk: ByteArray): String {
     val createResponse = multipartObjectStorage.createMultipartUpload(
         CreateMultipartUploadRequest(key, "video/mp4")
@@ -1560,7 +1330,7 @@ fully in memory.</p>
 <h1 id="bucketManagement"><a class="anchor" href="#bucketManagement"></a>8 Bucket and Container Management</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/bucketManagement.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/bucketManagement.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1588,18 +1358,6 @@ public class BucketService {
     }
 
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class BucketService:
-
-    def __init__(self,
-                 bucket_operations: Annotated[BucketOperations, Named("default")],
-                 reactive_bucket_operations: Annotated[ReactiveBucketOperations, Named("default")]):
-        self.bucket_operations = bucket_operations
-        self.reactive_bucket_operations = reactive_bucket_operations</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1649,16 +1407,6 @@ class BucketService {
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def manage_bucket(self, name: str) -&gt; None:
-    self.bucket_operations.create(name)
-    exists = self.bucket_operations.exists(name)
-    self.bucket_operations.retrieve(name).ifPresent(lambda bucket: print(bucket.name()))
-    if exists:
-        self.bucket_operations.delete(name)</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">open fun manageBucket(name: String) {
     bucketOperations.create(name)
     val exists = bucketOperations.exists(name)
@@ -1695,13 +1443,6 @@ the portable API keeps the logical bucket or container name available via <code>
     Publisher&lt;Void&gt; create = reactiveBucketOperations.create(name);
     Publisher&lt;Boolean&gt; exists = reactiveBucketOperations.exists(name);
 }</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">def manage_bucket_reactive(self, name: str) -&gt; None:
-    create: Publisher = self.reactive_bucket_operations.create(name)
-    exists: Publisher = self.reactive_bucket_operations.exists(name)</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1767,7 +1508,7 @@ in addition to the existing <code>bucket</code> and <code>namespace</code> confi
 <h1 id="metadataPersistence"><a class="anchor" href="#metadataPersistence"></a>9 Metadata Persistence SPI</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/metadataPersistence.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/metadataPersistence.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1871,7 +1612,7 @@ semantics between those stores. Providers should document their own consistency 
 <h1 id="aws"><a class="anchor" href="#aws"></a>10 Amazon S3</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/aws.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/aws.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1893,15 +1634,6 @@ semantics between those stores. Providers should document their own consistency 
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-aws&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
-runtime = [
-    <span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-aws"</span>,
-]</code></pre>
 </div>
 </div>
 </p>
@@ -2042,7 +1774,7 @@ It also implements <a href="../api/io/micronaut/objectstorage/multipart/Multipar
 <p>For configuration properties other than the specified above, you can add bean to your application that implements
 <a href="https://docs.micronaut.io/latest/guide/#events"><code>BeanCreatedEventListener</code></a>. For example:</p>
 </div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
 public class S3ClientBuilderCustomizer implements BeanCreatedEventListener&lt;S3ClientBuilder&gt; {
@@ -2051,41 +1783,6 @@ public class S3ClientBuilderCustomizer implements BeanCreatedEventListener&lt;S3
     public S3ClientBuilder onCreated(@NonNull BeanCreatedEvent&lt;S3ClientBuilder&gt; event) {
         return event.getBean()
             .overrideConfiguration(c -&gt; c.apiCallTimeout(Duration.of(60, ChronoUnit.SECONDS)));
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class S3ClientBuilderCustomizer(BeanCreatedEventListener[S3ClientBuilder]):
-
-    def onCreated(self, event: BeanCreatedEvent[S3ClientBuilder]) -&gt; S3ClientBuilder:
-        return event.getBean() \
-            .overrideConfiguration(lambda c: c.apiCallTimeout(Duration.of(60, ChronoUnit.SECONDS)))</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
-class S3ClientBuilderCustomizer : BeanCreatedEventListener&lt;S3ClientBuilder&gt; {
-
-    override fun onCreated(event: BeanCreatedEvent&lt;S3ClientBuilder&gt;): S3ClientBuilder {
-        return event.bean
-            .overrideConfiguration { c: ClientOverrideConfiguration.Builder -&gt; c.apiCallTimeout(Duration.of(60, ChronoUnit.SECONDS)) }
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Singleton
-class S3ClientBuilderCustomizer implements BeanCreatedEventListener&lt;S3ClientBuilder&gt; {
-
-    @Override
-    S3ClientBuilder onCreated(BeanCreatedEvent&lt;S3ClientBuilder&gt; event) {
-        event.bean
-            .overrideConfiguration { c -&gt; c.apiCallTimeout(Duration.of(60, ChronoUnit.SECONDS)) }
     }
 }</code></pre>
 </div>
@@ -2112,7 +1809,7 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
 <h1 id="azure"><a class="anchor" href="#azure"></a>11 Azure Blob Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/azure.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/azure.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2134,15 +1831,6 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-azure&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
-runtime = [
-    <span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-azure"</span>,
-]</code></pre>
 </div>
 </div>
 </p>
@@ -2332,7 +2020,7 @@ configured container name.</p>
 <p>For configuration properties other than the specified above, you can add bean to your application that implements
 <a href="https://docs.micronaut.io/latest/guide/#events"><code>BeanCreatedEventListener</code></a>. For example:</p>
 </div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
 public class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListener&lt;BlobServiceClientBuilder&gt; {
@@ -2345,48 +2033,13 @@ public class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListe
 }</code></pre>
 </div>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class BlobServiceClientBuilderCustomizer(BeanCreatedEventListener[BlobServiceClientBuilder]):
-
-    def onCreated(self, event: BeanCreatedEvent[BlobServiceClientBuilder]) -&gt; BlobServiceClientBuilder:
-        no_op: HttpPipelinePolicy = lambda context, next: next.process()
-        return event.getBean().addPolicy(no_op)</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
-class BlobServiceClientBuilderCustomizer : BeanCreatedEventListener&lt;BlobServiceClientBuilder&gt; {
-
-    override fun onCreated(event: BeanCreatedEvent&lt;BlobServiceClientBuilder&gt;): BlobServiceClientBuilder {
-        val noOp = HttpPipelinePolicy { _, next -&gt; next.process() }
-        return event.bean.addPolicy(noOp)
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Singleton
-class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListener&lt;BlobServiceClientBuilder&gt; {
-
-    @Override
-    BlobServiceClientBuilder onCreated(BeanCreatedEvent&lt;BlobServiceClientBuilder&gt; event) {
-        HttpPipelinePolicy noOp = { context, next -&gt; next.process() }
-        event.bean.addPolicy(noOp)
-    }
-}</code></pre>
-</div>
-</div>
 </div>
 </div>
 
 <h1 id="gcp"><a class="anchor" href="#gcp"></a>12 Google Cloud Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/gcp.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/gcp.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2408,15 +2061,6 @@ class BlobServiceClientBuilderCustomizer implements BeanCreatedEventListener&lt;
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-gcp&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
-runtime = [
-    <span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-gcp"</span>,
-]</code></pre>
 </div>
 </div>
 </p>
@@ -2570,7 +2214,7 @@ micronaut {
 <p>For configuration properties other than the specified above, you can add bean to your application that implements
 <a href="https://docs.micronaut.io/latest/guide/#events"><code>BeanCreatedEventListener</code></a>. For example:</p>
 </div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
 public class StorageOptionsBuilderCustomizer implements BeanCreatedEventListener&lt;StorageOptions.Builder&gt; {
@@ -2579,41 +2223,6 @@ public class StorageOptionsBuilderCustomizer implements BeanCreatedEventListener
     public StorageOptions.Builder onCreated(@NonNull BeanCreatedEvent&lt;StorageOptions.Builder&gt; event) {
         return event.getBean()
             .setTransportOptions(HttpTransportOptions.newBuilder().setConnectTimeout(60_000).build());
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">@Singleton
-class StorageOptionsBuilderCustomizer(BeanCreatedEventListener[StorageOptions.Builder]):
-
-    def onCreated(self, event: BeanCreatedEvent[StorageOptions.Builder]) -&gt; StorageOptions.Builder:
-        return event.getBean() \
-            .setTransportOptions(HttpTransportOptions.newBuilder().setConnectTimeout(60_000).build())</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">@Singleton
-class StorageOptionsBuilderCustomizer : BeanCreatedEventListener&lt;StorageOptions.Builder&gt; {
-
-    override fun onCreated(event: BeanCreatedEvent&lt;StorageOptions.Builder&gt;): StorageOptions.Builder {
-        return event.bean
-            .setTransportOptions(HttpTransportOptions.newBuilder().setConnectTimeout(60_000).build())
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Singleton
-class StorageOptionsBuilderCustomizer implements BeanCreatedEventListener&lt;StorageOptions.Builder&gt; {
-
-    @Override
-    StorageOptions.Builder onCreated(BeanCreatedEvent&lt;StorageOptions.Builder&gt; event) {
-        event.bean
-            .setTransportOptions(HttpTransportOptions.newBuilder().setConnectTimeout(60_000).build())
     }
 }</code></pre>
 </div>
@@ -2636,7 +2245,7 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
 <h1 id="oracleCloud"><a class="anchor" href="#oracleCloud"></a>13 Oracle Cloud Infrastructure (OCI) Object Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/oracleCloud.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/oracleCloud.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2658,15 +2267,6 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
     &lt;groupId&gt;io.micronaut.objectstorage&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-object-storage-oracle-cloud&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
-runtime = [
-    <span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-oracle-cloud"</span>,
-]</code></pre>
 </div>
 </div>
 </p>
@@ -2846,7 +2446,7 @@ namespace and bucket.</p>
 <p>For configuration properties other than the specified above, you can add bean to your application that implements
 <a href="https://docs.micronaut.io/latest/guide/#events"><code>BeanCreatedEventListener</code></a>. For example:</p>
 </div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
 @Singleton
@@ -2866,71 +2466,6 @@ public class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventLis
 
         return event.getBean()
             .configuration(clientConfiguration);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python"># See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
-@Singleton
-class ObjectStorageClientBuilderCustomizer(BeanCreatedEventListener[ObjectStorageClient.Builder]):
-
-    CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000
-    READ_TIMEOUT_IN_MILLISECONDS = 35000
-
-    def onCreated(self, event: BeanCreatedEvent[ObjectStorageClient.Builder]) -&gt; ObjectStorageClient.Builder:
-        client_configuration = ClientConfiguration.builder() \
-            .connectionTimeoutMillis(self.CONNECTION_TIMEOUT_IN_MILLISECONDS) \
-            .readTimeoutMillis(self.READ_TIMEOUT_IN_MILLISECONDS) \
-            .build()
-
-        return event.getBean() \
-            .configuration(client_configuration)</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
-@Singleton
-class ObjectStorageClientBuilderCustomizer : BeanCreatedEventListener&lt;ObjectStorageClient.Builder&gt; {
-
-    companion object {
-        const val CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000
-        const val READ_TIMEOUT_IN_MILLISECONDS = 35000
-    }
-
-    override fun onCreated(event: BeanCreatedEvent&lt;ObjectStorageClient.Builder&gt;): ObjectStorageClient.Builder {
-        val clientConfiguration = ClientConfiguration.builder()
-            .connectionTimeoutMillis(CONNECTION_TIMEOUT_IN_MILLISECONDS)
-            .readTimeoutMillis(READ_TIMEOUT_IN_MILLISECONDS)
-            .build()
-
-        return event.bean
-            .configuration(clientConfiguration)
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">//See https://github.com/oracle/oci-java-sdk/blob/master/bmc-examples/src/main/java/ClientConfigurationTimeoutExample.java
-@Singleton
-class ObjectStorageClientBuilderCustomizer implements BeanCreatedEventListener&lt;ObjectStorageClient.Builder&gt; {
-
-    public static final int CONNECTION_TIMEOUT_IN_MILLISECONDS = 25000
-    public static final int READ_TIMEOUT_IN_MILLISECONDS = 35000
-
-    @Override
-    ObjectStorageClient.Builder onCreated(BeanCreatedEvent&lt;ObjectStorageClient.Builder&gt; event) {
-        ClientConfiguration clientConfiguration =
-            ClientConfiguration.builder()
-                .connectionTimeoutMillis(CONNECTION_TIMEOUT_IN_MILLISECONDS)
-                .readTimeoutMillis(READ_TIMEOUT_IN_MILLISECONDS)
-                .build()
-
-        event.bean
-            .configuration(clientConfiguration)
     }
 }</code></pre>
 </div>
@@ -2957,7 +2492,7 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
 <h1 id="local"><a class="anchor" href="#local"></a>14 Local Storage</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/local.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/local.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2980,15 +2515,6 @@ See the guide for <a href="https://guides.micronaut.io/latest/micronaut-object-s
     &lt;artifactId&gt;micronaut-object-storage-local&lt;/artifactId&gt;
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
-test = [
-    <span class="hljs-string">"io.micronaut.objectstorage:micronaut-object-storage-local"</span>,
-]</code></pre>
 </div>
 </div>
 </p>
@@ -3239,7 +2765,7 @@ See the <a href="#multipartUploads">Multipart Uploads</a> guide for the portable
 <h1 id="control-panel"><a class="anchor" href="#control-panel"></a>15 Control Panel</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/control-panel.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/control-panel.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3264,15 +2790,6 @@ See the <a href="#multipartUploads">Multipart Uploads</a> guide for the portable
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
-build = [
-    <span class="hljs-string">"io.micronaut.controlpanel:micronaut-control-panel-object-storage"</span>,
-]</code></pre>
-</div>
-</div>
 </p>
 </div>
 <div class="paragraph">
@@ -3284,7 +2801,7 @@ build = [
 <h1 id="objectStorageGuides"><a class="anchor" href="#objectStorageGuides"></a>16 Guides</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/objectStorageGuides.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/objectStorageGuides.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3300,7 +2817,7 @@ build = [
 <h1 id="breaks"><a class="anchor" href="#breaks"></a>17 Breaking Changes</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/breaks.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/breaks.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3331,7 +2848,7 @@ Use <code>AzureBlobStorageEntry(String, BinaryData, BlobProperties)</code> inste
 <h1 id="repository"><a class="anchor" href="#repository"></a>18 Repository</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.2.x/src/main/docs/guide/repository.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-object-storage/edit/3.1.x/src/main/docs/guide/repository.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
