@@ -14,6 +14,9 @@ dependencies {
         api("com.fasterxml.jackson.core:jackson-core:2.22.3") {
             because("Require a version without the known Jackson Databind vulnerabilities brought by google-cloud-storage")
         }
+        api("com.fasterxml.jackson.core:jackson-databind:2.22.3") {
+            because("Require a version without the known Jackson Databind vulnerabilities brought by google-cloud-storage")
+        }
     }
     api("com.fasterxml.jackson.core:jackson-core")
     implementation(platform(mnGcp.micronaut.gcp.bom))
