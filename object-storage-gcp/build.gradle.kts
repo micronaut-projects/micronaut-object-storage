@@ -11,7 +11,7 @@ dependencies {
         exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
     }
     constraints {
-        api("com.fasterxml.jackson.core:jackson-core:2.18.9") {
+        api("com.fasterxml.jackson.core:jackson-core:2.22.3") {
             because("Require a version without the known Jackson Databind vulnerabilities brought by google-cloud-storage")
         }
     }
