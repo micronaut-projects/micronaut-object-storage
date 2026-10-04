@@ -27,11 +27,33 @@ import io.micronaut.objectstorage.configuration.AbstractObjectStorageModuleConfi
 @ConfigurationProperties(GoogleCloudStorageConfiguration.PREFIX)
 public class GoogleCloudStorageModuleConfiguration extends AbstractObjectStorageModuleConfiguration {
 
+    private boolean grpcEnabled;
+
     /**
      * Whether to enable or disable the whole Google Cloud Storage module.
      */
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * Whether to use gRPC as the transport for Google Cloud Storage.
+     *
+     * @return {@code true} if gRPC transport is enabled
+     * @since 3.1.1
+     */
+    public boolean isGrpcEnabled() {
+        return grpcEnabled;
+    }
+
+    /**
+     * Sets whether to use gRPC as the transport for Google Cloud Storage.
+     *
+     * @param grpcEnabled Whether gRPC transport is enabled
+     * @since 3.1.1
+     */
+    public void setGrpcEnabled(boolean grpcEnabled) {
+        this.grpcEnabled = grpcEnabled;
     }
 }
