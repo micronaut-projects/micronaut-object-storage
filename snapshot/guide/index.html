@@ -371,7 +371,11 @@ micronaut.object-storage.aws.logos.bucket=logos-bucket</code></pre>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {object-storage = {aws = {pictures = {bucket = "pictures-bucket"}, logos = {bucket = "logos-bucket"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.object-storage.aws.pictures]
+bucket = "pictures-bucket"
+
+[micronaut.object-storage.aws.logos]
+bucket = "logos-bucket"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1967,7 +1971,8 @@ information about credentials and region configuration.</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {object-storage = {aws = {default = {bucket = "profile-pictures-bucket"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.object-storage.aws.default]
+bucket = "profile-pictures-bucket"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -2226,8 +2231,14 @@ micronaut:
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">azure = {credential = {client-secret = {client-id = "&lt;client-id&gt;", tenant-id = "&lt;tenant-id&gt;", secret = "&lt;secret&gt;"}}}
-micronaut = {object-storage = {azure = {default = {container = "profile-pictures-container", endpoint = "https://my-account.blob.core.windows.net"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[azure.credential.client-secret]
+client-id = "&lt;client-id&gt;"
+tenant-id = "&lt;tenant-id&gt;"
+secret = "&lt;secret&gt;"
+
+[micronaut.object-storage.azure.default]
+container = "profile-pictures-container"
+endpoint = "https://my-account.blob.core.windows.net"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -2486,8 +2497,11 @@ micronaut:
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">gcp = {project-id = "my-gcp-project"}
-micronaut = {object-storage = {gcp = {default = {bucket = "profile-pictures-bucket"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[gcp]
+project-id = "my-gcp-project"
+
+[micronaut.object-storage.gcp.default]
+bucket = "profile-pictures-bucket"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -2751,8 +2765,12 @@ micronaut:
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">oci = {config = {profile = "DEFAULT"}}
-micronaut = {object-storage = {oracle-cloud = {default = {bucket = "profile-pictures-bucket", namespace = "MyNamespace"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[oci.config]
+profile = "DEFAULT"
+
+[micronaut.object-storage.oracle-cloud.default]
+bucket = "profile-pictures-bucket"
+namespace = "MyNamespace"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -3014,7 +3032,8 @@ test = [
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {object-storage = {local = {default = {enabled = true}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.object-storage.local.default]
+enabled = true</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -3182,7 +3201,8 @@ restrictive ACLs by the caller.</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {object-storage = {local = {default = {path = "/tmp/my-object-storage"}}}}</code></pre>
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut.object-storage.local.default]
+path = "/tmp/my-object-storage"</code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
