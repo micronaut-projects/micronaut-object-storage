@@ -45,16 +45,21 @@ import java.util.concurrent.locks.Lock;
 final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperations<Path> {
 
     private final LocalStorageLayout layout;
+    private final LocalStorageMetadataMode metadataMode;
     private final boolean supportsPosixPermissions;
 
     LocalStorageObjectMetadataOperations(@Parameter LocalStorageConfiguration configuration) {
         this.layout = new LocalStorageLayout(configuration);
+        this.metadataMode = configuration.getMetadataMode();
         this.supportsPosixPermissions = layout.storageRoot().getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
     @Override
     @NonNull
     public Optional<ObjectMetadataEntry<Path>> retrieve(@NonNull String key) {
+        if (metadataMode == LocalStorageMetadataMode.NONE) {
+            return Optional.empty();
+        }
         for (Path metadataFile : layout.objectMetadataReadPaths(key)) {
             try {
                 return Optional.of(LocalStorageMetadataSupport.readObjectMetadata(metadataFile, key));
@@ -70,6 +75,9 @@ final class LocalStorageObjectMetadataOperations implements ObjectMetadataOperat
 
     @Override
     public void save(@NonNull ObjectMetadataWrite write) {
+        if (metadataMode == LocalStorageMetadataMode.NONE) {
+            throw new ObjectStorageException("Local storage metadata mode NONE does not support object metadata persistence");
+        }
         Lock bucketLock = LocalStorageLocks.bucketReadLock(layout.configuredBucketPath());
         bucketLock.lock();
         try {
