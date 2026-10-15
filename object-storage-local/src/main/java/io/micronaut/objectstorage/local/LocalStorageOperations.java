@@ -519,10 +519,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return LocalStorageLayout.reservedLocalStorageNamespace(name);
     }
 
-    private static boolean isReservedLocalStorageKey(String key) {
-        return LocalStorageLayout.isReservedLocalStorageKey(key);
-    }
-
     private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
         deleteEmptyDirectories(directories, failure);
     }

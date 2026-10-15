@@ -68,7 +68,7 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
      * @since 3.1.1
      */
     public void setInternalDirectory(@NonNull String internalDirectory) {
-        if (internalDirectory == null || !internalDirectory.matches("[A-Za-z0-9._-]+") ||
+        if (!internalDirectory.matches("[A-Za-z0-9._-]+") ||
             internalDirectory.equals(".") || internalDirectory.equals("..") ||
             internalDirectory.equalsIgnoreCase(LocalStorageLayout.LEGACY_METADATA_DIRECTORY)) {
             throw new IllegalArgumentException("internal-directory must be one safe relative directory name other than .metadata");
