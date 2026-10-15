@@ -279,7 +279,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 if (File.separatorChar != '/') {
                     key = key.replace(File.separatorChar, '/');
                 }
-                if (isReservedLocalStorageKey(key)) {
+                if (layout.isInternalKey(key)) {
                     return;
                 }
                 if (prefix != null && !key.startsWith(prefix)) {

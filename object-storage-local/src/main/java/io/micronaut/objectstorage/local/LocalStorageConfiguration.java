@@ -49,6 +49,32 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
     @NonNull
     private LocalStorageMetadataMode metadataMode = LocalStorageMetadataMode.ENABLED;
 
+    private String internalDirectory = LocalStorageLayout.INTERNAL_DIRECTORY;
+
+    /**
+     * Returns the provider working directory name, relative to the storage root.
+     * @return The directory name, defaulting to {@code .mn-storage}.
+     * @since 3.1.1
+     */
+    @NonNull
+    public String getInternalDirectory() {
+        return internalDirectory;
+    }
+
+    /**
+     * Sets the directory used for metadata, multipart state, temporary files, and snapshots.
+     * @param internalDirectory One safe relative directory name.
+     * @since 3.1.1
+     */
+    public void setInternalDirectory(@NonNull String internalDirectory) {
+        if (internalDirectory == null || !internalDirectory.matches("[A-Za-z0-9._-]+") ||
+            internalDirectory.equals(".") || internalDirectory.equals("..") ||
+            internalDirectory.equalsIgnoreCase(LocalStorageLayout.LEGACY_METADATA_DIRECTORY)) {
+            throw new IllegalArgumentException("internal-directory must be one safe relative directory name other than .metadata");
+        }
+        this.internalDirectory = internalDirectory;
+    }
+
     public LocalStorageConfiguration(@Parameter String name) {
         super(name);
     }

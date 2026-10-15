@@ -17,6 +17,25 @@ micronaut:
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
 
+The optional `internal-directory` property defaults to `.mn-storage`. Set it to a single directory name
+(letters, digits, dots, underscores, or hyphens), such as `.graalbase-internal`, to change the directory
+under the storage root used for sidecars, multipart state, temporary writes, and rollback snapshots.
+The names `.` and `..`, paths, and `.metadata` are rejected. The configured name, `.mn-storage`, and
+legacy `.metadata` remain reserved and hidden from object listing.
+Configurations sharing a storage root must use the same internal directory name to preserve these protections.
+Changing this setting does not move existing data: stop storage operations and migrate the existing internal
+directory before restarting with the new name, including any in-progress multipart uploads.
+Paths below using `.mn-storage` describe the default; a custom name replaces that component.
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    local:
+      default:
+        internal-directory: .graalbase-internal
+----
+
 The `metadata-mode` property controls persistent metadata ownership:
 
 `ENABLED`:: The default. The local provider persists metadata through the configured metadata SPI. The built-in

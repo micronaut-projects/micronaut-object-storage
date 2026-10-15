@@ -20,6 +20,94 @@ import java.security.MessageDigest
 
 class LocalStorageMetadataModeSpec extends Specification {
 
+    void 'custom internal directory contains provider state and is reserved'() {
+        given:
+        Path root = Files.createTempDirectory('local-custom-internal')
+        Path bucket = root.resolve('default')
+        LocalStorageConfiguration configuration = enabledConfiguration(bucket)
+        configuration.internalDirectory = '.graalbase-internal'
+        LocalStorageLayout layout = new LocalStorageLayout(configuration)
+        LocalStorageOperations operations = new LocalStorageOperations(configuration)
+        LocalStorageMultipartOperations multipart = new LocalStorageMultipartOperations(configuration, operations)
+        operations.upload(UploadRequest.fromBytes('content'.bytes, 'object.txt'))
+        def created = multipart.createMultipartUpload(new CreateMultipartUploadRequest('multipart.txt'))
+
+        expect:
+        Files.exists(root.resolve('.graalbase-internal/metadata/objects/default/object.txt'))
+        created.nativeResponse.path.startsWith(root.resolve('.graalbase-internal/multipart/default'))
+        layout.objectTemporaryDirectory().startsWith(root.resolve('.graalbase-internal'))
+        layout.snapshotBucketDirectory().startsWith(root.resolve('.graalbase-internal'))
+        !Files.exists(root.resolve('.mn-storage'))
+
+        when:
+        Files.createDirectories(bucket.resolve('.graalbase-internal'))
+        Files.writeString(bucket.resolve('.graalbase-internal/hidden'), 'internal')
+
+        then:
+        operations.listObjects() == ['object.txt'] as Set
+
+        when:
+        operations.upload(UploadRequest.fromBytes('bad'.bytes, '.GRAALBASE-INTERNAL/hidden'))
+
+        then:
+        thrown IllegalArgumentException
+
+        when:
+        layout.bucketPath('.graalbase-internal')
+
+        then:
+        thrown IllegalArgumentException
+
+        cleanup:
+        LocalStorageBucketOperations.deleteRecursively(root)
+    }
+
+    void 'internal directory defaults and binds through configuration'() {
+        given:
+        ApplicationContext context = ApplicationContext.run([
+            (property('default', 'enabled')): true,
+            (property('custom', 'internal-directory')): '.graalbase-internal'
+        ])
+
+        expect:
+        configuration(context, 'default').internalDirectory == '.mn-storage'
+        configuration(context, 'custom').internalDirectory == '.graalbase-internal'
+
+        cleanup:
+        context.close()
+    }
+
+    void 'custom internal directory retains symlink protection'() {
+        given:
+        Path root = Files.createTempDirectory('local-custom-symlink')
+        Path outside = Files.createDirectory(root.resolve('outside'))
+        Files.createSymbolicLink(root.resolve('.graalbase-internal'), outside)
+        LocalStorageConfiguration configuration = enabledConfiguration(root.resolve('default'))
+        configuration.internalDirectory = '.graalbase-internal'
+
+        when:
+        new LocalStorageOperations(configuration).upload(UploadRequest.fromBytes('content'.bytes, 'object.txt'))
+
+        then:
+        thrown IllegalArgumentException
+        !Files.exists(outside.resolve('metadata'))
+        !Files.exists(root.resolve('default/object.txt'))
+
+        cleanup:
+        LocalStorageBucketOperations.deleteRecursively(root)
+    }
+
+    void 'unsafe internal directory names are rejected'() {
+        when:
+        new LocalStorageConfiguration('default').setInternalDirectory(name)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        name << ['', '.', '..', '../outside', '/absolute', 'nested/directory', 'nested\\directory', '.metadata', 'C:drive', 'with space']
+    }
+
     void 'metadata mode defaults and binds for multiple named configurations'() {
         given:
         ApplicationContext context = ApplicationContext.run([
