@@ -27,6 +27,7 @@ import io.micronaut.objectstorage.db.internal.DbStorageRuntime;
 import io.micronaut.objectstorage.db.internal.DigestingInputStream;
 import io.micronaut.objectstorage.db.internal.JsonMaps;
 import io.micronaut.objectstorage.db.spi.DbContentStore;
+import io.micronaut.objectstorage.db.spi.DbObjectChangeListener;
 import io.micronaut.objectstorage.db.spi.DbObjectRef;
 import io.micronaut.objectstorage.db.spi.DbStorageContext;
 import io.micronaut.objectstorage.request.ListObjectsRequest;
@@ -118,6 +119,7 @@ public class DbStorageOperations implements ObjectStorageOperations<DbUploadOpti
                 content.drain();
                 String etag = DigestingInputStream.toHex(content.getDigest());
                 objects.updateContentInfo(connection, object, content.getCount(), etag);
+                runtime.changed(connection, new DbObjectChangeListener.Change(DbObjectChangeListener.Type.UPLOADED, object.bucket(), key, etag));
                 return new DbStorageObject(object.bucket(), key, content.getCount(), contentType, etag, now);
             });
             return UploadResponse.of(key, stored.etag(), stored);
@@ -142,7 +144,12 @@ public class DbStorageOperations implements ObjectStorageOperations<DbUploadOpti
             if (existing.isEmpty()) {
                 return false;
             }
-            return deleteVersion(connection, existing.get().ref());
+            DbObjectRef object = existing.get().ref();
+            boolean deleted = deleteVersion(connection, object);
+            if (deleted) {
+                runtime.changed(connection, new DbObjectChangeListener.Change(DbObjectChangeListener.Type.DELETED, object.bucket(), key, null));
+            }
+            return deleted;
         });
     }
 
@@ -202,6 +209,8 @@ public class DbStorageOperations implements ObjectStorageOperations<DbUploadOpti
             DbObjectRef target = objects.copy(connection, source.get(), destinationKey, Instant.now(),
                 store.getCopiedColumns(context.mapping()));
             store.copyContent(context, connection, source.get().ref(), target);
+            runtime.changed(connection, new DbObjectChangeListener.Change(DbObjectChangeListener.Type.UPLOADED, target.bucket(),
+                destinationKey, source.get().ref().etag()));
             return null;
         });
     }

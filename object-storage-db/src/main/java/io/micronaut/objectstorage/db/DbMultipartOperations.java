@@ -26,6 +26,7 @@ import io.micronaut.objectstorage.db.internal.DbStorageRuntime;
 import io.micronaut.objectstorage.db.internal.DigestingInputStream;
 import io.micronaut.objectstorage.db.internal.JsonMaps;
 import io.micronaut.objectstorage.db.spi.DbContentStore;
+import io.micronaut.objectstorage.db.spi.DbObjectChangeListener;
 import io.micronaut.objectstorage.db.spi.DbObjectRef;
 import io.micronaut.objectstorage.db.spi.DbPartRef;
 import io.micronaut.objectstorage.db.spi.DbSqlDialect;
@@ -236,6 +237,8 @@ public class DbMultipartOperations implements MultipartObjectStorageOperations<D
             List<DbPartRef> all = new ArrayList<>(manifest);
             uploaded.values().forEach(part -> all.add(part.ref()));
             deleteUpload(connection, context, store, handle.getUploadId(), all);
+            runtime.changed(connection, new DbObjectChangeListener.Change(DbObjectChangeListener.Type.UPLOADED, object.bucket(),
+                handle.getKey(), etag));
             return new DbStorageObject(object.bucket(), handle.getKey(), length, upload.contentType(), etag, now);
         });
         return CompleteMultipartUploadResponse.of(handle, stored.etag(), stored);

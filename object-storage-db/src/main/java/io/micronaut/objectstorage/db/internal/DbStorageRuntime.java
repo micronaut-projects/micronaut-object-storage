@@ -31,6 +31,7 @@ import io.micronaut.objectstorage.db.DbSchemaGenerate;
 import io.micronaut.objectstorage.db.DbStorageConfiguration;
 import io.micronaut.objectstorage.db.spi.DbContentStore;
 import io.micronaut.objectstorage.db.spi.DbContentStoreProvider;
+import io.micronaut.objectstorage.db.spi.DbObjectChangeListener;
 import io.micronaut.objectstorage.db.spi.DbObjectRef;
 import io.micronaut.objectstorage.db.spi.DbSqlDialect;
 import io.micronaut.objectstorage.db.spi.DbStorageContext;
@@ -76,14 +77,17 @@ public final class DbStorageRuntime {
     private final BeanContext beanContext;
     private final List<DbContentStoreProvider> providers;
     private final ExecutorService prefetchExecutor;
+    private final List<DbObjectChangeListener> listeners;
 
     private volatile @Nullable Resolved resolved;
 
     DbStorageRuntime(@Parameter DbStorageConfiguration configuration,
                      BeanContext beanContext,
                      List<DbContentStoreProvider> providers,
+                     List<DbObjectChangeListener> listeners,
                      @Named(TaskExecutors.BLOCKING) ExecutorService prefetchExecutor) {
         this.configuration = configuration;
+        this.listeners = List.copyOf(listeners);
         this.beanContext = beanContext;
         List<DbContentStoreProvider> sorted = new ArrayList<>(providers);
         OrderUtil.sort(sorted);
@@ -129,6 +133,23 @@ public final class DbStorageRuntime {
     @NonNull
     public DbObjectSql objects() {
         return resolve().objects;
+    }
+
+    /**
+     * Notifies the change listeners, inside the transaction of the change.
+     *
+     * @param connection The connection of the change.
+     * @param change The change.
+     * @throws SQLException If a listener fails.
+     */
+    public void changed(@NonNull Connection connection, DbObjectChangeListener.@NonNull Change change) throws SQLException {
+        if (listeners.isEmpty()) {
+            return;
+        }
+        DbStorageContext context = context();
+        for (DbObjectChangeListener listener : listeners) {
+            listener.onChange(context, connection, change);
+        }
     }
 
     /**

@@ -8,11 +8,12 @@ plugins {
 dependencies {
     testImplementation(projects.micronautObjectStorageDb)
     testImplementation(projects.micronautObjectStorageDbOracle)
+    testImplementation(projects.micronautObjectStorageDbPostgres)
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(mnTest.micronaut.test.spock)
     testImplementation(mnSql.micronaut.jdbc.hikari)
+    testImplementation(mnSql.postgresql)
 
-    testRuntimeOnly(mnSql.postgresql)
     testRuntimeOnly(mnSql.ojdbc17)
     testRuntimeOnly(mnSql.mysql.connector.j)
     testRuntimeOnly(mnSql.mariadb.java.client)
