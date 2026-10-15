@@ -46,10 +46,11 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
     @NonNull
     private Path path;
 
-    @NonNull
-    private LocalStorageMetadataMode metadataMode = LocalStorageMetadataMode.ENABLED;
-
     private String internalDirectory = LocalStorageLayout.INTERNAL_DIRECTORY;
+
+    public LocalStorageConfiguration(@Parameter String name) {
+        super(name);
+    }
 
     /**
      * Returns the provider working directory name, relative to the storage root.
@@ -75,10 +76,6 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
         this.internalDirectory = internalDirectory;
     }
 
-    public LocalStorageConfiguration(@Parameter String name) {
-        super(name);
-    }
-
     /**
      * The path of the local storage.
      *
@@ -101,27 +98,6 @@ public class LocalStorageConfiguration extends AbstractObjectStorageConfiguratio
      */
     public void setPath(@NonNull Path path) {
         this.path = path;
-    }
-
-    /**
-     * The metadata persistence mode for this local storage configuration.
-     *
-     * @return The metadata persistence mode.
-     * @since 3.1.1
-     */
-    @NonNull
-    public LocalStorageMetadataMode getMetadataMode() {
-        return metadataMode;
-    }
-
-    /**
-     * Sets the metadata persistence mode for this local storage configuration.
-     *
-     * @param metadataMode The metadata persistence mode.
-     * @since 3.1.1
-     */
-    public void setMetadataMode(@NonNull LocalStorageMetadataMode metadataMode) {
-        this.metadataMode = metadataMode;
     }
 
     /**
