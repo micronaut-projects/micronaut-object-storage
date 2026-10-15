@@ -1,0 +1,203 @@
+Database storage keeps objects in a relational database, through Micronaut Data JDBC. Objects live next to the data
+that references them, and uploads can join your transactions, so a file and the rows that point at it commit or roll
+back together.
+
+Three modules are available:
+
+[cols="1,3"]
+|===
+|Module |Use it for
+
+|`micronaut-object-storage-db`
+|Any database supported by Micronaut Data JDBC. Schema scripts are provided for H2, PostgreSQL, Oracle, MySQL/MariaDB
+and SQL Server.
+
+|`micronaut-object-storage-db-postgres`
+|PostgreSQL 15 or later. Stores content as Large Objects, copies and assembles multipart uploads inside the database,
+and can publish change notifications with `LISTEN/NOTIFY`.
+
+|`micronaut-object-storage-db-oracle`
+|Oracle Database 23ai or later. Stores content in SecureFile BLOBs, and copies and assembles multipart uploads inside
+the database.
+|===
+
+The PostgreSQL and Oracle modules bring the generic module with them. For example, on PostgreSQL:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-db-postgres[]
+
+dependency:org.postgresql:postgresql[scope=runtimeOnly]
+
+Then configure a datasource and a storage:
+
+[configuration]
+----
+datasources:
+  default:
+    url: jdbc:postgresql://localhost:5432/app
+    username: app
+    password: secret
+    dialect: POSTGRES
+micronaut:
+  object-storage:
+    db:
+      documents:
+        schema-generate: FLYWAY
+----
+
+The concrete implementation of `ObjectStorageOperations` is api:objectstorage.db.DbStorageOperations[]. The module also
+provides api:objectstorage.db.DbBucketOperations[], api:objectstorage.db.DbMultipartOperations[],
+api:objectstorage.db.DbObjectMetadataOperations[], api:objectstorage.db.DbBucketMetadataOperations[] and reactive
+variants of each.
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.db.DbStorageConfiguration.adoc[]
+
+Nothing touches the database at startup. The datasource, its dialect and the content store are resolved on the first
+use of each storage.
+
+=== Tables and schema
+
+By default, every storage uses the same built-in tables (`MN_OS_OBJECT`, `MN_OS_CHUNK`, `MN_OS_BUCKET`,
+`MN_OS_UPLOAD` and `MN_OS_UPLOAD_PART`), and keeps its objects apart from other storages through its `bucket`, which
+defaults to the storage name. The schema is provided in three forms, one directory per database (`h2`, `postgres`,
+`oracle`, `mysql` and `sqlserver`):
+
+* Plain scripts: `META-INF/micronaut-object-storage-db/<database>/schema.sql`.
+* Flyway migrations: `db/micronaut-object-storage-db/<database>`. Add the location to your Flyway configuration, or set
+`schema-generate: FLYWAY` to have the storage apply them on first use with a dedicated `MN_OS_SCHEMA_HISTORY` table
+that never interferes with your own migrations.
+* Liquibase changelogs: `db/changelog/micronaut-object-storage-db/<database>.xml`, to include from your master
+changelog.
+
+With `schema-generate: CREATE`, the storage runs the plain script on first use when `MN_OS_OBJECT` does not exist. It
+is intended for development and tests.
+
+=== Transactions
+
+Writes (`upload`, `delete`, `copy`, metadata and bucket changes, and multipart operations) run with the configured
+`transaction-propagation`, `REQUIRED` by default: inside a transaction on the same datasource they join it, otherwise
+they run in their own. All propagation values are supported: `REQUIRES_NEW` always commits the object on its own,
+`MANDATORY` requires a caller transaction, and `NEVER` rejects one.
+
+[source,java]
+----
+@Transactional
+void attach(Invoice invoice, CompletedFileUpload file) {
+    invoiceRepository.save(invoice);
+    storage.upload(UploadRequest.fromCompletedFileUpload(file, "invoices/" + invoice.getId() + ".pdf"));
+    // an exception here rolls back the invoice row and the stored file together
+}
+----
+
+=== Streaming and memory
+
+Downloads never hold a connection while a client consumes the stream. The content is read in windows of `chunk-size`
+bytes (1 MB by default), each with its own short query, and the next window is prefetched while the current one is
+consumed. Windows are accounted in a budget shared by all downloads of a storage, `max-buffered-bytes` (a quarter of the
+heap by default): when it is spent, downloads wait instead of exhausting the heap. If an object is overwritten or
+deleted while it is being read, the stream fails with an `IOException` instead of mixing two versions. Inside a
+transaction, windows are read on the transaction's connection, so content written by the transaction can be read back
+before it commits.
+
+Uploads are streamed to the database and their MD5 entity tag is computed on the way. Set `max-object-size` to reject
+objects above a size.
+
+=== Content layouts
+
+`content-layout` selects how the bytes of each object are stored. When it is not set, the module that handles the
+datasource's dialect picks its default.
+
+[cols="1,3"]
+|===
+|Layout |Description
+
+|`CHUNKED`
+|Chunk rows of `chunk-size` bytes in `MN_OS_CHUNK`. The default of the generic module.
+
+|`SINGLE_COLUMN`
+|One binary column of the object row. The default of the Oracle module, which uses a SecureFile BLOB, and the only
+layout of mapped tables.
+
+|`LARGE_OBJECT`
+|PostgreSQL Large Objects referenced by `MN_OS_OBJECT.content_oid`. The default of the PostgreSQL module. Triggers of
+the built-in schema unlink a Large Object when its row is deleted, so none is orphaned. Note that logical replication
+does not replicate Large Objects and that `pg_dump` with schema filters skips them; use `BYTEA_CHUNKS` if you rely on
+either.
+
+|`BYTEA_CHUNKS`
+|Chunk rows stored as `bytea` on PostgreSQL.
+|===
+
+If the generic module alone is used on PostgreSQL or Oracle, it logs a suggestion to add the matching module.
+
+=== Mapping onto your own table
+
+A storage can use an existing table instead of the built-in ones. You own that table and its DDL; the module never
+creates or alters it. Only the `key` and `content` columns are required, and each optional column you leave out turns
+off the matching feature:
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    db:
+      contracts:
+        bucket: acme
+        table:
+          name: LEGAL.CONTRACT_FILES
+          columns:
+            key: FILE_PATH
+            content: FILE_DATA
+            content-length: FILE_SIZE
+            content-type: MIME_TYPE
+            etag: CHECKSUM
+            metadata: METADATA_JSON
+            bucket: TENANT
+            updated-at: MODIFIED_AT
+----
+
+Other columns of the table, such as an owner or a foreign key, can be set on upload:
+
+[source,java]
+----
+storage.upload(request, options -> options.setColumn("OWNER_ID", currentUser.getId()));
+----
+
+Mapped tables use the `SINGLE_COLUMN` layout. Bucket management, bucket metadata and multipart uploads require the
+built-in tables.
+
+Because nothing is checked at startup, inject api:objectstorage.db.DbStorageMappingValidator[] in a test to verify the
+mapping against the database, or set `validate-mapping: true` to check it on first use:
+
+[source,java]
+----
+@Inject
+@Named("contracts")
+DbStorageMappingValidator validator;
+
+@Test
+void mappingIsValid() {
+    validator.assertValid();
+}
+----
+
+When `micronaut-management` is on the classpath, the `objectStorageDb` health indicator reports the result of the same
+check for every storage. Disable it with `micronaut.object-storage.db.health.enabled: false`.
+
+=== PostgreSQL change notifications
+
+With the PostgreSQL module, a storage can publish a notification for every upload, copy, completed multipart upload
+and delete:
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    db:
+      documents:
+        postgres:
+          notify-channel: object_events
+----
+
+The payload is a JSON object with the `storage`, `bucket`, `key`, `event` (`UPLOADED` or `DELETED`) and, for uploads,
+`etag`. PostgreSQL delivers it to connections that ran `LISTEN object_events` only when the transaction of the change
+commits.
