@@ -14,7 +14,7 @@ import jakarta.inject.Inject
 
 import java.security.MessageDigest
 
-@MicronautTest
+@MicronautTest(transactional = false)
 class DbMultipartOperationsSingleColumnSpec extends MultipartObjectStorageOperationsSpecification implements TestPropertyProvider {
 
     @Inject

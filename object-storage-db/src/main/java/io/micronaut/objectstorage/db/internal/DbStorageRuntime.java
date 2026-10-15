@@ -24,6 +24,7 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.data.jdbc.config.DataJdbcConfiguration;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.inject.qualifiers.Qualifiers;
+import io.micronaut.jdbc.DataSourceResolver;
 import io.micronaut.objectstorage.ObjectStorageException;
 import io.micronaut.objectstorage.db.DbContentLayout;
 import io.micronaut.objectstorage.db.DbSchemaGenerate;
@@ -237,7 +238,10 @@ public final class DbStorageRuntime {
     private void generateSchema(DbTransactions transactions, DbSqlDialect sql) {
         String directory = sql.getSchemaDirectory();
         if (configuration.getSchemaGenerate() == DbSchemaGenerate.FLYWAY) {
-            DataSource dataSource = beanContext.getBean(DataSource.class, Qualifiers.byName(configuration.getDatasource()));
+            // Flyway needs the target datasource, not the contextual proxy that Micronaut Data registers
+            DataSource dataSource = beanContext.findBean(DataSourceResolver.class)
+                .orElse(DataSourceResolver.DEFAULT)
+                .resolve(beanContext.getBean(DataSource.class, Qualifiers.byName(configuration.getDatasource())));
             try {
                 DbFlywayMigrator.migrate(dataSource, directory);
             } catch (NoClassDefFoundError e) {

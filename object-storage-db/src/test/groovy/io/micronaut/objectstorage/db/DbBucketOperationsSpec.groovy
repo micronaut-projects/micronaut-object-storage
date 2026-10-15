@@ -8,7 +8,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 
-@MicronautTest
+@MicronautTest(transactional = false)
 class DbBucketOperationsSpec extends BucketOperationsSpecification implements TestPropertyProvider {
 
     @Inject

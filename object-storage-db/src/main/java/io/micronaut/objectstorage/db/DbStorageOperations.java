@@ -86,13 +86,16 @@ public class DbStorageOperations implements ObjectStorageOperations<DbUploadOpti
     public UploadResponse<DbStorageObject> upload(@NonNull UploadRequest request, @NonNull Consumer<DbUploadOptions> requestConsumer) {
         DbUploadOptions options = new DbUploadOptions();
         requestConsumer.accept(options);
-        if (!options.getColumns().isEmpty()) {
-            runtime.requireBuiltInTables("Extra columns");
-        }
         String key = request.getKey();
         String contentType = request.getContentType().orElse(null);
         String metadata = JsonMaps.write(request.getMetadata());
         DbStorageContext context = runtime.context();
+        if (!options.getColumns().isEmpty() && context.mapping().builtIn()) {
+            throw new ObjectStorageException("Database storage '" + context.configuration().getName()
+                + "' uses the built-in tables, which have no extra columns: " + options.getColumns().keySet()
+                + ". Extra columns are only supported on tables mapped with " + DbStorageConfiguration.PREFIX + "."
+                + context.configuration().getName() + ".table");
+        }
         DbContentStore store = runtime.store();
         DbObjectSql objects = runtime.objects();
         try (InputStream in = request.getInputStream()) {

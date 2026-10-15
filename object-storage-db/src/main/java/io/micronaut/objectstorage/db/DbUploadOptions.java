@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Upload options of the database storage, passed to the consumer of
@@ -35,19 +36,25 @@ import java.util.Objects;
  */
 public final class DbUploadOptions {
 
+    private static final Pattern IDENTIFIER = Pattern.compile("[A-Za-z_][A-Za-z0-9_$]*|\"[^\"]+\"");
+
     private final Map<String, @Nullable Object> columns = new LinkedHashMap<>();
 
     /**
      * Sets the value of an extra column of a mapped table. The value is bound with
      * {@link java.sql.PreparedStatement#setObject(int, Object)}.
      *
-     * @param name The column name.
+     * @param name The column name: a plain SQL identifier, or a double-quoted one.
      * @param value The value.
      * @return These options.
      */
     @NonNull
     public DbUploadOptions setColumn(@NonNull String name, @Nullable Object value) {
-        columns.put(Objects.requireNonNull(name, "name"), value);
+        Objects.requireNonNull(name, "name");
+        if (!IDENTIFIER.matcher(name).matches()) {
+            throw new IllegalArgumentException("Invalid column name: " + name);
+        }
+        columns.put(name, value);
         return this;
     }
 

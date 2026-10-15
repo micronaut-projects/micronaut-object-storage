@@ -10,7 +10,7 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
 
-@MicronautTest
+@MicronautTest(transactional = false)
 class DbObjectMetadataOperationsSpec extends ObjectMetadataOperationsSpecification implements TestPropertyProvider {
 
     @Inject
