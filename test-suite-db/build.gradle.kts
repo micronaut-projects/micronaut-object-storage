@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     testImplementation(projects.micronautObjectStorageDb)
+    testImplementation(projects.micronautObjectStorageDbOracle)
     testImplementation(projects.micronautObjectStorageTck)
     testImplementation(mnTest.micronaut.test.spock)
     testImplementation(mnSql.micronaut.jdbc.hikari)

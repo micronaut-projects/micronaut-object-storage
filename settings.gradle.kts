@@ -25,6 +25,7 @@ include("object-storage-gcp")
 include("object-storage-oracle-cloud")
 include("object-storage-local")
 include("object-storage-db")
+include("object-storage-db-oracle")
 include("test-suite-graal")
 include("test-suite-db")
 
