@@ -15,9 +15,15 @@
  */
 package io.micronaut.objectstorage.local;
 
+import io.micronaut.objectstorage.ObjectStorageException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 final class LocalStorageLayout {
 
@@ -58,6 +64,35 @@ final class LocalStorageLayout {
             throw new IllegalArgumentException("Local storage bucket path uses the reserved " + reservedNamespace + " namespace: " + bucketPath);
         }
         this.bucketName = bucketFileName == null ? configurationName : bucketFileName.toString();
+        validateCustomInternalDirectory();
+    }
+
+    /**
+     * Recognizes the provider layout without claiming or modifying an existing user directory.
+     * Subdirectories are optional because provider state is created lazily.
+     */
+    private void validateCustomInternalDirectory() {
+        if (INTERNAL_DIRECTORY.equals(internalDirectory)) {
+            return;
+        }
+        Path directory = rootInternalDirectory();
+        LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, directory);
+        validateDirectoryEntries(directory, Set.of(METADATA_DIRECTORY, MULTIPART_DIRECTORY, TEMPORARY_DIRECTORY, SNAPSHOT_DIRECTORY));
+        validateDirectoryEntries(directory.resolve(METADATA_DIRECTORY), Set.of(OBJECTS_DIRECTORY, BUCKETS_DIRECTORY));
+    }
+
+    private static void validateDirectoryEntries(Path directory, Set<String> allowedNames) {
+        try (var entries = Files.newDirectoryStream(directory)) {
+            for (Path entry : entries) {
+                if (!allowedNames.contains(entry.getFileName().toString()) || !Files.isDirectory(entry, LinkOption.NOFOLLOW_LINKS)) {
+                    throw new IllegalArgumentException("Custom internal-directory contains unexpected provider layout entry: " + entry);
+                }
+            }
+        } catch (NoSuchFileException ignored) {
+            // No provider state has been created yet.
+        } catch (IOException e) {
+            throw new ObjectStorageException("Cannot validate custom internal-directory: " + directory, e);
+        }
     }
 
     Path storageRoot() {
@@ -105,10 +140,11 @@ final class LocalStorageLayout {
     }
 
     Path objectMetadataFile(String key) {
-        objectPath(key);
         Path metadataBucketRoot = objectMetadataBucketRoot();
         LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, metadataBucketRoot);
-        return LocalStorageIoSupport.resolveSafe(metadataBucketRoot, key);
+        Path path = LocalStorageIoSupport.resolveSafe(metadataBucketRoot, key);
+        rejectInternalName(metadataBucketRoot.relativize(path).getName(0).toString());
+        return path;
     }
 
     List<Path> objectMetadataReadPaths(String key) {
