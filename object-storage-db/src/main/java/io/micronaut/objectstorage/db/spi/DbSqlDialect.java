@@ -208,7 +208,8 @@ public final class DbSqlDialect {
     @Nullable
     public String substringBinary(@NonNull String column) {
         return switch (dialect) {
-            case POSTGRES -> "SUBSTRING(" + column + " FROM ? FOR ?)";
+            // bytea values are at most 1 GB, and SUBSTRING on bytea takes integer positions
+            case POSTGRES -> "SUBSTRING(" + column + " FROM CAST(? AS INTEGER) FOR ?)";
             case MYSQL, SQL_SERVER -> "SUBSTRING(" + column + ", ?, ?)";
             default -> null;
         };
