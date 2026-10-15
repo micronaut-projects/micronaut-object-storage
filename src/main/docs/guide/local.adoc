@@ -23,6 +23,8 @@ The names `.` and `..`, paths, and `.metadata` are rejected. The configured name
 legacy `.metadata` remain reserved and hidden from object listing.
 Enabled configurations sharing a storage root must use the same internal directory name. Startup rejects
 conflicting names and internal directory names that collide with configured bucket directories.
+Validation resolves existing filesystem ancestors even when the storage directories do not yet exist.
+Configured buckets and provider internal directories must not contain one another, including through path aliases.
 An existing custom directory must be empty or contain only provider directories: `metadata`, `multipart`,
 `tmp`, and `snapshots`. Within `metadata`, only `objects` and `buckets` directories are accepted.
 These directories are optional and must not be symbolic links. Unexpected entries cause validation to fail

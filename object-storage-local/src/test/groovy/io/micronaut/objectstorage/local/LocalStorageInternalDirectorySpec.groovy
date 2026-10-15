@@ -10,6 +10,103 @@ import java.nio.file.Path
 
 class LocalStorageInternalDirectorySpec extends Specification {
 
+    void 'startup rejects buckets nested inside provider state'() {
+        given:
+        Path root = Files.createTempDirectory('local-nested-collision')
+        ApplicationContext context = null
+
+        when:
+        context = ApplicationContext.run([
+            'micronaut.object-storage.local.a.path': root.resolve('docs').toString(),
+            'micronaut.object-storage.local.a.internal-directory': '.storage-internal',
+            'micronaut.object-storage.local.b.path': root.resolve('.storage-internal/metadata/objects/docs').toString()
+        ])
+
+        then:
+        def e = thrown(Exception)
+        e.message.contains('collides with configured bucket')
+        !Files.exists(root.resolve('.storage-internal'))
+        !Files.exists(root.resolve('docs'))
+
+        cleanup:
+        context?.close()
+        LocalStorageBucketOperations.deleteRecursively(root)
+    }
+
+    void 'startup rejects provider state nested inside a configured bucket'() {
+        given:
+        Path root = Files.createTempDirectory('local-provider-inside-bucket')
+        ApplicationContext context = null
+
+        when:
+        context = ApplicationContext.run([
+            'micronaut.object-storage.local.a.path': root.resolve('outer/docs').toString(),
+            'micronaut.object-storage.local.a.internal-directory': '.storage-internal',
+            'micronaut.object-storage.local.b.path': root.resolve('outer').toString()
+        ])
+
+        then:
+        def e = thrown(Exception)
+        e.message.contains('collides with configured bucket')
+        !Files.exists(root.resolve('outer'))
+
+        cleanup:
+        context?.close()
+        LocalStorageBucketOperations.deleteRecursively(root)
+    }
+
+    void 'root aliases resolve consistently before directories exist'() {
+        given:
+        Path root = Files.createTempDirectory('local-aliased-root')
+        Path real = Files.createDirectory(root.resolve('real'))
+        Path alias = Files.createSymbolicLink(root.resolve('alias'), real)
+        ApplicationContext context = null
+
+        when:
+        context = ApplicationContext.run([
+            'micronaut.object-storage.local.a.path': real.resolve('new/docs').toString(),
+            'micronaut.object-storage.local.a.internal-directory': '.storage-internal',
+            'micronaut.object-storage.local.b.path': alias.resolve('new/photos').toString(),
+            'micronaut.object-storage.local.b.internal-directory': otherInternal
+        ])
+
+        then:
+        def e = thrown(Exception)
+        e.message.contains('different internal-directory')
+        !Files.exists(real.resolve('new'))
+
+        cleanup:
+        context?.close()
+        LocalStorageBucketOperations.deleteRecursively(root)
+
+        where:
+        otherInternal << ['.mn-storage', '.other-internal']
+    }
+
+    void 'matching configurations through aliases can start before creating storage'() {
+        given:
+        Path root = Files.createTempDirectory('local-compatible-alias')
+        Path real = Files.createDirectory(root.resolve('real'))
+        Path alias = Files.createSymbolicLink(root.resolve('alias'), real)
+        ApplicationContext context = null
+
+        when:
+        context = ApplicationContext.run([
+            'micronaut.object-storage.local.a.path': real.resolve('new/docs').toString(),
+            'micronaut.object-storage.local.a.internal-directory': '.storage-internal',
+            'micronaut.object-storage.local.b.path': alias.resolve('new/photos').toString(),
+            'micronaut.object-storage.local.b.internal-directory': '.storage-internal'
+        ])
+
+        then:
+        context.isRunning()
+        !Files.exists(real.resolve('new'))
+
+        cleanup:
+        context?.close()
+        LocalStorageBucketOperations.deleteRecursively(root)
+    }
+
     void 'startup rejects conflicting internal names on a shared root'() {
         given:
         Path root = Files.createTempDirectory('local-root-conflict')
