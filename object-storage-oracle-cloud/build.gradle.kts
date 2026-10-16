@@ -10,6 +10,14 @@ dependencies {
     api(mnOraclecloud.micronaut.oraclecloud.bmc.objectstorage)
 
     implementation(platform(mnOraclecloud.micronaut.oraclecloud.bom))
+    constraints {
+        api(libs.jackson.core) {
+            because("Require a version without the known Jackson vulnerabilities brought by the Oracle Cloud SDK")
+        }
+        api(libs.jackson.databind) {
+            because("Require a version without the known Jackson vulnerabilities brought by the Oracle Cloud SDK")
+        }
+    }
 
     testImplementation(mnValidation.micronaut.validation)
     testImplementation(mnValidation.micronaut.validation.processor)
