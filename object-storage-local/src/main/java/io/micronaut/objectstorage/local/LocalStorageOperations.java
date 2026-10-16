@@ -258,7 +258,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 if (File.separatorChar != '/') {
                     key = key.replace(File.separatorChar, '/');
                 }
-                if (isReservedLocalStorageKey(key)) {
+                if (layout.isInternalKey(key)) {
                     return;
                 }
                 if (prefix != null && !key.startsWith(prefix)) {
@@ -517,10 +517,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     static Optional<String> reservedLocalStorageNamespace(String name) {
         return LocalStorageLayout.reservedLocalStorageNamespace(name);
-    }
-
-    private static boolean isReservedLocalStorageKey(String key) {
-        return LocalStorageLayout.isReservedLocalStorageKey(key);
     }
 
     private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {

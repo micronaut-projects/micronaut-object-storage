@@ -15,9 +15,15 @@
  */
 package io.micronaut.objectstorage.local;
 
+import io.micronaut.objectstorage.ObjectStorageException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 final class LocalStorageLayout {
 
@@ -36,12 +42,14 @@ final class LocalStorageLayout {
     private final Path storageRoot;
     private final String bucketName;
     private final boolean hasBucketParent;
+    private final String internalDirectory;
 
     LocalStorageLayout(LocalStorageConfiguration configuration) {
-        this(configuration.getPath(), configuration.getName());
+        this(configuration.getPath(), configuration.getName(), configuration.getInternalDirectory());
     }
 
-    private LocalStorageLayout(Path bucketPath, String configurationName) {
+    private LocalStorageLayout(Path bucketPath, String configurationName, String internalDirectory) {
+        this.internalDirectory = internalDirectory;
         this.bucketPath = bucketPath;
         Path normalizedBucketPath = bucketPath.toAbsolutePath().normalize();
         Path bucketParent = normalizedBucketPath.getParent();
@@ -49,10 +57,42 @@ final class LocalStorageLayout {
         this.storageRoot = hasBucketParent ? bucketParent : normalizedBucketPath;
         Path bucketFileName = normalizedBucketPath.getFileName();
         String reservedNamespace = bucketFileName == null ? null : reservedLocalStorageNamespace(bucketFileName.toString()).orElse(null);
+        if (bucketFileName != null && internalDirectory.equalsIgnoreCase(bucketFileName.toString())) {
+            reservedNamespace = internalDirectory;
+        }
         if (reservedNamespace != null) {
             throw new IllegalArgumentException("Local storage bucket path uses the reserved " + reservedNamespace + " namespace: " + bucketPath);
         }
         this.bucketName = bucketFileName == null ? configurationName : bucketFileName.toString();
+        validateCustomInternalDirectory();
+    }
+
+    /**
+     * Recognizes the provider layout without claiming or modifying an existing user directory.
+     * Subdirectories are optional because provider state is created lazily.
+     */
+    private void validateCustomInternalDirectory() {
+        if (INTERNAL_DIRECTORY.equals(internalDirectory)) {
+            return;
+        }
+        Path directory = rootInternalDirectory();
+        LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, directory);
+        validateDirectoryEntries(directory, Set.of(METADATA_DIRECTORY, MULTIPART_DIRECTORY, TEMPORARY_DIRECTORY, SNAPSHOT_DIRECTORY));
+        validateDirectoryEntries(directory.resolve(METADATA_DIRECTORY), Set.of(OBJECTS_DIRECTORY, BUCKETS_DIRECTORY));
+    }
+
+    private static void validateDirectoryEntries(Path directory, Set<String> allowedNames) {
+        try (var entries = Files.newDirectoryStream(directory)) {
+            for (Path entry : entries) {
+                if (!allowedNames.contains(entry.getFileName().toString()) || !Files.isDirectory(entry, LinkOption.NOFOLLOW_LINKS)) {
+                    throw new IllegalArgumentException("Custom internal-directory contains unexpected provider layout entry: " + entry);
+                }
+            }
+        } catch (NoSuchFileException _) {
+            // No provider state has been created yet.
+        } catch (IOException e) {
+            throw new ObjectStorageException("Cannot validate custom internal-directory: " + directory, e);
+        }
     }
 
     Path storageRoot() {
@@ -71,15 +111,18 @@ final class LocalStorageLayout {
     }
 
     Path objectPath(String key) {
-        return LocalStorageIoSupport.resolveSafe(bucketPath, key);
+        Path path = LocalStorageIoSupport.resolveSafe(bucketPath, key);
+        rejectInternalName(bucketPath.normalize().relativize(path).getName(0).toString());
+        return path;
     }
 
     Path bucketPath(String name) {
+        rejectInternalName(name);
         return LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("bucket operations"), name);
     }
 
     Path rootInternalDirectory() {
-        return storageRoot.resolve(INTERNAL_DIRECTORY);
+        return storageRoot.resolve(internalDirectory);
     }
 
     Path objectMetadataRoot() {
@@ -99,7 +142,9 @@ final class LocalStorageLayout {
     Path objectMetadataFile(String key) {
         Path metadataBucketRoot = objectMetadataBucketRoot();
         LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, metadataBucketRoot);
-        return LocalStorageIoSupport.resolveSafe(metadataBucketRoot, key);
+        Path path = LocalStorageIoSupport.resolveSafe(metadataBucketRoot, key);
+        rejectInternalName(metadataBucketRoot.relativize(path).getName(0).toString());
+        return path;
     }
 
     List<Path> objectMetadataReadPaths(String key) {
@@ -120,6 +165,7 @@ final class LocalStorageLayout {
     }
 
     Path bucketMetadataFile(String name) {
+        rejectInternalName(name);
         LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("bucket metadata operations"), name);
         Path metadataRoot = bucketMetadataRoot();
         LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, metadataRoot);
@@ -172,6 +218,7 @@ final class LocalStorageLayout {
     }
 
     Path temporaryBucketDirectory(String name) {
+        rejectInternalName(name);
         LocalStorageIoSupport.resolveBucketPath(requireBucketRoot("temporary file cleanup"), name);
         return rootInternalDirectory()
             .resolve(TEMPORARY_DIRECTORY)
@@ -215,6 +262,7 @@ final class LocalStorageLayout {
     }
 
     private Path providerManagedBucketDirectory(String name, Path root, String component) {
+        rejectInternalName(name);
         requireBucketRoot(component);
         Path bucketDirectory = LocalStorageIoSupport.resolveBucketPath(root, name);
         LocalStorageIoSupport.rejectSymbolicLinks(storageRoot, bucketDirectory);
@@ -229,6 +277,17 @@ final class LocalStorageLayout {
             return Optional.of(LEGACY_METADATA_DIRECTORY);
         }
         return Optional.empty();
+    }
+
+    private void rejectInternalName(String name) {
+        if (internalDirectory.equalsIgnoreCase(name) && reservedLocalStorageNamespace(name).isEmpty()) {
+            throw new IllegalArgumentException("Name uses the reserved " + internalDirectory + " namespace: " + name);
+        }
+    }
+
+    boolean isInternalKey(String key) {
+        String firstSegment = key.split("/", 2)[0];
+        return internalDirectory.equalsIgnoreCase(firstSegment) || isReservedLocalStorageKey(key);
     }
 
     static boolean isReservedLocalStorageKey(String key) {

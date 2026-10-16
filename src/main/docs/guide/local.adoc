@@ -16,6 +16,52 @@ micronaut:
 NOTE: When added to the classpath, api:objectstorage.local.LocalStorageOperations[] becomes the primary implementation of
 api:objectstorage.ObjectStorageOperations[].
 
+The optional `internal-directory` property defaults to `.mn-storage`. Set it to a single directory name
+(letters, digits, dots, underscores, or hyphens), such as `.storage-internal`, to change the directory
+under the storage root used for sidecars, multipart state, temporary writes, and rollback snapshots.
+The names `.` and `..`, paths, and `.metadata` are rejected. The configured name, `.mn-storage`, and
+legacy `.metadata` remain reserved and hidden from object listing.
+Enabled configurations sharing a storage root must use the same internal directory name. Startup rejects
+conflicting names and internal directory names that collide with configured bucket directories.
+Validation resolves existing filesystem ancestors even when the storage directories do not yet exist.
+Configured buckets and provider internal directories must not contain one another, including through path aliases.
+This validation also applies to the default `.mn-storage` directory. Previously accepted nested bucket paths,
+such as `/data/a` and `/data/a/b`, now fail at startup. Before upgrading, stop storage operations and migrate
+these buckets to separate, non-nested paths together with their associated provider state, then update the configuration.
+An existing custom directory must be empty or contain only provider directories: `metadata`, `multipart`,
+`tmp`, and `snapshots`. Within `metadata`, only `objects` and `buckets` directories are accepted.
+These directories are optional and must not be symbolic links. Unexpected entries cause validation to fail
+without changing their contents. Layout recognition is a collision safeguard, not proof of ownership;
+the custom directory must be dedicated to provider state. Existing default `.mn-storage` directories
+remain compatible without this additional layout check.
+Changing this setting does not move existing data: stop storage operations and migrate the existing internal
+directory before restarting with the new name, including any in-progress multipart uploads.
+Paths below using `.mn-storage` describe the default; a custom name replaces that component.
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    local:
+      default:
+        internal-directory: .storage-internal
+----
+
+Applications that manage metadata separately can provide no-op implementations of the
+<<metadataPersistence,Metadata Persistence SPI>>. Register primary, named beans for
+api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[],
+using the same qualifier as the local storage configuration (for example, `default`). Each implementation returns
+`Optional.empty()` from `retrieve` and does nothing in `save` and `delete`. The existing local reactive adapters
+delegate to these implementations as well.
+
+With these beans, uploads accept user metadata but discard it. Retrieval returns an empty metadata map and retains
+filename-based content-type detection. Ordinary and multipart uploads still calculate SHA-256 while streaming bytes
+and return the lowercase digest as the ETag; metadata persistence is independent of ETag calculation.
+Object operations create no new metadata sidecars through the no-op beans.
+
+Applications are responsible for persisting the logical metadata they need and coordinating their database
+transactions with successful object operations. No-op beans do not access the application database.
+
 NOTE: The local storage implementation reserves the `.mn-storage` key namespace for provider-managed metadata,
 multipart upload state, temporary write files, and temporary rollback files. It also reserves the legacy `.metadata` key
 namespace used by released older versions for metadata sidecars. User object keys cannot be `.mn-storage`, `.metadata`,
@@ -24,9 +70,15 @@ and configured local bucket directory names cannot use those reserved namespaces
 
 The local implementation is also the reference provider for
 api:objectstorage.metadata.ObjectMetadataOperations[] and api:objectstorage.metadata.BucketMetadataOperations[].
-Provider-managed files live under one `.mn-storage` directory in the storage root that contains the configured bucket.
-Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata sidecars live under
-`.mn-storage/metadata/buckets/<bucket>`, in-progress multipart upload state lives under
+Configured implementations of those SPIs remain responsible for metadata persistence. With the built-in
+implementation, provider-managed files live under one `.mn-storage` directory in the storage root that contains the
+configured bucket. Object metadata sidecars live under `.mn-storage/metadata/objects/<bucket>/<key>`, bucket metadata
+sidecars live under `.mn-storage/metadata/buckets/<bucket>`, and legacy per-bucket `.metadata` sidecars remain readable.
+New sidecar writes use the root `.mn-storage` layout, and deletes remove both the current and legacy sidecars for the
+affected object.
+
+The `.mn-storage` directory is not exclusively a metadata directory and can still exist with no-op metadata beans. In-progress
+multipart upload state lives under
 `.mn-storage/multipart/<bucket>`, temporary local file rollback snapshots live under `.mn-storage/snapshots/<bucket>`,
 and in-flight local file writes use typed provider temp directories under `.mn-storage/tmp/<bucket>`, such as `objects`,
 `object-metadata`, and `bucket-metadata`. Before creating a new replacement temporary file, local writes opportunistically
@@ -44,9 +96,11 @@ crash-atomic transaction across both. Custom metadata providers, including datab
 responsible for their own metadata durability, cleanup lifecycle, and any higher-level transaction or compensation
 behavior.
 
-For compatibility with persistent local storage paths created by released older versions, the built-in local sidecar
-metadata provider also checks legacy per-bucket `.metadata` sidecars. New built-in sidecar metadata writes use the root
-`.mn-storage` layout, and deletes remove both the root sidecar and the legacy `.metadata` sidecar for the deleted object.
+No-op metadata beans do not read or remove existing sidecars during object operations. If they are later replaced
+with the built-in implementation, old metadata can become visible again. Explicitly migrate or clean up old sidecars
+before re-enabling built-in persistence. Bucket deletion still removes provider-managed working state and object
+sidecar directories. Provider-managed directories and legacy `.metadata` remain hidden from object listing,
+although direct filesystem users can see them.
 
 By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:
 
