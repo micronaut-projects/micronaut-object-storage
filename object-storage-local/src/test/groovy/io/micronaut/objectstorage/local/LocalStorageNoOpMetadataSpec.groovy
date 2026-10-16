@@ -108,8 +108,12 @@ class LocalStorageNoOpMetadataSpec extends Specification {
         ObjectMetadataOperations<Path> objectMetadataOperations() {
             new ObjectMetadataOperations<Path>() {
                 Optional<ObjectMetadataEntry<Path>> retrieve(String key) { Optional.empty() }
-                void save(ObjectMetadataWrite write) { }
-                void delete(String key) { }
+                void save(ObjectMetadataWrite write) {
+                    // Intentionally discard object metadata without creating sidecars.
+                }
+                void delete(String key) {
+                    // No metadata is stored, so deletion intentionally does nothing.
+                }
             }
         }
 
@@ -119,8 +123,12 @@ class LocalStorageNoOpMetadataSpec extends Specification {
         BucketMetadataOperations<Path> bucketMetadataOperations() {
             new BucketMetadataOperations<Path>() {
                 Optional<BucketMetadataEntry<Path>> retrieve(String name) { Optional.empty() }
-                void save(BucketMetadataWrite write) { }
-                void delete(String name) { }
+                void save(BucketMetadataWrite write) {
+                    // Intentionally discard bucket metadata without creating sidecars.
+                }
+                void delete(String name) {
+                    // No metadata is stored, so deletion intentionally does nothing.
+                }
             }
         }
     }

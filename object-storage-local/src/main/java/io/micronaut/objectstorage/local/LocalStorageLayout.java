@@ -88,7 +88,7 @@ final class LocalStorageLayout {
                     throw new IllegalArgumentException("Custom internal-directory contains unexpected provider layout entry: " + entry);
                 }
             }
-        } catch (NoSuchFileException ignored) {
+        } catch (NoSuchFileException _) {
             // No provider state has been created yet.
         } catch (IOException e) {
             throw new ObjectStorageException("Cannot validate custom internal-directory: " + directory, e);
