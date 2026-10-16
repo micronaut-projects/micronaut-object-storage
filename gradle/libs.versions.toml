@@ -13,7 +13,6 @@ micronaut-logging = "2.1.0"
 gcp-libraries = '26.80.0'
 bytebuddy = '1.18.8'
 jackson = '2.22.3'
-gcp-jackson = '2.18.11'
 
 # Gradle plugins
 micronaut-gradle-plugin = "5.0.2"
@@ -23,8 +22,6 @@ kotlin-gradle-ksp-plugin = "2.3.11"
 [libraries]
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
-gcp-jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'gcp-jackson' }
-gcp-jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'gcp-jackson' }
 
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
