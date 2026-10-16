@@ -10,6 +10,35 @@ import java.nio.file.Path
 
 class LocalStorageInternalDirectorySpec extends Specification {
 
+    void 'startup rejects existing nested buckets using the default internal directory'() {
+        given:
+        Path root = Files.createTempDirectory('local-default-nested-buckets')
+        Path outer = Files.createDirectory(root.resolve('a'))
+        Path nested = Files.createDirectories(outer.resolve(nestedPath))
+        Path object = Files.writeString(nested.resolve('existing.txt'), 'keep existing data')
+        ApplicationContext context = null
+
+        when:
+        context = ApplicationContext.run([
+            'micronaut.object-storage.local.a.path': outer.toString(),
+            'micronaut.object-storage.local.b.path': nested.toString()
+        ])
+
+        then:
+        def e = thrown(Exception)
+        e.message.contains('collides with configured bucket')
+        Files.readString(object) == 'keep existing data'
+        !Files.exists(root.resolve('.mn-storage'))
+        !Files.exists(nested.parent.resolve('.mn-storage'))
+
+        cleanup:
+        context?.close()
+        LocalStorageBucketOperations.deleteRecursively(root)
+
+        where:
+        nestedPath << ['b', 'level/b']
+    }
+
     void 'startup rejects buckets nested inside provider state'() {
         given:
         Path root = Files.createTempDirectory('local-nested-collision')

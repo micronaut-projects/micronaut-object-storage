@@ -1,5 +1,18 @@
 This section documents breaking changes between Micronaut Object Storage versions:
 
+=== Micronaut Object Storage 3.1.1
+
+==== Local storage directory validation
+
+Local storage now rejects enabled configurations when a configured bucket contains a provider internal directory
+or is contained by one, including through path aliases. This also applies when using the default `.mn-storage`
+directory: previously accepted nested bucket paths such as `/data/a` and `/data/a/b` now fail at startup.
+This prevents bucket operations from exposing or deleting another configuration's provider state.
+
+Before upgrading, stop storage operations and migrate affected buckets and their associated provider state
+to separate, non-nested paths. Update the configured bucket paths and preserve metadata and any in-progress
+multipart upload state. See <<local,Local Storage>> for the provider directory layout and validation requirements.
+
 === Micronaut Object Storage 3.0.0
 
 ==== Deprecations

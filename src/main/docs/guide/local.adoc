@@ -25,6 +25,9 @@ Enabled configurations sharing a storage root must use the same internal directo
 conflicting names and internal directory names that collide with configured bucket directories.
 Validation resolves existing filesystem ancestors even when the storage directories do not yet exist.
 Configured buckets and provider internal directories must not contain one another, including through path aliases.
+This validation also applies to the default `.mn-storage` directory. Previously accepted nested bucket paths,
+such as `/data/a` and `/data/a/b`, now fail at startup. Before upgrading, stop storage operations and migrate
+these buckets to separate, non-nested paths together with their associated provider state, then update the configuration.
 An existing custom directory must be empty or contain only provider directories: `metadata`, `multipart`,
 `tmp`, and `snapshots`. Within `metadata`, only `objects` and `buckets` directories are accepted.
 These directories are optional and must not be symbolic links. Unexpected entries cause validation to fail
