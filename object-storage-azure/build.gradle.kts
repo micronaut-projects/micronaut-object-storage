@@ -8,9 +8,14 @@ dependencies {
     api(libs.azure.storage.blob)
 
     implementation(platform(mnAzure.micronaut.azure.bom))
-    // Keep transitive Jackson 2 and Netty components aligned on patched releases.
-    api(platform(libs.jackson.bom))
-    api(platform(libs.netty.bom))
+    constraints {
+        api(libs.jackson.core) {
+            because("Require a version without the known Jackson vulnerabilities brought by the Azure SDK")
+        }
+        api(libs.jackson.databind) {
+            because("Require a version without the known Jackson vulnerabilities brought by the Azure SDK")
+        }
+    }
 
     testImplementation(mnValidation.micronaut.validation)
     testImplementation(mnValidation.micronaut.validation.processor)

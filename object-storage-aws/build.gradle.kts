@@ -8,8 +8,6 @@ dependencies {
     api(libs.amazon.awssdk.s3)
 
     implementation(platform(mnAws.micronaut.aws.bom))
-    // Align the SDK HTTP client's Netty components on a patched release.
-    api(platform(libs.netty.bom))
     annotationProcessor(mnValidation.micronaut.validation.processor)
     implementation(mnValidation.micronaut.validation)
 

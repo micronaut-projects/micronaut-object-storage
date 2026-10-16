@@ -1,6 +1,6 @@
 [versions]
 micronaut-platform = "5.0.5"
-micronaut = "5.1.7"
+micronaut = "5.1.11"
 micronaut-test = "5.1.0"
 micronaut-aws = "5.0.2"
 micronaut-azure = "6.1.0"
@@ -14,7 +14,6 @@ gcp-libraries = '26.80.0'
 bytebuddy = '1.18.8'
 jackson = '2.22.3'
 gcp-jackson = '2.18.11'
-netty = '4.2.17.Final'
 
 # Gradle plugins
 micronaut-gradle-plugin = "5.0.2"
@@ -22,9 +21,10 @@ kotlin-gradle-plugin = "2.3.21"
 kotlin-gradle-ksp-plugin = "2.3.11"
 
 [libraries]
-jackson-bom = { module = 'com.fasterxml.jackson:jackson-bom', version.ref = 'jackson' }
-gcp-jackson-bom = { module = 'com.fasterxml.jackson:jackson-bom', version.ref = 'gcp-jackson' }
-netty-bom = { module = 'io.netty:netty-bom', version.ref = 'netty' }
+jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
+jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
+gcp-jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'gcp-jackson' }
+gcp-jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'gcp-jackson' }
 
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
