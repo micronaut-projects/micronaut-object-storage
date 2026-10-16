@@ -10,6 +10,9 @@ dependencies {
     api(mnOraclecloud.micronaut.oraclecloud.bmc.objectstorage)
 
     implementation(platform(mnOraclecloud.micronaut.oraclecloud.bom))
+    // Keep transitive Jackson 2 and Netty components aligned on patched releases.
+    api(platform(libs.jackson.bom))
+    api(platform(libs.netty.bom))
 
     testImplementation(mnValidation.micronaut.validation)
     testImplementation(mnValidation.micronaut.validation.processor)

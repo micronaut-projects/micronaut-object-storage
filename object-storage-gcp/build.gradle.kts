@@ -10,11 +10,8 @@ dependencies {
     api(libs.gcp.storage) {
         exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
     }
-    constraints {
-        api("com.fasterxml.jackson.core:jackson-core:2.18.9") {
-            because("Require a version without the known Jackson Databind vulnerabilities brought by google-cloud-storage")
-        }
-    }
+    // Keep the Google SDK on the patched Jackson 2.18 maintenance line.
+    api(platform(libs.gcp.jackson.bom))
     api("com.fasterxml.jackson.core:jackson-core")
     implementation(platform(mnGcp.micronaut.gcp.bom))
 

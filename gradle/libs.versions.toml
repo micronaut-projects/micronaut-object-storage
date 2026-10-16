@@ -12,6 +12,9 @@ micronaut-logging = "2.1.0"
 
 gcp-libraries = '26.80.0'
 bytebuddy = '1.18.8'
+jackson = '2.22.3'
+gcp-jackson = '2.18.11'
+netty = '4.2.17.Final'
 
 # Gradle plugins
 micronaut-gradle-plugin = "5.0.2"
@@ -19,6 +22,10 @@ kotlin-gradle-plugin = "2.3.21"
 kotlin-gradle-ksp-plugin = "2.3.11"
 
 [libraries]
+jackson-bom = { module = 'com.fasterxml.jackson:jackson-bom', version.ref = 'jackson' }
+gcp-jackson-bom = { module = 'com.fasterxml.jackson:jackson-bom', version.ref = 'gcp-jackson' }
+netty-bom = { module = 'io.netty:netty-bom', version.ref = 'netty' }
+
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
 micronaut-platform = { module = 'io.micronaut.platform:micronaut-platform', version.ref = 'micronaut-platform' }
