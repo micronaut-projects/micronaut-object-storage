@@ -155,7 +155,7 @@
         <h1>Micronaut Object Storage</h1>
         <p></p>
         <p>Micronaut Object Storage provides a uniform API to create, read and delete objects in the major cloud providers</p>
-        <p><strong>Version:</strong> 3.1.0 </p>
+        <p><strong>Version:</strong> 3.1.1 </p>
     </div>
     
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
@@ -2601,6 +2601,113 @@ When added to the classpath, <a href="../api/io/micronaut/objectstorage/local/Lo
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>The optional <code>internal-directory</code> property defaults to <code>.mn-storage</code>. Set it to a single directory name
+(letters, digits, dots, underscores, or hyphens), such as <code>.storage-internal</code>, to change the directory
+under the storage root used for sidecars, multipart state, temporary writes, and rollback snapshots.
+The names <code>.</code> and <code>..</code>, paths, and <code>.metadata</code> are rejected. The configured name, <code>.mn-storage</code>, and
+legacy <code>.metadata</code> remain reserved and hidden from object listing.
+Enabled configurations sharing a storage root must use the same internal directory name. Startup rejects
+conflicting names and internal directory names that collide with configured bucket directories.
+Validation resolves existing filesystem ancestors even when the storage directories do not yet exist.
+Configured buckets and provider internal directories must not contain one another, including through path aliases.
+This validation also applies to the default <code>.mn-storage</code> directory. Previously accepted nested bucket paths,
+such as <code>/data/a</code> and <code>/data/a/b</code>, now fail at startup. Before upgrading, stop storage operations and migrate
+these buckets to separate, non-nested paths together with their associated provider state, then update the configuration.
+An existing custom directory must be empty or contain only provider directories: <code>metadata</code>, <code>multipart</code>,
+<code>tmp</code>, and <code>snapshots</code>. Within <code>metadata</code>, only <code>objects</code> and <code>buckets</code> directories are accepted.
+These directories are optional and must not be symbolic links. Unexpected entries cause validation to fail
+without changing their contents. Layout recognition is a collision safeguard, not proof of ownership;
+the custom directory must be dedicated to provider state. Existing default <code>.mn-storage</code> directories
+remain compatible without this additional layout check.
+Changing this setting does not move existing data: stop storage operations and migrate the existing internal
+directory before restarting with the new name, including any in-progress multipart uploads.
+Paths below using <code>.mn-storage</code> describe the default; a custom name replaces that component.</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.object-storage.local.default.internal-directory=.storage-internal</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  object-storage:
+    local:
+      default:
+        internal-directory: .storage-internal</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">micronaut = {object-storage = {local = {default = {internal-directory = ".storage-internal"}}}}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  objectStorage {
+    local {
+      'default' {
+        internalDirectory = ".storage-internal"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    object-storage {
+      local {
+        default {
+          internal-directory = ".storage-internal"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "object-storage": {
+      "local": {
+        "default": {
+          "internal-directory": ".storage-internal"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Applications that manage metadata separately can provide no-op implementations of the
+<a href="#metadataPersistence">Metadata Persistence SPI</a>. Register primary, named beans for
+<a href="../api/io/micronaut/objectstorage/metadata/ObjectMetadataOperations.html">ObjectMetadataOperations</a> and <a href="../api/io/micronaut/objectstorage/metadata/BucketMetadataOperations.html">BucketMetadataOperations</a>,
+using the same qualifier as the local storage configuration (for example, <code>default</code>). Each implementation returns
+<code>Optional.empty()</code> from <code>retrieve</code> and does nothing in <code>save</code> and <code>delete</code>. The existing local reactive adapters
+delegate to these implementations as well.</p>
+</div>
+<div class="paragraph">
+<p>With these beans, uploads accept user metadata but discard it. Retrieval returns an empty metadata map and retains
+filename-based content-type detection. Ordinary and multipart uploads still calculate SHA-256 while streaming bytes
+and return the lowercase digest as the ETag; metadata persistence is independent of ETag calculation.
+Object operations create no new metadata sidecars through the no-op beans.</p>
+</div>
+<div class="paragraph">
+<p>Applications are responsible for persisting the logical metadata they need and coordinating their database
+transactions with successful object operations. No-op beans do not access the application database.</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -2620,9 +2727,16 @@ and configured local bucket directory names cannot use those reserved namespaces
 <div class="paragraph">
 <p>The local implementation is also the reference provider for
 <a href="../api/io/micronaut/objectstorage/metadata/ObjectMetadataOperations.html">ObjectMetadataOperations</a> and <a href="../api/io/micronaut/objectstorage/metadata/BucketMetadataOperations.html">BucketMetadataOperations</a>.
-Provider-managed files live under one <code>.mn-storage</code> directory in the storage root that contains the configured bucket.
-Object metadata sidecars live under <code>.mn-storage/metadata/objects/&lt;bucket&gt;/&lt;key&gt;</code>, bucket metadata sidecars live under
-<code>.mn-storage/metadata/buckets/&lt;bucket&gt;</code>, in-progress multipart upload state lives under
+Configured implementations of those SPIs remain responsible for metadata persistence. With the built-in
+implementation, provider-managed files live under one <code>.mn-storage</code> directory in the storage root that contains the
+configured bucket. Object metadata sidecars live under <code>.mn-storage/metadata/objects/&lt;bucket&gt;/&lt;key&gt;</code>, bucket metadata
+sidecars live under <code>.mn-storage/metadata/buckets/&lt;bucket&gt;</code>, and legacy per-bucket <code>.metadata</code> sidecars remain readable.
+New sidecar writes use the root <code>.mn-storage</code> layout, and deletes remove both the current and legacy sidecars for the
+affected object.</p>
+</div>
+<div class="paragraph">
+<p>The <code>.mn-storage</code> directory is not exclusively a metadata directory and can still exist with no-op metadata beans. In-progress
+multipart upload state lives under
 <code>.mn-storage/multipart/&lt;bucket&gt;</code>, temporary local file rollback snapshots live under <code>.mn-storage/snapshots/&lt;bucket&gt;</code>,
 and in-flight local file writes use typed provider temp directories under <code>.mn-storage/tmp/&lt;bucket&gt;</code>, such as <code>objects</code>,
 <code>object-metadata</code>, and <code>bucket-metadata</code>. Before creating a new replacement temporary file, local writes opportunistically
@@ -2641,9 +2755,11 @@ responsible for their own metadata durability, cleanup lifecycle, and any higher
 behavior.</p>
 </div>
 <div class="paragraph">
-<p>For compatibility with persistent local storage paths created by released older versions, the built-in local sidecar
-metadata provider also checks legacy per-bucket <code>.metadata</code> sidecars. New built-in sidecar metadata writes use the root
-<code>.mn-storage</code> layout, and deletes remove both the root sidecar and the legacy <code>.metadata</code> sidecar for the deleted object.</p>
+<p>No-op metadata beans do not read or remove existing sidecars during object operations. If they are later replaced
+with the built-in implementation, old metadata can become visible again. Explicitly migrate or clean up old sidecars
+before re-enabling built-in persistence. Bucket deletion still removes provider-managed working state and object
+sidecar directories. Provider-managed directories and legacy <code>.metadata</code> remain hidden from object listing,
+although direct filesystem users can see them.</p>
 </div>
 <div class="paragraph">
 <p>By default, it will create a temporary folder to store the files, but you can configure it to use a specific folder:</p>
@@ -2676,6 +2792,12 @@ restrictive ACLs by the caller.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.*.enabled</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable or disable this object storage.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.object-storage.local.*.internal-directory</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">java.lang.String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the directory used for metadata, multipart state, temporary files, and snapshots.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -2825,6 +2947,23 @@ See the <a href="#multipartUploads">Multipart Uploads</a> guide for the portable
 
 <div class="paragraph">
 <p>This section documents breaking changes between Micronaut Object Storage versions:</p>
+</div>
+<div class="sect2">
+<h3 id="_micronaut_object_storage_3_1_1">Micronaut Object Storage 3.1.1</h3>
+<div class="sect3">
+<h4 id="_local_storage_directory_validation">Local storage directory validation</h4>
+<div class="paragraph">
+<p>Local storage now rejects enabled configurations when a configured bucket contains a provider internal directory
+or is contained by one, including through path aliases. This also applies when using the default <code>.mn-storage</code>
+directory: previously accepted nested bucket paths such as <code>/data/a</code> and <code>/data/a/b</code> now fail at startup.
+This prevents bucket operations from exposing or deleting another configuration&#8217;s provider state.</p>
+</div>
+<div class="paragraph">
+<p>Before upgrading, stop storage operations and migrate affected buckets and their associated provider state
+to separate, non-nested paths. Update the configured bucket paths and preserve metadata and any in-progress
+multipart upload state. See <a href="#local">Local Storage</a> for the provider directory layout and validation requirements.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_micronaut_object_storage_3_0_0">Micronaut Object Storage 3.0.0</h3>
