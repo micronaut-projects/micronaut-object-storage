@@ -1,0 +1,87 @@
+To use https://supabase.com/docs/guides/storage[Supabase Storage], you need the following dependency:
+
+dependency:io.micronaut.objectstorage:micronaut-object-storage-supabase[]
+
+The module talks to the Supabase Storage REST API through the `SupabaseStorageClient` of
+https://micronaut-projects.github.io/micronaut-supabase/latest/guide[Micronaut Supabase], a declarative HTTP client,
+so your application also needs a Micronaut HTTP client runtime such as `io.micronaut:micronaut-http-client`.
+
+Configure the Supabase project under the `supabase` prefix:
+
+* `supabase.url` or `supabase.project-id`: the project the storage belongs to.
+* `supabase.publishable-key`: sent in the `apikey` header of every request, as the Supabase API gateway requires.
+* `supabase.secret-key`: sent as the bearer token of every request. It gives the service role, which bypasses Row
+Level Security, so keep it on the server. When it is not set, the publishable key is used as bearer token instead
+and Row Level Security policies apply to the `anon` role.
+
+Override `SupabaseStorageOperations#getAuthorization()` to send another token, such as the access token of the
+current user.
+
+The object storage specific configuration options available are:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.supabase.SupabaseStorageConfiguration.adoc[]
+
+For example:
+
+.`src/main/resources/application-supabase.yml`
+[configuration]
+----
+include::doc-examples/example-java/src/test/resources/application-supabase.yml[]
+----
+
+The concrete implementation of `ObjectStorageOperations` is api:objectstorage.supabase.SupabaseStorageOperations[], and
+api:objectstorage.supabase.SupabaseBucketOperations[] implements `BucketOperations`. Both expose the Micronaut Supabase
+schema records as their native types: uploads return `UploadObjectResponse`, deletes return the list of deleted
+`ObjectSchema` entries, entries wrap `ObjectInfoSchema` and buckets wrap `BucketSchema`.
+
+Errors reported by the Supabase Storage API are raised as api:objectstorage.supabase.SupabaseStorageException[]. Supabase
+answers most rejected requests with HTTP `400`; the exception exposes the error body, whose `code` (for example
+`NoSuchKey`, `NoSuchBucket` or `KeyAlreadyExists`) is the stable value to branch on.
+
+== Behaviour notes
+
+The Supabase Storage REST API differs from the S3-style APIs of the other providers, which shows in a few places:
+
+* Uploads replace an existing object with the same key, as the portable contract requires. The upload route does not
+return an entity tag, so `UploadResponse#getETag()` is read from the object information with an additional request.
+Use the upload consumer to change the `Cache-Control` header, the user metadata or to disable the replacement:
+
+[source,java]
+----
+objectStorage.upload(uploadRequest, request -> {
+    request.setCacheControl("max-age=3600");
+    request.setUpsert(false);
+});
+----
+
+* `retrieve` needs two requests, one for the object information and one for the content, and keeps the content in
+memory.
+* `delete` is idempotent: deleting a missing key returns an empty list instead of failing.
+* `copy` keeps the user metadata of the source object. Supabase Storage refuses to copy over an existing object, so an
+existing destination is deleted first; the two steps are not atomic.
+* Paginated listing uses the flat variant of the Supabase list API ordered by name, and the continuation token is bound
+to the prefix and page size of the request that produced it.
+* Pre-signed uploads use Supabase signed upload URLs. The server decides their validity
+(`UPLOAD_SIGNED_URL_EXPIRATION_TIME`, two hours by default), so the requested duration is not sent and the returned
+expiration is read from the signed token. The absolute URL is built from `micronaut.http.services.supabase.url` when
+set, otherwise from the project URL; without either, `createPresignedUpload` returns an empty optional.
+* Buckets are created private without size or MIME type limits, and Supabase Storage only deletes empty buckets. Use
+the `SupabaseStorageClient` directly for other bucket settings, lifecycle rules, signed download URLs or image
+transformations.
+* Multipart uploads are not implemented: Supabase exposes them through its S3-compatible and TUS endpoints, not through
+the REST API this module uses.
+
+The reactive beans, api:objectstorage.supabase.SupabaseStorageReactiveOperations[] and
+api:objectstorage.supabase.SupabaseReactiveBucketOperations[], are built on the non-blocking
+`ReactiveSupabaseStorageClient` of Micronaut Supabase, so no request runs on the blocking executor; only the content
+of an upload request that is not already in memory is read there. Nothing is sent until a returned publisher is
+subscribed to, and every failure, including a missing key, is signalled as an error. The reactive beans follow the same
+rules as the blocking ones: credentials, the `copy` delete-then-copy fallback, the continuation token, and the mapping of
+not-found answers to empty results.
+
+== Testing
+
+The module's own tests run against the https://github.com/supabase/storage[`supabase/storage-api`] Docker image backed
+by PostgreSQL, started with Testcontainers in single-tenant mode with the file backend. Point `micronaut.http.services.supabase.url`
+at such a server and set `supabase.storage-path` to an empty string, because a bare Storage API server serves its routes
+at the root instead of under `/storage/v1`.
