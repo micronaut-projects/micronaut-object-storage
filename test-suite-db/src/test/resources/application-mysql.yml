@@ -1,0 +1,8 @@
+datasources:
+  default:
+    db-type: mysql
+    dialect: MYSQL
+test-resources:
+  containers:
+    mysql:
+      image-name: mysql:8.4
