@@ -204,10 +204,10 @@ final class LocalStorageLayout {
 
     List<Path> multipartCleanupDirectories() {
         Path multipartBucketDirectory = multipartBucketDirectory();
+        // The shared internal root can be in use by another operation even while it is empty.
         return List.of(
             multipartBucketDirectory,
-            multipartBucketDirectory.getParent(),
-            rootInternalDirectory()
+            multipartBucketDirectory.getParent()
         );
     }
 
@@ -243,15 +243,6 @@ final class LocalStorageLayout {
             multipartBucketDirectory(name),
             snapshotBucketDirectory(name),
             temporaryBucketDirectory(name)
-        );
-    }
-
-    List<Path> snapshotCleanupDirectories() {
-        Path snapshotBucketDirectory = snapshotBucketDirectory();
-        return List.of(
-            snapshotBucketDirectory,
-            snapshotBucketDirectory.getParent(),
-            rootInternalDirectory()
         );
     }
 
