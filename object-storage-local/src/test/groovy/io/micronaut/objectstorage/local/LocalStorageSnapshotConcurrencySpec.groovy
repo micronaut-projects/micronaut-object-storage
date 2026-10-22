@@ -166,21 +166,7 @@ class LocalStorageSnapshotConcurrencySpec extends Specification {
                 executor.submit({
                     ready.countDown()
                     assert start.await(10, TimeUnit.SECONDS)
-                    switch (operation) {
-                        case 'copy':
-                            operations.copy('source.txt', key)
-                            break
-                        case 'delete':
-                            operations.delete(key)
-                            break
-                        default:
-                            operations.upload(UploadRequest.fromBytes('payload'.bytes, key))
-                    }
-                    if (operation == 'delete') {
-                        assert !Files.exists(bucket.resolve(key))
-                    } else {
-                        assert Files.readString(bucket.resolve(key)) == 'payload'
-                    }
+                    performOperationAndVerify(operation, operations, bucket, key)
                 } as Callable)
             }
             try {
@@ -208,5 +194,23 @@ class LocalStorageSnapshotConcurrencySpec extends Specification {
         'copy'    | 1
         'delete'  | 1
         'delete'  | 2
+    }
+
+    private static void performOperationAndVerify(String operation, LocalStorageOperations operations, Path bucket, String key) {
+        switch (operation) {
+            case 'copy':
+                operations.copy('source.txt', key)
+                break
+            case 'delete':
+                operations.delete(key)
+                break
+            default:
+                operations.upload(UploadRequest.fromBytes('payload'.bytes, key))
+        }
+        if (operation == 'delete') {
+            assert !Files.exists(bucket.resolve(key))
+        } else {
+            assert Files.readString(bucket.resolve(key)) == 'payload'
+        }
     }
 }
