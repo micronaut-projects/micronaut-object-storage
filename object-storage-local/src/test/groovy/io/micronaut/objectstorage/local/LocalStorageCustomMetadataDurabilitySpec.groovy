@@ -238,7 +238,8 @@ class LocalStorageCustomMetadataDurabilitySpec extends AbstractLocalStorageCusto
         operations.exists('destination.txt')
         def entry = operations.retrieve('destination.txt').get()
         new String(entry.inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'destination'
-        !Files.exists(snapshotBucketDirectory(entry.nativeEntry))
+        Files.isDirectory(snapshotBucketDirectory(entry.nativeEntry))
+        Files.list(snapshotBucketDirectory(entry.nativeEntry)).withCloseable { it.findAny().isEmpty() }
     }
 
     void 'failed copy metadata save cannot restore over concurrent destination upload'() {
@@ -309,7 +310,8 @@ class LocalStorageCustomMetadataDurabilitySpec extends AbstractLocalStorageCusto
         operations.exists('delete-failure.txt')
         def entry = operations.retrieve('delete-failure.txt').get()
         new String(entry.inputStream.readAllBytes(), StandardCharsets.UTF_8) == 'content'
-        !Files.exists(snapshotBucketDirectory(entry.nativeEntry))
+        Files.isDirectory(snapshotBucketDirectory(entry.nativeEntry))
+        Files.list(snapshotBucketDirectory(entry.nativeEntry)).withCloseable { it.findAny().isEmpty() }
     }
 
     private static void replaceSnapshotsWithNonEmptyDirectories(Path snapshotDirectory) {

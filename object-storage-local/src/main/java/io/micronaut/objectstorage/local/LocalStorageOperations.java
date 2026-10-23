@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
@@ -438,7 +437,6 @@ public class LocalStorageOperations implements ObjectStorageOperations<
 
     private StoredFileSnapshot snapshotStoredFile(Path file) {
         Path snapshotDirectory = layout.snapshotBucketDirectory();
-        List<Path> cleanupDirectories = layout.snapshotCleanupDirectories();
         try {
             LocalStorageIoSupport.rejectSymbolicLinks(layout.storageRoot(), snapshotDirectory);
             mkdirs(layout.rootInternalDirectory(), snapshotDirectory);
@@ -449,16 +447,13 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 ".snapshot",
                 supportsPosixPermissions
             );
-            return copyStoredFileToSnapshot(file, snapshot, cleanupDirectories);
+            return copyStoredFileToSnapshot(file, snapshot);
         } catch (NoSuchFileException e) {
             if (isMissingStoredFile(file, e)) {
-                deleteEmptySnapshotDirectories(cleanupDirectories, null);
                 return StoredFileSnapshot.empty();
             }
-            deleteEmptySnapshotDirectories(cleanupDirectories, e);
             throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         } catch (IOException e) {
-            deleteEmptySnapshotDirectories(cleanupDirectories, e);
             throw new ObjectStorageException("Error snapshotting file before update: " + file, e);
         }
     }
@@ -467,7 +462,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
         return file.toString().equals(e.getFile());
     }
 
-    private StoredFileSnapshot copyStoredFileToSnapshot(Path file, Path snapshot, List<Path> cleanupDirectories) throws IOException {
+    private StoredFileSnapshot copyStoredFileToSnapshot(Path file, Path snapshot) throws IOException {
         try (InputStream in = newInputStreamNoFollow(file);
              OutputStream out = Files.newOutputStream(snapshot)) {
             in.transferTo(out);
@@ -479,7 +474,7 @@ public class LocalStorageOperations implements ObjectStorageOperations<
             }
             throw e;
         }
-        return new StoredFileSnapshot(snapshot, cleanupDirectories);
+        return new StoredFileSnapshot(snapshot);
     }
 
     private boolean restoreStoredFileAfterFailure(Path file, StoredFileSnapshot snapshot, RuntimeException failure) {
@@ -512,27 +507,11 @@ public class LocalStorageOperations implements ObjectStorageOperations<
                 recordSnapshotCleanupFailure(failure, e);
             }
         }
-        deleteEmptySnapshotDirectories(snapshot.cleanupDirectories(), failure);
+        // Retain shared directories: another operation may be about to create its snapshot file.
     }
 
     static Optional<String> reservedLocalStorageNamespace(String name) {
         return LocalStorageLayout.reservedLocalStorageNamespace(name);
-    }
-
-    private void deleteEmptySnapshotDirectories(List<Path> directories, Throwable failure) {
-        deleteEmptyDirectories(directories, failure);
-    }
-
-    private void deleteEmptyDirectories(List<Path> directories, Throwable failure) {
-        for (Path directory : directories) {
-            try {
-                Files.deleteIfExists(directory);
-            } catch (DirectoryNotEmptyException ignored) {
-                // Another snapshot or provider-managed file still uses this directory.
-            } catch (IOException e) {
-                recordSnapshotCleanupFailure(failure, e);
-            }
-        }
     }
 
     private static void recordSnapshotCleanupFailure(Throwable failure, IOException cleanupFailure) {
@@ -578,9 +557,9 @@ public class LocalStorageOperations implements ObjectStorageOperations<
      */
     public record LocalStorageFile(Path path) { }
 
-    private record StoredFileSnapshot(Path path, List<Path> cleanupDirectories) {
+    private record StoredFileSnapshot(Path path) {
         static StoredFileSnapshot empty() {
-            return new StoredFileSnapshot(null, List.of());
+            return new StoredFileSnapshot(null);
         }
 
         boolean exists() {
