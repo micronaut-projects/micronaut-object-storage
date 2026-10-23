@@ -2741,7 +2741,9 @@ multipart upload state lives under
 and in-flight local file writes use typed provider temp directories under <code>.mn-storage/tmp/&lt;bucket&gt;</code>, such as <code>objects</code>,
 <code>object-metadata</code>, and <code>bucket-metadata</code>. Before creating a new replacement temporary file, local writes opportunistically
 attempt best-effort removal of matching replacement temporary files older than one day from the relevant typed provider
-temp directory. Rollback snapshots are normally removed after the local mutation completes, but a cleanup failure after a
+temp directory. Rollback snapshot files are normally removed after the local mutation completes. Empty snapshot directories
+and the shared internal root are retained so cleanup cannot race with concurrent directory or snapshot creation.
+Bucket deletion removes the bucket&#8217;s snapshot directory. A cleanup failure after a
 committed mutation can leave snapshot cleanup debt; rollback snapshots are not part of the one-day replacement temp
 cleanup. Temp-file replacement uses atomic moves where supported by the local file system, with a non-atomic replace
 fallback and best-effort directory synchronization where those operations are unavailable. Within a single JVM, local
