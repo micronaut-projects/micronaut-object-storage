@@ -9,6 +9,10 @@ The object storage specific configuration options available are:
 
 include::{includedir}configurationProperties/io.micronaut.objectstorage.googlecloud.GoogleCloudStorageConfiguration.adoc[]
 
+The module-wide configuration options available are:
+
+include::{includedir}configurationProperties/io.micronaut.objectstorage.googlecloud.GoogleCloudStorageModuleConfiguration.adoc[]
+
 For example:
 
 .`src/main/resources/application-gcp.yml`
@@ -28,7 +32,18 @@ The `gs:` alias only resolves buckets that are already configured under `microna
 
 == Advanced configuration
 
-For configuration properties other than the specified above, you can add bean to your application that implements
+The Google Cloud Storage client uses the JSON-over-HTTP transport by default. To use the gRPC transport, set
+`grpc-enabled` to `true`:
+
+[configuration]
+----
+micronaut:
+  object-storage:
+    gcp:
+      grpc-enabled: true
+----
+
+For configuration properties other than the specified above, you can add a bean to your application that implements
 https://docs.micronaut.io/latest/guide/#events[`BeanCreatedEventListener`]. For example:
 
 [source,java]
