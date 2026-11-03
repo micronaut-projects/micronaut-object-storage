@@ -64,8 +64,6 @@ import io.micronaut.objectstorage.response.ListObjectsResponse;
 import io.micronaut.objectstorage.response.PresignedUpload;
 import io.micronaut.objectstorage.response.UploadResponse;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -99,7 +97,6 @@ public class OracleCloudStorageOperations
         com.oracle.bmc.objectstorage.responses.CommitMultipartUploadResponse> {
 
     private static final int DEFAULT_LIST_PAGE_SIZE = 1_000;
-    private static final Logger LOG = LoggerFactory.getLogger(OracleCloudStorageOperations.class);
 
     private final OracleCloudStorageConfiguration configuration;
     private final ObjectStorage client;
@@ -181,10 +178,10 @@ public class OracleCloudStorageOperations
             OracleCloudStorageEntry storageEntry = new OracleCloudStorageEntry(key, objectResponse);
             return Optional.of(storageEntry);
         } catch (BmcException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Error when trying to retrieve an object from Oracle Cloud Storage: {}", e.getMessage(), e);
+            if (isObjectAbsent(key, e)) {
+                return Optional.empty();
             }
-            return Optional.empty();
+            throw new ObjectStorageException("Error when trying to retrieve an object from Oracle Cloud Storage", e);
         }
     }
 
@@ -198,6 +195,10 @@ public class OracleCloudStorageOperations
                 .objectName(key)
                 .build());
         } catch (BmcException e) {
+            if (isObjectAbsent(key, e)) {
+                // Preserve a non-null response for an idempotent delete of confirmed-absent bytes.
+                return DeleteObjectResponse.builder().__httpStatusCode__(204).opcRequestId(e.getOpcRequestId()).build();
+            }
             throw new ObjectStorageException("Error when trying to delete an object from Oracle Cloud Storage", e);
         }
     }
@@ -212,8 +213,17 @@ public class OracleCloudStorageOperations
                 .build());
             return true;
         } catch (BmcException e) {
-            return false;
+            if (e.getStatusCode() == 404) {
+                return !isObjectAbsent(key, e);
+            }
+            throw new ObjectStorageException("Error when checking if an object exists in Oracle Cloud Storage", e);
         }
+    }
+
+    private boolean isObjectAbsent(String key, BmcException failure) {
+        // OCI can use the same 404 for missing objects and denied access, including bodyless HEAD responses.
+        // Only a successful listing can establish absence; listing failures must propagate.
+        return failure.getStatusCode() == 404 && !listObjects(new ListObjectsRequest(1, key, null)).getKeys().contains(key);
     }
 
     @NonNull
@@ -249,10 +259,7 @@ public class OracleCloudStorageOperations
                 .toList();
             return new ListObjectsResponse(keys, response.getListObjects().getNextStartWith());
         } catch (BmcException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Error when listing the objects in the bucket {} from Oracle Cloud Storage: {}", bucket, e.getMessage(), e);
-            }
-            return new ListObjectsResponse(Collections.emptyList());
+            throw new ObjectStorageException("Error when listing objects in Oracle Cloud Storage", e);
         }
     }
 
