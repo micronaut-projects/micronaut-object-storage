@@ -1,0 +1,9 @@
+{
+  "resources": {
+    "includes": [
+      { "pattern": "\\QMETA-INF/micronaut-object-storage-db/\\E.*\\.sql" },
+      { "pattern": "\\Qdb/micronaut-object-storage-db/\\E.*\\.sql" },
+      { "pattern": "\\Qdb/changelog/micronaut-object-storage-db/\\E.*\\.xml" }
+    ]
+  }
+}
