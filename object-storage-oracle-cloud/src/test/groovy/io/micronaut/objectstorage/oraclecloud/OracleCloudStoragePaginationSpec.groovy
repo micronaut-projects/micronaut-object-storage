@@ -5,6 +5,7 @@ import com.oracle.bmc.model.BmcException
 import com.oracle.bmc.objectstorage.ObjectStorage
 import com.oracle.bmc.objectstorage.model.ListObjects
 import com.oracle.bmc.objectstorage.model.ObjectSummary
+import io.micronaut.objectstorage.ObjectStorageException
 import io.micronaut.objectstorage.request.ListObjectsRequest
 import spock.lang.Specification
 
@@ -94,7 +95,7 @@ class OracleCloudStoragePaginationSpec extends Specification {
         allKeys == ['animals/cat.txt', 'animals/dog.txt', 'animals/mammals/fox.txt', 'plants/oak.txt'] as LinkedHashSet
     }
 
-    void 'it returns empty portable pages when OCI listing fails'() {
+    void 'it propagates OCI listing failures instead of returning empty pages'() {
         given:
         OracleCloudStorageConfiguration configuration = Stub() {
             getBucket() >> 'bucket'
@@ -105,18 +106,19 @@ class OracleCloudStoragePaginationSpec extends Specification {
         OracleCloudStorageOperations operations = new OracleCloudStorageOperations(configuration, client, regionProvider)
 
         when:
-        def response = operations.listObjects(new ListObjectsRequest(3, 'animals/', 'animals/cat.txt'))
-        def allKeys = operations.listObjects()
+        operations.listObjects(new ListObjectsRequest(3, 'animals/', 'animals/cat.txt'))
 
         then:
         1 * client.listObjects(_ as com.oracle.bmc.objectstorage.requests.ListObjectsRequest) >> { throw bmcException('boom') }
-        1 * client.listObjects(_ as com.oracle.bmc.objectstorage.requests.ListObjectsRequest) >> { throw bmcException('boom') }
-        0 * _
+        thrown(ObjectStorageException)
 
-        and:
-        response.keys == []
-        !response.continuationToken.present
-        allKeys.isEmpty()
+        when:
+        operations.listObjects()
+
+        then:
+        1 * client.listObjects(_ as com.oracle.bmc.objectstorage.requests.ListObjectsRequest) >> { throw bmcException('boom') }
+        thrown(ObjectStorageException)
+        0 * _
     }
 
     private static com.oracle.bmc.objectstorage.responses.ListObjectsResponse ociListResponse(List<String> keys, String nextStartWith) {
