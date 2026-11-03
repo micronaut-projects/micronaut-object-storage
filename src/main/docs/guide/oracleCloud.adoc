@@ -20,6 +20,12 @@ include::doc-examples/example-java/src/test/resources/application-oraclecloud.ym
 The concrete implementation of `ObjectStorageOperations` is api:objectstorage.oraclecloud.OracleCloudStorageOperations[].
 It also implements api:objectstorage.multipart.MultipartObjectStorageOperations[] for multipart upload lifecycle support.
 
+The blocking object operations propagate provider failures as `ObjectStorageException` instead of reporting missing
+objects or empty listings. OCI can return HTTP 404 for both missing objects and denied access. After an object 404,
+the adapter confirms absence with a prefix-filtered listing, which requires permission to list objects in the bucket.
+If that check fails, the original operation fails rather than assuming absence. Deleting a confirmed-absent object is
+idempotent and returns a `DeleteObjectResponse` with status 204; the object was not deleted again.
+
 You can also resolve objects through Micronaut's `ResourceLoader` abstraction:
 
 * Named storage URI: `pictures://avatars/logo.png`
