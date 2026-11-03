@@ -22,6 +22,8 @@ Portable contract:
   configuration, return `Optional.empty()`.
 * Oracle Cloud uses OCI pre-authenticated requests for this API and returns the upload URL as the portable signed request URI.
 * Local storage does not support this API because it has no HTTP endpoint to sign.
+* Supabase Storage uses signed upload URLs. The server decides their validity, so the requested duration is not
+  honoured and the returned expiration is the one of the signed token. See <<supabase, Supabase Storage>>.
 
 The following controller example returns a JSON payload your frontend can use to upload directly to object storage:
 

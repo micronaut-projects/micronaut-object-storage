@@ -1,0 +1,10 @@
+supabase:
+  project-id: abcdefghijklmnopqrst
+  publishable-key: ${SUPABASE_PUBLISHABLE_KEY}
+  secret-key: ${SUPABASE_SECRET_KEY}
+
+micronaut:
+  object-storage:
+    supabase:
+      default:
+        bucket: profile-pictures-bucket
