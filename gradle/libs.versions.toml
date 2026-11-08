@@ -12,12 +12,10 @@ micronaut-logging = "2.1.0"
 
 gcp-libraries = "26.93.0"
 bytebuddy = "1.18.17-jdk5"
-
 # Gradle plugins
 micronaut-gradle-plugin = "5.0.2"
 kotlin-gradle-plugin = "2.4.21"
 kotlin-gradle-ksp-plugin = "2.3.13"
-
 [libraries]
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
@@ -46,7 +44,7 @@ micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-
 micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 micronaut-core-reactive = { module = "io.micronaut:micronaut-core-reactive" }
 
-bytebuddy = "1.18.17-jdk5"
+bytebuddy = { module = 'net.bytebuddy:byte-buddy', version.ref = 'bytebuddy' }
 
 # Plugins
 gradle-micronaut = { module = 'io.micronaut.gradle:micronaut-gradle-plugin', version.ref = 'micronaut-gradle-plugin' }
