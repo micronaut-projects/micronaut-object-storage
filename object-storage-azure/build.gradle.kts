@@ -8,10 +8,10 @@ dependencies {
     api(libs.azure.storage.blob)
 
     constraints {
-        api("com.fasterxml.jackson.core:jackson-core:2.22.3") {
+        api("com.fasterxml.jackson.core:jackson-core:2.22.4") {
             because("Require a version without the known Jackson vulnerabilities brought by the Azure SDK")
         }
-        api("com.fasterxml.jackson.core:jackson-databind:2.22.3") {
+        api("com.fasterxml.jackson.core:jackson-databind:2.22.4") {
             because("Require a version without the known Jackson vulnerabilities brought by the Azure SDK")
         }
     }
