@@ -1,0 +1,8 @@
+datasources:
+  default:
+    db-type: mariadb
+    dialect: MYSQL
+test-resources:
+  containers:
+    mariadb:
+      image-name: mariadb:11.4

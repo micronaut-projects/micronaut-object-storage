@@ -1,0 +1,8 @@
+datasources:
+  default:
+    db-type: postgres
+    dialect: POSTGRES
+test-resources:
+  containers:
+    postgres:
+      image-name: postgres:17-alpine
