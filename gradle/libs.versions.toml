@@ -1,6 +1,6 @@
 [versions]
-micronaut-platform = "5.2.5"
-micronaut = "5.2.22"
+micronaut-platform = "5.2.6"
+micronaut = "5.2.23"
 micronaut-test = "5.1.0"
 micronaut-aws = "5.1.1"
 micronaut-azure = "6.2.0"
@@ -15,7 +15,7 @@ bytebuddy = "1.18.17-jdk5"
 # Gradle plugins
 micronaut-gradle-plugin = "5.0.2"
 kotlin-gradle-plugin = "2.4.21"
-kotlin-gradle-ksp-plugin = "2.3.13"
+kotlin-gradle-ksp-plugin = "2.3.14"
 [libraries]
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }

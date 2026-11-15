@@ -11,7 +11,7 @@ dependencies {
         exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
     }
     constraints {
-        api("io.opentelemetry:opentelemetry-api:1.67.0") {
+        api("io.opentelemetry:opentelemetry-api:1.68.0") {
             because("Require a version without GHSA-ccrj-gw8r-854m brought by google-cloud-storage")
         }
         api("com.fasterxml.jackson.core:jackson-core:2.23.0") {
