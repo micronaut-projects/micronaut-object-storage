@@ -68,8 +68,6 @@ jobs:
            ORACLE_CLOUD_TEST_NAMESPACE: ${{ secrets.ORACLE_CLOUD_TEST_NAMESPACE }}
            ORACLE_CLOUD_TEST_COMPARTMENT_ID: ${{ secrets.ORACLE_CLOUD_TEST_COMPARTMENT_ID }}
            GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
-           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "false"
       - name: Build with Gradle (pull requests)
         if: github.event_name == 'pull_request'

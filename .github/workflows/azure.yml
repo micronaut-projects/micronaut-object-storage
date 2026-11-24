@@ -63,8 +63,6 @@ jobs:
            AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
            AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT: ${{ secrets.AZURE_TEST_STORAGE_ACCOUNT_ENDPOINT }}
            GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
-           GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
-           GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
            PREDICTIVE_TEST_SELECTION: "false"
       - name: Build with Gradle (pull requests)
         if: github.event_name == 'pull_request'
