@@ -1,0 +1,6 @@
+micronaut:
+  object-storage:
+    db:
+      # each spec configures its own storage; these defaults apply to all of them
+      health:
+        enabled: false

@@ -9,9 +9,12 @@ dependencies {
 
     testImplementation(projects.micronautObjectStorageCore)
     testImplementation(projects.micronautObjectStorageLocal)
+    testImplementation(projects.micronautObjectStorageDb)
+    testImplementation(mnSql.micronaut.jdbc.hikari)
     testImplementation(mnTest.micronaut.test.junit5)
 
     testRuntimeOnly(mnLogging.logback.classic)
+    testRuntimeOnly(mnSql.h2)
     testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnTest.junit.platform.launcher)
 }

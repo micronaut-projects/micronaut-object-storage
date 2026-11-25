@@ -1,0 +1,9 @@
+datasources:
+  default:
+    db-type: mssql
+    dialect: SQL_SERVER
+test-resources:
+  containers:
+    mssql:
+      image-name: mcr.microsoft.com/mssql/server:2022-latest
+      accept-license: true
