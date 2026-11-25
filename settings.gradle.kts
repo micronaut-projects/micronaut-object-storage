@@ -23,6 +23,7 @@ include("object-storage-aws")
 include("object-storage-azure")
 include("object-storage-gcp")
 include("object-storage-oracle-cloud")
+include("object-storage-supabase")
 include("object-storage-local")
 include("test-suite-graal")
 
@@ -38,6 +39,7 @@ configure<MicronautBuildSettingsExtension> {
     importMicronautCatalog("micronaut-azure")
     importMicronautCatalog("micronaut-gcp")
     importMicronautCatalog("micronaut-oracle-cloud")
+    importMicronautCatalog("micronaut-serde")
     importMicronautCatalog("micronaut-test-resources")
     importMicronautCatalog("micronaut-validation")
 }

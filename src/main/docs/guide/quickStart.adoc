@@ -5,6 +5,7 @@ provider documentation for more details:
 * <<azure, Azure Blob Storage>>.
 * <<gcp, Google Cloud Storage>>.
 * <<oracleCloud, Oracle Cloud Infrastructure (OCI) Object Storage>>.
+* <<supabase, Supabase Storage>>.
 
 Then, you can inject in your controllers/services/etc. a bean of type api:objectstorage.ObjectStorageOperations[], the
 parent interface that allows you to use the API in a generic way for all cloud providers:
